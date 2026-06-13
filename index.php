@@ -151,7 +151,7 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
 
         /* ─── HERO ─── */
         .hero {
-            min-height: 85vh;
+            min-height: 100vh;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -367,6 +367,10 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
 
         /* ─── MODULES SECTION ─── */
         .section {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
             max-width: 1180px;
             margin: 0 auto;
             padding: 110px 24px;
@@ -568,7 +572,14 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
 
         /* ─── PHILOSOPHY SECTION ─── */
         .story-section {
-            background: transparent;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 100px 24px;
+            width: 100%;
+            text-align: center;
+            position: relative;
         }
 
         .story-inner {
@@ -624,8 +635,12 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
         .t-gap { height: 0.4rem; }
         .t-cursor { display: inline-block; width: 8px; height: 13px; background: var(--green); animation: blink 1.1s step-start infinite; vertical-align: middle; }
 
-        /* ─── BETA ─── */
+        /* ─── BETA CTA ─── */
         .beta-wrap {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
             max-width: 1180px;
             margin: 0 auto;
             padding: 110px 24px;
@@ -798,6 +813,10 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
         }
         /* ─── NEW STORY SECTIONS ─── */
         .story-section {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
             padding: 100px 24px;
             width: 100%;
             text-align: center;
