@@ -1280,7 +1280,7 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
                 The <strong style="color:#fff">Logics</strong> half keeps us grounded. This isn't a game — people's livelihoods depend on accurate payroll, fair reviews, and secure personal data. We bring the energy of gaming culture with the discipline of enterprise software.
             </p>
             <p style="font-size: 1rem; color: var(--text); line-height: 1.8; font-weight: 500; text-align: left;">
-                Built in the Philippines 🇵🇭, for companies that take their people seriously — without taking themselves too seriously.
+                Built in the Philippines <img src="https://flagcdn.com/ph.svg" width="20" alt="PH" style="vertical-align: middle; margin-left: 2px; margin-top: -3px; border-radius: 2px;">, for companies that take their people seriously — without taking themselves too seriously.
             </p>
         </div>
 
@@ -1387,7 +1387,7 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
 <footer>
     <div class="footer-inner">
         <div class="footer-copy">
-            © <?= date('Y') ?> Respawn Logics Inc. &nbsp;·&nbsp; Built in the Philippines 🇵🇭
+            © <?= date('Y') ?> Respawn Logics Inc. &nbsp;·&nbsp; Built in the Philippines <img src="https://flagcdn.com/ph.svg" width="16" alt="PH" style="vertical-align: middle; margin-left: 2px; margin-top: -2px; border-radius: 2px;">
         </div>
         <div class="footer-socials">
             <a href="#"><i class="fa-brands fa-linkedin"></i></a>
