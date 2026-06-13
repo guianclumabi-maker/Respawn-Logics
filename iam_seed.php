@@ -20,11 +20,17 @@ try {
     ");
 
     // We may need to alter permissions if it exists (from my previous run)
-    $pdo->exec("
-        ALTER TABLE permissions 
-        ADD COLUMN IF NOT EXISTS permission_group_id INT NULL AFTER id,
-        DROP COLUMN IF EXISTS module_name;
-    ");
+    try {
+        $pdo->exec("ALTER TABLE permissions ADD COLUMN permission_group_id INT NULL AFTER id");
+    } catch (PDOException $e) {
+        // Ignore if column already exists
+    }
+    
+    try {
+        $pdo->exec("ALTER TABLE permissions DROP COLUMN module_name");
+    } catch (PDOException $e) {
+        // Ignore if column already dropped
+    }
 
     try {
         $pdo->exec("
