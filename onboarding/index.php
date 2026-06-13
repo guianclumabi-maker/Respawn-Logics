@@ -1,3 +1,3 @@
 <?php
-header('Location: dist/');
+header('Location: dist/index.html');
 exit;
