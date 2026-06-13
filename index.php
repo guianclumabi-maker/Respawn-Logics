@@ -787,6 +787,198 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
             .hero-h1 { font-size: 2.75rem; }
             .hud { grid-template-columns: 1fr 1fr; }
         }
+        /* ─── NEW STORY SECTIONS ─── */
+        .story-section {
+            padding: 110px 24px;
+            max-width: 1200px;
+            margin: 0 auto;
+            text-align: center;
+        }
+        .story-section h2 {
+            font-size: clamp(2rem, 5vw, 3rem);
+            color: #fff;
+            margin-bottom: 24px;
+            line-height: 1.1;
+        }
+        .story-section p.sub {
+            font-size: 1.125rem;
+            color: var(--text-mid);
+            max-width: 700px;
+            margin: 0 auto 56px;
+            line-height: 1.6;
+        }
+
+        /* Journey Flow */
+        .journey-flow {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 40px;
+        }
+        .journey-node {
+            background: rgba(0,224,122,0.05);
+            border: 1px solid rgba(0,224,122,0.2);
+            padding: 12px 24px;
+            border-radius: 50px;
+            color: var(--green);
+            font-family: var(--mono);
+            font-weight: 600;
+            font-size: 0.875rem;
+        }
+        .journey-arrow {
+            color: var(--text-dim);
+            font-size: 0.875rem;
+        }
+
+        /* Problems Grid */
+        .problems-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+            margin-bottom: 40px;
+        }
+        .problem-card {
+            background: rgba(255,77,106,0.05);
+            border: 1px solid rgba(255,77,106,0.15);
+            border-radius: 10px;
+            padding: 24px;
+            text-align: left;
+            color: var(--red);
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        .problem-card i { font-size: 1.25rem; }
+        .solution-block {
+            background: linear-gradient(135deg, rgba(0,224,122,0.1), rgba(0,184,255,0.05));
+            border: 1px solid rgba(0,224,122,0.3);
+            border-radius: 12px;
+            padding: 32px;
+            font-size: 1.25rem;
+            color: #fff;
+            font-weight: 600;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        /* 4 Pillars */
+        .pillars-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 24px;
+        }
+        .pillar-card {
+            background: var(--bg2);
+            border: 1px solid var(--border2);
+            border-radius: 12px;
+            padding: 32px 24px;
+            text-align: left;
+        }
+        .pillar-card h3 {
+            font-size: 1.25rem;
+            color: #fff;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .pillar-card h3 i { color: var(--green); }
+        .pillar-card ul {
+            list-style: none;
+            color: var(--text-mid);
+            font-size: 0.9375rem;
+        }
+        .pillar-card ul li {
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .pillar-card ul li::before {
+            content: '\f054';
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            font-size: 0.625rem;
+            color: var(--green);
+        }
+
+        /* Why Teams Choose */
+        .why-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 24px;
+        }
+        @media (max-width: 768px) { .why-grid { grid-template-columns: 1fr; } }
+        .why-card {
+            background: var(--bg3);
+            border: 1px solid var(--border2);
+            border-radius: 12px;
+            padding: 40px;
+            text-align: left;
+            transition: transform 0.2s;
+        }
+        .why-card:hover { transform: translateY(-3px); border-color: rgba(0,224,122,0.3); }
+        .why-card i {
+            font-size: 2rem;
+            color: var(--green);
+            margin-bottom: 20px;
+        }
+        .why-card h3 {
+            font-size: 1.375rem;
+            color: #fff;
+            margin-bottom: 12px;
+        }
+        .why-card p {
+            color: var(--text-mid);
+            line-height: 1.6;
+        }
+
+        /* Split Section */
+        .split-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            align-items: center;
+            text-align: left;
+        }
+        @media (max-width: 900px) { .split-section { grid-template-columns: 1fr; text-align: center; } }
+        .split-image img {
+            width: 100%;
+            border-radius: 12px;
+            border: 1px solid var(--border2);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+        }
+
+        /* Gaming CTA */
+        .gaming-cta {
+            background: linear-gradient(135deg, var(--bg4), var(--bg2));
+            border-top: 1px solid var(--border2);
+            border-bottom: 1px solid var(--border2);
+            padding: 80px 24px;
+            text-align: center;
+        }
+        .gaming-flow {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 24px;
+            flex-wrap: wrap;
+            margin-top: 40px;
+        }
+        .gaming-step {
+            font-family: var(--mono);
+            font-size: 1.125rem;
+            font-weight: 700;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .gaming-step i { color: var(--green); }
+        .gaming-divider { color: var(--text-dim); }
     </style>
 </head>
 <body>
@@ -795,9 +987,9 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
 <nav>
     <?= renderLogo('navbar') ?>
     <div class="nav-links">
-        <a href="#modules">Modules</a>
+        <a href="#overview">Platform</a>
         <a href="deep_dive.php">Deep Dive</a>
-        <a href="#story">The Story</a>
+        <a href="#why">Why Us</a>
         <a href="#beta">Beta</a>
         <?php if ($loggedIn): ?>
             <a href="<?= url('/pages/dashboard.php') ?>" class="nav-cta">[ RESUME ]</a>
@@ -864,237 +1056,150 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
     </div>
 </section>
 
-<!-- MODULES -->
-<section class="section" id="modules">
-    <div class="eyebrow">// SKILL TREE — 17 MODULES</div>
-    <h2 class="section-h">Every feature your HR team<br>actually needs. All of them.</h2>
-    <p class="section-p">No padded feature lists. No "coming soon" gates. Every module below is live, secured, and wired into a single platform.</p>
-
-    <!-- MODULE FILTER TABS -->
-    <div class="module-tabs" id="module-tabs">
-        <button class="tab-btn active" data-filter="all">All Modules</button>
-        <button class="tab-btn" data-filter="core">Core HR</button>
-        <button class="tab-btn" data-filter="finance">Finance</button>
-        <button class="tab-btn" data-filter="talent">Talent</button>
-        <button class="tab-btn" data-filter="ops">Operations</button>
-        <button class="tab-btn" data-filter="platform">Platform</button>
-    </div>
-
-    <div class="module-grid">
-
-        <!-- 1. Onboarding Engine — WIDE -->
-        <div class="mod-card wide c-green" data-filter="ops">
-            <div class="mod-icon green"><i class="fa-solid fa-bolt-lightning"></i></div>
-            <span class="mod-tag green">SPAWN POINT</span>
-            <div class="mod-title">Universal Onboarding Engine</div>
-            <div class="mod-desc">Upload a CSV, map your columns, and the engine handles the rest. It checks for duplicates, structures your org hierarchy, assigns roles, and generates secure one-time activation links for every new hire. Zero manual re-entry. One upload — entire team online.</div>
-            <div class="xp">
-                <div class="xp-head"><span>Automation Level</span><span style="color:var(--green)">MAX</span></div>
-                <div class="xp-track"><div class="xp-fill" style="width:98%; background: var(--green);"></div></div>
-            </div>
-            <div class="mod-badge">MODULE 01</div>
-        </div>
-
-        <!-- 2. Core HR -->
-        <div class="mod-card c-blue" data-filter="core">
-            <div class="mod-icon blue"><i class="fa-solid fa-users"></i></div>
-            <span class="mod-tag blue">PARTY ROSTER</span>
-            <div class="mod-title">Core HR & Employee Records</div>
-            <div class="mod-desc">Full employee profiles, document storage, org chart, HR directory, and team hierarchy — all in one place.</div>
-            <div class="mod-badge">MODULE 02</div>
-        </div>
-
-        <!-- 3. Attendance -->
-        <div class="mod-card c-teal" data-filter="ops">
-            <div class="mod-icon teal"><i class="fa-solid fa-clock"></i></div>
-            <span class="mod-tag teal">TIME LOG</span>
-            <div class="mod-title">Attendance & Time Tracking</div>
-            <div class="mod-desc">Clock-in/out management, late detection, attendance reports, and shift scheduling with a visual weekly roster.</div>
-            <div class="mod-badge">MODULE 03</div>
-        </div>
-
-        <!-- 4. Payroll -->
-        <div class="mod-card c-amber" data-filter="finance">
-            <div class="mod-icon amber"><i class="fa-solid fa-peso-sign"></i></div>
-            <span class="mod-tag amber">GOLD FARM</span>
-            <div class="mod-title">Payroll Engine</div>
-            <div class="mod-desc">Pulls live attendance data. Auto-computes SSS, PhilHealth, Pag-IBIG, and BIR Withholding Tax. Generates downloadable payslips per run.</div>
-            <div class="xp">
-                <div class="xp-head"><span>Compliance Coverage</span><span style="color:var(--amber)">PH Statutory</span></div>
-                <div class="xp-track"><div class="xp-fill" style="width:100%; background: var(--amber);"></div></div>
-            </div>
-            <div class="mod-badge">MODULE 04</div>
-        </div>
-
-        <!-- 5. Leave -->
-        <div class="mod-card c-green" data-filter="core">
-            <div class="mod-icon green"><i class="fa-solid fa-calendar-check"></i></div>
-            <span class="mod-tag green">COOLDOWN</span>
-            <div class="mod-title">Leave Management</div>
-            <div class="mod-desc">Employees submit leave requests online. Team leads and managers approve through a two-tier system. Leave balances auto-update.</div>
-            <div class="mod-badge">MODULE 05</div>
-        </div>
-
-        <!-- 6. ATS -->
-        <div class="mod-card wide c-purple" data-filter="talent">
-            <div class="mod-icon purple"><i class="fa-solid fa-crosshairs"></i></div>
-            <span class="mod-tag purple">RECRUIT QUEUE</span>
-            <div class="mod-title">Applicant Tracking System (ATS)</div>
-            <div class="mod-desc">Post jobs, manage talent pools, run multi-stage interview pipelines with scorecards. When you hire a candidate, they're converted into a full employee record with one click — no re-entry.</div>
-            <div class="mod-badge">MODULE 06</div>
-        </div>
-
-        <!-- 7. Performance -->
-        <div class="mod-card c-purple" data-filter="talent">
-            <div class="mod-icon purple"><i class="fa-solid fa-ranking-star"></i></div>
-            <span class="mod-tag purple">RANK UP</span>
-            <div class="mod-title">Performance & KPIs</div>
-            <div class="mod-desc">Set goals per employee, run review cycles, and track scores. Give your people a visible progression system, not just an annual surprise.</div>
-            <div class="mod-badge">MODULE 07</div>
-        </div>
-
-        <!-- 8. AI Intelligence -->
-        <div class="mod-card c-blue" data-filter="core">
-            <div class="mod-icon blue"><i class="fa-solid fa-brain"></i></div>
-            <span class="mod-tag blue">AI BOSS</span>
-            <div class="mod-title">Predictive AI & Intelligence</div>
-            <div class="mod-desc">Calculates attrition risk per employee using behavioral signals. Flags flight risks before they resign. Also integrates an AI Career Coach inside every employee profile.</div>
-            <div class="mod-badge">MODULE 08</div>
-        </div>
-
-        <!-- 9. RBAC -->
-        <div class="mod-card c-green" data-filter="core">
-            <div class="mod-icon green"><i class="fa-solid fa-shield-halved"></i></div>
-            <span class="mod-tag green">ACCESS GATE</span>
-            <div class="mod-title">Roles & Permissions (RBAC)</div>
-            <div class="mod-desc">Custom roles with granular, per-action permissions. Employees see their data. Managers see their squad. Admins see everything. No accidental data leaks.</div>
-            <div class="mod-badge">MODULE 09</div>
-        </div>
-
-        <!-- 10. Benefits & Compensation -->
-        <div class="mod-card c-amber" data-filter="finance">
-            <div class="mod-icon amber"><i class="fa-solid fa-gift"></i></div>
-            <span class="mod-tag amber">PERKS SYSTEM</span>
-            <div class="mod-title">Benefits & Compensation</div>
-            <div class="mod-desc">Manage company benefit packages and salary structures. Track what each employee is entitled to with full admin controls.</div>
-            <div class="mod-badge">MODULE 10</div>
-        </div>
-
-        <!-- 11. ELR -->
-        <div class="mod-card c-red" data-filter="core">
-            <div class="mod-icon red"><i class="fa-solid fa-scale-balanced"></i></div>
-            <span class="mod-tag red">TRIBUNAL</span>
-            <div class="mod-title">Employee Relations (ELR)</div>
-            <div class="mod-desc">PIPs, disciplinary cases, disputes, and investigations — handled in strict access-controlled case files. The module where getting it wrong costs real money.</div>
-            <div class="mod-badge">MODULE 11</div>
-        </div>
-
-        <!-- 12. Expenses -->
-        <div class="mod-card c-teal" data-filter="ops">
-            <div class="mod-icon teal"><i class="fa-solid fa-receipt"></i></div>
-            <span class="mod-tag teal">LOOT DROP</span>
-            <div class="mod-title">Expense Management</div>
-            <div class="mod-desc">Employees submit expense reports with receipt uploads. Managers approve through a clean workflow. Finance gets a full audit trail.</div>
-            <div class="mod-badge">MODULE 12</div>
-        </div>
-
-        <!-- 13. Knowledge Base -->
-        <div class="mod-card c-blue" data-filter="core">
-            <div class="mod-icon blue"><i class="fa-solid fa-book-open"></i></div>
-            <span class="mod-tag blue">WIKI</span>
-            <div class="mod-title">Knowledge Base</div>
-            <div class="mod-desc">Internal company wiki for policies, SOPs, and guides. HR publishes it; employees read it. Searchable, organized, and always up to date.</div>
-            <div class="mod-badge">MODULE 13</div>
-        </div>
-
-        <!-- 14. Announcements + Surveys -->
-        <div class="mod-card wide c-purple" data-filter="talent">
-            <div class="mod-icon purple"><i class="fa-solid fa-bullhorn"></i></div>
-            <span class="mod-tag purple">BROADCAST</span>
-            <div class="mod-title">Announcements & Pulse Surveys</div>
-            <div class="mod-desc">Post company-wide announcements with image attachments via a LinkedIn-style feed. Run anonymous eNPS pulse surveys — the system mathematically separates identity from answers, so employees actually tell the truth. Live eNPS score updates on the admin dashboard as responses come in.</div>
-            <div class="mod-badge">MODULE 14</div>
-        </div>
-
-        <!-- 15. Asset Management -->
-        <div class="mod-card c-teal" data-filter="ops">
-            <div class="mod-icon teal"><i class="fa-solid fa-laptop"></i></div>
-            <span class="mod-tag teal">INVENTORY</span>
-            <div class="mod-title">Asset Management</div>
-            <div class="mod-desc">Track company-issued equipment. Log who has what, when it was issued, and current condition. Never lose track of company property again.</div>
-            <div class="mod-badge">MODULE 15</div>
-        </div>
-
-        <!-- 16. Audit Logs -->
-        <div class="mod-card c-red" data-filter="core">
-            <div class="mod-icon red"><i class="fa-solid fa-scroll"></i></div>
-            <span class="mod-tag red">KILL FEED</span>
-            <div class="mod-title">Audit Trail & Logs</div>
-            <div class="mod-desc">A paginated, searchable ledger of every action taken in the system. Multi-tenant isolated — your data never bleeds into another company's logs.</div>
-            <div class="mod-badge">MODULE 16</div>
-        </div>
-
-        <!-- 17. ESM / Support -->
-        <div class="mod-card c-green" data-filter="core">
-            <div class="mod-icon green"><i class="fa-solid fa-headset"></i></div>
-            <span class="mod-tag green">HELP DESK</span>
-            <div class="mod-title">Employee Service Management</div>
-            <div class="mod-desc">Internal IT and HR helpdesk system. Employees submit tickets, support agents respond with priority tracking and SLA monitoring built in.</div>
-            <div class="mod-badge">MODULE 17</div>
-        </div>
-
+<!-- SECTION 1: JOURNEY -->
+<section class="story-section" id="journey">
+    <h2>Manage every stage of the employee journey</h2>
+    <p class="sub">From recruitment and onboarding to payroll, performance, and employee support, Respawn Logic helps organizations manage their workforce from a single platform.</p>
+    
+    <div class="journey-flow">
+        <div class="journey-node">Recruit</div> <i class="fa-solid fa-arrow-right journey-arrow"></i>
+        <div class="journey-node">Hire</div> <i class="fa-solid fa-arrow-right journey-arrow"></i>
+        <div class="journey-node">Onboard</div> <i class="fa-solid fa-arrow-right journey-arrow"></i>
+        <div class="journey-node">Work</div> <i class="fa-solid fa-arrow-right journey-arrow"></i>
+        <div class="journey-node">Pay</div> <i class="fa-solid fa-arrow-right journey-arrow"></i>
+        <div class="journey-node">Develop</div> <i class="fa-solid fa-arrow-right journey-arrow"></i>
+        <div class="journey-node">Support</div> <i class="fa-solid fa-arrow-right journey-arrow"></i>
+        <div class="journey-node" style="background: rgba(155,109,255,0.1); border-color: var(--purple); color: var(--purple);">Grow</div>
     </div>
 </section>
 
-<hr class="divider">
+<!-- SECTION 2: PROBLEMS ELIMINATED -->
+<section class="story-section" id="problems" style="background: var(--bg2);">
+    <h2>Stop managing people across disconnected tools</h2>
+    
+    <div class="problems-grid">
+        <div class="problem-card"><i class="fa-solid fa-file-excel"></i> Spreadsheets</div>
+        <div class="problem-card"><i class="fa-solid fa-clock-rotate-left"></i> Manual Tracking</div>
+        <div class="problem-card"><i class="fa-solid fa-envelope-open-text"></i> Email Approvals</div>
+        <div class="problem-card"><i class="fa-solid fa-money-bill-transfer"></i> Payroll Rework</div>
+        <div class="problem-card"><i class="fa-solid fa-folder-tree"></i> Scattered Documents</div>
+        <div class="problem-card"><i class="fa-solid fa-server"></i> Disconnected Records</div>
+    </div>
 
-<!-- STORY -->
-<div class="story-section" id="story">
-    <div class="story-inner">
-        <div>
-            <div class="eyebrow">// THE LORE</div>
-            <h2 class="section-h" style="margin-bottom: 24px;">Built by someone who plays games and hates boring HR software.</h2>
-            <p style="font-size: 1rem; color: var(--text-mid); line-height: 1.8; margin-bottom: 20px;">
-                In every game, dying isn't the end. You <strong style="color:#fff">respawn</strong>. You come back smarter, better equipped, with another shot at the objective. That's the mindset we think every company should have toward its people — second chances, continuous growth, and the belief that your team can always level up.
-            </p>
-            <p style="font-size: 1rem; color: var(--text-mid); line-height: 1.8; margin-bottom: 20px;">
-                The <strong style="color:#fff">Logics</strong> half keeps us grounded. This isn't a game — people's livelihoods depend on accurate payroll, fair reviews, and secure personal data. We bring the energy of gaming culture with the discipline of enterprise software.
-            </p>
-            <p style="font-size: 1rem; color: var(--text); line-height: 1.8; font-weight: 500;">
-                Built in the Philippines 🇵🇭, for companies that take their people seriously — without taking themselves too seriously.
-            </p>
+    <div class="solution-block">
+        Respawn Logic brings your people data, workflows, and processes into one place.
+    </div>
+</section>
+
+<!-- SECTION 3: PLATFORM OVERVIEW (4 PILLARS) -->
+<section class="story-section" id="overview">
+    <h2>Everything you need. Nothing you don't.</h2>
+    <p class="sub">A unified platform built on four core pillars.</p>
+
+    <div class="pillars-grid">
+        <div class="pillar-card">
+            <h3><i class="fa-solid fa-users-gear"></i> Workforce</h3>
+            <ul>
+                <li>Attendance</li>
+                <li>Leave Management</li>
+                <li>Scheduling</li>
+                <li>Organization Structure</li>
+            </ul>
         </div>
-
-        <div class="terminal">
-            <div class="term-bar">
-                <div class="t-dot r"></div>
-                <div class="t-dot y"></div>
-                <div class="t-dot g"></div>
-                <span class="term-file">respawn-logics ~ system.log</span>
-            </div>
-            <div class="term-body">
-                <div class="t-row"><span class="t-p">▶</span><span class="t-c">./respawn <span style="color:var(--green)">--boot</span></span></div>
-                <div class="t-o t-cm"># Initializing core modules...</div>
-                <div class="t-o"><span style="color:var(--green)">✔</span> onboarding.engine &nbsp;&nbsp; <span class="t-v">READY</span></div>
-                <div class="t-o"><span style="color:var(--green)">✔</span> payroll.engine &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="t-v">READY</span></div>
-                <div class="t-o"><span style="color:var(--green)">✔</span> ats.pipeline &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="t-v">READY</span></div>
-                <div class="t-o"><span style="color:var(--green)">✔</span> ai.intelligence &nbsp;&nbsp;&nbsp;&nbsp; <span class="t-v">READY</span></div>
-                <div class="t-o"><span style="color:var(--green)">✔</span> rbac.security &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="t-v">READY</span></div>
-                <div class="t-o"><span style="color:var(--green)">✔</span> esm.helpdesk &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="t-v">READY</span></div>
-                <div class="t-gap"></div>
-                <div class="t-o t-cm"># 17 modules active.</div>
-                <div class="t-o t-cm"># Tenant isolation: ON</div>
-                <div class="t-o t-cm"># Audit trail: ARMED</div>
-                <div class="t-gap"></div>
-                <div class="t-row"><span class="t-p">▶</span><span class="t-c">status <span style="color:var(--green)">--all</span></span></div>
-                <div class="t-o"><span class="t-v">SYSTEM</span> All systems nominal.</div>
-                <div class="t-o"><span class="t-v">SERVER</span> Uptime: <span style="color:var(--green)">99.9%</span></div>
-                <div class="t-gap"></div>
-                <div class="t-row"><span class="t-p">▶</span><span class="t-cursor"></span></div>
-            </div>
+        <div class="pillar-card">
+            <h3><i class="fa-solid fa-coins"></i> Pay & Benefits</h3>
+            <ul>
+                <li>Enterprise Payroll</li>
+                <li>Government Contributions</li>
+                <li>Benefits Administration</li>
+                <li>Expense Management</li>
+            </ul>
+        </div>
+        <div class="pillar-card">
+            <h3><i class="fa-solid fa-rocket"></i> Talent & Growth</h3>
+            <ul>
+                <li>Recruitment / ATS</li>
+                <li>Automated Onboarding</li>
+                <li>Performance Reviews</li>
+                <li>Succession Planning</li>
+            </ul>
+        </div>
+        <div class="pillar-card">
+            <h3><i class="fa-solid fa-headset"></i> Employee Support</h3>
+            <ul>
+                <li>Employee Relations</li>
+                <li>Knowledge Base</li>
+                <li>Case Management</li>
+                <li>AI Companion</li>
+            </ul>
         </div>
     </div>
-</div>
+</section>
+
+<!-- SECTION 4: WHY TEAMS CHOOSE RESPAWN -->
+<section class="story-section" id="why" style="background: var(--bg2);">
+    <h2>Built for real-world people operations</h2>
+    <p class="sub">Why organizations are leaving legacy tools behind.</p>
+
+    <div class="why-grid">
+        <div class="why-card">
+            <i class="fa-solid fa-layer-group"></i>
+            <h3>One Platform</h3>
+            <p>Manage employee data, payroll, performance, and employee support from a unified system without messy integrations.</p>
+        </div>
+        <div class="why-card">
+            <i class="fa-solid fa-sliders"></i>
+            <h3>Configurable Workflows</h3>
+            <p>Adapt processes to your organization's needs. Build approval chains, document requirements, and custom fields.</p>
+        </div>
+        <div class="why-card">
+            <i class="fa-solid fa-mobile-screen"></i>
+            <h3>Employee Self-Service</h3>
+            <p>Give employees access to the information and tools they need to request leave, check payslips, and log attendance.</p>
+        </div>
+        <div class="why-card">
+            <i class="fa-solid fa-book-open"></i>
+            <h3>Knowledge-Driven</h3>
+            <p>Policies, procedures, and guidance available when your teams need them. Integrated directly into the support flow.</p>
+        </div>
+    </div>
+</section>
+
+<!-- SECTION 5: EMPLOYEE EXPERIENCE (COMPANION) -->
+<section class="story-section" id="experience">
+    <div class="split-section">
+        <div>
+            <h2 style="font-size: clamp(1.8rem, 4vw, 2.5rem);">Help employees find answers faster.</h2>
+            <p style="font-size: 1.125rem; color: var(--text-mid); line-height: 1.6; margin-bottom: 30px;">
+                Employees can access leave balances, attendance records, payroll information, company policies, and more from a single, intelligent experience.
+            </p>
+            <ul style="list-style: none; color: var(--text); font-size: 1rem; display: flex; flex-direction: column; gap: 16px;">
+                <li><i class="fa-solid fa-check" style="color: var(--green); margin-right: 12px;"></i> Instant policy lookups</li>
+                <li><i class="fa-solid fa-check" style="color: var(--green); margin-right: 12px;"></i> Self-service document generation</li>
+                <li><i class="fa-solid fa-check" style="color: var(--green); margin-right: 12px;"></i> 24/7 autonomous support</li>
+            </ul>
+        </div>
+        <div class="split-image">
+            <img src="https://images.unsplash.com/photo-1618761714954-0b8cd0026356?auto=format&fit=crop&w=800&q=80" alt="Platform Dashboard">
+        </div>
+    </div>
+</section>
+
+<!-- SECTION 6: GAMING CTA -->
+<section class="gaming-cta">
+    <h2 style="font-size: 2.5rem; color: #fff; margin-bottom: 20px;">A Better Way to Manage People</h2>
+    <p style="color: var(--text-mid); font-size: 1.125rem;">Equip your HR team with the ultimate loadout.</p>
+    
+    <div class="gaming-flow">
+        <div class="gaming-step"><i class="fa-solid fa-location-dot"></i> Spawn Point</div>
+        <i class="fa-solid fa-chevron-right gaming-divider"></i>
+        <div class="gaming-step"><i class="fa-solid fa-users"></i> Build Your Team</div>
+        <i class="fa-solid fa-chevron-right gaming-divider"></i>
+        <div class="gaming-step"><i class="fa-solid fa-arrow-trend-up"></i> Level Up Performance</div>
+        <i class="fa-solid fa-chevron-right gaming-divider"></i>
+        <div class="gaming-step"><i class="fa-solid fa-shield-heart"></i> Support Your People</div>
+    </div>
+</section>
 
 <section class="beta-wrap" id="beta">
     <div style="display: grid; gap: 32px; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); align-items: stretch;">
