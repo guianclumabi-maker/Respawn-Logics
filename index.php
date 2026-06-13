@@ -563,15 +563,12 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
         /* ─── DIVIDER ─── */
         .divider {
             border: none;
-            border-top: 1px solid var(--border3);
-            margin: 0;
+            margin: 80px 0;
         }
 
         /* ─── PHILOSOPHY SECTION ─── */
         .story-section {
             background: transparent;
-            border-top: 1px solid var(--border3);
-            border-bottom: 1px solid var(--border3);
         }
 
         .story-inner {
@@ -746,7 +743,6 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
 
         /* ─── FOOTER ─── */
         footer {
-            border-top: 1px solid var(--border2);
         }
 
         .footer-inner {
