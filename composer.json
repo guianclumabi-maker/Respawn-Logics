@@ -1,0 +1,12 @@
+{
+    "name": "respawn-logics/app",
+    "description": "Respawn Logics HRIS",
+    "type": "project",
+    "require": {
+        "php": ">=8.1",
+        "ext-pdo": "*",
+        "ext-pdo_mysql": "*",
+        "ext-curl": "*",
+        "ext-mbstring": "*"
+    }
+}
