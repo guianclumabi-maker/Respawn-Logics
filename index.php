@@ -813,9 +813,9 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
             max-width: 1200px;
             margin: 0 auto;
             position: relative;
-            background: rgba(10, 15, 24, 0.7);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
+            background: rgba(255, 255, 255, 0.02);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
             border: 1px solid rgba(255, 255, 255, 0.05);
             border-radius: 24px;
             padding: 80px 40px;
@@ -918,7 +918,9 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
             gap: 24px;
         }
         .pillar-card {
-            background: var(--bg2);
+            background: rgba(255, 255, 255, 0.02);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
             border: 1px solid var(--border2);
             border-radius: 12px;
             padding: 32px 24px;
@@ -960,12 +962,14 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
         }
         @media (max-width: 768px) { .why-grid { grid-template-columns: 1fr; } }
         .why-card {
-            background: var(--bg3);
-            border: 1px solid var(--border2);
+            background: transparent;
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.03);
             border-radius: 12px;
-            padding: 40px;
+            padding: 40px 32px;
             text-align: left;
-            transition: transform 0.2s;
+            transition: transform 0.3s, border-color 0.3s;
         }
         .why-card:hover { transform: translateY(-3px); border-color: rgba(0,224,122,0.3); }
         .why-card i {
@@ -1007,7 +1011,9 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
             position: relative;
         }
         .gaming-cta .story-container {
-            background: linear-gradient(135deg, rgba(10, 15, 24, 0.8), rgba(0, 224, 122, 0.05));
+            background: linear-gradient(135deg, rgba(0, 224, 122, 0.05), rgba(0, 224, 122, 0.01));
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
             border-color: rgba(0, 224, 122, 0.2);
         }
         .gaming-flow {
