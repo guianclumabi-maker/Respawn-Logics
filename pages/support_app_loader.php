@@ -5,7 +5,8 @@ requireLogin();
 
 $user = getCurrentUser();
 
-$tablePrefix = $supportMode === 'platform' ? 'platform' : 'esm';
+$ticketTable = $supportMode === 'platform' ? 'platform_tickets' : 'service_tickets';
+$commentTable = $supportMode === 'platform' ? 'platform_ticket_comments' : 'ticket_comments';
 $apiRoute = $supportMode === 'platform' ? 'platform_support' : 'esm_support';
 
 // Determine query conditions based on role
@@ -31,16 +32,18 @@ if ($supportRole === 'client') {
     // Platform Agent sees everything (no where clause needed)
 }
 
+$assignedColumn = $supportMode === 'platform' ? 'assigned_to' : 'assigned_to_user_id';
+
 // Map Database Tickets to React UI format
 $sqlTickets = "
     SELECT pt.*, 
            u.first_name, u.last_name, u.email,
            t.company_name as tenant_name,
            a.first_name as a_first_name, a.last_name as a_last_name
-    FROM {$tablePrefix}_tickets pt
+    FROM {$ticketTable} pt
     LEFT JOIN users u ON pt.created_by = u.id
     LEFT JOIN tenants t ON pt.tenant_id = t.id
-    LEFT JOIN users a ON pt.assigned_to = a.id
+    LEFT JOIN users a ON pt.{$assignedColumn} = a.id
     $where
     ORDER BY pt.created_at DESC
 ";
@@ -58,7 +61,7 @@ if (!empty($ticketIds)) {
         SELECT ptc.*, 
                u.first_name, u.last_name, u.email,
                ur.role_id, r.name as role_name
-        FROM {$tablePrefix}_ticket_comments ptc
+        FROM {$commentTable} ptc
         LEFT JOIN users u ON ptc.user_id = u.id
         LEFT JOIN user_roles ur ON u.id = ur.user_id
         LEFT JOIN roles r ON ur.role_id = r.id

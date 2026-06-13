@@ -99,17 +99,28 @@ if (!array_key_exists($route, $controllers)) {
 $controllerName = $controllers[$route];
 $controllerFile = __DIR__ . "/../backend/controllers/{$controllerName}.php";
 
-if (!file_exists($controllerFile)) {
+try {
+    if (file_exists($controllerFile)) {
+        require_once $controllerFile;
+        global $pdo;
+        $controller = new $controllerName($pdo);
+        $controller->handleRequest($action);
+    } else {
+        http_response_code(404);
+        echo json_encode(['success' => false, 'error' => "Controller file for route '{$route}' not found."]);
+    }
+} catch (PDOException $e) {
     http_response_code(500);
-    echo json_encode(['success' => false, 'error' => 'Controller file is missing']);
-    exit;
+    echo json_encode([
+        'success' => false, 
+        'error' => 'Database error (Missing table or column)',
+        'details' => $e->getMessage()
+    ]);
+} catch (Exception $e) {
+    http_response_code(500);
+    echo json_encode([
+        'success' => false, 
+        'error' => 'Server error',
+        'details' => $e->getMessage()
+    ]);
 }
-
-require_once $controllerFile;
-
-// Instantiate the controller, passing global dependencies (Dependency Injection)
-global $pdo;
-$controller = new $controllerName($pdo);
-
-// Call the handle method which will process the $action
-$controller->handleRequest($action);

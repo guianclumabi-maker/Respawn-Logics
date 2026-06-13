@@ -1,16 +1,17 @@
 <?php
 $pages = glob(__DIR__ . '/pages/*.php');
 $views = glob(__DIR__ . '/pages/views/*.php');
-$all_files = array_merge($pages, $views);
+$controllers = glob(__DIR__ . '/backend/controllers/*.php');
+$all_files = array_merge($pages, $views, $controllers);
 
 $tables = [];
 foreach ($all_files as $f) {
     $content = file_get_contents($f);
-    preg_match_all('/(?:FROM|INTO|UPDATE)\s+[`]?([a-zA-Z0-9_]+)[`]?/i', $content, $matches);
+    preg_match_all('/(?:FROM|INTO|UPDATE|JOIN)\s+[`]?([a-zA-Z0-9_]+)[`]?/i', $content, $matches);
     if (!empty($matches[1])) {
         foreach ($matches[1] as $t) {
             $t = strtolower($t);
-            if (!in_array($t, ['where', 'set', 'select'])) {
+            if (!in_array($t, ['where', 'set', 'select', 'inner', 'left', 'right', 'outer', 'users', 'tenants'])) {
                 $tables[$t] = true;
             }
         }
