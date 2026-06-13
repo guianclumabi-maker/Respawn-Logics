@@ -831,10 +831,10 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
                 <i class="fa-solid fa-play"></i> Resume Session
             </a>
         <?php else: ?>
-            <a href="onboarding/" class="btn-primary">
+            <a href="<?= url('/onboarding/') ?>" class="btn-primary">
                 <i class="fa-solid fa-play"></i> Initialize Setup
             </a>
-            <a href="login.php" class="btn-ghost">
+            <a href="<?= url('/login.php') ?>" class="btn-ghost">
                 <i class="fa-solid fa-floppy-disk"></i> Continue Save File
             </a>
         <?php endif; ?>
@@ -1120,10 +1120,10 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
                         <i class="fa-solid fa-play"></i> Go to Dashboard
                     </a>
                 <?php else: ?>
-                    <a href="register.php" class="btn-primary" style="width:100%; justify-content:center;">
+                    <a href="<?= url('/register.php') ?>" class="btn-primary" style="width:100%; justify-content:center;">
                         <i class="fa-solid fa-rocket"></i> Create Solo Workspace
                     </a>
-                    <a href="login.php" class="btn-ghost" style="width:100%; justify-content:center; margin-top: 10px;">
+                    <a href="<?= url('/login.php') ?>" class="btn-ghost" style="width:100%; justify-content:center; margin-top: 10px;">
                         Sign In
                     </a>
                 <?php endif; ?>
@@ -1151,10 +1151,10 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
                         <i class="fa-solid fa-play"></i> Go to Dashboard
                     </a>
                 <?php else: ?>
-                    <a href="onboarding/" class="btn-primary" style="width:100%; justify-content:center;">
+                    <a href="<?= url('/onboarding/') ?>" class="btn-primary" style="width:100%; justify-content:center;">
                         <i class="fa-solid fa-building"></i> Claim Enterprise Slot
                     </a>
-                    <a href="login.php" class="btn-ghost" style="width:100%; justify-content:center; margin-top: 10px;">
+                    <a href="<?= url('/login.php') ?>" class="btn-ghost" style="width:100%; justify-content:center; margin-top: 10px;">
                         Sign In
                     </a>
                 <?php endif; ?>
