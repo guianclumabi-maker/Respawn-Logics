@@ -789,22 +789,24 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
         }
         /* ─── NEW STORY SECTIONS ─── */
         .story-section {
-            padding: 110px 24px;
+            padding: 140px 24px;
             max-width: 1200px;
             margin: 0 auto;
             text-align: center;
+            position: relative;
         }
         .story-section h2 {
-            font-size: clamp(2rem, 5vw, 3rem);
+            font-size: clamp(2rem, 5vw, 3.25rem);
             color: #fff;
             margin-bottom: 24px;
-            line-height: 1.1;
+            line-height: 1.15;
+            letter-spacing: -0.02em;
         }
         .story-section p.sub {
             font-size: 1.125rem;
             color: var(--text-mid);
             max-width: 700px;
-            margin: 0 auto 56px;
+            margin: 0 auto 64px;
             line-height: 1.6;
         }
 
@@ -814,22 +816,38 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
             align-items: center;
             justify-content: center;
             flex-wrap: wrap;
-            gap: 12px;
+            gap: 16px;
             margin-top: 40px;
+            position: relative;
         }
         .journey-node {
             background: rgba(0,224,122,0.05);
             border: 1px solid rgba(0,224,122,0.2);
-            padding: 12px 24px;
+            padding: 14px 28px;
             border-radius: 50px;
             color: var(--green);
             font-family: var(--mono);
             font-weight: 600;
-            font-size: 0.875rem;
+            font-size: 0.9375rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 4px 20px rgba(0,224,122,0.05);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .journey-node:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 24px rgba(0,224,122,0.15);
+            border-color: rgba(0,224,122,0.4);
+        }
+        .journey-node i {
+            font-size: 1.1em;
+            opacity: 0.8;
         }
         .journey-arrow {
             color: var(--text-dim);
-            font-size: 0.875rem;
+            font-size: 1rem;
+            opacity: 0.5;
         }
 
         /* Problems Grid */
@@ -837,7 +855,7 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: 24px;
-            margin-bottom: 40px;
+            margin-bottom: 56px;
         }
         .problem-card {
             background: rgba(255,77,106,0.05);
@@ -1063,14 +1081,14 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
     <p class="sub">From recruitment and onboarding to payroll, performance, and employee support, Respawn Logic helps organizations manage their workforce from a single platform.</p>
     
     <div class="journey-flow">
-        <div class="journey-node">Recruit</div> <i class="fa-solid fa-arrow-right journey-arrow"></i>
-        <div class="journey-node">Hire</div> <i class="fa-solid fa-arrow-right journey-arrow"></i>
-        <div class="journey-node">Onboard</div> <i class="fa-solid fa-arrow-right journey-arrow"></i>
-        <div class="journey-node">Work</div> <i class="fa-solid fa-arrow-right journey-arrow"></i>
-        <div class="journey-node">Pay</div> <i class="fa-solid fa-arrow-right journey-arrow"></i>
-        <div class="journey-node">Develop</div> <i class="fa-solid fa-arrow-right journey-arrow"></i>
-        <div class="journey-node">Support</div> <i class="fa-solid fa-arrow-right journey-arrow"></i>
-        <div class="journey-node" style="background: rgba(155,109,255,0.1); border-color: var(--purple); color: var(--purple);">Grow</div>
+        <div class="journey-node"><i class="fa-solid fa-crosshairs"></i> Recruit</div> <i class="fa-solid fa-chevron-right journey-arrow"></i>
+        <div class="journey-node"><i class="fa-solid fa-handshake"></i> Hire</div> <i class="fa-solid fa-chevron-right journey-arrow"></i>
+        <div class="journey-node"><i class="fa-solid fa-bolt"></i> Onboard</div> <i class="fa-solid fa-chevron-right journey-arrow"></i>
+        <div class="journey-node"><i class="fa-solid fa-briefcase"></i> Work</div> <i class="fa-solid fa-chevron-right journey-arrow"></i>
+        <div class="journey-node"><i class="fa-solid fa-coins"></i> Pay</div> <i class="fa-solid fa-chevron-right journey-arrow"></i>
+        <div class="journey-node"><i class="fa-solid fa-ranking-star"></i> Develop</div> <i class="fa-solid fa-chevron-right journey-arrow"></i>
+        <div class="journey-node"><i class="fa-solid fa-shield-heart"></i> Support</div> <i class="fa-solid fa-chevron-right journey-arrow"></i>
+        <div class="journey-node" style="background: rgba(155,109,255,0.1); border-color: var(--purple); color: var(--purple);"><i class="fa-solid fa-level-up-alt"></i> Grow</div>
     </div>
 </section>
 
@@ -1079,12 +1097,12 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
     <h2>Stop managing people across disconnected tools</h2>
     
     <div class="problems-grid">
-        <div class="problem-card"><i class="fa-solid fa-file-excel"></i> Spreadsheets</div>
-        <div class="problem-card"><i class="fa-solid fa-clock-rotate-left"></i> Manual Tracking</div>
-        <div class="problem-card"><i class="fa-solid fa-envelope-open-text"></i> Email Approvals</div>
-        <div class="problem-card"><i class="fa-solid fa-money-bill-transfer"></i> Payroll Rework</div>
-        <div class="problem-card"><i class="fa-solid fa-folder-tree"></i> Scattered Documents</div>
-        <div class="problem-card"><i class="fa-solid fa-server"></i> Disconnected Records</div>
+        <div class="problem-card"><i class="fa-solid fa-skull"></i> Spreadsheets</div>
+        <div class="problem-card"><i class="fa-solid fa-hourglass-half"></i> Manual Tracking</div>
+        <div class="problem-card"><i class="fa-solid fa-envelope-circle-xmark"></i> Email Approvals</div>
+        <div class="problem-card"><i class="fa-solid fa-triangle-exclamation"></i> Payroll Rework</div>
+        <div class="problem-card"><i class="fa-solid fa-ghost"></i> Scattered Documents</div>
+        <div class="problem-card"><i class="fa-solid fa-plug-circle-xmark"></i> Disconnected Records</div>
     </div>
 
     <div class="solution-block">
@@ -1099,7 +1117,7 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
 
     <div class="pillars-grid">
         <div class="pillar-card">
-            <h3><i class="fa-solid fa-users-gear"></i> Workforce</h3>
+            <h3><i class="fa-solid fa-users-viewfinder"></i> Workforce</h3>
             <ul>
                 <li>Attendance</li>
                 <li>Leave Management</li>
@@ -1117,7 +1135,7 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
             </ul>
         </div>
         <div class="pillar-card">
-            <h3><i class="fa-solid fa-rocket"></i> Talent & Growth</h3>
+            <h3><i class="fa-solid fa-star"></i> Talent & Growth</h3>
             <ul>
                 <li>Recruitment / ATS</li>
                 <li>Automated Onboarding</li>
@@ -1144,22 +1162,22 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
 
     <div class="why-grid">
         <div class="why-card">
-            <i class="fa-solid fa-layer-group"></i>
+            <i class="fa-solid fa-gamepad"></i>
             <h3>One Platform</h3>
             <p>Manage employee data, payroll, performance, and employee support from a unified system without messy integrations.</p>
         </div>
         <div class="why-card">
-            <i class="fa-solid fa-sliders"></i>
+            <i class="fa-solid fa-microchip"></i>
             <h3>Configurable Workflows</h3>
             <p>Adapt processes to your organization's needs. Build approval chains, document requirements, and custom fields.</p>
         </div>
         <div class="why-card">
-            <i class="fa-solid fa-mobile-screen"></i>
+            <i class="fa-solid fa-bolt"></i>
             <h3>Employee Self-Service</h3>
             <p>Give employees access to the information and tools they need to request leave, check payslips, and log attendance.</p>
         </div>
         <div class="why-card">
-            <i class="fa-solid fa-book-open"></i>
+            <i class="fa-solid fa-book-journal-whills"></i>
             <h3>Knowledge-Driven</h3>
             <p>Policies, procedures, and guidance available when your teams need them. Integrated directly into the support flow.</p>
         </div>
