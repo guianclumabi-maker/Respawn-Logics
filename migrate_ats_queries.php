@@ -1,5 +1,9 @@
 <?php
 $file = __DIR__ . '/candidates_api.php';
+if (!file_exists($file)) {
+    echo "Candidates API ATS file not found. Skipping.\n";
+    return;
+}
 $content = file_get_contents($file);
 
 // Add tenant_id init

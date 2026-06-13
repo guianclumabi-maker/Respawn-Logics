@@ -24,7 +24,7 @@ try {
     $pdo->exec('CREATE TABLE IF NOT EXISTS import_batch_errors (
         id BIGINT PRIMARY KEY AUTO_INCREMENT,
         batch_id BIGINT NOT NULL,
-        row_number INT NOT NULL,
+        row_num INT NOT NULL,
         error_message TEXT NOT NULL
     );');
     $cols = ['organization_unit_1', 'organization_unit_2', 'organization_unit_3', 'organization_unit_4'];

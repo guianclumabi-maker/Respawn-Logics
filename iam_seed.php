@@ -4,16 +4,9 @@ $permissionDict = require __DIR__ . '/config/permissions.php';
 
 try {
     // 0. Create and Update tenants table
+    // 0. Ensure missing tenants exist
     $pdo->exec("
-        CREATE TABLE IF NOT EXISTS tenants (
-            id INT PRIMARY KEY,
-            name VARCHAR(100),
-            permission_version INT DEFAULT 1,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        ) ENGINE=InnoDB;
-    ");
-    $pdo->exec("
-        INSERT IGNORE INTO tenants (id, name)
+        INSERT IGNORE INTO tenants (id, company_name)
         SELECT DISTINCT tenant_id, CONCAT('Tenant ', tenant_id) FROM users WHERE tenant_id IS NOT NULL
     ");
 
@@ -33,11 +26,16 @@ try {
         DROP COLUMN IF EXISTS module_name;
     ");
 
-    $pdo->exec("
-        ALTER TABLE permissions 
-        ADD CONSTRAINT fk_permission_group 
-        FOREIGN KEY (permission_group_id) REFERENCES permission_groups(id) ON DELETE CASCADE;
-    ");
+    try {
+        $pdo->exec("
+            ALTER TABLE permissions 
+            ADD CONSTRAINT fk_permission_group 
+            FOREIGN KEY (permission_group_id) REFERENCES permission_groups(id) ON DELETE CASCADE;
+        ");
+    } catch (PDOException $e) {
+        // Ignore duplicate foreign key error
+        if ($e->getCode() !== 'HY000') throw $e;
+    }
 
     // The rest of the tables (roles, role_permissions, user_roles) are correct from earlier, 
     // but just ensure they exist.

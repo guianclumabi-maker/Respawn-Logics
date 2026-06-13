@@ -136,7 +136,7 @@ try {
     foreach ($rows as $row) {
         if (empty($row['employee_id'])) {
             $validationWarnings[] = "Row {$row['line']}: Missing Employee ID. Skipping row.";
-            $pdo->prepare("INSERT INTO import_batch_errors (batch_id, row_number, error_message) VALUES (?, ?, ?)")
+            $pdo->prepare("INSERT INTO import_batch_errors (batch_id, row_num, error_message) VALUES (?, ?, ?)")
                 ->execute([$batchId, $row['line'], "Missing Employee ID"]);
             $skippedCount++;
             continue;
@@ -144,7 +144,7 @@ try {
         
         if (empty($row['first_name'])) {
             $validationWarnings[] = "Row {$row['line']}: Missing First Name. Skipping row.";
-            $pdo->prepare("INSERT INTO import_batch_errors (batch_id, row_number, error_message) VALUES (?, ?, ?)")
+            $pdo->prepare("INSERT INTO import_batch_errors (batch_id, row_num, error_message) VALUES (?, ?, ?)")
                 ->execute([$batchId, $row['line'], "Missing First Name"]);
             $skippedCount++;
             continue;
