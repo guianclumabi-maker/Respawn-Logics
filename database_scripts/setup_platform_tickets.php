@@ -1,4 +1,5 @@
 <?php
+if (!defined('MIGRATION_SAFE')) die('Forbidden');
 require_once __DIR__ . '/config/db.php';
 
 $sql = "

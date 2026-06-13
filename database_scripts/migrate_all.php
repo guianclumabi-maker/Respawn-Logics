@@ -1,6 +1,7 @@
 <?php
+if (!defined('MIGRATION_SAFE')) die('Forbidden');
 header('Content-Type: text/plain');
-require_once __DIR__ . '/bootstrap/app.php';
+require_once __DIR__ . '/../bootstrap/app.php';
 
 echo "Starting All Migrations...\n";
 echo "====================================\n";

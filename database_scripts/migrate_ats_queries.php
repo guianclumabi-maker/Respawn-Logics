@@ -1,4 +1,5 @@
 <?php
+if (!defined('MIGRATION_SAFE')) die('Forbidden');
 $file = __DIR__ . '/candidates_api.php';
 if (!file_exists($file)) {
     echo "Candidates API ATS file not found. Skipping.\n";

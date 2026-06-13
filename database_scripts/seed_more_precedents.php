@@ -1,5 +1,6 @@
 <?php
-require_once __DIR__ . '/bootstrap/app.php';
+if (!defined('MIGRATION_SAFE')) die('Forbidden');
+require_once __DIR__ . '/../bootstrap/app.php';
 
 try {
     $stmtSc = $pdo->prepare("INSERT INTO `elr_precedents` (`case_type`, `title`, `summary`, `key_principles`, `source_reference`, `risk_level`, `recommended_process`) VALUES (?, ?, ?, ?, ?, ?, ?)");

@@ -1,5 +1,6 @@
 <?php
-require_once __DIR__ . '/bootstrap/app.php';
+if (!defined('MIGRATION_SAFE')) die('Forbidden');
+require_once __DIR__ . '/../bootstrap/app.php';
 
 try {
     $pdo->exec("CREATE TABLE IF NOT EXISTS `hr_knowledge_base` (
