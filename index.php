@@ -165,6 +165,7 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
         .hero-bg {
             position: absolute;
             inset: 0;
+            pointer-events: none;
             background:
                 radial-gradient(ellipse 90% 70% at 50% 0%, rgba(0,150,255,0.05) 0%, transparent 60%),
                 radial-gradient(ellipse 60% 50% at 80% 100%, rgba(155,109,255,0.05) 0%, transparent 60%),
@@ -174,6 +175,7 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
         .hero-grid {
             position: absolute;
             inset: 0;
+            pointer-events: none;
             background-image:
                 linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
                 linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
