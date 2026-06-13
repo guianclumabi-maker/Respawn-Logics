@@ -162,9 +162,10 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
         }
 
         /* Layered background — navy base with soft grid */
-        .hero-bg {
-            position: absolute;
+        .global-bg {
+            position: fixed;
             inset: 0;
+            z-index: -2;
             pointer-events: none;
             background:
                 radial-gradient(ellipse 90% 70% at 50% 0%, rgba(0,150,255,0.05) 0%, transparent 60%),
@@ -172,9 +173,10 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
                 radial-gradient(ellipse 40% 40% at 20% 60%, rgba(0,224,122,0.04) 0%, transparent 50%);
         }
 
-        .hero-grid {
-            position: absolute;
+        .global-grid {
+            position: fixed;
             inset: 0;
+            z-index: -1;
             pointer-events: none;
             background-image:
                 linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
@@ -1004,6 +1006,8 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
     </style>
 </head>
 <body>
+    <div class="global-bg"></div>
+    <div class="global-grid"></div>
 
 <!-- NAV -->
 <nav>
@@ -1024,8 +1028,6 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
 
 <!-- HERO -->
 <section class="hero" id="home">
-    <div class="hero-bg"></div>
-    <div class="hero-grid"></div>
 
     <div class="hero-badge">
         <div class="ping"></div>
