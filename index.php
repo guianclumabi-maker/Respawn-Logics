@@ -823,7 +823,7 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
             position: relative;
         }
         .story-container {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
             position: relative;
             background: rgba(255, 255, 255, 0.02);
@@ -896,9 +896,15 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
         /* Problems Grid */
         .problems-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            grid-template-columns: repeat(3, 1fr);
             gap: 24px;
             margin-bottom: 56px;
+        }
+        @media (max-width: 1024px) {
+            .problems-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+        @media (max-width: 768px) {
+            .problems-grid { grid-template-columns: 1fr; }
         }
         .problem-card {
             background: rgba(255,77,106,0.05);
@@ -928,8 +934,13 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
         /* 4 Pillars */
         .pillars-grid {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
+            grid-template-columns: repeat(4, 1fr);
             gap: 24px;
+        }
+        @media (max-width: 1024px) {
+            .pillars-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
         }
         @media (max-width: 768px) {
             .pillars-grid {
