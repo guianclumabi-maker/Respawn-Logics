@@ -48,7 +48,6 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
             background-color: transparent;
             font-family: var(--sans);
             color: var(--text);
-            overflow-x: hidden;
             line-height: 1.5;
             -webkit-font-smoothing: antialiased;
         }
@@ -166,7 +165,7 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
         /* Layered background — navy base with dynamic drifting grid */
         .global-bg {
             position: fixed;
-            inset: -100px;
+            top: 0; left: 0; width: 100vw; height: 100vh;
             z-index: 0;
             pointer-events: none;
             background-color: var(--bg);
@@ -178,12 +177,12 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
 
         .global-grid {
             position: fixed;
-            inset: -100px;
+            top: -100px; left: -100px; width: calc(100vw + 200px); height: calc(100vh + 200px);
             z-index: 0;
             pointer-events: none;
             background-image:
-                linear-gradient(rgba(0, 224, 122, 0.05) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(0, 224, 122, 0.05) 1px, transparent 1px);
+                linear-gradient(rgba(0, 224, 122, 0.12) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 224, 122, 0.12) 1px, transparent 1px);
             background-size: 60px 60px;
             animation: grid-drift 20s linear infinite;
         }
@@ -191,6 +190,7 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
         .app-wrapper {
             position: relative;
             z-index: 1;
+            overflow-x: hidden;
         }
 
         @keyframes grid-drift {
