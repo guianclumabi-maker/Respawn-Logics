@@ -19,6 +19,17 @@ try {
         ) ENGINE=InnoDB;
     ");
 
+    // 1.5 Create permissions table (for fresh databases)
+    $pdo->exec("
+        CREATE TABLE IF NOT EXISTS permissions (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            permission_group_id INT NULL,
+            permission_key VARCHAR(100) NOT NULL UNIQUE,
+            description VARCHAR(255),
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        ) ENGINE=InnoDB;
+    ");
+
     // We may need to alter permissions if it exists (from my previous run)
     try {
         $pdo->exec("ALTER TABLE permissions ADD COLUMN permission_group_id INT NULL AFTER id");
