@@ -162,28 +162,36 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
             overflow: hidden;
         }
 
-        /* Layered background — navy base with soft grid */
+        /* Layered background — navy base with dynamic drifting grid */
         .global-bg {
             position: fixed;
             inset: 0;
             z-index: -2;
             pointer-events: none;
             background:
-                radial-gradient(ellipse 90% 70% at 50% 0%, rgba(0,150,255,0.05) 0%, transparent 60%),
-                radial-gradient(ellipse 60% 50% at 80% 100%, rgba(155,109,255,0.05) 0%, transparent 60%),
-                radial-gradient(ellipse 40% 40% at 20% 60%, rgba(0,224,122,0.04) 0%, transparent 50%);
+                radial-gradient(ellipse 80% 60% at 50% 0%, rgba(0,184,255,0.07) 0%, transparent 70%),
+                radial-gradient(ellipse 70% 60% at 80% 100%, rgba(155,109,255,0.06) 0%, transparent 70%),
+                radial-gradient(ellipse 50% 50% at 20% 50%, rgba(0,224,122,0.05) 0%, transparent 60%);
         }
 
         .global-grid {
             position: fixed;
-            inset: 0;
+            inset: -20%;
+            width: 140%;
+            height: 140%;
             z-index: -1;
             pointer-events: none;
             background-image:
-                linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
-            background-size: 48px 48px;
-            mask-image: radial-gradient(ellipse 80% 70% at 50% 40%, rgba(0,0,0,0.8) 0%, transparent 100%);
+                linear-gradient(rgba(0, 224, 122, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 224, 122, 0.05) 1px, transparent 1px);
+            background-size: 60px 60px;
+            mask-image: radial-gradient(ellipse 60% 60% at 50% 40%, rgba(0,0,0,0.8) 0%, transparent 100%);
+            animation: grid-drift 20s linear infinite;
+        }
+
+        @keyframes grid-drift {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(-60px, -60px); }
         }
 
         .hero-badge {
