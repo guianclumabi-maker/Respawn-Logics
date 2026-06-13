@@ -990,6 +990,7 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
         <a href="#overview">Platform</a>
         <a href="deep_dive.php">Deep Dive</a>
         <a href="#why">Why Us</a>
+        <a href="#story">The Story</a>
         <a href="#beta">Beta</a>
         <?php if ($loggedIn): ?>
             <a href="<?= url('/pages/dashboard.php') ?>" class="nav-cta">[ RESUME ]</a>
@@ -1188,7 +1189,7 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
 <!-- SECTION 6: GAMING CTA -->
 <section class="gaming-cta">
     <h2 style="font-size: 2.5rem; color: #fff; margin-bottom: 20px;">A Better Way to Manage People</h2>
-    <p style="color: var(--text-mid); font-size: 1.125rem;">Equip your HR team with the ultimate loadout.</p>
+    <p style="color: var(--text-mid); font-size: 1.125rem; max-width: 600px; margin: 0 auto;">Equip your HR team with the ultimate loadout. No more juggling ten different tabs just to onboard a single employee or process payroll.</p>
     
     <div class="gaming-flow">
         <div class="gaming-step"><i class="fa-solid fa-location-dot"></i> Spawn Point</div>
@@ -1200,6 +1201,56 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
         <div class="gaming-step"><i class="fa-solid fa-shield-heart"></i> Support Your People</div>
     </div>
 </section>
+
+<hr class="divider">
+
+<!-- STORY -->
+<div class="story-section" id="story">
+    <div class="story-inner">
+        <div>
+            <div class="eyebrow">// THE LORE</div>
+            <h2 class="section-h" style="margin-bottom: 24px;">Built by someone who plays games and hates boring HR software.</h2>
+            <p style="font-size: 1rem; color: var(--text-mid); line-height: 1.8; margin-bottom: 20px; text-align: left;">
+                In every game, dying isn't the end. You <strong style="color:#fff">respawn</strong>. You come back smarter, better equipped, with another shot at the objective. That's the mindset we think every company should have toward its people — second chances, continuous growth, and the belief that your team can always level up.
+            </p>
+            <p style="font-size: 1rem; color: var(--text-mid); line-height: 1.8; margin-bottom: 20px; text-align: left;">
+                The <strong style="color:#fff">Logics</strong> half keeps us grounded. This isn't a game — people's livelihoods depend on accurate payroll, fair reviews, and secure personal data. We bring the energy of gaming culture with the discipline of enterprise software.
+            </p>
+            <p style="font-size: 1rem; color: var(--text); line-height: 1.8; font-weight: 500; text-align: left;">
+                Built in the Philippines 🇵🇭, for companies that take their people seriously — without taking themselves too seriously.
+            </p>
+        </div>
+
+        <div class="terminal">
+            <div class="term-bar">
+                <div class="t-dot r"></div>
+                <div class="t-dot y"></div>
+                <div class="t-dot g"></div>
+                <span class="term-file">respawn-logics ~ system.log</span>
+            </div>
+            <div class="term-body" style="text-align: left;">
+                <div class="t-row"><span class="t-p">▶</span><span class="t-c">./respawn <span style="color:var(--green)">--boot</span></span></div>
+                <div class="t-o t-cm"># Initializing core modules...</div>
+                <div class="t-o"><span style="color:var(--green)">✔</span> onboarding.engine &nbsp;&nbsp; <span class="t-v">READY</span></div>
+                <div class="t-o"><span style="color:var(--green)">✔</span> payroll.engine &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="t-v">READY</span></div>
+                <div class="t-o"><span style="color:var(--green)">✔</span> ats.pipeline &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="t-v">READY</span></div>
+                <div class="t-o"><span style="color:var(--green)">✔</span> ai.intelligence &nbsp;&nbsp;&nbsp;&nbsp; <span class="t-v">READY</span></div>
+                <div class="t-o"><span style="color:var(--green)">✔</span> rbac.security &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="t-v">READY</span></div>
+                <div class="t-o"><span style="color:var(--green)">✔</span> esm.helpdesk &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="t-v">READY</span></div>
+                <div class="t-gap"></div>
+                <div class="t-o t-cm"># 17 modules active.</div>
+                <div class="t-o t-cm"># Tenant isolation: ON</div>
+                <div class="t-o t-cm"># Audit trail: ARMED</div>
+                <div class="t-gap"></div>
+                <div class="t-row"><span class="t-p">▶</span><span class="t-c">status <span style="color:var(--green)">--all</span></span></div>
+                <div class="t-o"><span class="t-v">SYSTEM</span> All systems nominal.</div>
+                <div class="t-o"><span class="t-v">SERVER</span> Uptime: <span style="color:var(--green)">99.9%</span></div>
+                <div class="t-gap"></div>
+                <div class="t-row"><span class="t-p">▶</span><span class="t-cursor"></span></div>
+            </div>
+        </div>
+    </div>
+</div>
 
 <section class="beta-wrap" id="beta">
     <div style="display: grid; gap: 32px; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); align-items: stretch;">
