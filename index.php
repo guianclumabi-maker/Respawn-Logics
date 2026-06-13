@@ -800,7 +800,7 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
         }
         /* ─── NEW STORY SECTIONS ─── */
         .story-section {
-            padding: 140px 24px;
+            padding: 60px 24px;
             width: 100%;
             text-align: center;
             position: relative;
@@ -809,6 +809,16 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
             max-width: 1200px;
             margin: 0 auto;
             position: relative;
+            background: rgba(10, 15, 24, 0.7);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 24px;
+            padding: 80px 40px;
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.4);
+        }
+        @media (max-width: 768px) {
+            .story-container { padding: 40px 20px; }
         }
         .story-section h2 {
             font-size: clamp(2rem, 5vw, 3.25rem);
@@ -987,11 +997,14 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
 
         /* Gaming CTA */
         .gaming-cta {
-            background: linear-gradient(135deg, var(--bg4), var(--bg2));
-            border-top: 1px solid var(--border2);
-            border-bottom: 1px solid var(--border2);
-            padding: 80px 24px;
+            padding: 60px 24px;
+            width: 100%;
             text-align: center;
+            position: relative;
+        }
+        .gaming-cta .story-container {
+            background: linear-gradient(135deg, rgba(10, 15, 24, 0.8), rgba(0, 224, 122, 0.05));
+            border-color: rgba(0, 224, 122, 0.2);
         }
         .gaming-flow {
             display: flex;
@@ -1110,7 +1123,7 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
 </section>
 
 <!-- SECTION 2: PROBLEMS ELIMINATED -->
-<section class="story-section" id="problems" style="background: var(--bg2);">
+<section class="story-section" id="problems">
     <div class="story-container">
         <h2>Stop managing people across disconnected tools</h2>
         
@@ -1177,7 +1190,7 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
 </section>
 
 <!-- SECTION 4: WHY TEAMS CHOOSE RESPAWN -->
-<section class="story-section" id="why" style="background: var(--bg2);">
+<section class="story-section" id="why">
     <div class="story-container">
         <h2>Built for real-world people operations</h2>
         <p class="sub">Why organizations are leaving legacy tools behind.</p>
