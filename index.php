@@ -175,17 +175,7 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
                 radial-gradient(ellipse 50% 50% at 20% 50%, rgba(0,224,122,0.05) 0%, transparent 60%);
         }
 
-        .global-grid {
-            position: fixed;
-            top: -100px; left: -100px; width: calc(100vw + 200px); height: calc(100vh + 200px);
-            z-index: 0;
-            pointer-events: none;
-            background-image:
-                linear-gradient(rgba(0, 224, 122, 0.12) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(0, 224, 122, 0.12) 1px, transparent 1px);
-            background-size: 60px 60px;
-            animation: grid-drift 20s linear infinite;
-        }
+
 
         .app-wrapper {
             position: relative;
@@ -193,10 +183,7 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
             overflow-x: hidden;
         }
 
-        @keyframes grid-drift {
-            0% { transform: translate(0, 0); }
-            100% { transform: translate(-60px, -60px); }
-        }
+
 
         @keyframes pulse-glow {
             0%, 100% { box-shadow: 0 0 15px rgba(0, 224, 122, 0.02); border-color: rgba(0, 224, 122, 0.05); }
@@ -1053,7 +1040,6 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
 </head>
 <body>
     <div class="global-bg"></div>
-    <div class="global-grid"></div>
 
 <div class="app-wrapper">
 <!-- NAV -->
