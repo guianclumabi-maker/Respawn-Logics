@@ -831,7 +831,7 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
             -webkit-backdrop-filter: blur(8px);
             border: 1px solid rgba(255, 255, 255, 0.05);
             border-radius: 24px;
-            padding: 80px 40px;
+            padding: 120px 80px;
             box-shadow: 0 30px 60px rgba(0, 0, 0, 0.4);
             animation: pulse-glow 6s infinite alternate;
         }
@@ -846,11 +846,11 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
             letter-spacing: -0.02em;
         }
         .story-section p.sub {
-            font-size: 1.125rem;
+            font-size: 1.2rem;
             color: var(--text-mid);
-            max-width: 700px;
-            margin: 0 auto 64px;
-            line-height: 1.6;
+            max-width: 800px;
+            margin: 0 auto 40px;
+            line-height: 1.7;
         }
 
         /* Journey Flow */
@@ -1132,8 +1132,8 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
 <!-- SECTION 1: JOURNEY -->
 <section class="story-section" id="journey">
     <div class="story-container">
-        <h2>Manage every stage of the employee journey</h2>
-        <p class="sub">From recruitment and onboarding to payroll, performance, and employee support, Respawn Logic helps organizations manage their workforce from a single platform.</p>
+        <h2>The Complete Player Journey</h2>
+        <p class="sub">Forget the messy spreadsheets and clunky onboarding forms. We treat your employees like players logging into a AAA MMO. From their very first tutorial (onboarding) to their end-game progression (performance reviews), everything is tracked, rewarded, and managed in one seamless ecosystem.</p>
         
         <div class="journey-flow">
             <div class="journey-node"><i class="fa-solid fa-crosshairs"></i> Recruit</div> <i class="fa-solid fa-chevron-right journey-arrow"></i>
@@ -1151,7 +1151,8 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
 <!-- SECTION 2: PROBLEMS ELIMINATED -->
 <section class="story-section" id="problems">
     <div class="story-container">
-        <h2>Stop managing people across disconnected tools</h2>
+        <h2>Defeat the Final Boss of HR: Disconnected Tools</h2>
+        <p class="sub">Are you still tracking PTO in an Excel sheet, approving payroll via email chains, and storing performance reviews in a dusty Google Drive? That's the equivalent of playing on dial-up. It's time to wipe the board clean.</p>
         
         <div class="problems-grid">
             <div class="problem-card"><i class="fa-solid fa-skull"></i> Spreadsheets</div>
@@ -1171,8 +1172,8 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
 <!-- SECTION 3: PLATFORM OVERVIEW (4 PILLARS) -->
 <section class="story-section" id="overview">
     <div class="story-container">
-        <h2>Everything you need. Nothing you don't.</h2>
-        <p class="sub">A unified platform built on four core pillars.</p>
+        <h2>The Core Engine. No Bloatware.</h2>
+        <p class="sub">We stripped out the corporate fluff and built exactly what you need to run a high-performance guild (your company). A unified platform built on four core pillars, running at 60 FPS.</p>
 
         <div class="pillars-grid">
             <div class="pillar-card">
