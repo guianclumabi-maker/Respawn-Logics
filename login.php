@@ -34,27 +34,42 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     $email = trim($_POST['email']);
     $password = $_POST['password'];
     
-    if (empty($email) || empty($password)) {
-        $error = 'Please fill in all fields.';
+    // Rate Limiting
+    if (!isset($_SESSION['login_attempts'])) $_SESSION['login_attempts'] = 0;
+    if (!isset($_SESSION['last_login_attempt'])) $_SESSION['last_login_attempt'] = time();
+    
+    if ($_SESSION['login_attempts'] >= 5 && (time() - $_SESSION['last_login_attempt']) < 60) {
+        $error = 'Too many failed login attempts. Please wait 60 seconds.';
     } else {
-        try {
-            $stmt = $pdo->prepare("SELECT * FROM `users` WHERE `email` = ?");
-            $stmt->execute([$email]);
-            $user = $stmt->fetch();
-            
-            if ($user && !empty($user['password_hash']) && password_verify($password, $user['password_hash'])) {
-                $_SESSION['user_id'] = $user['id'];
-                $_SESSION['user_email'] = $user['email'];
-                $_SESSION['user_name'] = $user['full_name'];
-                $_SESSION['tenant_id'] = $user['tenant_id'];
+        if (time() - $_SESSION['last_login_attempt'] >= 60) {
+            $_SESSION['login_attempts'] = 0;
+        }
+        $_SESSION['last_login_attempt'] = time();
+
+        if (empty($email) || empty($password)) {
+            $error = 'Please fill in all fields.';
+        } else {
+            try {
+                $stmt = $pdo->prepare("SELECT * FROM `users` WHERE `email` = ?");
+                $stmt->execute([$email]);
+                $user = $stmt->fetch();
                 
-                header('Location: ' . url('/pages/dashboard.php'));
-                exit;
-            } else {
-                $error = 'Invalid email or password.';
+                if ($user && !empty($user['password_hash']) && password_verify($password, $user['password_hash'])) {
+                    $_SESSION['login_attempts'] = 0; // Reset on success
+                    $_SESSION['user_id'] = $user['id'];
+                    $_SESSION['user_email'] = $user['email'];
+                    $_SESSION['user_name'] = $user['full_name'];
+                    $_SESSION['tenant_id'] = $user['tenant_id'];
+                    
+                    header('Location: ' . url('/pages/dashboard.php'));
+                    exit;
+                } else {
+                    $_SESSION['login_attempts']++;
+                    $error = 'Invalid email or password.';
+                }
+            } catch (PDOException $e) {
+                $error = 'Database error: ' . $e->getMessage();
             }
-        } catch (PDOException $e) {
-            $error = 'Database error: ' . $e->getMessage();
         }
     }
 }
