@@ -151,13 +151,13 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
 
         /* ─── HERO ─── */
         .hero {
-            min-height: 100vh;
+            min-height: 85vh;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             text-align: center;
-            padding: 140px 24px 100px;
+            padding: 140px 24px 80px;
             position: relative;
             overflow: hidden;
         }
@@ -185,7 +185,6 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
                 linear-gradient(rgba(0, 224, 122, 0.05) 1px, transparent 1px),
                 linear-gradient(90deg, rgba(0, 224, 122, 0.05) 1px, transparent 1px);
             background-size: 60px 60px;
-            mask-image: radial-gradient(ellipse 60% 60% at 50% 40%, rgba(0,0,0,0.8) 0%, transparent 100%);
             animation: grid-drift 20s linear infinite;
         }
 
