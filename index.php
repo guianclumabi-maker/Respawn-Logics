@@ -843,7 +843,7 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
     <div class="hud">
         <div class="hud-item">
             <div class="hud-key">// MODULES</div>
-            <div class="hud-val">14</div>
+            <div class="hud-val">17</div>
             <div class="hud-desc">Fully wired modules</div>
         </div>
         <div class="hud-item">
