@@ -198,6 +198,11 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
             100% { transform: translate(-60px, -60px); }
         }
 
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 0 15px rgba(0, 224, 122, 0.02); border-color: rgba(0, 224, 122, 0.05); }
+            50% { box-shadow: 0 0 35px rgba(0, 224, 122, 0.15); border-color: rgba(0, 224, 122, 0.3); }
+        }
+
         .hero-badge {
             position: relative;
             z-index: 2;
@@ -443,12 +448,15 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
         }
 
         .mod-card {
-            background: var(--bg2);
+            background: rgba(255, 255, 255, 0.02);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
             border: 1px solid var(--border2);
             border-radius: 10px;
             padding: 26px 28px;
             position: relative;
             overflow: hidden;
+            animation: pulse-glow 4s infinite alternate;
             transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
         }
 
@@ -574,7 +582,7 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
 
         /* ─── PHILOSOPHY SECTION ─── */
         .story-section {
-            background: var(--bg2);
+            background: transparent;
             border-top: 1px solid var(--border3);
             border-bottom: 1px solid var(--border3);
         }
@@ -640,7 +648,9 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
         }
 
         .beta-card {
-            background: var(--bg2);
+            background: rgba(255, 255, 255, 0.02);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
             border: 1px solid var(--border2);
             border-radius: 14px;
             padding: 64px 60px;
@@ -650,6 +660,7 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
             align-items: center;
             position: relative;
             overflow: hidden;
+            animation: pulse-glow 5s infinite alternate;
         }
 
         .beta-card::before {
@@ -820,6 +831,7 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
             border-radius: 24px;
             padding: 80px 40px;
             box-shadow: 0 30px 60px rgba(0, 0, 0, 0.4);
+            animation: pulse-glow 6s infinite alternate;
         }
         @media (max-width: 768px) {
             .story-container { padding: 40px 20px; }
@@ -925,6 +937,7 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
             border-radius: 12px;
             padding: 32px 24px;
             text-align: left;
+            animation: pulse-glow 4.5s infinite alternate;
         }
         .pillar-card h3 {
             font-size: 1.25rem;
@@ -970,6 +983,7 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
             padding: 40px 32px;
             text-align: left;
             transition: transform 0.3s, border-color 0.3s;
+            animation: pulse-glow 5.5s infinite alternate;
         }
         .why-card:hover { transform: translateY(-3px); border-color: rgba(0,224,122,0.3); }
         .why-card i {
