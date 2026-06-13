@@ -65,6 +65,44 @@ try {
         `status` VARCHAR(50) DEFAULT "Pending",
         `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;');
+    
+    $pdo->exec('CREATE TABLE IF NOT EXISTS `leave_balances` (
+        `id` BIGINT PRIMARY KEY AUTO_INCREMENT,
+        `tenant_id` VARCHAR(50) NOT NULL,
+        `employee_email` VARCHAR(150) NOT NULL,
+        `leave_type` VARCHAR(50) NOT NULL,
+        `total_allowance` DECIMAL(10,2) DEFAULT 0,
+        `used_balance` DECIMAL(10,2) DEFAULT 0,
+        `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;');
+    
+    $pdo->exec("CREATE TABLE IF NOT EXISTS `assets` (
+        `id` BIGINT PRIMARY KEY AUTO_INCREMENT,
+        `asset_tag` VARCHAR(100) NOT NULL,
+        `type` VARCHAR(100) NOT NULL,
+        `make_model` VARCHAR(255),
+        `serial_number` VARCHAR(255),
+        `status` VARCHAR(50) DEFAULT 'Available',
+        `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;");
+    
+    $pdo->exec("CREATE TABLE IF NOT EXISTS `asset_assignments` (
+        `id` BIGINT PRIMARY KEY AUTO_INCREMENT,
+        `asset_id` BIGINT NOT NULL,
+        `assigned_to_email` VARCHAR(150) NOT NULL,
+        `assigned_at` DATETIME DEFAULT CURRENT_TIMESTAMP,
+        `returned_at` DATETIME NULL
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;");
+    
+    $pdo->exec("CREATE TABLE IF NOT EXISTS `audit_logs` (
+        `id` BIGINT PRIMARY KEY AUTO_INCREMENT,
+        `tenant_id` VARCHAR(50) NOT NULL,
+        `user_email` VARCHAR(150) NOT NULL,
+        `action` VARCHAR(255) NOT NULL,
+        `details` TEXT,
+        `ip_address` VARCHAR(45),
+        `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;");
 
     echo "Schema updated successfully.\n";
 } catch (Exception $e) {

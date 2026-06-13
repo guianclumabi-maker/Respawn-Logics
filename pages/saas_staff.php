@@ -4,7 +4,7 @@ require_once __DIR__ . '/../includes/auth.php';
 
 // Strict Platform Admin check (Only the master owner can add other internal staff)
 $user = getCurrentUser();
-if (!hasRole('Platform_Admin')) {
+if (!hasRole(['Platform_Admin', 'Super_Admin'])) {
     header("Location: dashboard.php");
     exit;
 }

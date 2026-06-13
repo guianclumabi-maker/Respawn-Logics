@@ -9,8 +9,8 @@ if ($action === 'start') {
     $currentUser = getCurrentUser();
     $isStaff = false;
     if ($currentUser) {
-        $allowed_roles = ['Platform_Admin', 'Support_Agent', 'Implementation_Specialist'];
-        if (in_array($currentUser['role'], $allowed_roles) || $currentUser['tenant_id'] === null) {
+        $allowed_roles = ['Platform_Admin', 'Support_Agent', 'Implementation_Specialist', 'Super_Admin'];
+        if (in_array($currentUser['role'], $allowed_roles) || empty($currentUser['tenant_id']) || $currentUser['tenant_id'] == '1') {
             $isStaff = true;
         }
     }

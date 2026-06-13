@@ -3,7 +3,7 @@ require_once __DIR__ . '/../bootstrap/app.php';
 require_once __DIR__ . '/../includes/auth.php';
 
 $user = getCurrentUser();
-if (!hasRole(['Platform_Admin', 'Support_Agent', 'Implementation_Specialist']) && ($user['tenant_id'] !== null)) {
+if (!hasRole(['Platform_Admin', 'Support_Agent', 'Implementation_Specialist', 'Super_Admin']) && (!empty($user['tenant_id']) && $user['tenant_id'] != '1')) {
     header("Location: dashboard.php");
     exit;
 }

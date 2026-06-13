@@ -4,8 +4,8 @@ require_once __DIR__ . '/../includes/auth.php';
 
 // SaaS Control Center access check (Platform Admin and Internal Vendor Staff)
 $user = getCurrentUser();
-$allowed_roles = ['Platform_Admin', 'Support_Agent', 'Implementation_Specialist'];
-if (!hasRole($allowed_roles) && ($user === null || $user['tenant_id'] !== null)) {
+$allowed_roles = ['Platform_Admin', 'Support_Agent', 'Implementation_Specialist', 'Super_Admin'];
+if (!hasRole($allowed_roles) && ($user === null || (!empty($user['tenant_id']) && $user['tenant_id'] != '1'))) {
     header("Location: dashboard.php");
     exit;
 }
