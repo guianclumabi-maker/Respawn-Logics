@@ -1,7 +1,7 @@
 <?php
 if (!defined('MIGRATION_SAFE')) die('Forbidden');
 require_once __DIR__ . '/../bootstrap/app.php';
-$permissionDict = require __DIR__ . '/config/permissions.php';
+$permissionDict = require __DIR__ . '/../config/permissions.php';
 
 try {
     // 0. Create and Update tenants table
