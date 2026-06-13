@@ -45,10 +45,11 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
         html { scroll-behavior: smooth; }
 
         body {
-            background: var(--bg);
+            background-color: transparent;
             font-family: var(--sans);
             color: var(--text);
             overflow-x: hidden;
+            line-height: 1.5;
             -webkit-font-smoothing: antialiased;
         }
 
@@ -165,10 +166,11 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
         /* Layered background — navy base with dynamic drifting grid */
         .global-bg {
             position: fixed;
-            inset: 0;
-            z-index: -2;
+            inset: -100px;
+            z-index: 0;
             pointer-events: none;
-            background:
+            background-color: var(--bg);
+            background-image:
                 radial-gradient(ellipse 80% 60% at 50% 0%, rgba(0,184,255,0.07) 0%, transparent 70%),
                 radial-gradient(ellipse 70% 60% at 80% 100%, rgba(155,109,255,0.06) 0%, transparent 70%),
                 radial-gradient(ellipse 50% 50% at 20% 50%, rgba(0,224,122,0.05) 0%, transparent 60%);
@@ -176,16 +178,19 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
 
         .global-grid {
             position: fixed;
-            inset: -20%;
-            width: 140%;
-            height: 140%;
-            z-index: -1;
+            inset: -100px;
+            z-index: 0;
             pointer-events: none;
             background-image:
                 linear-gradient(rgba(0, 224, 122, 0.05) 1px, transparent 1px),
                 linear-gradient(90deg, rgba(0, 224, 122, 0.05) 1px, transparent 1px);
             background-size: 60px 60px;
             animation: grid-drift 20s linear infinite;
+        }
+
+        .app-wrapper {
+            position: relative;
+            z-index: 1;
         }
 
         @keyframes grid-drift {
@@ -1030,6 +1035,7 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
     <div class="global-bg"></div>
     <div class="global-grid"></div>
 
+<div class="app-wrapper">
 <!-- NAV -->
 <nav>
     <?= renderLogo('navbar') ?>
@@ -1412,8 +1418,6 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
     });
 })();
 </script>
-
+</div>
 </body>
 </html>
-
-
