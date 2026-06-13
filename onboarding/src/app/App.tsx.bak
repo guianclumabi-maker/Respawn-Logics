@@ -1,0 +1,844 @@
+import { useState, useRef } from "react";
+import { Upload, Download, CloudUpload, CheckCircle, AlertTriangle, Info, FileSpreadsheet, Users, ArrowRight, Shield, Zap, Database } from "lucide-react";
+
+type ViewState = "welcome" | "upload" | "preview" | "processing" | "results";
+
+export default function App() {
+  const [currentView, setCurrentView] = useState<ViewState>("welcome");
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const [fileName, setFileName] = useState("");
+  const [fileSize, setFileSize] = useState("");
+  const [progress, setProgress] = useState(0);
+  const [showCreds, setShowCreds] = useState(false);
+
+  const [previewFile, setPreviewFile] = useState<File | null>(null);
+  const [parsedRows, setParsedRows] = useState<any[]>([]);
+  const [clientWarnings, setClientWarnings] = useState<string[]>([]);
+  const [isHeaderValid, setIsHeaderValid] = useState(true);
+  const [headerErrorMsg, setHeaderErrorMsg] = useState("");
+
+  const [importStats, setImportStats] = useState({
+    processed: 0,
+    skipped: 0,
+    warnings: [] as string[],
+    adminEmail: "",
+    adminPassword: ""
+  });
+
+  const [toast, setToast] = useState<{message: string, type: 'error' | 'success'} | null>(null);
+
+  const showToast = (message: string, type: 'error' | 'success' = 'error') => {
+    setToast({ message, type });
+    setTimeout(() => setToast(null), 5000);
+  };
+
+  // Client-side CSV parser helper
+  const parseCSV = (text: string) => {
+    const lines = text.split("\n").map(line => line.trim()).filter(Boolean);
+    if (lines.length === 0) return { headers: [], rows: [] };
+    
+    const splitLine = (line: string) => {
+      const result: string[] = [];
+      let current = "";
+      let inQuotes = false;
+      for (let i = 0; i < line.length; i++) {
+        const char = line[i];
+        if (char === '"') {
+          inQuotes = !inQuotes;
+        } else if (char === ',' && !inQuotes) {
+          result.push(current.replace(/^"|"$/g, '').replace(/""/g, '"').trim());
+          current = "";
+        } else {
+          current += char;
+        }
+      }
+      result.push(current.replace(/^"|"$/g, '').replace(/""/g, '"').trim());
+      return result;
+    };
+
+    const headers = splitLine(lines[0]);
+    const rows: Record<string, string>[] = [];
+    for (let i = 1; i < lines.length; i++) {
+      const values = splitLine(lines[i]);
+      if (values.length === 1 && values[0] === "") continue;
+      const rowObj: Record<string, string> = {};
+      headers.forEach((h, index) => {
+        const key = h.trim().toLowerCase().replace(/[\s_()]/g, '');
+        rowObj[key] = values[index] || "";
+      });
+      rows.push(rowObj);
+    }
+    return { headers, rows };
+  };
+
+  // Dynamic template CSV generation & download (Flat Relational HRIS Layout)
+  const handleDownloadTemplate = () => {
+    const csvContent = 
+      "employee_id,first_name,last_name,work_email,department,job_title,manager_id,hire_date\n" +
+      "EMP-001,Jane,Doe,jane@company.com,Executive,Chief Executive Officer,,2024-01-15\n" +
+      "EMP-002,John,Smith,john@company.com,Engineering,VP of Engineering,EMP-001,2024-02-10\n" +
+      "EMP-003,Alice,Johnson,alice@company.com,Engineering,Software Engineer,EMP-002,2024-03-01\n" +
+      "EMP-004,Bob,Lee,bob@company.com,Engineering,Software Engineer,EMP-002,2024-03-15\n" +
+      "EMP-005,Charlie,Kim,charlie@company.com,Engineering,QA Engineer,EMP-002,2024-04-01\n" +
+      "EMP-006,Diana,Prince,diana@company.com,Product,Product Manager,EMP-001,2024-01-20\n";
+    
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute("download", "employee_flat_template.csv");
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  // Error Report Download
+  const handleDownloadErrorReport = () => {
+    if (importStats.warnings.length === 0) return;
+    const errorCsvContent = "Validation Warnings\n" + importStats.warnings.map(w => `"${w.replace(/"/g, '""')}"`).join("\n");
+    const blob = new Blob([errorCsvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute("download", "validation_warnings.csv");
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  // Upload trigger helpers
+  const handleBrowseClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      processUpload(e.target.files[0]);
+    }
+  };
+
+  // Drag and drop event handlers
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = () => {
+    setIsDragging(false);
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+      processUpload(e.dataTransfer.files[0]);
+    }
+  };
+
+  // Process the file, perform client-side previews/validations
+  const processUpload = (file: File) => {
+    setFileName(file.name);
+    setFileSize((file.size / (1024 * 1024)).toFixed(2) + " MB");
+    setPreviewFile(file);
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const text = e.target?.result as string;
+      const { headers, rows } = parseCSV(text);
+
+      // Validate headers
+      const expectedKeys = ['employeeid', 'firstname', 'lastname', 'workemail', 'department', 'jobtitle', 'managerid', 'hiredate'];
+      const normalizedHeaders = headers.map(h => h.trim().toLowerCase().replace(/[\s_()]/g, ''));
+      
+      const missingKeys = expectedKeys.filter(k => !normalizedHeaders.includes(k));
+      if (missingKeys.length > 0) {
+        setIsHeaderValid(false);
+        setHeaderErrorMsg(`Missing required columns: ${missingKeys.map(k => {
+          if (k === 'employeeid') return 'employee_id';
+          if (k === 'firstname') return 'first_name';
+          if (k === 'lastname') return 'last_name';
+          if (k === 'workemail') return 'work_email';
+          if (k === 'jobtitle') return 'job_title';
+          if (k === 'managerid') return 'manager_id';
+          if (k === 'hiredate') return 'hire_date';
+          return k;
+        }).join(', ')}. Please use the template CSV.`);
+        setParsedRows([]);
+        setClientWarnings([]);
+      } else {
+        setIsHeaderValid(true);
+        setHeaderErrorMsg("");
+        
+        // Validate rows
+        const warnings: string[] = [];
+        const validBatchRows: any[] = [];
+        const emails = new Set<string>();
+        const empIds = new Set<string>();
+
+        rows.forEach((r, idx) => {
+          const line = idx + 2;
+          const employeeId = r['employeeid'] || "";
+          const firstName = r['firstname'] || "";
+          const lastName = r['lastname'] || "";
+          const workEmail = r['workemail'] || "";
+          const hireDate = r['hiredate'] || "";
+
+          if (!employeeId) {
+            warnings.push(`Row ${line}: Missing 'employee_id'. Row will be skipped.`);
+            return;
+          }
+          if (empIds.has(employeeId)) {
+            warnings.push(`Row ${line}: Duplicate 'employee_id' '${employeeId}' in batch. (Tenant-level deduplication will be handled by the server on import)`);
+          }
+          empIds.add(employeeId);
+
+          if (!firstName || !lastName) {
+            warnings.push(`Row ${line}: Missing first or last name.`);
+          }
+
+          if (!workEmail) {
+            warnings.push(`Row ${line}: Missing 'work_email'. Row will be skipped.`);
+          } else {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(workEmail)) {
+              warnings.push(`Row ${line}: Invalid email format '${workEmail}'.`);
+            }
+            if (emails.has(workEmail.toLowerCase())) {
+              warnings.push(`Row ${line}: Duplicate email '${workEmail}' in batch.`);
+            }
+            emails.add(workEmail.toLowerCase());
+          }
+
+          if (!hireDate) {
+            warnings.push(`Row ${line}: Missing 'hire_date'. Row will be skipped.`);
+          } else {
+            const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+            if (!dateRegex.test(hireDate)) {
+              warnings.push(`Row ${line}: Invalid date format '${hireDate}' (expected YYYY-MM-DD).`);
+            }
+          }
+
+          validBatchRows.push({
+            employee_id: employeeId,
+            first_name: firstName,
+            last_name: lastName,
+            work_email: workEmail,
+            department: r['department'] || "",
+            job_title: r['jobtitle'] || "",
+            manager_id: r['managerid'] || "",
+            hire_date: hireDate
+          });
+        });
+
+        // Cycle Check
+        const managerMap: Record<string, string> = {};
+        validBatchRows.forEach(emp => {
+          managerMap[emp.employee_id] = emp.manager_id;
+        });
+
+        validBatchRows.forEach(emp => {
+          const visited: string[] = [];
+          let curr = emp.employee_id;
+          while (curr && managerMap[curr]) {
+            if (visited.includes(curr)) {
+              warnings.push(`Cycle Warning: Loop found involving Employee ID '${curr}' in manager tree.`);
+              break;
+            }
+            visited.push(curr);
+            curr = managerMap[curr];
+          }
+        });
+
+        setParsedRows(validBatchRows);
+        setClientWarnings(warnings);
+      }
+      
+      setCurrentView("preview");
+    };
+    reader.readAsText(file);
+  };
+
+  // Submit parsed data to backend and process
+  const handleConfirmImport = () => {
+    if (!previewFile) return;
+
+    setCurrentView("processing");
+    setProgress(15);
+    setShowCreds(false);
+
+    const formData = new FormData();
+    formData.append("file", previewFile);
+
+    const progressInterval = setInterval(() => {
+      setProgress((prev) => {
+        if (prev >= 90) {
+          clearInterval(progressInterval);
+          return 90;
+        }
+        return prev + 15;
+      });
+    }, 300);
+
+    fetch("./import.php", {
+      method: "POST",
+      body: formData
+    })
+    .then(async (res) => {
+      clearInterval(progressInterval);
+      setProgress(100);
+      
+      const text = await res.text();
+      try {
+        const data = JSON.parse(text);
+        if (data.success) {
+          setImportStats({
+            processed: data.processed,
+            skipped: data.skipped,
+            warnings: data.warnings,
+            adminEmail: data.admin_email,
+            adminPassword: data.admin_password
+          });
+          setTimeout(() => {
+            setCurrentView("results");
+          }, 600);
+        } else {
+          showToast("Import Failure: " + (data.error || "Malformed file headers or fields. Please review configuration."));
+          setCurrentView("upload");
+        }
+      } catch (e) {
+        console.error("Parse error:", text);
+        showToast("Upload parsing error. Please check CSV format.");
+        setCurrentView("upload");
+      }
+    })
+    .catch((err) => {
+      clearInterval(progressInterval);
+      console.error(err);
+      showToast("Ingestion error: Connection to local MySQL server timed out.");
+      setCurrentView("upload");
+    });
+  };
+
+  const handleGoToDirectory = () => {
+    window.location.href = "/respawn-logics/pages/dashboard.php";
+  };
+
+  return (
+    <div className="relative min-h-screen w-full bg-[#0a0b10] text-[#f3f4f6] font-sans overflow-x-hidden">
+      {/* Toast Notification System */}
+      {toast && (
+        <div className="fixed top-6 left-1/2 -translate-x-1/2 z-[9999] animate-fade-in flex items-center gap-3 px-6 py-4 rounded-xl shadow-2xl backdrop-blur-xl border"
+             style={{
+               backgroundColor: toast.type === 'error' ? 'rgba(239, 68, 68, 0.15)' : 'rgba(16, 185, 129, 0.15)',
+               borderColor: toast.type === 'error' ? 'rgba(239, 68, 68, 0.3)' : 'rgba(16, 185, 129, 0.3)',
+               color: toast.type === 'error' ? '#fca5a5' : '#a7f3d0'
+             }}>
+          {toast.type === 'error' ? <AlertTriangle className="w-5 h-5 text-red-400" /> : <CheckCircle className="w-5 h-5 text-emerald-400" />}
+          <span className="font-semibold text-sm tracking-wide">{toast.message}</span>
+          <button onClick={() => setToast(null)} className="ml-4 opacity-70 hover:opacity-100 transition-opacity">✕</button>
+        </div>
+      )}
+
+      {/* Ambient background glows */}
+      <div className="absolute top-[-100px] left-[-100px] w-[500px] h-[500px] rounded-full bg-[#8b5cf6] blur-[120px] opacity-15 pointer-events-none z-0" />
+      <div className="absolute bottom-[-150px] right-[-100px] w-[600px] h-[600px] rounded-full bg-[#ec4899] blur-[140px] opacity-12 pointer-events-none z-0" />
+
+      {/* Hidden file input anchor */}
+      <input 
+        type="file" 
+        ref={fileInputRef} 
+        onChange={handleFileChange} 
+        accept=".csv" 
+        style={{ display: "none" }} 
+      />
+
+      {/* Header Navigation */}
+      <header className="relative z-10 bg-[#161922]/40 border-b border-[rgba(255,255,255,0.08)] px-6 py-4 backdrop-blur-md">
+        <div className="max-w-7xl mx-auto flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 bg-gradient-to-br from-[#8b5cf6] to-[#ec4899] rounded-lg flex items-center justify-center shadow-lg shadow-purple-500/25">
+              <span className="text-white font-bold text-sm">RL</span>
+            </div>
+            <h1 className="text-white font-semibold text-lg tracking-wide font-heading">Respawn Logic</h1>
+          </div>
+          <nav className="flex gap-6 flex-wrap">
+            <a href="#" onClick={() => setCurrentView("welcome")} className="text-slate-400 hover:text-white transition-colors">Welcome</a>
+            <a href="#" onClick={() => setCurrentView("upload")} className="text-[#3b82f6] font-medium">Onboard</a>
+            <a href="/respawn-logics/pages/dashboard.php" className="text-slate-400 hover:text-white transition-colors">Portal Dashboard</a>
+          </nav>
+        </div>
+      </header>
+
+      {/* Main Content */}
+      <main className="relative z-10 max-w-7xl mx-auto px-6 py-8">
+        
+        {/* State Indicators & Mock Panel Toggle */}
+        <div className="mb-6 p-4 bg-[#161922]/50 border border-[rgba(255,255,255,0.08)] rounded-xl flex gap-3 flex-wrap backdrop-blur-md">
+          <button
+            onClick={() => setCurrentView("welcome")}
+            className={`px-4 py-2 rounded-lg transition-all duration-300 font-semibold cursor-pointer ${
+              currentView === "welcome" ? "bg-gradient-to-r from-[#8b5cf6] to-[#ec4899] text-white shadow-md shadow-purple-500/20" : "bg-[#161922]/40 text-slate-300 hover:bg-[#161922]/80 border border-[rgba(255,255,255,0.05)]"
+            }`}
+          >
+            Welcome Panel
+          </button>
+          <button
+            onClick={() => setCurrentView("upload")}
+            className={`px-4 py-2 rounded-lg transition-all duration-300 font-semibold cursor-pointer ${
+              currentView === "upload" ? "bg-gradient-to-r from-[#8b5cf6] to-[#ec4899] text-white shadow-md shadow-purple-500/20" : "bg-[#161922]/40 text-slate-300 hover:bg-[#161922]/80 border border-[rgba(255,255,255,0.05)]"
+            }`}
+          >
+            Step 1: Upload Roster
+          </button>
+          <button
+            onClick={() => parsedRows.length > 0 ? setCurrentView("preview") : showToast("No preview data loaded yet. Please upload a file first.")}
+            className={`px-4 py-2 rounded-lg transition-all duration-300 font-semibold cursor-pointer ${
+              currentView === "preview" ? "bg-gradient-to-r from-[#8b5cf6] to-[#ec4899] text-white shadow-md shadow-purple-500/20" : "bg-[#161922]/40 text-slate-300 hover:bg-[#161922]/80 border border-[rgba(255,255,255,0.05)]"
+            }`}
+          >
+            File Preview
+          </button>
+          <button
+            onClick={() => setCurrentView("processing")}
+            className={`px-4 py-2 rounded-lg transition-all duration-300 font-semibold cursor-pointer ${
+              currentView === "processing" ? "bg-gradient-to-r from-[#8b5cf6] to-[#ec4899] text-white shadow-md shadow-purple-500/20" : "bg-[#161922]/40 text-slate-300 hover:bg-[#161922]/80 border border-[rgba(255,255,255,0.05)]"
+            }`}
+          >
+            Step 2: Processing
+          </button>
+          <button
+            onClick={() => setCurrentView("results")}
+            className={`px-4 py-2 rounded-lg transition-all duration-300 font-semibold cursor-pointer ${
+              currentView === "results" ? "bg-gradient-to-r from-[#8b5cf6] to-[#ec4899] text-white shadow-md shadow-purple-500/20" : "bg-[#161922]/40 text-slate-300 hover:bg-[#161922]/80 border border-[rgba(255,255,255,0.05)]"
+            }`}
+          >
+            Step 3: Import Report
+          </button>
+        </div>
+
+        {/* WELCOME PAGE */}
+        {currentView === "welcome" && (
+          <div className="max-w-5xl mx-auto">
+            <div className="text-center mb-12">
+              <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-[#8b5cf6] to-[#ec4899] rounded-2xl mb-6 shadow-lg shadow-purple-500/25">
+                <Users className="w-10 h-10 text-white" />
+              </div>
+              <h1 className="text-4xl font-bold text-white font-heading mb-4">
+                Welcome to Respawn Logic
+              </h1>
+              <p className="text-xl text-slate-300 max-w-2xl mx-auto">
+                Your complete flat relational HR management platform. Upload your relational employee tables and map supervisor chains dynamically.
+              </p>
+            </div>
+
+            {/* Feature Cards */}
+            <div className="grid md:grid-cols-3 gap-6 mb-12">
+              <div className="bg-[#161922]/65 border border-[rgba(255,255,255,0.08)] rounded-xl p-6 hover:border-[#8b5cf6]/50 transition-all backdrop-blur-md">
+                <div className="w-12 h-12 bg-[#8b5cf6]/10 rounded-lg flex items-center justify-center mb-4">
+                  <Zap className="w-6 h-6 text-[#8b5cf6]" />
+                </div>
+                <h3 className="text-white text-lg font-semibold font-heading mb-2">Flat relational Schema</h3>
+                <p className="text-slate-400 text-sm">
+                  We've discarded complex node trees in favor of simple, primary-key relationships via employee ID mappings.
+                </p>
+              </div>
+
+              <div className="bg-[#161922]/65 border border-[rgba(255,255,255,0.08)] rounded-xl p-6 hover:border-[#ec4899]/50 transition-all backdrop-blur-md">
+                <div className="w-12 h-12 bg-[#ec4899]/10 rounded-lg flex items-center justify-center mb-4">
+                  <Shield className="w-6 h-6 text-[#ec4899]" />
+                </div>
+                <h3 className="text-white text-lg font-semibold font-heading mb-2">Incremental Upserts</h3>
+                <p className="text-slate-400 text-sm">
+                  Database matches Employee IDs to insert new personnel or update existing user properties without conflicts.
+                </p>
+              </div>
+
+              <div className="bg-[#161922]/65 border border-[rgba(255,255,255,0.08)] rounded-xl p-6 hover:border-blue-500/50 transition-all backdrop-blur-md">
+                <div className="w-12 h-12 bg-blue-500/10 rounded-lg flex items-center justify-center mb-4">
+                  <Database className="w-6 h-6 text-[#3b82f6]" />
+                </div>
+                <h3 className="text-white text-lg font-semibold font-heading mb-2">Pre-upload Preview</h3>
+                <p className="text-slate-400 text-sm">
+                  Inspect imported spreadsheet rows, catch format warnings, and check for cycles before committing to MySQL.
+                </p>
+              </div>
+            </div>
+
+            {/* CTA Section */}
+            <div className="bg-[#161922]/65 border border-[rgba(255,255,255,0.08)] rounded-xl p-8 text-center backdrop-blur-md">
+              <h3 className="text-white text-xl font-bold font-heading mb-3">Ready to get started?</h3>
+              <p className="text-slate-400 mb-6 max-w-xl mx-auto">
+                Import your employee roster and start managing your workforce more effectively. Our guided workflow makes it easy.
+              </p>
+              <div className="flex gap-4 justify-center flex-wrap">
+                <button
+                  onClick={() => setCurrentView("upload")}
+                  className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-[#8b5cf6] to-[#ec4899] text-white rounded-lg hover:from-[#7c3aed] hover:to-[#db2777] transition-all font-semibold shadow-lg shadow-purple-500/10 cursor-pointer"
+                >
+                  Start Batch Import
+                  <ArrowRight className="w-5 h-5" />
+                </button>
+                <button 
+                  onClick={handleDownloadTemplate}
+                  className="px-6 py-3 bg-[#161922]/50 border border-[rgba(255,255,255,0.08)] text-slate-300 rounded-lg hover:bg-[#161922]/80 transition-colors font-semibold cursor-pointer"
+                >
+                  Get CSV Template
+                </button>
+              </div>
+            </div>
+
+            {/* Quick Stats */}
+            <div className="grid grid-cols-3 gap-6 mt-12">
+              <div className="text-center">
+                <div className="text-3xl font-bold text-[#8b5cf6] font-heading mb-1">99.9%</div>
+                <div className="text-sm text-slate-400">Uptime</div>
+              </div>
+              <div className="text-center">
+                <div className="text-3xl font-bold text-[#ec4899] font-heading mb-1">10K+</div>
+                <div className="text-sm text-slate-400">Companies</div>
+              </div>
+              <div className="text-center">
+                <div className="text-3xl font-bold text-[#3b82f6] font-heading mb-1">2M+</div>
+                <div className="text-sm text-slate-400">Employees Managed</div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* STATE 1: UPLOAD */}
+        {currentView === "upload" && (
+          <div className="grid lg:grid-cols-2 gap-8 animate-fade-in">
+            {/* Left Panel */}
+            <div className="space-y-6">
+              <div className="flex items-center gap-3 mb-6">
+                <Users className="w-6 h-6 text-[#8b5cf6]" />
+                <span className="text-slate-400 text-sm uppercase tracking-wide font-semibold">Employee Management</span>
+              </div>
+
+              <div>
+                <h2 className="text-white text-2xl font-bold font-heading mb-2">Batch Import Employees</h2>
+                <p className="text-[#3b82f6] font-medium">
+                  Upload your corporate CSV structure to initialize the flat relational directory. We will validate rows and self-referencing links prior to import.
+                </p>
+              </div>
+
+              <button 
+                onClick={handleDownloadTemplate}
+                className="flex items-center gap-2 px-4 py-2.5 bg-[#161922]/50 border border-[rgba(255,255,255,0.08)] text-slate-300 rounded-lg hover:bg-[#161922]/90 hover:border-slate-600 transition-colors cursor-pointer"
+              >
+                <Download className="w-5 h-5" />
+                Download CSV/Excel Template
+              </button>
+
+              {/* Formatting Checklist */}
+              <div className="bg-[#161922]/65 border border-[rgba(255,255,255,0.08)] rounded-xl p-6 backdrop-blur-md">
+                <h3 className="text-white text-lg font-semibold font-heading mb-4">Formatting Checklist</h3>
+                <ul className="space-y-3">
+                  <li className="flex gap-3 text-slate-300">
+                    <span className="text-[#8b5cf6] font-bold">1.</span>
+                    <span>Use unique <b>employee_id</b> primary keys (treated strictly as strings to preserve leading zeros).</span>
+                  </li>
+                  <li className="flex gap-3 text-slate-300">
+                    <span className="text-[#8b5cf6] font-bold">2.</span>
+                    <span>Provide explicit, separate <b>first_name</b> and <b>last_name</b> fields.</span>
+                  </li>
+                  <li className="flex gap-3 text-slate-300">
+                    <span className="text-[#8b5cf6] font-bold">3.</span>
+                    <span>Map supervisor hierarchies directly using matching Employee IDs in the <b>manager_id</b> column.</span>
+                  </li>
+                  <li className="flex gap-3 text-slate-300">
+                    <span className="text-[#8b5cf6] font-bold">4.</span>
+                    <span>Provide valid <b>hire_date</b> dates formatted exactly as YYYY-MM-DD.</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+
+            {/* Right Panel - Dropzone */}
+            <div>
+              <div 
+                onDragOver={handleDragOver}
+                onDragLeave={handleDragLeave}
+                onDrop={handleDrop}
+                onClick={handleBrowseClick}
+                className={`bg-[#161922]/30 border-2 border-dashed rounded-xl p-12 text-center transition-all duration-300 cursor-pointer min-h-[300px] flex items-center justify-center ${
+                  isDragging ? "border-[#8b5cf6] bg-[#8b5cf6]/5" : "border-[rgba(255,255,255,0.15)] hover:border-[#8b5cf6] hover:bg-[#161922]/60"
+                }`}
+              >
+                <div className="flex flex-col items-center gap-4">
+                  <div className="w-16 h-16 bg-[#8b5cf6]/10 rounded-full flex items-center justify-center">
+                    <CloudUpload className="w-8 h-8 text-[#8b5cf6]" />
+                  </div>
+                  <div>
+                    <p className="text-white font-medium mb-1">
+                      Drag and drop your spreadsheet here, or browse files
+                    </p>
+                    <p className="text-sm text-slate-400">
+                      Supported formats: .csv only (Max file size: 10MB, up to 10,000 rows)
+                    </p>
+                  </div>
+                  <button className="mt-2 px-6 py-2.5 bg-gradient-to-r from-[#8b5cf6] to-[#ec4899] text-white rounded-lg hover:from-[#7c3aed] hover:to-[#db2777] transition-all cursor-pointer font-semibold shadow-lg shadow-purple-500/10">
+                    <Upload className="w-5 h-5 inline mr-2" />
+                    Browse Files
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* STATE: FILE PREVIEW */}
+        {currentView === "preview" && (
+          <div className="max-w-6xl mx-auto space-y-6 animate-fade-in">
+            <div className="flex items-center justify-between flex-wrap gap-4 border-b border-[rgba(255,255,255,0.08)] pb-4">
+              <div>
+                <h2 className="text-white text-2xl font-bold font-heading">File Preview & Schema Check</h2>
+                <p className="text-slate-400 text-sm">
+                  Reviewing file: <span className="text-white font-semibold">{fileName}</span> ({fileSize})
+                </p>
+              </div>
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setCurrentView("upload")}
+                  className="px-5 py-2.5 bg-[#161922]/50 border border-[rgba(255,255,255,0.08)] text-slate-300 rounded-lg hover:bg-[#161922]/80 transition-all cursor-pointer font-semibold"
+                >
+                  Change File
+                </button>
+                {isHeaderValid && (
+                  <button
+                    onClick={handleConfirmImport}
+                    className="px-6 py-2.5 bg-gradient-to-r from-[#8b5cf6] to-[#ec4899] text-white rounded-lg hover:from-[#7c3aed] hover:to-[#db2777] transition-all cursor-pointer font-semibold shadow-lg shadow-purple-500/25"
+                  >
+                    Confirm & Start Import
+                  </button>
+                )}
+              </div>
+            </div>
+
+            {/* Validation Banner */}
+            {!isHeaderValid ? (
+              <div className="bg-[#ef4444]/10 border border-[#ef4444]/20 rounded-xl p-6 flex gap-4">
+                <div className="w-12 h-12 bg-[#ef4444]/10 rounded-full flex items-center justify-center flex-shrink-0">
+                  <AlertTriangle className="w-6 h-6 text-[#ef4444]" />
+                </div>
+                <div>
+                  <h4 className="text-white font-bold mb-1">CSV Header Validation Failed</h4>
+                  <p className="text-[#fca5a5] text-sm mb-3">{headerErrorMsg}</p>
+                  <p className="text-slate-400 text-xs">
+                    Please modify your spreadsheet file headers to exactly match: <b>employee_id, first_name, last_name, work_email, department, job_title, manager_id, hire_date</b>.
+                  </p>
+                </div>
+              </div>
+            ) : (
+              <>
+                {/* Warnings Log if present */}
+                {clientWarnings.length > 0 && (
+                  <div className="bg-[#f59e0b]/10 border border-[#f59e0b]/20 rounded-xl p-5 flex gap-4 max-h-[220px] overflow-y-auto">
+                    <AlertTriangle className="w-6 h-6 text-[#f59e0b] flex-shrink-0 mt-1" />
+                    <div className="space-y-1">
+                      <h4 className="text-white font-bold text-sm">Ingestion Warnings Detected ({clientWarnings.length})</h4>
+                      <p className="text-[#fcd34d] text-xs pb-1">You can still import, but rows with errors will be skipped or adjusted:</p>
+                      <ul className="list-disc list-inside text-slate-300 text-xs space-y-1">
+                        {clientWarnings.map((w, idx) => <li key={idx}>{w}</li>)}
+                      </ul>
+                    </div>
+                  </div>
+                )}
+
+                {/* Table Data Preview UI Component */}
+                <div className="bg-[#161922]/40 border border-[rgba(255,255,255,0.08)] rounded-xl overflow-hidden backdrop-blur-md shadow-2xl">
+                  <div className="p-4 bg-[#161922]/80 border-b border-[rgba(255,255,255,0.08)] flex justify-between items-center">
+                    <span className="text-xs uppercase font-semibold text-slate-400 tracking-wider">
+                      Batch Preview (First 20 records)
+                    </span>
+                    <span className="text-xs bg-[#8b5cf6]/20 text-[#c084fc] px-2 py-1 rounded-md font-semibold font-mono">
+                      {parsedRows.length} Rows Found
+                    </span>
+                  </div>
+                  <div className="overflow-x-auto max-h-[420px]">
+                    <table className="w-full text-left border-collapse text-sm">
+                      <thead>
+                        <tr className="bg-[#11131a]/80 text-slate-400 font-semibold border-b border-[rgba(255,255,255,0.08)]">
+                          <th className="p-4 text-xs uppercase tracking-wider">Employee ID</th>
+                          <th className="p-4 text-xs uppercase tracking-wider">First Name</th>
+                          <th className="p-4 text-xs uppercase tracking-wider">Last Name</th>
+                          <th className="p-4 text-xs uppercase tracking-wider">Work Email</th>
+                          <th className="p-4 text-xs uppercase tracking-wider">Department</th>
+                          <th className="p-4 text-xs uppercase tracking-wider">Job Title</th>
+                          <th className="p-4 text-xs uppercase tracking-wider">Manager ID</th>
+                          <th className="p-4 text-xs uppercase tracking-wider">Hire Date</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-[rgba(255,255,255,0.04)] text-slate-200">
+                        {parsedRows.slice(0, 20).map((row, idx) => (
+                          <tr key={idx} className="hover:bg-[#161922]/50 transition-colors">
+                            <td className="p-4 font-mono font-semibold text-[#c084fc]">{row.employee_id}</td>
+                            <td className="p-4">{row.first_name}</td>
+                            <td className="p-4">{row.last_name}</td>
+                            <td className="p-4 text-slate-400">{row.work_email}</td>
+                            <td className="p-4">{row.department}</td>
+                            <td className="p-4 text-slate-300">{row.job_title}</td>
+                            <td className="p-4 font-mono text-slate-400">{row.manager_id || <span className="text-slate-600">—</span>}</td>
+                            <td className="p-4 font-mono text-slate-400">{row.hire_date}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </>
+            )}
+          </div>
+        )}
+
+        {/* STATE 2: PROCESSING */}
+        {currentView === "processing" && (
+          <div className="max-w-3xl mx-auto animate-fade-in">
+            <div className="bg-[#161922]/65 border border-[rgba(255,255,255,0.08)] rounded-xl p-8 backdrop-blur-md">
+              <div className="text-center mb-8">
+                <div className="inline-flex items-center justify-center w-16 h-16 bg-[#8b5cf6]/10 rounded-full mb-4">
+                  <FileSpreadsheet className="w-8 h-8 text-[#8b5cf6] animate-pulse" />
+                </div>
+                <h2 className="text-white text-2xl font-bold font-heading mb-2">Importing Employee Data...</h2>
+                <p className="text-sm text-slate-400">
+                  File: {fileName || "spreadsheet.csv"} ({fileSize || "Calculating size..."})
+                </p>
+              </div>
+
+              {/* Progress Bar */}
+              <div className="mb-6">
+                <div className="flex justify-between items-center mb-2">
+                  <span className="text-sm text-slate-400">Ingesting relational data and generating hashes</span>
+                  <span className="text-sm font-medium text-white">{progress}% completed</span>
+                </div>
+                <div className="w-full h-3 bg-[#11131a] rounded-full overflow-hidden border border-[rgba(255,255,255,0.05)]">
+                  <div
+                    className="h-full bg-gradient-to-r from-[#8b5cf6] to-[#ec4899] rounded-full transition-all duration-300"
+                    style={{ width: `${progress}%` }}
+                  />
+                </div>
+                <div className="text-right mt-1">
+                  <span className="text-sm font-medium text-[#8b5cf6]">{progress}%</span>
+                </div>
+              </div>
+
+              {/* Info Banner */}
+              <div className="bg-[#3b82f6]/10 border border-[#3b82f6]/20 rounded-lg p-4 flex gap-3">
+                <Info className="w-5 h-5 text-[#3b82f6] flex-shrink-0 mt-0.5" />
+                <p className="text-sm text-blue-300">
+                  Please wait while the server modifies table schemas, runs upsert loops, establishes manager self-referencing IDs, and hashes credential passwords.
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* STATE 3: RESULTS */}
+        {currentView === "results" && (
+          <div className="max-w-4xl mx-auto space-y-6 animate-fade-in">
+            {/* Metric Cards */}
+            <div className="grid md:grid-cols-2 gap-6">
+              {/* Success Card */}
+              <div className="bg-[#161922]/65 border border-[rgba(255,255,255,0.08)] border-l-4 border-l-[#10b981] rounded-xl p-6 backdrop-blur-md">
+                <div className="flex items-start justify-between mb-4">
+                  <div className="w-10 h-10 bg-[#10b981]/10 rounded-lg flex items-center justify-center">
+                    <CheckCircle className="w-6 h-6 text-[#10b981]" />
+                  </div>
+                </div>
+                <div className="text-4xl font-bold text-[#10b981] mb-2 font-heading">{importStats.processed}</div>
+                <p className="text-slate-300">Profiles Created or Updated</p>
+              </div>
+
+              {/* Error Card */}
+              <div className="bg-[#161922]/65 border border-[rgba(255,255,255,0.08)] border-l-4 border-l-[#ef4444] rounded-xl p-6 backdrop-blur-md">
+                <div className="flex items-start justify-between mb-4">
+                  <div className="w-10 h-10 bg-[#ef4444]/10 rounded-lg flex items-center justify-center">
+                    <AlertTriangle className="w-6 h-6 text-[#ef4444]" />
+                  </div>
+                </div>
+                <div className="text-4xl font-bold text-[#ef4444] mb-2 font-heading">{importStats.skipped}</div>
+                <p className="text-slate-300">Rows Skipped due to Validation Errors</p>
+              </div>
+            </div>
+
+            {/* Ingestion details spotlight card (Collapsible - hidden initially) */}
+            <div className="bg-[#161922]/35 border border-[rgba(255,255,255,0.08)] rounded-xl p-6 backdrop-blur-md">
+              <button 
+                onClick={() => setShowCreds(!showCreds)}
+                className="w-full flex items-center justify-between text-white font-semibold font-heading cursor-pointer border-none bg-transparent outline-none"
+              >
+                <span className="flex items-center gap-2">
+                  <Shield className="w-5 h-5 text-[#8b5cf6]" /> Ingestion Details & Credentials
+                </span>
+                <span className="text-sm text-[#8b5cf6] hover:underline">
+                  {showCreds ? "Hide Details" : "Show Details"}
+                </span>
+              </button>
+              
+              {showCreds && (
+                <div className="mt-4 space-y-4 animate-fade-in">
+                  {/* Alert Banner */}
+                  <div className={`p-4 rounded-lg border flex items-center gap-3 ${
+                    importStats.skipped > 0 
+                      ? "bg-[#f59e0b]/10 border-[#f59e0b]/20 text-[#f59e0b]" 
+                      : "bg-[#10b981]/10 border-[#10b981]/20 text-[#10b981]"
+                  }`}>
+                    <AlertTriangle className="w-5 h-5 flex-shrink-0" />
+                    <span className="font-medium font-sans">
+                      {importStats.skipped > 0 ? "Import Complete with Warnings" : "Ingest Successful! All records synced."}
+                    </span>
+                  </div>
+
+                  <p className="text-slate-300 text-sm">
+                    The database has been initialized. The primary administrator account has been set to the top leader email below. You will be prompted to change your temporary password upon entering the platform.
+                  </p>
+                  <div className="grid sm:grid-cols-2 gap-4 bg-[#0a0b10] border border-[rgba(255,255,255,0.05)] p-4 rounded-lg font-mono text-sm">
+                    <div>
+                      <span className="text-slate-400 block text-xs uppercase mb-1">Admin Email</span>
+                      <span className="text-white break-all">{importStats.adminEmail || "admin@respawn.io"}</span>
+                    </div>
+                    <div>
+                      <span className="text-slate-400 block text-xs uppercase mb-1">Temporary Password</span>
+                      <span className="text-white">{importStats.adminPassword || "password123"}</span>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Resolution Call-to-Action */}
+            <div className="bg-[#161922]/35 border border-[rgba(255,255,255,0.08)] rounded-xl p-6 backdrop-blur-md">
+              <p className="text-slate-300 mb-4">
+                {importStats.skipped > 0 
+                  ? `${importStats.skipped} records were skipped due to formatting errors or invalid emails. You can download the report to correct them.` 
+                  : "All employee hierarchy rows have been integrated successfully. Ready to explore the directory."
+                }
+              </p>
+              <div className="flex flex-wrap gap-3">
+                <button 
+                  onClick={handleGoToDirectory}
+                  className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-[#8b5cf6] to-[#ec4899] text-white rounded-lg hover:from-[#7c3aed] hover:to-[#db2777] transition-all font-semibold shadow-lg shadow-purple-500/10 cursor-pointer"
+                >
+                  Enter Portal Directory
+                  <ArrowRight className="w-5 h-5" />
+                </button>
+                {importStats.skipped > 0 && (
+                  <button 
+                    onClick={handleDownloadErrorReport}
+                    className="flex items-center gap-2 px-5 py-3 bg-[#161922]/50 border border-[rgba(255,255,255,0.08)] text-slate-300 rounded-lg hover:bg-[#161922]/80 transition-colors font-semibold cursor-pointer"
+                  >
+                    <Download className="w-5 h-5" />
+                    Download Warnings Report (.csv)
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+      </main>
+    </div>
+  );
+}

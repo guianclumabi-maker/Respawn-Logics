@@ -1,0 +1,6 @@
+Column,Name/Team Name,ConnectedTo,Responsibilities,TeamMembers,EmployeeNumber,JobPosition
+1,Richard Branson,,,,EMP-001,CEO
+2,Sarah Jenkins,Richard Branson,,,,EMP-002,
+2,John Doe,Richard Branson,,,,EMP-003,
+5,Engineering Team,Sarah Jenkins,,"Alice Smith, Bob Jones, Charlie Brown, Dana Scully",,
+5,Design Team,John Doe,,"Eve Miller, Frank Wright, Grace Hopper",,

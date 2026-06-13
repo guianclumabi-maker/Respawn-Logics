@@ -1,0 +1,13 @@
+providers = ["node", "php"]
+
+[phases.setup]
+nixPkgs = ["php82", "php82Packages.composer", "nodejs_20", "php82Extensions.pdo", "php82Extensions.pdo_mysql", "php82Extensions.curl", "php82Extensions.mbstring"]
+
+[phases.install]
+cmds = ["npm install"]
+
+[phases.build]
+cmds = ["npm run build:all"]
+
+[start]
+# We let the default PHP provider handle the start command (Nginx + PHP-FPM)

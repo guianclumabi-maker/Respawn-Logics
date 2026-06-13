@@ -1,0 +1,9 @@
+node_modules/
+onboarding/node_modules/
+recruitment/node_modules/
+employee-relations/node_modules/
+.env
+scratch/
+tests/
+*.log
+.DS_Store

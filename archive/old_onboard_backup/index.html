@@ -1,0 +1,776 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sandbox HRIS - Onboarding & Organization Builder</title>
+    <!-- Google Fonts: Inter and Outfit -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome for Premium Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Floating Ambient Background Blobs -->
+        <div class="ambient-blob blob-1"></div>
+        <div class="ambient-blob blob-2"></div>
+        <div class="ambient-blob blob-3"></div>
+
+        <!-- ONBOARDING STEP 1: CREATE ORG -->
+        <section id="step-org-create" class="onboarding-step active">
+            <div class="card onboarding-card">
+                <div class="onboarding-header">
+                    <div class="logo">
+                        <svg class="logo-mark-svg" viewBox="0 0 100 80" width="32" height="26" xmlns="http://www.w3.org/2000/svg" style="display: inline-block; vertical-align: middle;">
+                            <defs>
+                                <linearGradient id="logo-white-create" x1="0%" y1="0%" x2="100%" y2="100%">
+                                    <stop offset="0%" stop-color="#ffffff" />
+                                    <stop offset="100%" stop-color="#cbd5e1" />
+                                </linearGradient>
+                                <filter id="logo-shadow-create" x="-20%" y="-20%" width="140%" height="140%">
+                                    <feDropShadow dx="-2" dy="2" stdDeviation="1.5" flood-color="#000000" flood-opacity="0.6" />
+                                </filter>
+                            </defs>
+                            <path d="M 16,65 L 43,38 L 33,38 L 58,13 L 58,38 L 50,38 L 80,68 L 73,68 L 43,38 L 23,65 Z" fill="url(#logo-white-create)" />
+                            <path d="M 41,65 L 68,38 L 58,38 L 83,13 L 83,38 L 73,38 L 48,65 Z" fill="url(#logo-white-create)" filter="url(#logo-shadow-create)" />
+                        </svg>
+                        <span>Respawn Logic</span>
+                    </div>
+                    <h1>Create Your Organization</h1>
+                    <p>Enter the base details of your sandbox company to initialize your workspace.</p>
+                </div>
+                <form id="org-create-form" class="onboarding-form">
+                    <div class="form-group">
+                        <label for="org-name">Organization Name</label>
+                        <div class="input-wrapper">
+                            <i class="fa-solid fa-building input-icon"></i>
+                            <input type="text" id="org-name" placeholder="e.g., Respawn Group" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="org-domain">Company Domain</label>
+                            <div class="input-wrapper">
+                                <i class="fa-solid fa-globe input-icon"></i>
+                                <input type="text" id="org-domain" placeholder="e.g., respawn.io" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="org-industry">Industry</label>
+                            <div class="input-wrapper">
+                                <i class="fa-solid fa-briefcase input-icon"></i>
+                                <select id="org-industry">
+                                    <option value="technology">Technology & Software</option>
+                                    <option value="finance">Fintech & Finance</option>
+                                    <option value="healthcare">Healthcare & Biotech</option>
+                                    <option value="logistics">Logistics & Supply Chain</option>
+                                    <option value="retail">E-Commerce & Retail</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="org-size">Projected Headcount</label>
+                        <div class="input-wrapper">
+                            <i class="fa-solid fa-users input-icon"></i>
+                            <select id="org-size">
+                                <option value="1-50">1 - 50 Employees (Startup)</option>
+                                <option value="51-200">51 - 200 Employees (Growth)</option>
+                                <option value="201-1000">201 - 1000 Employees (Mid-Market)</option>
+                                <option value="1000+">1000+ Employees (Enterprise)</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">
+                        <span>Initialize Org Sandbox</span>
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </form>
+            </div>
+        </section>
+
+        <!-- ONBOARDING STEP 2: HRIS ORG CHART CANVAS -->
+        <section id="step-org-canvas" class="onboarding-step hris-canvas-step">
+
+            <!-- HRIS Canvas Header Toolbar -->
+            <header class="hris-canvas-header">
+                <div style="display:flex;align-items:center;gap:10px;">
+                    <div style="display:flex;flex-direction:column;gap:1px;">
+                        <span style="font-size:10px;color:rgba(255,255,255,0.5);font-weight:700;letter-spacing:2px;text-transform:uppercase;">Step 2 of 4</span>
+                        <span style="font-family:'Outfit',sans-serif;font-weight:800;font-size:15px;color:#fff;letter-spacing:1px;">Organization Builder Canvas</span>
+                    </div>
+                </div>
+
+                <!-- Quick Action Toolbar -->
+                <div style="display:flex;flex-wrap:wrap;align-items:center;gap:12px;font-size:12px;flex:1;margin-left:24px;justify-content:flex-end;">
+                    <div style="display:flex;align-items:center;gap:6px;background:rgba(255,255,255,0.05);padding:4px;border-radius:8px;border:1px solid rgba(255,255,255,0.1);">
+                        <div id="hris-add-emp-menu-container" style="position:relative;display:inline-block;">
+                            <button type="button" id="hris-add-employee-btn" style="padding:6px 12px;border-radius:6px;border:none;background:transparent;color:#fff;font-weight:700;font-size:11px;cursor:pointer;outline:none;">
+                                <i class="fa-solid fa-user-plus" style="color:#a78bfa;margin-right:6px;"></i>Add Employee
+                            </button>
+                            <div id="hris-add-emp-dropdown" class="hris-dropdown-menu" style="display:none;position:absolute;top:100%;right:0;margin-top:6px;background:#161821;border:1px solid rgba(255,255,255,0.1);border-radius:8px;box-shadow:0 10px 30px rgba(0,0,0,0.5);z-index:999;width:210px;overflow:hidden;flex-direction:column;text-align:left;">
+                                <!-- Populated dynamically -->
+                            </div>
+                        </div>
+                        <button type="button" id="hris-template-btn" style="padding:6px 12px;border-radius:6px;border:none;background:transparent;color:#fff;font-weight:700;font-size:11px;cursor:pointer;" title="Download Template CSV">
+                            <i class="fa-solid fa-file-arrow-down" style="color:#f472b6;margin-right:6px;"></i>Template
+                        </button>
+                        <button type="button" id="hris-export-btn" style="padding:6px 12px;border-radius:6px;border:none;background:transparent;color:#fff;font-weight:700;font-size:11px;cursor:pointer;" title="Export CSV">
+                            <i class="fa-solid fa-file-export" style="color:#22d3ee;margin-right:6px;"></i>Export
+                        </button>
+                        <div style="width:1px;height:16px;background:rgba(255,255,255,0.1);"></div>
+                        <button type="button" id="hris-reset-btn" style="padding:6px 12px;border-radius:6px;border:none;background:transparent;color:#f87171;font-weight:700;font-size:11px;cursor:pointer;">
+                            Clear
+                        </button>
+                    </div>
+
+                    <!-- Search & Dept Filter -->
+                    <div style="display:flex;align-items:center;gap:8px;">
+                        <div style="position:relative;">
+                            <i class="fa-solid fa-magnifying-glass" style="color:rgba(255,255,255,0.4);position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:11px;"></i>
+                            <input type="text" id="hris-search-input" placeholder="Search..." style="width:140px;padding:6px 10px 6px 30px;border-radius:8px;background:#0a0b10;border:1px solid rgba(255,255,255,0.1);color:#fff;font-size:11px;outline:none;">
+                        </div>
+                        <div style="position:relative;">
+                            <select id="hris-dept-filter" style="padding:6px 28px 6px 10px;border-radius:8px;background:#0a0b10;border:1px solid rgba(255,255,255,0.1);color:#fff;font-size:11px;outline:none;appearance:none;cursor:pointer;">
+                                <option value="All">All Departments</option>
+                            </select>
+                            <div style="pointer-events:none;position:absolute;right:10px;top:50%;transform:translateY(-50%);color:rgba(255,255,255,0.3);font-size:8px;">▼</div>
+                        </div>
+                    </div>
+
+                    <!-- Batch Import Button -->
+                    <button type="button" id="hris-import-btn" style="display:inline-flex;align-items:center;gap:6px;padding:6px 16px;border-radius:8px;background:linear-gradient(to right,#8b5cf6,#ec4899);border:none;color:#fff;font-weight:700;font-size:11px;cursor:pointer;box-shadow:0 4px 12px rgba(139,92,246,0.3);">
+                        <i class="fa-solid fa-upload"></i> Batch Import
+                    </button>
+                </div>
+            </header>
+
+            <!-- Main Canvas Area -->
+            <div id="hris-canvas-viewport" style="flex:1;height:100%;position:relative;overflow:hidden;background:#0d0e15;cursor:grab;">
+                <div id="hris-canvas-board" style="position:absolute;left:0;right:0;top:0;padding:48px;display:flex;align-items:flex-start;gap:96px;min-height:100%;transform-origin:top left;">
+                    <svg id="hris-connections-svg" style="position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:1;"></svg>
+                    <!-- Columns injected dynamically -->
+                </div>
+
+                <!-- Zoom Controls -->
+                <div style="position:absolute;bottom:24px;left:24px;z-index:10;display:flex;align-items:center;gap:6px;background:rgba(22,24,33,0.8);backdrop-filter:blur(8px);padding:6px;border-radius:12px;border:1px solid rgba(255,255,255,0.1);">
+                    <button id="hris-zoom-out" style="width:32px;height:32px;border-radius:8px;border:none;background:transparent;color:rgba(255,255,255,0.6);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:12px;"><i class="fa-solid fa-minus"></i></button>
+                    <span id="hris-zoom-label" style="font-size:11px;font-weight:700;color:rgba(255,255,255,0.8);min-width:36px;text-align:center;">100%</span>
+                    <button id="hris-zoom-in" style="width:32px;height:32px;border-radius:8px;border:none;background:transparent;color:rgba(255,255,255,0.6);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:12px;"><i class="fa-solid fa-plus"></i></button>
+                    <div style="width:1px;height:16px;background:rgba(255,255,255,0.1);"></div>
+                    <button id="hris-zoom-reset" style="width:32px;height:32px;border-radius:8px;border:none;background:transparent;color:rgba(255,255,255,0.6);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:12px;" title="Reset Zoom"><i class="fa-solid fa-arrows-to-eye"></i></button>
+                </div>
+            </div>
+
+            <!-- Employee Settings Sidebar (hidden until node selected) -->
+            <aside id="hris-sidebar" style="width:320px;background:#161821;border-left:1px solid rgba(255,255,255,0.1);height:100%;display:flex;flex-direction:column;z-index:20;position:absolute;right:0;top:0;display:none;box-shadow:-8px 0 32px rgba(0,0,0,0.4);">
+                <div style="padding:16px;border-bottom:1px solid rgba(255,255,255,0.1);display:flex;align-items:center;justify-content:space-between;">
+                    <div>
+                        <h2 style="font-family:'Outfit',sans-serif;font-weight:700;font-size:13px;color:#fff;text-transform:uppercase;letter-spacing:1px;margin:0;">Employee Settings</h2>
+                        <p style="font-size:10px;color:rgba(255,255,255,0.5);margin:2px 0 0;">Edit roles, department, and managers.</p>
+                    </div>
+                    <button id="hris-sidebar-close" style="background:transparent;border:none;color:rgba(255,255,255,0.4);cursor:pointer;font-size:18px;">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+
+                <div style="flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:14px;">
+                    <!-- Employee ID (read-only) -->
+                    <div>
+                        <label style="font-size:10px;color:rgba(255,255,255,0.4);font-weight:700;text-transform:uppercase;display:block;margin-bottom:4px;">Employee ID</label>
+                        <div style="position:relative;">
+                            <i class="fa-solid fa-id-card" style="color:rgba(34,211,238,0.6);position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:11px;"></i>
+                            <input type="text" id="hris-edit-emp-id" readonly style="width:100%;padding:6px 10px 6px 32px;border-radius:6px;background:#0a0b10;border:1px solid rgba(255,255,255,0.05);font-size:11px;color:rgba(255,255,255,0.4);font-family:monospace;cursor:default;box-sizing:border-box;">
+                        </div>
+                    </div>
+                    <!-- Employee Number -->
+                    <div>
+                        <label style="font-size:10px;color:rgba(255,255,255,0.4);font-weight:700;text-transform:uppercase;display:block;margin-bottom:4px;">Employee Number</label>
+                        <div style="position:relative;">
+                            <i class="fa-solid fa-hashtag" style="color:rgba(255,255,255,0.3);position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:11px;"></i>
+                            <input type="text" id="hris-edit-emp-number" style="width:100%;padding:6px 10px 6px 32px;border-radius:6px;background:#0a0b10;border:1px solid rgba(255,255,255,0.1);font-size:11px;color:#fff;box-sizing:border-box;outline:none;">
+                        </div>
+                    </div>
+                    <!-- Full Name -->
+                    <div>
+                        <label style="font-size:10px;color:rgba(255,255,255,0.4);font-weight:700;text-transform:uppercase;display:block;margin-bottom:4px;">Full Name</label>
+                        <div style="position:relative;">
+                            <i class="fa-solid fa-user" style="color:rgba(255,255,255,0.3);position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:11px;"></i>
+                            <input type="text" id="hris-edit-name" style="width:100%;padding:6px 10px 6px 32px;border-radius:6px;background:#0a0b10;border:1px solid rgba(255,255,255,0.1);font-size:11px;color:#fff;box-sizing:border-box;outline:none;">
+                        </div>
+                    </div>
+                    <!-- Job Position -->
+                    <div>
+                        <label style="font-size:10px;color:rgba(255,255,255,0.4);font-weight:700;text-transform:uppercase;display:block;margin-bottom:4px;">Job Position</label>
+                        <div style="position:relative;">
+                            <i class="fa-solid fa-briefcase" style="color:rgba(255,255,255,0.3);position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:11px;"></i>
+                            <input type="text" id="hris-edit-position" style="width:100%;padding:6px 10px 6px 32px;border-radius:6px;background:#0a0b10;border:1px solid rgba(255,255,255,0.1);font-size:11px;color:#fff;box-sizing:border-box;outline:none;">
+                        </div>
+                    </div>
+                    <!-- Department -->
+                    <div>
+                        <label style="font-size:10px;color:rgba(255,255,255,0.4);font-weight:700;text-transform:uppercase;display:block;margin-bottom:4px;">Department</label>
+                        <div style="position:relative;">
+                            <i class="fa-solid fa-building" style="color:rgba(255,255,255,0.3);position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:11px;"></i>
+                            <input type="text" id="hris-edit-department" style="width:100%;padding:6px 10px 6px 32px;border-radius:6px;background:#0a0b10;border:1px solid rgba(255,255,255,0.1);font-size:11px;color:#fff;box-sizing:border-box;outline:none;">
+                        </div>
+                    </div>
+                    <!-- Immediate Supervisor -->
+                    <div>
+                        <label style="font-size:10px;color:rgba(255,255,255,0.4);font-weight:700;text-transform:uppercase;display:block;margin-bottom:4px;">Immediate Supervisor</label>
+                        <div style="position:relative;">
+                            <select id="hris-edit-supervisor" onchange="hrisOnSupervisorChange()" style="width:100%;padding:6px 28px 6px 10px;border-radius:6px;background:#0a0b10;border:1px solid rgba(255,255,255,0.1);font-size:11px;color:#fff;outline:none;appearance:none;cursor:pointer;box-sizing:border-box;"></select>
+                            <div style="pointer-events:none;position:absolute;right:10px;top:50%;transform:translateY(-50%);color:rgba(255,255,255,0.3);font-size:9px;">▼</div>
+                        </div>
+                        <div id="hris-sup-id-badge" style="font-size:10px;color:#a78bfa;font-weight:500;margin-top:4px;display:none;">
+                            Selected Manager ID: <span id="hris-sup-id-val" style="font-family:monospace;font-weight:700;background:#0a0b10;padding:1px 4px;border-radius:3px;border:1px solid rgba(255,255,255,0.05);"></span>
+                        </div>
+                        <div id="hris-sup-warning" style="display:none;padding:8px;border-radius:6px;background:rgba(234,179,8,0.05);border:1px solid rgba(234,179,8,0.1);font-size:9px;color:#fde68a;margin-top:4px;display:flex;gap:6px;align-items:flex-start;">
+                            <i class="fa-solid fa-triangle-exclamation" style="flex-shrink:0;margin-top:1px;"></i>
+                            <span>Making this employee a Root Node has direct visual promotion outcomes.</span>
+                        </div>
+                    </div>
+                    <!-- Manager/Department Supervisor -->
+                    <div>
+                        <label style="font-size:10px;color:rgba(255,255,255,0.4);font-weight:700;text-transform:uppercase;display:block;margin-bottom:4px;">Manager Supervisor</label>
+                        <div style="position:relative;">
+                            <select id="hris-edit-manager-supervisor" style="width:100%;padding:6px 28px 6px 10px;border-radius:6px;background:#0a0b10;border:1px solid rgba(255,255,255,0.1);font-size:11px;color:#fff;outline:none;appearance:none;cursor:pointer;box-sizing:border-box;"></select>
+                            <div style="pointer-events:none;position:absolute;right:10px;top:50%;transform:translateY(-50%);color:rgba(255,255,255,0.3);font-size:9px;">▼</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Footer Buttons -->
+                <div style="padding:16px;border-top:1px solid rgba(255,255,255,0.1);display:flex;flex-direction:column;gap:8px;">
+                    <button type="button" id="hris-save-emp-btn" style="width:100%;padding:8px;border-radius:8px;background:#8b5cf6;border:none;color:#fff;font-weight:700;font-size:11px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;">
+                        <i class="fa-solid fa-floppy-disk"></i> Save Changes
+                    </button>
+                    <button type="button" id="hris-delete-emp-btn" style="width:100%;padding:8px;border-radius:8px;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.2);color:#f87171;font-weight:700;font-size:11px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;">
+                        <i class="fa-solid fa-trash-can"></i> Remove Employee
+                    </button>
+                </div>
+            </aside>
+
+            <!-- HRIS Canvas Footer -->
+            <div class="canvas-footer" style="z-index:25;position:relative;">
+                <div style="flex:1;"></div>
+                <button class="btn btn-secondary" id="hris-canvas-cancel-btn">CANCEL</button>
+                <button class="btn btn-primary btn-gradient" id="hris-canvas-save-btn">SAVE ORGANIZATIONAL STRUCTURE</button>
+            </div>
+
+            <!-- Import Modal Overlay -->
+            <div id="hris-import-modal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;z-index:9999;background:rgba(0,0,0,0.6);backdrop-filter:blur(8px);display:none;align-items:center;justify-content:center;">
+                <div style="width:560px;max-width:95vw;border-radius:16px;border:1px solid rgba(255,255,255,0.1);background:#161821;padding:24px;position:relative;display:flex;flex-direction:column;max-height:90vh;">
+                    <button id="hris-modal-close" style="position:absolute;top:16px;right:16px;background:transparent;border:none;color:rgba(255,255,255,0.5);cursor:pointer;font-size:18px;"><i class="fa-solid fa-xmark"></i></button>
+                    <h2 style="font-family:'Outfit',sans-serif;font-weight:700;font-size:18px;color:#fff;margin:0 0 4px;">Import Organization Roster</h2>
+                    <p style="font-size:11px;color:rgba(255,255,255,0.5);margin:0 0 16px;">Upload a CSV roster file to generate your visual team chart.</p>
+
+                    <div id="hris-upload-zone">
+                        <div onclick="document.getElementById('hris-csv-input').click()" style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px;border-radius:12px;border:1px dashed rgba(255,255,255,0.15);background:rgba(255,255,255,0.01);cursor:pointer;text-align:center;">
+                            <input type="file" id="hris-csv-input" accept=".csv" style="display:none;" onchange="hrisHandleFileSelect(event)">
+                            <i class="fa-solid fa-file-arrow-up" style="font-size:28px;color:#a78bfa;margin-bottom:12px;"></i>
+                            <p style="color:#fff;font-size:11px;font-weight:700;margin:0 0 4px;">Click to select CSV roster template</p>
+                            <p style="color:rgba(255,255,255,0.4);font-size:10px;margin:0 0 16px;">Required columns: employee_id, employee_name, position, department, employee_number, immediate_supervisor_id, Manager_supervisor_id</p>
+                            <button type="button" onclick="event.stopPropagation();hrisTriggerDownloadTemplate();" style="display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:8px;background:rgba(255,255,255,0.05);border:none;color:rgba(255,255,255,0.8);font-size:10px;font-weight:700;cursor:pointer;">
+                                <i class="fa-solid fa-download"></i> Download CSV Template
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="hris-report-zone" style="display:none;flex:1;overflow:hidden;min-height:280px;flex-direction:column;">
+                        <div style="padding:10px;background:rgba(255,255,255,0.05);border-radius:8px;display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;font-size:11px;border:1px solid rgba(255,255,255,0.05);">
+                            <span id="hris-import-filename" style="color:rgba(255,255,255,0.8);font-weight:500;truncate:true;max-width:280px;"><i class="fa-solid fa-file-csv" style="color:#22d3ee;margin-right:6px;"></i>file.csv</span>
+                            <button onclick="hrisResetImportModal()" style="background:transparent;border:none;color:#8b5cf6;font-weight:700;font-size:11px;cursor:pointer;">RE-UPLOAD</button>
+                        </div>
+                        <div id="hris-report-details" style="flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:12px;max-height:240px;"></div>
+                        <div style="margin-top:16px;padding-top:16px;border-top:1px solid rgba(255,255,255,0.05);display:flex;justify-content:flex-end;gap:10px;">
+                            <button onclick="hrisResetImportModal()" style="background:transparent;border:none;color:rgba(255,255,255,0.5);font-weight:700;font-size:11px;cursor:pointer;padding:8px 16px;">Cancel</button>
+                            <button id="hris-import-submit" onclick="hrisCommitImport()" style="padding:8px 16px;border-radius:8px;background:linear-gradient(to right,#8b5cf6,#ec4899);border:none;color:#fff;font-weight:700;font-size:11px;cursor:pointer;">Import &amp; Render</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ONBOARDING STEP 3: USER PROFILE REGISTRATION -->
+        <section id="step-user-position" class="onboarding-step">
+            <div class="card onboarding-card">
+                <div class="onboarding-header">
+                    <span class="step-indicator">Step 3 of 4</span>
+                    <h1>Who are you in the system?</h1>
+                    <p>Enter your details and select which of the positions you just mapped out belongs to you.</p>
+                </div>
+                <form id="user-position-form" class="onboarding-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="user-firstname">First Name</label>
+                            <div class="input-wrapper">
+                                <i class="fa-solid fa-user input-icon"></i>
+                                <input type="text" id="user-firstname" placeholder="Guian" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="user-lastname">Last Name</label>
+                            <div class="input-wrapper">
+                                <i class="fa-solid fa-user input-icon"></i>
+                                <input type="text" id="user-lastname" placeholder="Santos" required>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="user-position-select">Choose Your Position</label>
+                        <div class="input-wrapper">
+                            <i class="fa-solid fa-id-badge input-icon"></i>
+                            <select id="user-position-select" required>
+                                <!-- Dynamically populated from canvas positions -->
+                            </select>
+                        </div>
+                        <span class="help-text">Your system permissions, views, and dashboards will reflect the configuration of this position node.</span>
+                    </div>
+                    <button type="submit" class="btn btn-primary">
+                        <span>Generate Sandbox Account</span>
+                        <i class="fa-solid fa-key"></i>
+                    </button>
+                </form>
+            </div>
+        </section>
+
+        <!-- ONBOARDING STEP 4: TEMPORARY CREDENTIALS POPUP -->
+        <section id="step-credentials" class="onboarding-step">
+            <div class="card onboarding-card credentials-card animate-pop">
+                <div class="onboarding-header text-center">
+                    <span class="step-indicator">Step 4 of 4</span>
+                    <div class="success-icon-badge">
+                        <i class="fa-solid fa-circle-check"></i>
+                    </div>
+                    <h1>Your Sandbox Environment is Ready!</h1>
+                    <p>Use these generated temporary credentials to login and explore your HRIS workspace.</p>
+                </div>
+                
+                <div class="credentials-display-box">
+                    <div class="credential-field">
+                        <span class="field-label">TEMPORARY EMAIL</span>
+                        <div class="field-value-group">
+                            <span class="field-value" id="temp-email">loading...</span>
+                            <button class="copy-btn" data-target="temp-email" title="Copy Email">
+                                <i class="fa-solid fa-copy"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="credential-field">
+                        <span class="field-label">TEMPORARY PASSWORD</span>
+                        <div class="field-value-group">
+                            <span class="field-value font-mono" id="temp-password">loading...</span>
+                            <button class="copy-btn" data-target="temp-password" title="Copy Password">
+                                <i class="fa-solid fa-copy"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 8px; margin-top: 12px; width: 100%;">
+                    <button type="button" class="btn btn-secondary w-full" id="download-accounts-csv-btn">
+                        <i class="fa-solid fa-file-csv" style="color: #10b981; margin-right: 6px;"></i> Download All Accounts (CSV)
+                    </button>
+                </div>
+
+                <div class="collapsible-accounts" style="margin-top: 12px; width: 100%;">
+                    <button type="button" class="collapse-trigger" id="toggle-accounts-list-btn" style="background: transparent; border: none; color: #cbd5e1; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px; font-size: 13px; width: 100%; justify-content: center; padding: 6px 0; transition: color 0.2s;">
+                        <span>Show All Generated Accounts</span> <i class="fa-solid fa-chevron-down" id="toggle-accounts-icon" style="font-size: 11px; transition: transform 0.2s;"></i>
+                    </button>
+                    <div class="accounts-list-container hidden" id="accounts-list-container" style="max-height: 180px; overflow-y: auto; margin-top: 10px; background: rgba(15, 23, 42, 0.6); border-radius: 8px; padding: 12px; border: 1px solid rgba(255, 255, 255, 0.1);">
+                        <table style="width: 100%; font-size: 11px; text-align: left; border-collapse: collapse; color: #e2e8f0;">
+                            <thead>
+                                <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.1); color: #94a3b8;">
+                                    <th style="padding: 6px 4px; font-weight: 600;">Name</th>
+                                    <th style="padding: 6px 4px; font-weight: 600;">Email</th>
+                                    <th style="padding: 6px 4px; font-weight: 600;">Password</th>
+                                </tr>
+                            </thead>
+                            <tbody id="sandbox-accounts-tbody">
+                                <!-- Populated dynamically by app.js -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="warning-banner">
+                    <i class="fa-solid fa-circle-info"></i>
+                    <span>In this sandbox model, you can impersonate and test different levels of access from the dashboard dashboard switcher.</span>
+                </div>
+
+                <button class="btn btn-primary btn-gradient w-full" id="credentials-login-btn">
+                    <span>Proceed to Login</span>
+                    <i class="fa-solid fa-arrow-right-to-bracket"></i>
+                </button>
+            </div>
+        </section>
+
+        <!-- ONBOARDING STEP 5: LOGIN PAGE -->
+        <section id="step-login" class="onboarding-step">
+            <div class="card onboarding-card login-card">
+                <div class="onboarding-header">
+                    <div class="logo text-center" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; margin-bottom: 24px;">
+                        <svg class="logo-full-svg" viewBox="0 0 100 80" width="80" height="64" xmlns="http://www.w3.org/2000/svg">
+                            <defs>
+                                <linearGradient id="logo-white-login" x1="0%" y1="0%" x2="100%" y2="100%">
+                                    <stop offset="0%" stop-color="#ffffff" />
+                                    <stop offset="100%" stop-color="#cbd5e1" />
+                                </linearGradient>
+                                <filter id="logo-shadow-login" x="-20%" y="-20%" width="140%" height="140%">
+                                    <feDropShadow dx="-2" dy="2" stdDeviation="2" flood-color="#000000" flood-opacity="0.6" />
+                                </filter>
+                            </defs>
+                            <path d="M 16,65 L 43,38 L 33,38 L 58,13 L 58,38 L 50,38 L 80,68 L 73,68 L 43,38 L 23,65 Z" fill="url(#logo-white-login)" />
+                            <path d="M 41,65 L 68,38 L 58,38 L 83,13 L 83,38 L 73,38 L 48,65 Z" fill="url(#logo-white-login)" filter="url(#logo-shadow-login)" />
+                        </svg>
+                        <div style="display: flex; flex-direction: column; align-items: center; gap: 2px;">
+                            <span id="login-org-title" style="font-family: 'Outfit', sans-serif; font-weight: 800; font-size: 20px; letter-spacing: 2px; color: #ffffff; line-height: 1;">RESPAWN</span>
+                            <span id="login-org-subtitle" style="font-family: 'Outfit', sans-serif; font-weight: 500; font-size: 13px; letter-spacing: 3px; color: #9ca3af; line-height: 1; text-transform: uppercase;">LOGIC</span>
+                        </div>
+                    </div>
+                    <h1 class="text-center">Sign In to HRIS</h1>
+                    <p class="text-center">Enter your temporary sandbox credentials to access your organization dashboard.</p>
+                </div>
+                <div id="login-error" class="error-banner hidden">
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                    <span>Incorrect email or password. Please try again.</span>
+                </div>
+                <form id="login-form" class="onboarding-form">
+                    <div class="form-group">
+                        <label for="login-email">Email Address</label>
+                        <div class="input-wrapper">
+                            <i class="fa-solid fa-envelope input-icon"></i>
+                            <input type="email" id="login-email" placeholder="name@company.com" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="login-password">Password</label>
+                        <div class="input-wrapper">
+                            <i class="fa-solid fa-lock input-icon"></i>
+                            <input type="password" id="login-password" placeholder="••••••••" required>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-full">
+                        <span>Enter Dashboard Workspace</span>
+                        <i class="fa-solid fa-circle-play"></i>
+                    </button>
+                </form>
+            </div>
+        </section>
+
+        <!-- ONBOARDING STEP 6: SANDBOX HRIS DASHBOARD -->
+        <section id="step-dashboard" class="onboarding-step dashboard-step">
+            <!-- Sidebar Navigation -->
+            <nav class="dashboard-sidebar">
+                <div class="sidebar-brand" style="gap: 10px;">
+                    <svg class="logo-mark-svg" viewBox="0 0 100 80" width="28" height="23" xmlns="http://www.w3.org/2000/svg" style="display: inline-block; vertical-align: middle;">
+                        <defs>
+                            <linearGradient id="logo-white-side" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" stop-color="#ffffff" />
+                                <stop offset="100%" stop-color="#cbd5e1" />
+                            </linearGradient>
+                            <filter id="logo-shadow-side" x="-20%" y="-20%" width="140%" height="140%">
+                                <feDropShadow dx="-2" dy="2" stdDeviation="1.5" flood-color="#000000" flood-opacity="0.6" />
+                            </filter>
+                        </defs>
+                        <path d="M 16,65 L 43,38 L 33,38 L 58,13 L 58,38 L 50,38 L 80,68 L 73,68 L 43,38 L 23,65 Z" fill="url(#logo-white-side)" />
+                        <path d="M 41,65 L 68,38 L 58,38 L 83,13 L 83,38 L 73,38 L 48,65 Z" fill="url(#logo-white-side)" filter="url(#logo-shadow-side)" />
+                    </svg>
+                    <span id="dashboard-brand-name">Respawn Logic</span>
+                </div>
+
+                <div class="sidebar-menu">
+                    <div class="menu-section">Workspace</div>
+                    <a href="#" class="menu-item active" data-tab="overview">
+                        <i class="fa-solid fa-chart-line"></i>
+                        <span>Overview</span>
+                    </a>
+                    <a href="#" class="menu-item" data-tab="directory">
+                        <i class="fa-solid fa-address-book"></i>
+                        <span>Directory</span>
+                    </a>
+                    <a href="#" class="menu-item" data-tab="security">
+                        <i class="fa-solid fa-shield-halved"></i>
+                        <span>Access & Scope</span>
+                    </a>
+
+                    <div class="menu-section">Self Service</div>
+                    <a href="#" class="menu-item" data-tab="benefits">
+                        <i class="fa-solid fa-gift"></i>
+                        <span>My Benefits</span>
+                    </a>
+                    <a href="#" class="menu-item" data-tab="compliance">
+                        <i class="fa-solid fa-file-invoice-dollar"></i>
+                        <span>Tax & Payroll</span>
+                    </a>
+                </div>
+
+                <!-- Current Signed In User Card -->
+                <div class="sidebar-user-footer">
+                    <div class="user-avatar-group">
+                        <div class="user-avatar" id="sidebar-user-avatar">GS</div>
+                        <div class="user-info">
+                            <div class="user-name" id="sidebar-user-name">Guian Santos</div>
+                            <div class="user-role" id="sidebar-user-role">Senior HR Associate (3.5)</div>
+                        </div>
+                    </div>
+                    <button class="logout-action-btn" id="logout-btn" title="Sign Out">
+                        <i class="fa-solid fa-right-from-bracket"></i>
+                    </button>
+                </div>
+            </nav>
+
+            <!-- Dashboard Content Container -->
+            <main class="dashboard-main">
+                <!-- Dashboard Top Bar / Controller -->
+                <header class="dashboard-topbar">
+                    <div class="topbar-welcome">
+                        <h1>Welcome back, <span id="topbar-firstname">Guian</span>!</h1>
+                        <p class="text-secondary">Viewing HRIS sandbox with active position configurations.</p>
+                    </div>
+
+                    <!-- Sandbox Impersonator Panel -->
+                    <div class="sandbox-impersonator-control">
+                        <div class="sandbox-indicator">
+                            <i class="fa-solid fa-circle-dot animate-pulse"></i>
+                            <span>SANDBOX SIMULATOR</span>
+                        </div>
+                        <div class="impersonator-selector-wrapper">
+                            <label for="sandbox-role-selector">Impersonate Role:</label>
+                            <select id="sandbox-role-selector" class="sandbox-select">
+                                <!-- Populated dynamically from canvas positions -->
+                            </select>
+                        </div>
+                    </div>
+                </header>
+
+                <!-- Dashboard Pages -->
+                <div class="dashboard-body">
+                    <!-- PAGE 1: OVERVIEW -->
+                    <div id="tab-overview" class="dashboard-page active">
+                        <!-- Upper Metrics Row -->
+                        <div class="dashboard-metrics-grid">
+                            <div class="metric-card">
+                                <div class="metric-icon-badge company">
+                                    <i class="fa-solid fa-building"></i>
+                                </div>
+                                <div class="metric-info">
+                                    <span class="metric-label">Assigned Company</span>
+                                    <h3 class="metric-value" id="dashboard-metric-company">Parent Corp</h3>
+                                </div>
+                            </div>
+                            <div class="metric-card">
+                                <div class="metric-icon-badge division">
+                                    <i class="fa-solid fa-network-wired"></i>
+                                </div>
+                                <div class="metric-info">
+                                    <span class="metric-label">Division / Dept</span>
+                                    <h3 class="metric-value" id="dashboard-metric-division">Operations</h3>
+                                </div>
+                            </div>
+                            <div class="metric-card">
+                                <div class="metric-icon-badge hub">
+                                    <i class="fa-solid fa-map-pin"></i>
+                                </div>
+                                <div class="metric-info">
+                                    <span class="metric-label">Hub / Pod Location</span>
+                                    <h3 class="metric-value" id="dashboard-metric-hub">Laguna Hub</h3>
+                                </div>
+                            </div>
+                            <div class="metric-card">
+                                <div class="metric-icon-badge position">
+                                    <i class="fa-solid fa-shield"></i>
+                                </div>
+                                <div class="metric-info">
+                                    <span class="metric-label">System Access Clearance</span>
+                                    <h3 class="metric-value" id="dashboard-metric-clearance">Executive</h3>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Organization Tree Visualization (Your hierarchy mapping) -->
+                        <div class="dashboard-card hierarchy-card">
+                            <div class="card-header-group">
+                                <h2>Your Active Hierarchy Path</h2>
+                                <p class="text-secondary">How your active position maps to the parent structure in this sandbox session.</p>
+                            </div>
+                            <div class="hierarchy-flow-display" id="hierarchy-path-container">
+                                <!-- Populated dynamically by app.js -->
+                            </div>
+                        </div>
+
+                        <!-- Content Grid -->
+                        <div class="dashboard-content-split">
+                            <!-- Role Properties Card -->
+                            <div class="dashboard-card col-span-2">
+                                <h2>Active Role Details</h2>
+                                <div class="details-list-grid">
+                                    <div class="detail-item">
+                                        <div class="detail-label"><i class="fa-solid fa-file-invoice-dollar"></i> Tax & Compliance Blueprint</div>
+                                        <div class="detail-val" id="dashboard-detail-tax">PIN Tax & Compliance Insight</div>
+                                    </div>
+                                    <div class="detail-item">
+                                        <div class="detail-label"><i class="fa-solid fa-gift"></i> Active Benefits Profile</div>
+                                        <div class="detail-val" id="dashboard-detail-benefits">15 FYL (1.5 FIL Benefit Insight)</div>
+                                    </div>
+                                    <div class="detail-item">
+                                        <div class="detail-label"><i class="fa-solid fa-shield-halved"></i> Security & Auditing Clearance</div>
+                                        <div class="detail-val" id="dashboard-detail-security">All Calls (FIF Access Insight)</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Responsibilities Checklist -->
+                            <div class="dashboard-card">
+                                <h2>Sub-Responsibilities</h2>
+                                <ul class="checklist-list" id="dashboard-sub-items">
+                                    <!-- Populated dynamically -->
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- PAGE 2: DIRECTORY -->
+                    <div id="tab-directory" class="dashboard-page">
+                        <div class="dashboard-card">
+                            <div class="card-header-split">
+                                <div>
+                                    <h2>Organization Directory</h2>
+                                    <p class="text-secondary">Review all roles defined within the organization blueprint.</p>
+                                </div>
+                                <div class="badge badge-primary"><span id="directory-count">0</span> Registered Nodes</div>
+                            </div>
+                            <div class="table-container">
+                                <table class="directory-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Name</th>
+                                            <th>Type</th>
+                                            <th>Connected to (Parent)</th>
+                                            <th>Clearance Level</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="directory-table-body">
+                                        <!-- Dynamically generated rows -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- PAGE 3: ACCESS & SCOPE -->
+                    <div id="tab-security" class="dashboard-page">
+                        <div class="dashboard-card security-scope-card">
+                            <div class="security-banner">
+                                <i class="fa-solid fa-lock-open security-banner-icon"></i>
+                                <div>
+                                    <h2>Security Level: <span id="security-active-level">Executive</span></h2>
+                                    <p class="text-secondary">Security clearances dictate what information and actions are exposed to the user.</p>
+                                </div>
+                            </div>
+
+                            <div class="security-matrix-grid">
+                                <div class="matrix-card" id="sec-card-write">
+                                    <div class="matrix-card-header">
+                                        <i class="fa-solid fa-pen-to-square"></i>
+                                        <h3>Write & Edit Structure</h3>
+                                    </div>
+                                    <p class="matrix-card-desc">Allows editing organization branches, restructuring, and changing nodes.</p>
+                                    <span class="matrix-status badge">Restricted</span>
+                                </div>
+                                <div class="matrix-card" id="sec-card-payroll">
+                                    <div class="matrix-card-header">
+                                        <i class="fa-solid fa-money-bill-transfer"></i>
+                                        <h3>Manage Payroll & Compensation</h3>
+                                    </div>
+                                    <p class="matrix-card-desc">Allows adjusting salaries, reviewing tax structures, and executing compensation metrics.</p>
+                                    <span class="matrix-status badge">Restricted</span>
+                                </div>
+                                <div class="matrix-card" id="sec-card-benefits">
+                                    <div class="matrix-card-header">
+                                        <i class="fa-solid fa-sliders"></i>
+                                        <h3>Adjust Benefits Policies</h3>
+                                    </div>
+                                    <p class="matrix-card-desc">Modify organization-wide perks, wellness credits, and custom insurance templates.</p>
+                                    <span class="matrix-status badge">Restricted</span>
+                                </div>
+                                <div class="matrix-card" id="sec-card-audit">
+                                    <div class="matrix-card-header">
+                                        <i class="fa-solid fa-clipboard-list"></i>
+                                        <h3>System Audit & Access Logs</h3>
+                                    </div>
+                                    <p class="matrix-card-desc">Full visibility into security events, data operations, and compliance logs.</p>
+                                    <span class="matrix-status badge">Restricted</span>
+                                </div>
+                            </div>
+
+                            <!-- Sandbox Switch Alert -->
+                            <div class="sandbox-tip-box">
+                                <h3><i class="fa-solid fa-lightbulb"></i> Sandbox Pro-Tip</h3>
+                                <p>Try switching your role in the top header dropdown to **QA Specialist** or **QA ROLE** (or any other restricted node you created in Step 2) and return to this page to witness this security matrix dynamically update access permissions in real-time!</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- PAGE 4: MY BENEFITS -->
+                    <div id="tab-benefits" class="dashboard-page">
+                        <div class="dashboard-card text-center pad-lg">
+                            <i class="fa-solid fa-gift section-jumbo-icon"></i>
+                            <h2 class="margin-top">My Benefits Workspace</h2>
+                            <p class="text-secondary max-width-md mx-auto">Your benefits details are fetched dynamically from the organizational mapping established during onboarding.</p>
+                            
+                            <div class="benefits-insight-card mx-auto">
+                                <span class="badge badge-accent">BENEFIT PROFILE</span>
+                                <h3 id="benefits-page-value" class="margin-top-sm">15 FYL (1.5 FIL Benefit Insight)</h3>
+                                <div class="benefits-progress">
+                                    <div class="progress-bar" style="width: 75%"></div>
+                                </div>
+                                <div class="benefits-stats">
+                                    <span>Used: 3 Days</span>
+                                    <span>Remaining: 12 Days</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- PAGE 5: TAX & PAYROLL -->
+                    <div id="tab-compliance" class="dashboard-page">
+                        <div class="dashboard-card pad-lg">
+                            <div class="card-header-group text-center">
+                                <i class="fa-solid fa-file-invoice-dollar section-jumbo-icon"></i>
+                                <h2 class="margin-top">Compliance & Tax Profile</h2>
+                                <p class="text-secondary max-width-md mx-auto">Review the regulatory compliance framework mapping to your active role.</p>
+                            </div>
+                            
+                            <div class="tax-insight-display mx-auto">
+                                <div class="tax-header">
+                                    <i class="fa-solid fa-shield-check"></i>
+                                    <span>ACTIVE COMPLIANCE STACK</span>
+                                </div>
+                                <div class="tax-value" id="tax-page-value">PIN Tax & Compliance Insight</div>
+                                <div class="tax-status">
+                                    <span class="status-indicator active"></span>
+                                    <span>System Status: 100% Tax Compliant</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Notification Toast Element -->
+    <div class="toast-notification" id="toast">
+        <i class="fa-solid fa-info-circle toast-icon"></i>
+        <span class="toast-message">Notification message here</span>
+    </div>
+
+    <script src="hris-canvas-engine.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>

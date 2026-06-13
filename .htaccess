@@ -1,0 +1,16 @@
+AddType text/css .css
+
+<FilesMatch "\.(html|htm)$">
+    <IfModule mod_headers.c>
+        Header set Cache-Control "max-age=0, no-cache, no-store, must-revalidate"
+        Header set Pragma "no-cache"
+        Header set Expires "Wed, 12 Jan 1980 05:00:00 GMT"
+    </IfModule>
+</FilesMatch>
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    # Silently route legacy API calls to the new Front Controller
+    # e.g., core_hr_api.php?action=foo -> api/index.php?route=core_hr&action=foo
+    RewriteRule ^([a-zA-Z0-9_]+)_api\.php$ api/index.php?route=$1 [QSA,L]
+</IfModule>

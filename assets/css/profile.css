@@ -1,0 +1,225 @@
+/* ==========================================================================
+   PROFILE STYLING — GOD MODE THEME
+   ========================================================================= */
+
+.profile-layout {
+    display: grid;
+    grid-template-columns: 320px 1fr;
+    gap: 30px;
+}
+
+@media (max-width: 992px) {
+    .profile-layout { grid-template-columns: 1fr; }
+}
+
+/* ── Sidebar Card ── */
+.profile-sidebar-card {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    background: rgba(15, 20, 34, 0.7);
+    border: 1px solid rgba(0, 224, 122, 0.12);
+    border-radius: var(--radius-lg);
+    padding: 32px 24px;
+    position: relative;
+    overflow: hidden;
+}
+
+.profile-sidebar-card::before {
+    content: '';
+    position: absolute;
+    top: -60px; right: -60px;
+    width: 180px; height: 180px;
+    background: radial-gradient(circle, rgba(0,224,122,0.07) 0%, transparent 70%);
+    pointer-events: none;
+}
+
+/* ── Avatar ── */
+.profile-avatar-large {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #00e07a, #00b8ff);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #0b0f1a;
+    font-family: var(--font-heading);
+    font-size: 2.75rem;
+    font-weight: 800;
+    box-shadow: 0 0 0 3px rgba(0,224,122,0.2), 0 0 30px rgba(0,224,122,0.15);
+    border: 3px solid rgba(0,224,122,0.3);
+    object-fit: cover;
+    margin-bottom: 8px;
+}
+
+/* ── Name & Role ── */
+.profile-name-large {
+    font-family: var(--font-heading);
+    font-size: 1.375rem;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: -0.02em;
+}
+
+.profile-role-badge {
+    display: inline-block;
+    padding: 5px 14px;
+    background: rgba(0, 224, 122, 0.1);
+    border: 1px solid rgba(0, 224, 122, 0.25);
+    color: #00e07a;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    font-weight: 700;
+    border-radius: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+}
+
+/* ── Meta list ── */
+.profile-meta-list {
+    width: 100%;
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    border-top: 1px solid rgba(255,255,255,0.06);
+    padding-top: 20px;
+    margin-top: 4px;
+}
+
+.profile-meta-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.8125rem;
+    gap: 12px;
+}
+
+.profile-meta-label {
+    color: var(--text-muted);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.6875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    flex-shrink: 0;
+}
+
+.profile-meta-value {
+    font-weight: 500;
+    color: var(--text-primary);
+    text-align: right;
+    word-break: break-all;
+}
+
+/* ── Tab Bar ── */
+.profile-tabs {
+    display: flex;
+    gap: 2px;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    margin-bottom: 28px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    padding-bottom: 0;
+}
+
+.profile-tabs::-webkit-scrollbar { display: none; }
+
+.profile-tab-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    padding: 10px 16px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    cursor: pointer;
+    position: relative;
+    transition: color 0.2s ease;
+    white-space: nowrap;
+    border-radius: 6px 6px 0 0;
+}
+
+.profile-tab-btn:hover {
+    color: #c8d0e0;
+    background: rgba(255,255,255,0.03);
+}
+
+.profile-tab-btn.active {
+    color: #00e07a;
+}
+
+.profile-tab-btn.active::after {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(90deg, #00e07a, #00b8ff);
+    border-radius: 2px 2px 0 0;
+}
+
+/* ── Forms Detail Card ── */
+.profile-detail-card {
+    background: rgba(15, 20, 34, 0.7);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: var(--radius-lg);
+    padding: 28px;
+}
+
+/* ── File Upload ── */
+.file-upload-wrapper {
+    position: relative;
+    overflow: hidden;
+    display: inline-block;
+    width: 100%;
+}
+
+.file-upload-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background: rgba(0,224,122,0.04);
+    border: 1px dashed rgba(0,224,122,0.2);
+    border-radius: var(--radius-sm);
+    padding: 16px 20px;
+    width: 100%;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.file-upload-btn:hover {
+    background: rgba(0,224,122,0.08);
+    border-color: rgba(0,224,122,0.4);
+    color: #00e07a;
+}
+
+.file-upload-input {
+    position: absolute;
+    left: 0;
+    top: 0;
+    opacity: 0;
+    cursor: pointer;
+    height: 100%;
+    width: 100%;
+}
+
+/* ── Spinner ── */
+.spinner {
+    display: inline-block;
+    width: 24px; height: 24px;
+    border: 3px solid rgba(0,224,122,0.15);
+    border-radius: 50%;
+    border-top-color: #00e07a;
+    animation: profileSpin 0.8s linear infinite;
+}
+
+@keyframes profileSpin { to { transform: rotate(360deg); } }

@@ -1,0 +1,428 @@
+<?php
+header('Content-Type: application/json');
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+if (!class_exists('ValidationException')) {
+    class ValidationException extends Exception {}
+}
+
+// Helper for XSS sanitization
+if (!function_exists('sanitizeInput')) {
+    function sanitizeInput($str) {
+        if ($str === null) return null;
+        if (is_array($str)) {
+            return array_map('sanitizeInput', $str);
+        }
+        return htmlspecialchars(strip_tags(trim((string)$str)), ENT_QUOTES, 'UTF-8');
+    }
+}
+
+// 1. Read database configuration
+require_once __DIR__ . '/bootstrap/app.php';
+
+try {
+    // Extract tenant_id from context session
+    $tenantId = isset($_SESSION['tenant_id']) ? trim((string)$_SESSION['tenant_id']) : '';
+    if (empty($tenantId)) {
+        $tenantId = 'default_tenant';
+        $_SESSION['tenant_id'] = $tenantId;
+    }
+
+    if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+        throw new ValidationException('Invalid request method. Only POST is supported.');
+    }
+
+    if (!isset($_FILES['file']) || $_FILES['file']['error'] !== UPLOAD_ERR_OK) {
+        throw new ValidationException('No file uploaded or upload error occurred.');
+    }
+
+    $fileTmpPath = $_FILES['file']['tmp_path'] ?? $_FILES['file']['tmp_name'];
+    $fileName = $_FILES['file']['name'];
+
+    // 2. Parse CSV
+    $rows = [];
+    if (($handle = fopen($fileTmpPath, 'r')) !== FALSE) {
+        $headers = fgetcsv($handle, 1000, ',');
+        
+        // Normalize headers
+        $headers = array_map(function($h) {
+            return trim(strtolower(str_replace([' ', '_', '(', ')'], '', $h)));
+        }, $headers);
+
+        // Expected headers in the flat relational schema
+        $expected = [
+            'employeeid' => -1,
+            'firstname' => -1,
+            'lastname' => -1,
+            'workemail' => -1,
+            'department' => -1,
+            'jobtitle' => -1,
+            'managerid' => -1,
+            'hiredate' => -1
+        ];
+
+        foreach ($headers as $index => $header) {
+            if (isset($expected[$header])) {
+                $expected[$header] = $index;
+            }
+        }
+
+        // Validate required headers are present
+        foreach ($expected as $col => $index) {
+            if ($index === -1) {
+                throw new ValidationException("Missing required column header matching: '$col'. Please check the template formatting.");
+            }
+        }
+
+        $lineNum = 1;
+        while (($data = fgetcsv($handle, 1000, ',')) !== FALSE) {
+            $lineNum++;
+            
+            // Map row data
+            $row = [
+                'line' => $lineNum,
+                'employee_id' => trim($data[$expected['employeeid']] ?? ''),
+                'first_name' => trim($data[$expected['firstname']] ?? ''),
+                'last_name' => trim($data[$expected['lastname']] ?? ''),
+                'work_email' => trim($data[$expected['workemail']] ?? ''),
+                'department' => trim($data[$expected['department']] ?? ''),
+                'job_title' => trim($data[$expected['jobtitle']] ?? ''),
+                'manager_id' => trim($data[$expected['managerid']] ?? ''),
+                'hire_date' => trim($data[$expected['hiredate']] ?? '')
+            ];
+            
+            // Skip entirely blank rows
+            if (empty($row['employee_id']) && empty($row['work_email']) && empty($row['first_name'])) {
+                continue;
+            }
+            
+            $rows[] = $row;
+        }
+        fclose($handle);
+    } else {
+        throw new ValidationException('Failed to open uploaded CSV file.');
+    }
+
+    if (empty($rows)) {
+        throw new ValidationException('The uploaded CSV file is empty.');
+    }
+
+    // 3. Process structural validation
+    $validationWarnings = [];
+    $processedCount = 0;
+    $skippedCount = 0;
+    
+    $validEmployees = [];
+    $employeeIdsInBatch = [];
+    
+    // First pass: validate emails, employee IDs, dates, and build reference mapping
+    foreach ($rows as $row) {
+        if (empty($row['employee_id'])) {
+            $validationWarnings[] = "Row {$row['line']}: Missing Employee ID. Skipping row.";
+            $skippedCount++;
+            continue;
+        }
+        
+        if (empty($row['first_name']) || empty($row['last_name'])) {
+            $validationWarnings[] = "Row {$row['line']}: Missing First Name or Last Name for Employee ID '{$row['employee_id']}'. Skipping row.";
+            $skippedCount++;
+            continue;
+        }
+        
+        $email = filter_var($row['work_email'], FILTER_VALIDATE_EMAIL);
+        if (!$email) {
+            $validationWarnings[] = "Row {$row['line']}: Invalid or missing email '{$row['work_email']}' for Employee ID '{$row['employee_id']}'. Skipping row.";
+            $skippedCount++;
+            continue;
+        }
+        
+        if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $row['hire_date'])) {
+            $validationWarnings[] = "Row {$row['line']}: Invalid hire date format '{$row['hire_date']}' (expected YYYY-MM-DD) for Employee ID '{$row['employee_id']}'. Skipping row.";
+            $skippedCount++;
+            continue;
+        }
+        
+        $row['work_email'] = $email;
+        $validEmployees[] = $row;
+        $employeeIdsInBatch[$row['employee_id']] = true;
+    }
+
+    if (empty($validEmployees)) {
+        throw new ValidationException('No valid rows could be imported from the CSV.');
+    }
+
+    // Pre-resolve emails and names for both batch and existing DB employees
+    $emailsMap = []; 
+    $namesMap = [];
+    $managerMap = [];
+    
+    foreach ($validEmployees as $emp) {
+        $emailsMap[$emp['employee_id']] = $emp['work_email'];
+        $namesMap[$emp['employee_id']] = $emp['first_name'] . ' ' . $emp['last_name'];
+        $managerMap[$emp['employee_id']] = $emp['manager_id'];
+    }
+
+    // Load existing database users to resolve links to existing staff (strictly scoped by tenant_id)
+    try {
+        $stmtLook = $pdo->prepare("SELECT employee_id, work_email, first_name, last_name, manager_id, tenant_id FROM `users` WHERE employee_id IS NOT NULL AND tenant_id = ?");
+        $stmtLook->execute([$tenantId]);
+        while ($dbUser = $stmtLook->fetch()) {
+            if ($dbUser['tenant_id'] !== $tenantId) {
+                // Strict isolation safeguard: throw an error if cross-tenant data leaks in the select
+                throw new ValidationException("Data isolation violation: loaded employee from different tenant.");
+            }
+            if (!isset($emailsMap[$dbUser['employee_id']])) {
+                $emailsMap[$dbUser['employee_id']] = $dbUser['work_email'];
+                $namesMap[$dbUser['employee_id']] = $dbUser['first_name'] . ' ' . $dbUser['last_name'];
+                $managerMap[$dbUser['employee_id']] = $dbUser['manager_id'];
+            }
+        }
+    } catch (PDOException $e) {
+        // Table might not exist or columns missing; we will handle it in the DDL phase
+    }
+
+    // Self-referencing cycle check
+    foreach ($validEmployees as $emp) {
+        $visited = [];
+        $curr = $emp['employee_id'];
+        while (!empty($managerMap[$curr])) {
+            if (in_array($curr, $visited)) {
+                $loopPath = implode(" -> ", $visited) . " -> " . $curr;
+                throw new ValidationException("Circular reporting loop detected: " . $loopPath);
+            }
+            $visited[] = $curr;
+            $curr = $managerMap[$curr];
+        }
+    }
+
+    // 4. Schema Modification - Ensure new relational columns and constraints exist
+    try {
+        $pdo->exec("SET FOREIGN_KEY_CHECKS = 0;");
+        
+        $colsToAdd = [
+            'tenant_id' => 'VARCHAR(50) DEFAULT NULL',
+            'employee_id' => 'VARCHAR(50) DEFAULT NULL',
+            'first_name' => 'VARCHAR(100) DEFAULT NULL',
+            'last_name' => 'VARCHAR(100) DEFAULT NULL',
+            'work_email' => 'VARCHAR(150) DEFAULT NULL',
+            'manager_id' => 'VARCHAR(50) DEFAULT NULL',
+            'hire_date' => 'DATE DEFAULT NULL'
+        ];
+        
+        foreach ($colsToAdd as $col => $type) {
+            $check = $pdo->query("SHOW COLUMNS FROM `users` LIKE '$col'");
+            if (!$check->fetch()) {
+                $pdo->exec("ALTER TABLE `users` ADD COLUMN `$col` $type;");
+            }
+        }
+        
+        // Drop legacy globally unique keys if they exist
+        $checkIndex = $pdo->query("SHOW INDEX FROM `users` WHERE Key_name = 'uq_employee_id'")->fetch();
+        if ($checkIndex) {
+            $pdo->exec("ALTER TABLE `users` DROP INDEX `uq_employee_id`;");
+        }
+
+        $checkIndexEmail = $pdo->query("SHOW INDEX FROM `users` WHERE Key_name = 'uq_work_email'")->fetch();
+        if ($checkIndexEmail) {
+            $pdo->exec("ALTER TABLE `users` DROP INDEX `uq_work_email`;");
+        }
+
+        // Add composite unique key for tenant + employee
+        $checkIndexTenantEmp = $pdo->query("SHOW INDEX FROM `users` WHERE Key_name = 'unique_tenant_employee'")->fetch();
+        if (!$checkIndexTenantEmp) {
+            $pdo->exec("ALTER TABLE `users` ADD UNIQUE KEY `unique_tenant_employee` (`tenant_id`, `employee_id`);");
+        }
+
+        // Add composite unique key for tenant + email
+        $checkIndexTenantEmail = $pdo->query("SHOW INDEX FROM `users` WHERE Key_name = 'unique_tenant_email'")->fetch();
+        if (!$checkIndexTenantEmail) {
+            $pdo->exec("ALTER TABLE `users` ADD UNIQUE KEY `unique_tenant_email` (`tenant_id`, `work_email`);");
+        }
+        $pdo->exec("SET FOREIGN_KEY_CHECKS = 1;");
+    } catch (PDOException $e) {
+        // Safe to ignore if columns or constraints already exist
+    }
+
+    // 5. Database Transaction and Ingestion
+    $pdo->beginTransaction();
+
+    // Determine all manager IDs in the current state to check who is a supervisor
+    $allManagerIds = [];
+    foreach ($managerMap as $empId => $mgrId) {
+        if (!empty($mgrId)) {
+            $allManagerIds[$mgrId] = true;
+        }
+    }
+
+    // Identify the primary Admin user (first user with no manager_id, or first record)
+    $adminUser = null;
+    foreach ($validEmployees as $emp) {
+        if (empty($emp['manager_id'])) {
+            $adminUser = $emp;
+            break;
+        }
+    }
+    if (!$adminUser) {
+        $adminUser = $validEmployees[0];
+    }
+
+    // Prepared statement for database Upsert (scoped with tenant_id)
+    $stmt = $pdo->prepare("INSERT INTO `users` 
+        (`tenant_id`, `employee_id`, `first_name`, `last_name`, `work_email`, `department`, `job_title`, `manager_id`, `hire_date`, `full_name`, `email`, `password_hash`, `role`, `tier`, `immediate_supervisor`, `department_manager`, `profile_image`) 
+        VALUES 
+        (:tenant_id, :employee_id, :first_name, :last_name, :work_email, :department, :job_title, :manager_id, :hire_date, :full_name, :email, :password_hash, :role, :tier, :immediate_supervisor, :department_manager, '')
+        ON DUPLICATE KEY UPDATE
+        `first_name` = VALUES(`first_name`),
+        `last_name` = VALUES(`last_name`),
+        `work_email` = VALUES(`work_email`),
+        `department` = VALUES(`department`),
+        `job_title` = VALUES(`job_title`),
+        `manager_id` = VALUES(`manager_id`),
+        `hire_date` = VALUES(`hire_date`),
+        `full_name` = VALUES(`full_name`),
+        `email` = VALUES(`email`),
+        `role` = VALUES(`role`),
+        `tier` = VALUES(`tier`),
+        `immediate_supervisor` = VALUES(`immediate_supervisor`),
+        `department_manager` = VALUES(`department_manager`)");
+
+    $accounts = [];
+
+    foreach ($validEmployees as $emp) {
+        $employeeId = $emp['employee_id'];
+        $managerId = $emp['manager_id'];
+        $workEmail = $emp['work_email'];
+        
+        // Check if supervisor links are valid
+        if (!empty($managerId) && !isset($emailsMap[$managerId])) {
+            $validationWarnings[] = "Row {$emp['line']}: Manager ID '{$managerId}' not found. Defaulting supervisor links to empty.";
+            $managerId = null;
+        }
+
+        // Determine tier & role for legacy system support
+        $tierVal = 1.0;
+        $role = 'employee';
+        
+        if (empty($managerId)) {
+            $tierVal = 4.0;
+            $role = 'admin';
+        } else {
+            $isSupervisor = isset($allManagerIds[$employeeId]);
+            if ($isSupervisor) {
+                // If their manager is CEO, they are a director/manager (Tier 3), else supervisor (Tier 2)
+                $parentMgr = $managerMap[$managerId] ?? null;
+                if (empty($parentMgr)) {
+                    $tierVal = 3.0;
+                    $role = 'manager';
+                } else {
+                    $tierVal = 2.0;
+                    $role = 'supervisor';
+                }
+            }
+        }
+
+        // Resolve legacy supervisor and manager emails
+        $immediateSupervisorEmail = !empty($managerId) ? ($emailsMap[$managerId] ?? '') : '';
+        
+        // Find department manager by tracing up to find a tier >= 3.0 manager
+        $deptManagerEmail = '';
+        $curr = $employeeId;
+        $traceVisited = [];
+        while (!empty($managerMap[$curr])) {
+            if (in_array($curr, $traceVisited)) break;
+            $traceVisited[] = $curr;
+            $mId = $managerMap[$curr];
+            
+            // Check if this parent is a manager or CEO
+            $pMgr = $managerMap[$mId] ?? null;
+            if (empty($pMgr)) {
+                $deptManagerEmail = $emailsMap[$mId] ?? '';
+                break;
+            } else {
+                // Check if they are a Tier 3 Manager
+                $grandParent = $managerMap[$pMgr] ?? null;
+                if (empty($grandParent)) {
+                    $deptManagerEmail = $emailsMap[$mId] ?? '';
+                    break;
+                }
+            }
+            $curr = $mId;
+        }
+
+        $fullName = $emp['first_name'] . ' ' . $emp['last_name'];
+        $passwordHash = password_hash('password123', PASSWORD_BCRYPT);
+
+        $stmt->execute([
+            ':tenant_id' => $tenantId,
+            ':employee_id' => $employeeId,
+            ':first_name' => $emp['first_name'],
+            ':last_name' => $emp['last_name'],
+            ':work_email' => $workEmail,
+            ':department' => $emp['department'],
+            ':job_title' => $emp['job_title'],
+            ':manager_id' => $managerId,
+            ':hire_date' => $emp['hire_date'],
+            ':full_name' => $fullName,
+            ':email' => $workEmail,
+            ':password_hash' => $passwordHash,
+            ':role' => $role,
+            ':tier' => $tierVal,
+            ':immediate_supervisor' => $immediateSupervisorEmail,
+            ':department_manager' => $deptManagerEmail
+        ]);
+
+        $accounts[] = [
+            'full_name' => $fullName,
+            'email' => $workEmail,
+            'password' => 'password123',
+            'role' => $role,
+            'department' => $emp['department'],
+            'immediate_supervisor' => $immediateSupervisorEmail,
+            'job_title' => $emp['job_title']
+        ];
+        
+        $processedCount++;
+    }
+
+    $pdo->commit();
+
+    // 6. Establish Logged-in User Session (Logs in the Primary Admin)
+    $_SESSION['user_email'] = strtolower($adminUser['work_email']);
+    $_SESSION['logged_in'] = true;
+    $_SESSION['role'] = 'admin';
+    $_SESSION['tenant_id'] = $tenantId;
+    
+    // Security Hook: Force the newly imported Admin to change their temporary password
+    $_SESSION['must_change_password'] = true;
+
+    echo json_encode([
+        'success' => true,
+        'accounts' => $accounts,
+        'admin_email' => $adminUser['work_email'],
+        'admin_password' => 'password123',
+        'warnings' => $validationWarnings,
+        'processed' => $processedCount,
+        'skipped' => $skippedCount
+    ]);
+
+} catch (ValidationException $e) {
+    if (isset($pdo) && $pdo->inTransaction()) {
+        $pdo->rollBack();
+    }
+    http_response_code(400);
+    echo json_encode([
+        'success' => false,
+        'error' => $e->getMessage()
+    ]);
+} catch (Exception $e) {
+    if (isset($pdo) && $pdo->inTransaction()) {
+        $pdo->rollBack();
+    }
+    http_response_code(500);
+    echo json_encode([
+        'success' => false,
+        'error' => 'Database ingestion error: ' . $e->getMessage()
+    ]);
+}

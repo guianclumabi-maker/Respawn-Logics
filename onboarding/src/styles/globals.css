@@ -1,0 +1,43 @@
+
+.ambient-blob {
+    position: fixed;
+    border-radius: 50%;
+    filter: blur(120px);
+    opacity: 0.15;
+    z-index: -1;
+    pointer-events: none;
+}
+
+.blob-1 {
+    width: 500px;
+    height: 500px;
+    background-color: #4f8ef7;
+    top: -100px;
+    left: -100px;
+    animation: pulse-blob 12s infinite alternate;
+}
+
+.blob-2 {
+    width: 600px;
+    height: 600px;
+    background-color: #00c9b1;
+    bottom: -200px;
+    right: -100px;
+    animation: pulse-blob 15s infinite alternate-reverse;
+}
+
+.blob-3 {
+    width: 400px;
+    height: 400px;
+    background-color: #00e07a;
+    top: 30%;
+    left: 45%;
+    opacity: 0.08;
+    animation: pulse-blob 18s infinite alternate;
+}
+
+@keyframes pulse-blob {
+    0% { transform: scale(1) translate(0, 0); }
+    100% { transform: scale(1.2) translate(50px, 30px); }
+}
+

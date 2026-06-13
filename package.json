@@ -1,0 +1,18 @@
+{
+  "name": "respawn-logics-workspace",
+  "private": true,
+  "workspaces": [
+    "onboarding",
+    "recruitment",
+    "employee-relations"
+  ],
+  "scripts": {
+    "dev:onboarding": "node \"%npm_execpath%\" run dev --workspace=onboarding",
+    "dev:recruitment": "node \"%npm_execpath%\" run dev --workspace=recruitment",
+    "dev:relations": "node \"%npm_execpath%\" run dev --workspace=employee-relations",
+    "build:onboarding": "node \"%npm_execpath%\" run build --workspace=onboarding && powershell -Command \"Copy-Item -Path onboarding/dist/* -Destination . -Recurse -Force\"",
+    "build:recruitment": "node \"%npm_execpath%\" run build --workspace=recruitment && powershell -Command \"Copy-Item -Path recruitment/dist/* -Destination dist -Recurse -Force\"",
+    "build:relations": "node \"%npm_execpath%\" run build --workspace=employee-relations && powershell -Command \"Remove-Item -Path employee-relations-dist -Recurse -Force -ErrorAction SilentlyContinue; Copy-Item -Path employee-relations/dist -Destination employee-relations-dist -Recurse -Force\"",
+    "build:all": "node \"%npm_execpath%\" run build:onboarding && node \"%npm_execpath%\" run build:recruitment && node \"%npm_execpath%\" run build:relations"
+  }
+}
