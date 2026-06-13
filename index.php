@@ -798,7 +798,7 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
         }
         /* ─── NEW STORY SECTIONS ─── */
         .story-section {
-            padding: 60px 24px;
+            padding: 100px 24px;
             width: 100%;
             text-align: center;
             position: relative;
