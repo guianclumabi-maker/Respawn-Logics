@@ -17,4 +17,7 @@ $page_title = $page_title ?? 'Respawn Logics';
     <!-- Core Application CSS -->
     <link rel="stylesheet" href="<?= url('/assets/css/dashboard.css') ?>">
     <link rel="stylesheet" href="<?= url('/assets/css/app-nav.css') ?>">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="<?= url('/assets/favicon.svg') ?>">
 </head>
