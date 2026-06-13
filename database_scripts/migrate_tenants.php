@@ -20,6 +20,15 @@ try {
 
     echo "Tenants table created successfully.\n";
 
+    $pdo->exec("CREATE TABLE IF NOT EXISTS `tenant_modules` (
+        `tenant_id` VARCHAR(50) NOT NULL,
+        `module_key` VARCHAR(50) NOT NULL,
+        `is_enabled` TINYINT(1) DEFAULT 1,
+        PRIMARY KEY (`tenant_id`, `module_key`),
+        FOREIGN KEY (`tenant_id`) REFERENCES `tenants`(`id`) ON DELETE CASCADE
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;");
+    echo "Tenant Modules table created successfully.\n";
+
     // Seed mock tenants
     $stmt = $pdo->prepare("INSERT INTO `tenants` (`id`, `company_name`, `contact_email`, `subscription_tier`, `status`, `foot_traffic_score`, `ai_api_calls`) VALUES (?, ?, ?, ?, ?, ?, ?)");
     
