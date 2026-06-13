@@ -790,9 +790,13 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
         /* ─── NEW STORY SECTIONS ─── */
         .story-section {
             padding: 140px 24px;
+            width: 100%;
+            text-align: center;
+            position: relative;
+        }
+        .story-container {
             max-width: 1200px;
             margin: 0 auto;
-            text-align: center;
             position: relative;
         }
         .story-section h2 {
@@ -1077,116 +1081,124 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
 
 <!-- SECTION 1: JOURNEY -->
 <section class="story-section" id="journey">
-    <h2>Manage every stage of the employee journey</h2>
-    <p class="sub">From recruitment and onboarding to payroll, performance, and employee support, Respawn Logic helps organizations manage their workforce from a single platform.</p>
-    
-    <div class="journey-flow">
-        <div class="journey-node"><i class="fa-solid fa-crosshairs"></i> Recruit</div> <i class="fa-solid fa-chevron-right journey-arrow"></i>
-        <div class="journey-node"><i class="fa-solid fa-handshake"></i> Hire</div> <i class="fa-solid fa-chevron-right journey-arrow"></i>
-        <div class="journey-node"><i class="fa-solid fa-bolt"></i> Onboard</div> <i class="fa-solid fa-chevron-right journey-arrow"></i>
-        <div class="journey-node"><i class="fa-solid fa-briefcase"></i> Work</div> <i class="fa-solid fa-chevron-right journey-arrow"></i>
-        <div class="journey-node"><i class="fa-solid fa-coins"></i> Pay</div> <i class="fa-solid fa-chevron-right journey-arrow"></i>
-        <div class="journey-node"><i class="fa-solid fa-ranking-star"></i> Develop</div> <i class="fa-solid fa-chevron-right journey-arrow"></i>
-        <div class="journey-node"><i class="fa-solid fa-shield-heart"></i> Support</div> <i class="fa-solid fa-chevron-right journey-arrow"></i>
-        <div class="journey-node" style="background: rgba(155,109,255,0.1); border-color: var(--purple); color: var(--purple);"><i class="fa-solid fa-level-up-alt"></i> Grow</div>
+    <div class="story-container">
+        <h2>Manage every stage of the employee journey</h2>
+        <p class="sub">From recruitment and onboarding to payroll, performance, and employee support, Respawn Logic helps organizations manage their workforce from a single platform.</p>
+        
+        <div class="journey-flow">
+            <div class="journey-node"><i class="fa-solid fa-crosshairs"></i> Recruit</div> <i class="fa-solid fa-chevron-right journey-arrow"></i>
+            <div class="journey-node"><i class="fa-solid fa-handshake"></i> Hire</div> <i class="fa-solid fa-chevron-right journey-arrow"></i>
+            <div class="journey-node"><i class="fa-solid fa-bolt"></i> Onboard</div> <i class="fa-solid fa-chevron-right journey-arrow"></i>
+            <div class="journey-node"><i class="fa-solid fa-briefcase"></i> Work</div> <i class="fa-solid fa-chevron-right journey-arrow"></i>
+            <div class="journey-node"><i class="fa-solid fa-coins"></i> Pay</div> <i class="fa-solid fa-chevron-right journey-arrow"></i>
+            <div class="journey-node"><i class="fa-solid fa-ranking-star"></i> Develop</div> <i class="fa-solid fa-chevron-right journey-arrow"></i>
+            <div class="journey-node"><i class="fa-solid fa-shield-heart"></i> Support</div> <i class="fa-solid fa-chevron-right journey-arrow"></i>
+            <div class="journey-node" style="background: rgba(155,109,255,0.1); border-color: var(--purple); color: var(--purple);"><i class="fa-solid fa-level-up-alt"></i> Grow</div>
+        </div>
     </div>
 </section>
 
 <!-- SECTION 2: PROBLEMS ELIMINATED -->
 <section class="story-section" id="problems" style="background: var(--bg2);">
-    <h2>Stop managing people across disconnected tools</h2>
-    
-    <div class="problems-grid">
-        <div class="problem-card"><i class="fa-solid fa-skull"></i> Spreadsheets</div>
-        <div class="problem-card"><i class="fa-solid fa-hourglass-half"></i> Manual Tracking</div>
-        <div class="problem-card"><i class="fa-solid fa-envelope-circle-xmark"></i> Email Approvals</div>
-        <div class="problem-card"><i class="fa-solid fa-triangle-exclamation"></i> Payroll Rework</div>
-        <div class="problem-card"><i class="fa-solid fa-ghost"></i> Scattered Documents</div>
-        <div class="problem-card"><i class="fa-solid fa-plug-circle-xmark"></i> Disconnected Records</div>
-    </div>
+    <div class="story-container">
+        <h2>Stop managing people across disconnected tools</h2>
+        
+        <div class="problems-grid">
+            <div class="problem-card"><i class="fa-solid fa-skull"></i> Spreadsheets</div>
+            <div class="problem-card"><i class="fa-solid fa-hourglass-half"></i> Manual Tracking</div>
+            <div class="problem-card"><i class="fa-solid fa-envelope-circle-xmark"></i> Email Approvals</div>
+            <div class="problem-card"><i class="fa-solid fa-triangle-exclamation"></i> Payroll Rework</div>
+            <div class="problem-card"><i class="fa-solid fa-ghost"></i> Scattered Documents</div>
+            <div class="problem-card"><i class="fa-solid fa-plug-circle-xmark"></i> Disconnected Records</div>
+        </div>
 
-    <div class="solution-block">
-        Respawn Logic brings your people data, workflows, and processes into one place.
+        <div class="solution-block">
+            Respawn Logic brings your people data, workflows, and processes into one place.
+        </div>
     </div>
 </section>
 
 <!-- SECTION 3: PLATFORM OVERVIEW (4 PILLARS) -->
 <section class="story-section" id="overview">
-    <h2>Everything you need. Nothing you don't.</h2>
-    <p class="sub">A unified platform built on four core pillars.</p>
+    <div class="story-container">
+        <h2>Everything you need. Nothing you don't.</h2>
+        <p class="sub">A unified platform built on four core pillars.</p>
 
-    <div class="pillars-grid">
-        <div class="pillar-card">
-            <h3><i class="fa-solid fa-users-viewfinder"></i> Workforce</h3>
-            <ul>
-                <li>Attendance</li>
-                <li>Leave Management</li>
-                <li>Scheduling</li>
-                <li>Organization Structure</li>
-            </ul>
-        </div>
-        <div class="pillar-card">
-            <h3><i class="fa-solid fa-coins"></i> Pay & Benefits</h3>
-            <ul>
-                <li>Enterprise Payroll</li>
-                <li>Government Contributions</li>
-                <li>Benefits Administration</li>
-                <li>Expense Management</li>
-            </ul>
-        </div>
-        <div class="pillar-card">
-            <h3><i class="fa-solid fa-star"></i> Talent & Growth</h3>
-            <ul>
-                <li>Recruitment / ATS</li>
-                <li>Automated Onboarding</li>
-                <li>Performance Reviews</li>
-                <li>Succession Planning</li>
-            </ul>
-        </div>
-        <div class="pillar-card">
-            <h3><i class="fa-solid fa-headset"></i> Employee Support</h3>
-            <ul>
-                <li>Employee Relations</li>
-                <li>Knowledge Base</li>
-                <li>Case Management</li>
-                <li>AI Companion</li>
-            </ul>
+        <div class="pillars-grid">
+            <div class="pillar-card">
+                <h3><i class="fa-solid fa-users-viewfinder"></i> Workforce</h3>
+                <ul>
+                    <li>Attendance</li>
+                    <li>Leave Management</li>
+                    <li>Scheduling</li>
+                    <li>Organization Structure</li>
+                </ul>
+            </div>
+            <div class="pillar-card">
+                <h3><i class="fa-solid fa-coins"></i> Pay & Benefits</h3>
+                <ul>
+                    <li>Enterprise Payroll</li>
+                    <li>Government Contributions</li>
+                    <li>Benefits Administration</li>
+                    <li>Expense Management</li>
+                </ul>
+            </div>
+            <div class="pillar-card">
+                <h3><i class="fa-solid fa-star"></i> Talent & Growth</h3>
+                <ul>
+                    <li>Recruitment / ATS</li>
+                    <li>Automated Onboarding</li>
+                    <li>Performance Reviews</li>
+                    <li>Succession Planning</li>
+                </ul>
+            </div>
+            <div class="pillar-card">
+                <h3><i class="fa-solid fa-headset"></i> Employee Support</h3>
+                <ul>
+                    <li>Employee Relations</li>
+                    <li>Knowledge Base</li>
+                    <li>Case Management</li>
+                    <li>AI Companion</li>
+                </ul>
+            </div>
         </div>
     </div>
 </section>
 
 <!-- SECTION 4: WHY TEAMS CHOOSE RESPAWN -->
 <section class="story-section" id="why" style="background: var(--bg2);">
-    <h2>Built for real-world people operations</h2>
-    <p class="sub">Why organizations are leaving legacy tools behind.</p>
+    <div class="story-container">
+        <h2>Built for real-world people operations</h2>
+        <p class="sub">Why organizations are leaving legacy tools behind.</p>
 
-    <div class="why-grid">
-        <div class="why-card">
-            <i class="fa-solid fa-gamepad"></i>
-            <h3>One Platform</h3>
-            <p>Manage employee data, payroll, performance, and employee support from a unified system without messy integrations.</p>
-        </div>
-        <div class="why-card">
-            <i class="fa-solid fa-microchip"></i>
-            <h3>Configurable Workflows</h3>
-            <p>Adapt processes to your organization's needs. Build approval chains, document requirements, and custom fields.</p>
-        </div>
-        <div class="why-card">
-            <i class="fa-solid fa-bolt"></i>
-            <h3>Employee Self-Service</h3>
-            <p>Give employees access to the information and tools they need to request leave, check payslips, and log attendance.</p>
-        </div>
-        <div class="why-card">
-            <i class="fa-solid fa-book-journal-whills"></i>
-            <h3>Knowledge-Driven</h3>
-            <p>Policies, procedures, and guidance available when your teams need them. Integrated directly into the support flow.</p>
+        <div class="why-grid">
+            <div class="why-card">
+                <i class="fa-solid fa-gamepad"></i>
+                <h3>One Platform</h3>
+                <p>Manage employee data, payroll, performance, and employee support from a unified system without messy integrations.</p>
+            </div>
+            <div class="why-card">
+                <i class="fa-solid fa-microchip"></i>
+                <h3>Configurable Workflows</h3>
+                <p>Adapt processes to your organization's needs. Build approval chains, document requirements, and custom fields.</p>
+            </div>
+            <div class="why-card">
+                <i class="fa-solid fa-bolt"></i>
+                <h3>Employee Self-Service</h3>
+                <p>Give employees access to the information and tools they need to request leave, check payslips, and log attendance.</p>
+            </div>
+            <div class="why-card">
+                <i class="fa-solid fa-book-journal-whills"></i>
+                <h3>Knowledge-Driven</h3>
+                <p>Policies, procedures, and guidance available when your teams need them. Integrated directly into the support flow.</p>
+            </div>
         </div>
     </div>
 </section>
 
 <!-- SECTION 5: EMPLOYEE EXPERIENCE (COMPANION) -->
 <section class="story-section" id="experience">
-    <div class="split-section">
+    <div class="story-container split-section">
         <div>
             <h2 style="font-size: clamp(1.8rem, 4vw, 2.5rem);">Help employees find answers faster.</h2>
             <p style="font-size: 1.125rem; color: var(--text-mid); line-height: 1.6; margin-bottom: 30px;">
@@ -1206,17 +1218,19 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
 
 <!-- SECTION 6: GAMING CTA -->
 <section class="gaming-cta">
-    <h2 style="font-size: 2.5rem; color: #fff; margin-bottom: 20px;">A Better Way to Manage People</h2>
-    <p style="color: var(--text-mid); font-size: 1.125rem; max-width: 600px; margin: 0 auto;">Equip your HR team with the ultimate loadout. No more juggling ten different tabs just to onboard a single employee or process payroll.</p>
-    
-    <div class="gaming-flow">
-        <div class="gaming-step"><i class="fa-solid fa-location-dot"></i> Spawn Point</div>
-        <i class="fa-solid fa-chevron-right gaming-divider"></i>
-        <div class="gaming-step"><i class="fa-solid fa-users"></i> Build Your Team</div>
-        <i class="fa-solid fa-chevron-right gaming-divider"></i>
-        <div class="gaming-step"><i class="fa-solid fa-arrow-trend-up"></i> Level Up Performance</div>
-        <i class="fa-solid fa-chevron-right gaming-divider"></i>
-        <div class="gaming-step"><i class="fa-solid fa-shield-heart"></i> Support Your People</div>
+    <div class="story-container">
+        <h2 style="font-size: 2.5rem; color: #fff; margin-bottom: 20px;">A Better Way to Manage People</h2>
+        <p style="color: var(--text-mid); font-size: 1.125rem; max-width: 600px; margin: 0 auto;">Equip your HR team with the ultimate loadout. No more juggling ten different tabs just to onboard a single employee or process payroll.</p>
+        
+        <div class="gaming-flow">
+            <div class="gaming-step"><i class="fa-solid fa-location-dot"></i> Spawn Point</div>
+            <i class="fa-solid fa-chevron-right gaming-divider"></i>
+            <div class="gaming-step"><i class="fa-solid fa-users"></i> Build Your Team</div>
+            <i class="fa-solid fa-chevron-right gaming-divider"></i>
+            <div class="gaming-step"><i class="fa-solid fa-arrow-trend-up"></i> Level Up Performance</div>
+            <i class="fa-solid fa-chevron-right gaming-divider"></i>
+            <div class="gaming-step"><i class="fa-solid fa-shield-heart"></i> Support Your People</div>
+        </div>
     </div>
 </section>
 
@@ -1224,7 +1238,7 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
 
 <!-- STORY -->
 <div class="story-section" id="story">
-    <div class="story-inner">
+    <div class="story-container story-inner">
         <div>
             <div class="eyebrow">// THE LORE</div>
             <h2 class="section-h" style="margin-bottom: 24px;">Built by someone who plays games and hates boring HR software.</h2>
