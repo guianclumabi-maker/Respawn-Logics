@@ -6,7 +6,8 @@ export function PipelineBoard({ onViewChange }: { onViewChange: (v: string) => v
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch("/respawn-logics/elr_api.php?action=cases")
+    const basePath = window.location.hostname === 'localhost' ? '/respawn-logics' : '';
+    fetch(`${basePath}/elr_api.php?action=cases`)
       .then(res => res.json())
       .then(data => {
         if (data.success) {

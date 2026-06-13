@@ -13,7 +13,10 @@ Route::any('/ats', function(Request $request) {
     }
     
     // Proxy everything else to the old API
-    $oldUrl = "http://localhost/respawn-logics/candidates_api.php?" . http_build_query($request->query());
+    $baseUrl = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http";
+    $baseUrl .= "://" . $_SERVER['HTTP_HOST'];
+    $basePath = (strpos($_SERVER['HTTP_HOST'], 'localhost') !== false) ? '/respawn-logics' : '';
+    $oldUrl = $baseUrl . $basePath . "/candidates_api.php?" . http_build_query($request->query());
     
     // Forward Cookies for Session Auth
     $cookies = [];

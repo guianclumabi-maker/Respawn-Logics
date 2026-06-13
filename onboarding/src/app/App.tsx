@@ -37,9 +37,10 @@ export default function App() {
 
   const [toast, setToast] = useState<{message: string, type: 'error' | 'success'} | null>(null);
   const [csrfToken, setCsrfToken] = useState<string>("");
+  const API_BASE = window.location.origin + (window.location.hostname === 'localhost' ? '/respawn-logics' : '');
   
   useEffect(() => {
-    fetch("/respawn-logics/get_csrf.php", { credentials: "same-origin" })
+    fetch(`${API_BASE}/get_csrf.php`, { credentials: "same-origin" })
       .then(res => res.json())
       .then(data => {
         if (data.success) {
@@ -72,10 +73,10 @@ export default function App() {
 
   const handleModeSelect = (mode: SetupMode) => {
     setSetupMode(mode);
-    if (mode === "Solo") {
-        window.location.href = "/respawn-logics/register.php";
+      if (mode === "Solo") {
+        window.location.href = `${API_BASE}/register.php`;
         return;
-    }
+      }
     setCurrentView("upload");
   };
 
@@ -180,7 +181,7 @@ export default function App() {
     formData.append("setup_mode", setupMode);
     formData.append("mapping", JSON.stringify(mapping));
 
-    fetch("/respawn-logics/import.php", {
+    fetch(`${API_BASE}/import.php`, {
       method: "POST",
       credentials: "same-origin",
       headers: {
@@ -232,7 +233,7 @@ export default function App() {
         return;
       }
 
-      const response = await fetch("/respawn-logics/update_roles.php", {
+      const response = await fetch(`${API_BASE}/update_roles.php`, {
         method: "POST",
         credentials: "same-origin",
         headers: { 
@@ -311,9 +312,9 @@ export default function App() {
       <nav className="border-b border-white/[0.05] bg-[#0b0f1a]/80 backdrop-blur-md sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
           <div className="flex items-center gap-6">
-            <button onClick={() => window.location.href = '/respawn-logics/index.php'} className="text-[#8b95a8] hover:text-white font-['JetBrains_Mono'] text-sm flex items-center gap-2 transition-colors">
-              <ArrowRight className="w-4 h-4 rotate-180" /> [ ABORT ]
-            </button>
+            <button onClick={() => window.location.href = `${API_BASE}/index.php`} className="text-[#8b95a8] hover:text-white font-['JetBrains_Mono'] text-sm flex items-center gap-2 transition-colors">
+              <ArrowRight size={16} className="rotate-180" />
+              Cancel & Exit       </button>
             <div className="h-6 w-px bg-white/10 hidden md:block"></div>
             <div className="flex items-center gap-3">
               <div className="w-8 h-8 rounded-[7px] bg-gradient-to-br from-[#00e07a] to-[#00b8ff] flex items-center justify-center shadow-[0_0_15px_rgba(0,224,122,0.4)]">
@@ -569,7 +570,7 @@ export default function App() {
                 <button onClick={downloadActivationCSV} className="flex items-center justify-center gap-2 bg-[#00e07a] hover:bg-[#00c96a] text-black px-8 py-3 rounded-sm font-['JetBrains_Mono'] font-bold transition-all shadow-[0_0_20px_rgba(0,224,122,0.3)]">
                   <Download className="w-4 h-4" /> [ GET_KEYS.CSV ]
                 </button>
-                <button onClick={() => window.location.href = '/respawn-logics/'} className="flex items-center justify-center gap-2 bg-[#0f1422] hover:bg-white/10 border border-white/10 text-white px-8 py-3 rounded-sm font-['JetBrains_Mono'] font-bold transition-all">
+                <button onClick={() => window.location.href = `${API_BASE}/`} className="flex items-center justify-center gap-2 bg-[#0f1422] hover:bg-white/10 border border-white/10 text-white px-8 py-3 rounded-sm font-['JetBrains_Mono'] font-bold transition-all">
                   [ ENTER_SYSTEM ] <ArrowRight className="w-4 h-4" />
                 </button>
               </div>

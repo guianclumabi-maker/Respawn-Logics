@@ -38,7 +38,7 @@ import {
 } from 'recharts';
 import './App.css';
 
-const API_BASE = window.location.origin + '/respawn-logics/payroll_engine_api.php';
+const API_BASE = window.location.origin + (window.location.hostname === 'localhost' ? '/respawn-logics' : '') + '/payroll_engine_api.php';
 
 const API = {
   fetchDashboardInfo: () => fetch(`${API_BASE}?action=dashboard_kpis`).then(r => r.json()).then(d => d.data || {
@@ -857,7 +857,7 @@ function App() {
         </nav>
         
         <div className="sidebar-footer">
-          <a href="/respawn-logics/pages/dashboard.php" className="btn btn-secondary w-full mb-4" style={{ textDecoration: 'none' }}>
+          <a href={window.location.hostname === 'localhost' ? '/respawn-logics/pages/dashboard.php' : '/pages/dashboard.php'} className="btn btn-secondary w-full mb-4" style={{ textDecoration: 'none' }}>
              ← Return to Core HRIS
           </a>
           <div className="user-profile">

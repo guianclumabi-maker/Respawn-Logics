@@ -341,7 +341,8 @@ $user = getCurrentUser();
 
             try {
                 // POST to the backend
-                const response = await fetch('/respawn-logics/api/index.php?route=ai_companion&action=chat', {
+                const basePath = window.location.hostname === 'localhost' ? '/respawn-logics' : '';
+                const response = await fetch(`${basePath}/api/index.php?route=ai_companion&action=chat`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ message: message })

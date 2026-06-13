@@ -302,7 +302,8 @@ try {
 
         $baseUrl = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http";
         $baseUrl .= "://" . $_SERVER['HTTP_HOST'];
-        $activationLink = $baseUrl . "/respawn-logics/login.php?activation_token=" . $activationToken;
+        $basePath = (strpos($_SERVER['HTTP_HOST'], 'localhost') !== false) ? '/respawn-logics' : '';
+        $activationLink = $baseUrl . $basePath . "/login.php?activation_token=" . $activationToken;
 
         $accounts[] = [
             'employee_id' => $employeeId,

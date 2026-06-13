@@ -76,7 +76,8 @@ export function Sidebar({ activeView, onViewChange }: SidebarProps) {
   const [sessionUser, setSessionUser] = useState<{ full_name: string; role: string; initials: string; department?: string; profile_image?: string } | null>(null);
 
   useEffect(() => {
-    fetch("/respawn-logics/candidates_api.php?action=current_user")
+    const basePath = window.location.hostname === 'localhost' ? '/respawn-logics' : '';
+    fetch(`${basePath}/candidates_api.php?action=current_user`)
       .then((res) => res.json())
       .then((data) => {
         if (data.success && data.user) {
@@ -269,7 +270,7 @@ export function Sidebar({ activeView, onViewChange }: SidebarProps) {
             {/* User Initials Avatar */}
             <div className="w-10 h-10 rounded-full bg-[#a855f7]/20 border border-[#a855f7]/30 flex items-center justify-center flex-shrink-0 overflow-hidden">
               {sessionUser?.profile_image ? (
-                <img src={`/respawn-logics/uploads/${sessionUser.profile_image}`} alt="Profile" className="w-full h-full object-cover" />
+                <img src={`${window.location.hostname === 'localhost' ? '/respawn-logics' : ''}/uploads/${sessionUser.profile_image}`} alt="Profile" className="w-full h-full object-cover" />
               ) : (
                 <span className="text-[#c084fc] font-bold text-[0.95rem]">
                   {sessionUser ? sessionUser.initials : "JD"}
@@ -298,7 +299,7 @@ export function Sidebar({ activeView, onViewChange }: SidebarProps) {
             title={sessionUser ? sessionUser.full_name : "Jane Doe"}
           >
             {sessionUser?.profile_image ? (
-              <img src={`/respawn-logics/uploads/${sessionUser.profile_image}`} alt="Profile" className="w-full h-full object-cover" />
+              <img src={`${window.location.hostname === 'localhost' ? '/respawn-logics' : ''}/uploads/${sessionUser.profile_image}`} alt="Profile" className="w-full h-full object-cover" />
             ) : (
               <span className="text-[#c084fc] font-bold text-[0.85rem]">
                 {sessionUser ? sessionUser.initials : "JD"}

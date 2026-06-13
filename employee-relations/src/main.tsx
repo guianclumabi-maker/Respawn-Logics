@@ -9,7 +9,7 @@
     const response = await originalFetch(...args);
     if (response.status === 401) {
       alert("Session expired. Please log in again.");
-      window.location.href = "/respawn-logics/login.php";
+      window.location.href = (window.location.hostname === 'localhost' ? '/respawn-logics' : '') + "/login.php";
     }
     return response;
   };

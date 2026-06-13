@@ -8,7 +8,8 @@ export function CaseDetail({ caseId, onBack }: { caseId: number; onBack: () => v
   const [error, setError] = useState("");
 
   useEffect(() => {
-    fetch(`/respawn-logics/elr_api.php?action=case&id=${caseId}`)
+    const basePath = window.location.hostname === 'localhost' ? '/respawn-logics' : '';
+    fetch(`${basePath}/elr_api.php?action=case&id=${caseId}`)
       .then((res) => res.json())
       .then((data) => {
         if (data.success) {
