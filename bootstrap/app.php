@@ -2,7 +2,15 @@
 
 // 1. Load Environment Variables
 $envFile = __DIR__ . '/../.env';
-$env = file_exists($envFile) ? parse_ini_file($envFile) : [];
+$localEnv = file_exists($envFile) ? parse_ini_file($envFile) : [];
+$env = array_merge($localEnv, getenv(), $_ENV);
+
+// PHP-FPM sometimes puts env vars in $_SERVER
+foreach (['DB_HOST', 'DB_PORT', 'DB_NAME', 'DB_USER', 'DB_PASS', 'APP_URL', 'APP_ENV', 'APP_DEBUG'] as $key) {
+    if (isset($_SERVER[$key]) && !isset($env[$key])) {
+        $env[$key] = $_SERVER[$key];
+    }
+}
 
 // 2. Load Configuration
 global $config;
