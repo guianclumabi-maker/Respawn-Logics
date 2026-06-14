@@ -110,7 +110,7 @@ if ($user) {
             <?php endif; ?>
             
             <?php if (hasPermission('elr.view') && tenantModuleEnabled('elr')): ?>
-            <a href="<?= url('/employee-relations-dist/dist/index.html') ?>" class="menu-item">
+            <a href="<?= url('/pages/elr_admin.php') ?>" class="menu-item <?= $current_page === 'elr_admin.php' ? 'active' : '' ?>">
                 <i class="fa-solid fa-shield-halved"></i>
                 <span>Notices</span>
             </a>
@@ -181,7 +181,7 @@ if ($user) {
             <?php endif; ?>
 
             <?php if (hasPermission('elr.view') && tenantModuleEnabled('elr')): ?>
-            <a href="<?= url('/pages/elr_admin.php') ?>" class="menu-item <?= $current_page === 'elr_admin.php' ? 'active' : '' ?>" style="color:#ef4444;">
+            <a href="<?= url('/employee-relations-dist/dist/index.html') ?>" class="menu-item <?= $current_page === 'index.html' ? 'active' : '' ?>" style="color:#ef4444;">
                 <i class="fa-solid fa-gavel"></i>
                 <span style="font-weight:600;">ELR Admin Console</span>
             </a>
