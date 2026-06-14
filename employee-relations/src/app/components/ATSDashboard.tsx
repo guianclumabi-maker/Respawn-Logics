@@ -8,7 +8,8 @@ import {
   ArrowRight,
   TrendingDown,
   ShieldAlert,
-  Clock
+  Clock,
+  AlertCircle
 } from "lucide-react";
 import { SpinningDonut } from './SpinningDonut';
 
