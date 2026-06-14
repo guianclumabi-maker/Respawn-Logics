@@ -19,7 +19,7 @@ function figmaAssetResolver() {
 export default defineConfig({
   base: './',
   build: {
-    outDir: '../employee-relations-dist',
+    outDir: '../employee-relations-dist/dist',
     emptyOutDir: true,
   },
   plugins: [

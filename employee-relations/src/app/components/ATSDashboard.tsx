@@ -6,274 +6,164 @@ import {
   TrendingUp, 
   CheckCircle, 
   ArrowRight,
-  TrendingDown
+  TrendingDown,
+  ShieldAlert,
+  Clock
 } from "lucide-react";
 
-type ATSDashboardProps = {
+type ELRDashboardProps = {
   onViewChange: (view: any) => void;
 };
 
-export function ATSDashboard({ onViewChange }: ATSDashboardProps) {
-  const [candidates, setCandidates] = useState<any[]>([]);
+export function ATSDashboard({ onViewChange }: ELRDashboardProps) {
+  const [cases, setCases] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [dashboardData, setDashboardData] = useState<any>({
-    total_candidates: 0,
-    interviews_scheduled: 0,
-    offers_extended: 0,
-    hired_count: 0,
-    screened_count: 0,
-    f2f_count: 0,
-    activities: []
-  });
 
-  // Fetch pre-computed live metrics from the PHP backend API
+  // Fetch live cases from the ESM API
   useEffect(() => {
-    const API_URL = (window.location.pathname.includes("/dist/") || window.location.pathname.includes("-dist/")
-      ? "../employee_relations_api.php"
-      : "./employee_relations_api.php") + "?action=dashboard";
-
-    fetch(API_URL)
+    const basePath = window.location.hostname === 'localhost' ? '/respawn-logics' : '';
+    fetch(`${basePath}/api/index.php?route=esm&action=agent_queue`)
       .then((res) => res.json())
       .then((data) => {
-        if (data.success) {
-          setDashboardData(data);
+        if (data.success && Array.isArray(data.data)) {
+          const elrCases = data.data.filter((t: any) => t.team_name === 'Employee Relations' || t.is_confidential == 1);
+          setCases(elrCases);
+        } else {
+          setCases([]);
         }
         setLoading(false);
       })
       .catch((err) => {
-        console.error("Error loading computed metrics for ATS Dashboard:", err);
+        console.error("Error loading ELR cases:", err);
         setLoading(false);
       });
   }, []);
 
-  // Compute live values from server payload
-  const totalCount = dashboardData.total_candidates ?? dashboardData.total_cases ?? 0;
-  const activeJobsCount = 5; // Static open jobs from Jobs directory
-  const interviewsCount = dashboardData.interviews_scheduled ?? 0;
-  const offersCount = dashboardData.offers_extended ?? 0;
-  
-  const stats = [
-    { label: "Total Relations Cases", value: (totalCount ?? 0).toString(), change: "+5% vs last month", isPositive: true, icon: <Users size={16} />, color: "#06b6d4" },
-    { label: "Issue Types Tracking", value: "4", change: "Stable", isPositive: true, icon: <Briefcase size={16} />, color: "#ec4899" },
-    { label: "Investigations Active", value: (interviewsCount ?? 0).toString(), change: "+1 vs last week", isPositive: true, icon: <Calendar size={16} />, color: "#8b5cf6" },
-    { label: "Pending Resolutions", value: (offersCount ?? 0).toString(), change: "-2 vs last week", isPositive: false, icon: <CheckCircle size={16} />, color: "#10b981" },
-  ];
+  // Compute live values from cases
+  const totalCases = cases.length;
+  const openCases = cases.filter(c => c.status !== 'Closed' && c.status !== 'Resolved').length;
+  const resolvedCases = cases.filter(c => c.status === 'Closed' || c.status === 'Resolved').length;
+  const confidentialCases = cases.filter(c => c.is_confidential == 1).length;
 
-  // Funnel counts from server payload
-  const screenedCount = dashboardData.screened_count ?? 0;
-  const f2fCount = dashboardData.f2f_count ?? 0;
-  
-  const funnelData = [
-    { stage: "Grievances Reported", count: totalCount, width: "100%", color: "#06b6d4" },
-    { stage: "Under Review", count: screenedCount, width: totalCount > 0 ? `${Math.max(20, Math.round((screenedCount / totalCount) * 100))}%` : "0%", color: "#8b5cf6" },
-    { stage: "Active Investigations", count: f2fCount, width: totalCount > 0 ? `${Math.max(20, Math.round((f2fCount / totalCount) * 100))}%` : "0%", color: "#a855f7" },
-    { stage: "Resolved Cases", count: offersCount, width: totalCount > 0 ? `${Math.max(20, Math.round((offersCount / totalCount) * 100))}%` : "0%", color: "#10b981" },
-  ];
-
-  const hireRate = totalCount > 0
-    ? (((dashboardData.hired_count ?? dashboardData.resolved_count ?? 0) / totalCount) * 100).toFixed(1)
-    : "0.0";
-
-  // Sourced from server pre-computed activities feed
-  const activitiesList = dashboardData.activities || [];
-
-  // Fallback if no database cases exist
-  const displayActivities = activitiesList.length > 0 ? activitiesList : [
-    { name: "John Doe - Overtime Dispute", action: "filed issue", role: "HR Cases", time: "10 mins ago", type: "apply" },
-    { name: "Jane Smith - Transfer Request", action: "advanced case to", role: "Review", time: "2 hours ago", type: "advance" },
-    { name: "Bob Johnson - Policy Inquiry", action: "resolved case", role: "HR Cases", time: "5 hours ago", type: "offer" },
-  ];
-
-  // Map candidate counts per active position
-  const activeJobs = [
-    { title: "Overtime & Pay Dispute", dept: "Finance / Ops", candidates: totalCount, progress: Math.min(100, Math.round((totalCount / 10) * 100)), status: "Urgent" },
-    { title: "Policy Violations Inquiry", dept: "Legal / Compliance", candidates: 2, progress: 20, status: "Active" },
-    { title: "Interpersonal Disputes", dept: "HR / Administration", candidates: 3, progress: 30, status: "Active" },
-    { title: "Department Transfers", dept: "Operations / People", candidates: 1, progress: 10, status: "Active" },
+  const metrics = [
+    { label: "Total Cases", value: totalCases, icon: <Briefcase size={20} />, color: "from-blue-500 to-cyan-500" },
+    { label: "Open Investigations", value: openCases, icon: <Clock size={20} />, color: "from-orange-500 to-yellow-500" },
+    { label: "Resolved Cases", value: resolvedCases, icon: <CheckCircle size={20} />, color: "from-emerald-500 to-green-500" },
+    { label: "Confidential", value: confidentialCases, icon: <ShieldAlert size={20} />, color: "from-red-500 to-rose-600" },
   ];
 
   return (
-    <div className="flex-1 flex flex-col overflow-y-auto px-8 py-6 text-white font-sans relative scrollbar-thin" style={{ backgroundColor: "#0d0f19" }}>
-      {/* Glow graphics */}
-      <div className="absolute top-[-100px] left-[-100px] w-[500px] h-[500px] rounded-full bg-[#8b5cf6] blur-[120px] opacity-10 pointer-events-none z-0" />
-      <div className="absolute bottom-[-150px] right-[-100px] w-[600px] h-[600px] rounded-full bg-[#ec4899] blur-[140px] opacity-8 pointer-events-none z-0" />
-
-      {/* Header */}
-      <div className="relative z-10 flex items-center justify-between mb-8">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight bg-gradient-to-r from-white via-white to-gray-400 bg-clip-text text-transparent" style={{ fontFamily: "'Outfit', 'Inter', sans-serif" }}>
-            Relations Dashboard
-          </h1>
-          <p className="text-xs text-[#9ca3af] mt-1">Employee Relations case metrics and resolution center.</p>
+    <main className="flex-1 flex flex-col h-full bg-[#06070a] text-white overflow-y-auto">
+      <div className="p-8">
+        <div className="flex items-center justify-between mb-8">
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight mb-2 bg-gradient-to-r from-red-400 to-orange-500 bg-clip-text text-transparent">ELR Overview</h1>
+            <p className="text-slate-400 text-sm">Monitor employee relations health and investigations.</p>
+          </div>
+          <button 
+            onClick={() => onViewChange("Cases")}
+            className="h-10 px-4 bg-white/[0.03] border border-white/[0.06] rounded-lg font-medium text-sm flex items-center gap-2 hover:bg-white/[0.06] transition-colors"
+          >
+            View All Cases
+            <ArrowRight size={16} />
+          </button>
         </div>
-        <button
-          onClick={() => onViewChange("Candidates")}
-          className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-semibold transition-all hover:opacity-95 cursor-pointer bg-gradient-to-r from-[#8b5cf6] to-[#ec4899] text-white shadow-lg shadow-purple-500/10 border-0"
-        >
-          View Case Board
-          <ArrowRight size={14} />
-        </button>
-      </div>
 
-      {loading ? (
-        <div className="relative z-10 flex-1 flex items-center justify-center text-xs text-gray-500">
-          Loading metrics from database...
-        </div>
-      ) : (
-        <>
-          {/* Stats Grid */}
-          <div className="relative z-10 grid sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
-            {stats.map((s, idx) => (
-              <div 
-                key={idx}
-                className="p-5 rounded-2xl border bg-[#161922]/20 backdrop-blur-md transition-all hover:border-white/10 flex flex-col justify-between group" 
-                style={{ borderColor: "rgba(255, 255, 255, 0.06)" }}
-              >
-                <div className="flex items-center justify-between mb-3">
-                  <span className="text-[11px] font-bold uppercase tracking-wider text-gray-500">{s.label}</span>
-                  <div 
-                    className="w-8 h-8 rounded-lg flex items-center justify-center transition-transform group-hover:scale-105"
-                    style={{ backgroundColor: `${s.color}15`, color: s.color }}
-                  >
-                    {s.icon}
+        {/* Metrics Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          {metrics.map((m, i) => (
+            <div key={i} className="bg-[#0a0c14]/80 backdrop-blur-xl border border-white/[0.04] p-6 rounded-2xl shadow-xl shadow-black/20 hover:border-white/[0.08] transition-all relative overflow-hidden group">
+              <div className={`absolute top-0 right-0 w-32 h-32 bg-gradient-to-br ${m.color} opacity-5 blur-3xl group-hover:opacity-10 transition-opacity`} />
+              <div className="flex items-center justify-between mb-4 relative z-10">
+                <div className={`w-10 h-10 rounded-lg flex items-center justify-center bg-gradient-to-br ${m.color} bg-opacity-10 shadow-inner`}>
+                  <div className="text-white drop-shadow-md">
+                    {m.icon}
                   </div>
                 </div>
-                <div>
-                  <span className="text-2xl font-bold tracking-tight block mb-1">{s.value}</span>
-                  <span className={`text-[10px] font-semibold flex items-center gap-1 ${s.isPositive ? "text-emerald-400" : "text-rose-400"}`}>
-                    {s.isPositive ? <TrendingUp size={11} /> : <TrendingDown size={11} />}
-                    {s.change}
-                  </span>
-                </div>
               </div>
-            ))}
-          </div>
+              <div className="relative z-10">
+                <div className="text-3xl font-bold mb-1 tracking-tight">{loading ? "-" : m.value}</div>
+                <div className="text-sm text-slate-400 font-medium">{m.label}</div>
+              </div>
+            </div>
+          ))}
+        </div>
 
-          {/* Charts / Main Content Row */}
-          <div className="relative z-10 grid lg:grid-cols-3 gap-6 mb-8 items-stretch">
+        {/* Main Content Area */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          
+          <div className="lg:col-span-2 bg-[#0a0c14]/80 backdrop-blur-xl border border-white/[0.04] rounded-2xl p-6 shadow-xl shadow-black/20">
+            <div className="flex justify-between items-center mb-6">
+              <h3 className="font-semibold text-lg flex items-center gap-2">
+                <Clock size={18} className="text-orange-400" />
+                Recent Open Cases
+              </h3>
+            </div>
             
-            {/* Recruitment Funnel Card */}
-            <div className="lg:col-span-2 p-6 rounded-2xl border bg-[#161922]/20 backdrop-blur-md flex flex-col justify-between" style={{ borderColor: "rgba(255, 255, 255, 0.06)" }}>
-              <div>
-                <h3 className="text-sm font-semibold tracking-wide mb-1">Case Resolution Funnel</h3>
-                <p className="text-[10px] text-gray-500 mb-6">Case progression statistics across stages.</p>
-                
-                {/* Funnel representation */}
-                <div className="flex flex-col gap-4">
-                  {funnelData.map((item, idx) => (
-                    <div key={idx} className="flex items-center gap-4">
-                      <div className="w-32 text-xs font-semibold text-gray-400 truncate">{item.stage}</div>
-                      <div className="flex-1 bg-white/[0.02] border border-white/[0.04] h-7 rounded-lg overflow-hidden relative">
-                        <div 
-                          className="h-full bg-gradient-to-r transition-all duration-500 rounded-lg flex items-center justify-end px-3 font-semibold text-[10px]"
-                          style={{ 
-                            width: item.width,
-                            backgroundImage: `linear-gradient(90deg, ${item.color}50 0%, ${item.color}bb 100%)` 
-                          }}
-                        >
-                          {item.count} cases
-                        </div>
-                      </div>
-                    </div>
-                  ))}
+            <div className="space-y-4">
+              {loading ? (
+                <div className="text-center py-8 text-slate-500">Loading recent cases...</div>
+              ) : cases.filter(c => c.status !== 'Closed' && c.status !== 'Resolved').slice(0, 5).length === 0 ? (
+                <div className="text-center py-12 text-slate-500 bg-white/[0.01] rounded-xl border border-white/[0.02]">
+                  <CheckCircle size={32} className="mx-auto mb-3 text-emerald-500/50" />
+                  <p>All clear! No active cases require attention.</p>
                 </div>
-              </div>
-              
-              <div className="border-t border-white/[0.04] pt-4 mt-6 flex justify-between items-center text-[10px] text-gray-500">
-                <span>Case Resolution Efficiency: **{hireRate}%** resolution rate</span>
-                <span className="text-[#06b6d4] font-semibold hover:underline cursor-pointer" onClick={() => onViewChange("Insights")}>View detailed resolution insights</span>
-              </div>
-            </div>
-
-            {/* Recent Activities Panel */}
-            <div className="p-6 rounded-2xl border bg-[#161922]/20 backdrop-blur-md flex flex-col" style={{ borderColor: "rgba(255, 255, 255, 0.06)" }}>
-              <h3 className="text-sm font-semibold tracking-wide mb-1">Recent Activity</h3>
-              <p className="text-[10px] text-gray-500 mb-5">Live case tracking logs.</p>
-              
-              <div className="flex-1 space-y-4">
-                {displayActivities.map((a, idx) => {
-                  let tagColor = "rgba(255, 255, 255, 0.04)";
-                  let textColor = "#fff";
-                  if (a.type === "apply") { tagColor = "rgba(139, 92, 246, 0.1)"; textColor = "#c084fc"; }
-                  else if (a.type === "advance") { tagColor = "rgba(6, 182, 212, 0.1)"; textColor = "#2dd4bf"; }
-                  else if (a.type === "offer") { tagColor = "rgba(16, 185, 129, 0.1)"; textColor = "#34d399"; }
-                  else if (a.type === "reject") { tagColor = "rgba(239, 68, 68, 0.1)"; textColor = "#f87171"; }
-
-                  return (
-                    <div key={idx} className="flex gap-3 text-xs items-start leading-snug">
-                      <div 
-                        className="w-2.5 h-2.5 rounded-full flex-shrink-0 mt-1"
-                        style={{ backgroundColor: textColor }}
-                      />
-                      <div className="flex-1">
-                        <span className="font-semibold text-white">{a.name}</span>{" "}
-                        <span className="text-gray-500">{a.action}</span>{" "}
-                        <span className="font-medium" style={{ color: textColor }}>{a.role}</span>
-                        <span className="block text-[9px] text-gray-600 mt-0.5">{a.time}</span>
+              ) : (
+                cases.filter(c => c.status !== 'Closed' && c.status !== 'Resolved').slice(0, 5).map((c, i) => (
+                  <div key={i} className="flex items-center justify-between p-4 bg-white/[0.02] border border-white/[0.03] rounded-xl hover:bg-white/[0.04] cursor-pointer transition-colors" onClick={() => onViewChange("Cases")}>
+                    <div className="flex items-center gap-4">
+                      <div className="w-10 h-10 rounded-full bg-white/[0.05] flex items-center justify-center text-xs font-bold text-slate-300">
+                        {c.employee_name ? c.employee_name.substring(0, 2).toUpperCase() : '?'}
+                      </div>
+                      <div>
+                        <div className="font-medium text-sm mb-0.5">{c.ticket_number} • {c.subject || c.type_name}</div>
+                        <div className="text-xs text-slate-400">{c.employee_name || 'Unknown Employee'}</div>
                       </div>
                     </div>
-                  );
-                })}
-              </div>
-            </div>
-          </div>
-
-          {/* Active Jobs Grid */}
-          <div className="relative z-10 p-6 rounded-2xl border bg-[#161922]/20 backdrop-blur-md" style={{ borderColor: "rgba(255, 255, 255, 0.06)" }}>
-            <div className="flex items-center justify-between mb-6">
-              <div>
-                <h3 className="text-sm font-semibold tracking-wide">Active Issue Categories</h3>
-                <p className="text-[10px] text-gray-500 mt-0.5">Tracking case velocity and metrics per issue type.</p>
-              </div>
-              <button 
-                onClick={() => onViewChange("Jobs")}
-                className="text-xs text-[#06b6d4] hover:text-[#0891b2] hover:underline font-semibold border-0 bg-transparent cursor-pointer"
-              >
-                Manage Categories
-              </button>
-            </div>
-
-            <div className="grid md:grid-cols-2 gap-4">
-              {activeJobs.map((job, idx) => {
-                let statusStyle = "border-white/10 bg-white/5 text-gray-400";
-                if (job.status === "Urgent") statusStyle = "border-rose-500/20 bg-rose-500/10 text-rose-400";
-                else if (job.status === "Active") statusStyle = "border-cyan-500/20 bg-cyan-500/10 text-cyan-400";
-
-                return (
-                  <div 
-                    key={idx}
-                    className="p-4 rounded-xl border bg-[#11131a]/40 flex flex-col justify-between"
-                    style={{ borderColor: "rgba(255, 255, 255, 0.04)" }}
-                  >
-                    <div className="flex items-start justify-between mb-3">
-                      <div>
-                        <h4 className="text-xs font-bold text-white leading-tight">{job.title}</h4>
-                        <span className="text-[9px] font-bold tracking-wider text-gray-500 uppercase mt-0.5 block">{job.dept}</span>
-                      </div>
-                      <span className={`text-[8px] font-black uppercase px-2 py-0.5 rounded border ${statusStyle}`}>
-                        {job.status}
+                    <div className="flex items-center gap-4">
+                      <span className="text-xs font-medium px-2 py-1 rounded bg-orange-500/20 text-orange-400 border border-orange-500/30">
+                        {c.status}
                       </span>
                     </div>
-                    
-                    <div>
-                      <div className="flex justify-between items-center text-[10px] text-gray-400 mb-1.5">
-                        <span>{job.candidates} cases active</span>
-                        <span className="font-bold text-white">{job.progress}% capacity</span>
-                      </div>
-                      <div className="w-full h-1.5 bg-white/[0.03] border border-white/[0.04] rounded-full overflow-hidden">
-                        <div 
-                          className="h-full bg-gradient-to-r from-[#8b5cf6] to-[#ec4899] rounded-full"
-                          style={{ width: `${job.progress}%` }}
-                        />
-                      </div>
-                    </div>
                   </div>
-                );
-              })}
+                ))
+              )}
             </div>
           </div>
-        </>
-      )}
-    </div>
+
+          <div className="bg-[#0a0c14]/80 backdrop-blur-xl border border-white/[0.04] rounded-2xl p-6 shadow-xl shadow-black/20">
+            <h3 className="font-semibold text-lg mb-6 flex items-center gap-2">
+              <TrendingUp size={18} className="text-emerald-400" />
+              Quick Actions
+            </h3>
+            
+            <div className="space-y-3">
+              <button 
+                onClick={() => onViewChange("Cases")}
+                className="w-full text-left p-4 bg-white/[0.02] border border-white/[0.04] rounded-xl hover:bg-white/[0.06] hover:border-white/[0.1] transition-all group flex items-center justify-between"
+              >
+                <div>
+                  <div className="font-medium text-sm group-hover:text-red-400 transition-colors">Start Investigation</div>
+                  <div className="text-xs text-slate-400 mt-1">Open a new confidential case file</div>
+                </div>
+                <ArrowRight size={16} className="text-slate-500 group-hover:text-red-400 group-hover:translate-x-1 transition-all" />
+              </button>
+              
+              <button 
+                onClick={() => onViewChange("Analytics")}
+                className="w-full text-left p-4 bg-white/[0.02] border border-white/[0.04] rounded-xl hover:bg-white/[0.06] hover:border-white/[0.1] transition-all group flex items-center justify-between"
+              >
+                <div>
+                  <div className="font-medium text-sm group-hover:text-orange-400 transition-colors">View Analytics</div>
+                  <div className="text-xs text-slate-400 mt-1">Review department grievance metrics</div>
+                </div>
+                <ArrowRight size={16} className="text-slate-500 group-hover:text-orange-400 group-hover:translate-x-1 transition-all" />
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </main>
   );
 }
