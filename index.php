@@ -756,12 +756,14 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
             margin-bottom: 28px;
         }
 
-        /* ─── FOOTER ─── */
+        /* 🎮 FOOTER 🎮 */
         footer {
+            border-top: 1px solid var(--border2);
         }
 
         .footer-inner {
-            max-width: 1180px;
+            max-width: 1600px;
+            width: 95%;
             margin: 0 auto;
             padding: 36px 24px;
             display: flex;
