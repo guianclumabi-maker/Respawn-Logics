@@ -59,10 +59,12 @@ const navItems: NavItem[] = [
   },
 ];
 
+const basePath = window.location.hostname === 'localhost' ? '/respawn-logics' : '';
+
 const bottomItems = [
-  { label: "Company Directory", icon: <Building2 size={20} />, path: "../pages/org-chart.php" },
-  { label: "My Profile", icon: <Settings size={20} />, path: "../pages/profile.php" },
-  { label: "Return to Core HRIS", icon: <ArrowLeft size={20} />, path: "../pages/dashboard.php", highlight: true },
+  { label: "Company Directory", icon: <Building2 size={20} />, path: `${basePath}/pages/org-chart.php` },
+  { label: "My Profile", icon: <Settings size={20} />, path: `${basePath}/pages/profile.php` },
+  { label: "Return to Workspace", icon: <ArrowLeft size={20} />, path: `${basePath}/pages/dashboard.php`, highlight: true },
 ];
 
 type SidebarProps = {
@@ -76,8 +78,7 @@ export function Sidebar({ activeView, onViewChange }: SidebarProps) {
   const [sessionUser, setSessionUser] = useState<{ full_name: string; role: string; initials: string; department?: string; profile_image?: string } | null>(null);
 
   useEffect(() => {
-    const basePath = window.location.hostname === 'localhost' ? '/respawn-logics' : '';
-    fetch(`${basePath}/candidates_api.php?action=current_user`)
+    fetch(`${basePath}/api/index.php?route=candidates&action=current_user`)
       .then((res) => res.json())
       .then((data) => {
         if (data.success && data.user) {
@@ -264,7 +265,7 @@ export function Sidebar({ activeView, onViewChange }: SidebarProps) {
       {!collapsed && (
         <div className="p-4 border-t border-white/[0.04] flex-shrink-0">
           <div 
-            onClick={() => { window.location.href = "../pages/profile.php"; }}
+            onClick={() => { window.location.href = `${basePath}/pages/profile.php`; }}
             className="flex items-center gap-3 p-2.5 bg-[#8b5cf6]/5 border border-[#8b5cf6]/10 rounded-xl cursor-pointer hover:bg-[#8b5cf6]/10 transition-all"
           >
             {/* User Initials Avatar */}
@@ -294,7 +295,7 @@ export function Sidebar({ activeView, onViewChange }: SidebarProps) {
       {collapsed && (
         <div className="p-3 border-t border-white/[0.04] flex-shrink-0 flex justify-center">
           <div
-            onClick={() => { window.location.href = "../pages/profile.php"; }}
+            onClick={() => { window.location.href = `${basePath}/pages/profile.php`; }}
             className="w-10 h-10 rounded-full bg-[#a855f7]/20 border border-[#a855f7]/30 flex items-center justify-center cursor-pointer hover:bg-[#a855f7]/30 transition-all overflow-hidden"
             title={sessionUser ? sessionUser.full_name : "Jane Doe"}
           >
