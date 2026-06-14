@@ -183,7 +183,7 @@ if ($user) {
             <?php if (hasPermission('elr.view') && tenantModuleEnabled('elr')): ?>
             <a href="<?= url('/employee-relations-dist/dist/index.html') ?>" class="menu-item">
                 <i class="fa-solid fa-shield-halved"></i>
-                <span>Employee Relations (Portal)</span>
+                <span>Notices</span>
             </a>
             <?php endif; ?>
 
