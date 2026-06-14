@@ -25,12 +25,20 @@ $current_page = basename($_SERVER['SCRIPT_NAME']);
             align-items: start;
         }
 
+        @keyframes elr-pulse {
+            0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.0); }
+            100% { box-shadow: 0 0 40px 0 rgba(239, 68, 68, 0.15); }
+        }
+
         .ticket-list {
-            background: rgba(22, 25, 34, 0.7);
-            border: 1px solid #ef4444; /* Red border */
-            border-radius: var(--radius-lg);
+            background: rgba(255, 255, 255, 0.02);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            border-radius: 16px;
             height: calc(100vh - 180px);
             overflow-y: auto;
+            animation: elr-pulse 4s infinite alternate;
         }
         
         .ticket-item {
@@ -43,13 +51,16 @@ $current_page = basename($_SERVER['SCRIPT_NAME']);
         .ticket-item.active { background: rgba(239, 68, 68, 0.1); border-left: 3px solid #ef4444; }
         
         .ticket-detail {
-            background: rgba(22, 25, 34, 0.7);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-lg);
-            padding: 24px;
+            background: rgba(255, 255, 255, 0.02);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            border-radius: 16px;
+            padding: 32px;
             display: none;
             height: calc(100vh - 180px);
             overflow-y: auto;
+            animation: elr-pulse 4s infinite alternate;
         }
 
         .comment-thread { margin-top: 24px; }
