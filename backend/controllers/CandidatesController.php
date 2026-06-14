@@ -33,8 +33,6 @@ class CandidatesController
             requirePermission('ats.edit');
         }
 
-        $this->pdo->exec("USE respawn_logics");
-
         switch ($action) {
             // GET
             case 'dashboard': $this->dashboard(); break;
