@@ -110,7 +110,7 @@ if ($user) {
             <?php endif; ?>
             
             <?php if (hasPermission('elr.view') && tenantModuleEnabled('elr')): ?>
-            <a href="<?= url('/employee-relations-dist/index.html') ?>" class="menu-item">
+            <a href="<?= url('/employee-relations-dist/dist/index.html') ?>" class="menu-item">
                 <i class="fa-solid fa-shield-halved"></i>
                 <span>Employee Relations</span>
             </a>
@@ -224,7 +224,7 @@ if ($user) {
         </div>
         <?php endif; ?>
         
-        <?php if (hasRole(['Platform_Admin', 'Support_Agent', 'Implementation_Specialist', 'Super_Admin']) || empty($user['tenant_id'])): ?>
+        <?php if (hasRole(['Platform_Admin', 'Support_Agent', 'Implementation_Specialist', 'Super_Admin'])): ?>
         <div class="menu-group">
             <div class="group-title">Vendor Universe</div>
             
