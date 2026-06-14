@@ -635,15 +635,14 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
         .t-gap { height: 0.4rem; }
         .t-cursor { display: inline-block; width: 8px; height: 13px; background: var(--green); animation: blink 1.1s step-start infinite; vertical-align: middle; }
 
-        /* ─── BETA CTA ─── */
+        /* 🎮 BETA CTA 🎮 */
         .beta-wrap {
-            min-height: 100vh;
             display: flex;
             flex-direction: column;
             justify-content: center;
             max-width: 1400px;
             margin: 0 auto;
-            padding: 110px 24px;
+            padding: 110px 24px 60px;
         }
 
         .beta-card {
