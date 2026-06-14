@@ -181,6 +181,7 @@ class PayrollController
                 }
                 
                 echo json_encode(['success' => true, 'data' => [
+                    'themePreference' => $_SESSION['theme_preference'] ?? 'dark',
                     'activeRunName' => $activeRun ? 'PR-' . date('Y') . '-' . str_pad($activeRun['id'], 4, '0', STR_PAD_LEFT) : null,
                     'activeRunTotalEmployees' => intval($empData['cnt']),
                     'activeRunProcessed' => intval($processed),

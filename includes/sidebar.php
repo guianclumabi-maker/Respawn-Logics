@@ -269,6 +269,11 @@ if ($user) {
                 <i class="fa-solid fa-circle-user"></i>
                 <span>My Profile</span>
             </a>
+            
+            <button onclick="toggleTheme()" class="menu-item" style="width:100%; border:none; background:transparent; text-align:left; color:inherit; cursor:pointer;">
+                <i class="fa-solid fa-circle-half-stroke" id="theme-icon"></i>
+                <span id="theme-text">Toggle Theme</span>
+            </button>
         </div>
     </div>
     
@@ -359,4 +364,31 @@ function submitGlobalFeedback() {
         alert("An error occurred. Please try again.");
     });
 }
+
+function toggleTheme() {
+    const currentTheme = document.documentElement.getAttribute('data-theme') || 'dark';
+    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', newTheme);
+    
+    // Update icon if it exists
+    const icon = document.getElementById('theme-icon');
+    if (icon) {
+        icon.className = newTheme === 'dark' ? 'fa-solid fa-circle-half-stroke' : 'fa-regular fa-sun';
+    }
+
+    fetch('<?= url("/api/index.php?route=iam&action=update_theme") ?>', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ theme: newTheme })
+    }).then(res => res.json()).catch(err => console.error(err));
+}
+
+// Initial icon setup
+document.addEventListener('DOMContentLoaded', () => {
+    const currentTheme = document.documentElement.getAttribute('data-theme') || 'dark';
+    const icon = document.getElementById('theme-icon');
+    if (icon) {
+        icon.className = currentTheme === 'dark' ? 'fa-solid fa-circle-half-stroke' : 'fa-regular fa-sun';
+    }
+});
 </script>

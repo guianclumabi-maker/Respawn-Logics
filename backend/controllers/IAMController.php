@@ -53,6 +53,32 @@ class IAMController
                 return;
             }
 
+            if ($action === 'update_theme') {
+                try {
+                    $input = json_decode(file_get_contents('php://input'), true) ?? [];
+                    $theme = $input['theme'] ?? 'system';
+                    if (!in_array($theme, ['light', 'dark', 'system'])) {
+                        $theme = 'system';
+                    }
+                    
+                    // Fail-safe table modification (ignores error if column exists)
+                    try {
+                        $this->pdo->exec("ALTER TABLE `users` ADD COLUMN `theme_preference` ENUM('light', 'dark', 'system') DEFAULT 'dark'");
+                    } catch (Exception $e) {}
+
+                    $stmt = $this->pdo->prepare("UPDATE users SET theme_preference = ? WHERE id = ?");
+                    $stmt->execute([$theme, $this->currentUser['id']]);
+                    
+                    $_SESSION['theme_preference'] = $theme;
+                    
+                    echo json_encode(['success' => true, 'theme' => $theme]);
+                } catch (Exception $e) {
+                    http_response_code(500);
+                    echo json_encode(['success' => false, 'error' => $e->getMessage()]);
+                }
+                return;
+            }
+
             if ($action === 'roles') {
                 try {
                     $stmt = $this->pdo->prepare("SELECT id, name, description, is_system_role FROM roles WHERE tenant_id = ?");

@@ -33,6 +33,24 @@
     --text-primary: #c8d0e0;
     --text-secondary: #8b95a8;
     --text-muted: #5e6a82;
+}
+
+[data-theme="light"] {
+    --bg-dark-base: #f3f4f6;
+    --bg-dark-surface: rgba(255, 255, 255, 0.9);
+    --bg-dark-surface-solid: #ffffff;
+    --bg-dark-surface-elevated: rgba(255, 255, 255, 1);
+    --border-color: rgba(0, 0, 0, 0.08);
+    --border-color-hover: rgba(0, 0, 0, 0.15);
+    
+    --text-primary: #111827;
+    --text-secondary: #4b5563;
+    --text-muted: #6b7280;
+    
+    --glass-gradient: linear-gradient(135deg, rgba(0, 0, 0, 0.03), rgba(0, 0, 0, 0.01));
+}
+
+:root {
     
     /* Font Families */
     --font-heading: 'Space Grotesk', sans-serif;

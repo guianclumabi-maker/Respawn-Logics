@@ -26,6 +26,7 @@ import {
   ServerCog,
   Download,
   Printer,
+  Gamepad
 } from 'lucide-react';
 import {
   AreaChart,
@@ -113,6 +114,10 @@ function App() {
     if (dashInfo) {
       setProcessedEmployees(dashInfo.activeRunProcessed);
       setProgress(Math.floor((dashInfo.activeRunProcessed / dashInfo.activeRunTotalEmployees) * 100));
+      
+      if (dashInfo.themePreference) {
+          document.documentElement.setAttribute('data-theme', dashInfo.themePreference);
+      }
     }
   }, [dashInfo]);
 
@@ -808,11 +813,14 @@ function App() {
     <div className="app-container">
       {/* Sidebar */}
       <aside className="sidebar glass">
-        <div className="sidebar-brand">
-          <div className="brand-logo">
-            <Banknote size={28} className="text-blue-500" />
+        <div className="sidebar-brand" style={{ display: 'flex', alignItems: 'center', padding: '16px' }}>
+          <div style={{ width: '32px', height: '32px', background: 'linear-gradient(135deg, #00e07a, #00b8ff)', borderRadius: '7px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#000', fontSize: '16px', marginRight: '12px' }}>
+            <Gamepad size={18} />
           </div>
-          <span className="brand-text">PayrollEngine</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <span className="brand-text" style={{ fontFamily: "'JetBrains Mono', monospace", fontWeight: 700, color: 'var(--text-primary)', textTransform: 'none', fontSize: '15px', letterSpacing: '-0.5px' }}>Respawn Logics</span>
+            <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: '9px', fontWeight: 700, letterSpacing: '0.1em', color: '#00e07a', background: 'rgba(0,224,122,0.1)', padding: '2px 4px', border: '1px solid rgba(0,224,122,0.22)', borderRadius: '4px' }}>v2.0</span>
+          </div>
         </div>
         
         <nav className="sidebar-nav">
@@ -878,7 +886,7 @@ function App() {
         <header className="topbar glass">
           <div className="page-title">
             <h1 className="capitalize">{activeTab === 'govreports' ? 'Tax & Gov Reports' : activeTab.replace('-', ' ')}</h1>
-            <p className="text-muted">Centralized Payroll Command Center</p>
+            <p className="text-muted">Enterprise Payroll Module</p>
           </div>
           <div className="topbar-actions">
             <button className="icon-btn relative">

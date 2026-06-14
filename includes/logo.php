@@ -9,7 +9,7 @@ function renderLogo($variant = 'centered') {
                 <i class="fa-solid fa-gamepad" style="font-size: 24px; color: #000;"></i>
             </div>
             <div style="display: flex; align-items: center; gap: 8px;">
-                <span style="font-family: \'JetBrains Mono\', monospace; font-size: 24px; font-weight: 700; color: #fff; letter-spacing: -0.5px; margin: 0;">Respawn Logics</span>
+                <span style="font-family: \'JetBrains Mono\', monospace; font-size: 24px; font-weight: 700; color: var(--text-primary); letter-spacing: -0.5px; margin: 0;">Respawn Logics</span>
                 <span style="font-family: \'JetBrains Mono\', monospace; font-size: 10px; font-weight: 700; letter-spacing: 0.1em; color: #00e07a; background: rgba(0,224,122,0.1); padding: 4px 8px; border: 1px solid rgba(0,224,122,0.22); border-radius: 4px;">v2.0</span>
             </div>
         </div>
@@ -20,7 +20,7 @@ function renderLogo($variant = 'centered') {
             <i class="fa-solid fa-gamepad"></i>
         </div>
         <div style="display: flex; align-items: center; gap: 8px;">
-            <span class="brand-text" style="font-family: \'JetBrains Mono\', monospace; font-weight: 700; color: #fff; text-transform: none; font-size: 15px; letter-spacing: -0.5px;">Respawn Logics</span>
+            <span class="brand-text" style="font-family: \'JetBrains Mono\', monospace; font-weight: 700; color: var(--text-primary); text-transform: none; font-size: 15px; letter-spacing: -0.5px;">Respawn Logics</span>
             <span style="font-family: \'JetBrains Mono\', monospace; font-size: 9px; font-weight: 700; letter-spacing: 0.1em; color: #00e07a; background: rgba(0,224,122,0.1); padding: 2px 4px; border: 1px solid rgba(0,224,122,0.22); border-radius: 4px;">v2.0</span>
         </div>
         ';

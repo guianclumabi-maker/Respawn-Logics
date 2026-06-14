@@ -1,8 +1,10 @@
 <?php
 $page_title = $page_title ?? 'Respawn Logics';
+$userTheme = $_SESSION['theme_preference'] ?? 'dark';
+if ($userTheme === 'system') $userTheme = 'dark'; // Fallback to dark if system
 ?>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="<?= htmlspecialchars($userTheme) ?>">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
