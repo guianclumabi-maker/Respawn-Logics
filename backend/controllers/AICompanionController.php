@@ -96,46 +96,37 @@ class AICompanionController
     }
 
     /**
-     * Placeholder method for external LLM API Integration (e.g., OpenAI, Anthropic, Gemini).
-     * This will allow true reasoning, summarization, and synthesis of the local database context.
+     * Google Gemini API Integration.
+     * This performs true reasoning, summarization, and synthesis of the local database context.
      */
     private function callLLMAPI($prompt, $context)
     {
-        $apiUrl = "https://api.placeholder-llm.com/v1/chat/completions";
-        $apiKey = "YOUR_API_KEY_HERE"; // TODO: Move to .env when actual API is selected
+        $apiKey = "YOUR_GEMINI_API_KEY_HERE"; // TODO: Replace with your actual Google Gemini API Key
+
+        if ($apiKey === "YOUR_GEMINI_API_KEY_HERE") {
+            return "⚠️ **SYSTEM ALERT:** The Google Gemini API key has not been configured yet. Please insert your API key in `backend/controllers/AICompanionController.php` on line 104 to enable the AI Companion's reasoning engine.\n\n**Synthesized Context:**\n" . $context;
+        }
+
+        $apiUrl = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=" . $apiKey;
 
         // System prompt to instruct the LLM on its role
         $systemPrompt = "You are an expert HR and Employee Relations AI Companion for Philippine Labor Law and company policies. 
         You must strictly synthesize and base your answers on the provided CONTEXT. Do not invent policies. 
         If the context is empty or says no precedent is found, state that you do not have enough internal data and suggest consulting HR.";
 
-        // --- MOCK API RESPONSE START ---
-        // For now, since we don't have a real API key, we simulate the LLM's synthesis.
-        // Once an API key is available, remove this block and use the cURL request below.
-        
-        if (strpos($context, 'No internal policy') !== false) {
-            if (stripos($prompt, 'draft') !== false || stripos($prompt, 'incident') !== false) {
-                return "**Incident Report Draft**\n\n**Date of Incident:** [Insert Date]\n**Time:** [Insert Time]\n**Location:** [Insert Location]\n**Parties Involved:** [Insert Names]\n\n**Description of Event:**\n[Provide a clear, objective summary of the event.]\n\n*Would you like me to open a new case for this on the HR Cases Board?*";
-            } elseif (stripos($prompt, 'case #12') !== false || stripos($prompt, 'resolution') !== false) {
-                return "**Case Summary (Case #12: Unprofessional Conduct)**\n\n**Timeline:**\n* June 8, 2026: Incident reported by employee.\n\n**Policy References:**\n* Code of Conduct v2\n\n**Potential Risk:**\n* Medium (Interpersonal conflict affecting team morale)\n\n**Recommended Next Step:**\n* Initiate a Formal Mediation Session between the involved parties within 48 hours.";
-            } else {
-                return "I could not find a specific policy matching your query in the HR Knowledge Base. Try asking me to analyze a specific case or explain standard labor codes.";
-            }
-        }
+        $fullPrompt = "SYSTEM: " . $systemPrompt . "\n\nCONTEXT:\n" . $context . "\n\nUSER QUESTION:\n" . $prompt;
 
-        // Mocking the LLM synthesis of the context
-        return "Based on our internal records:\n\n" . $context . "\n\n*(Note: This is a placeholder LLM synthesis. Connect a real API key to enable advanced reasoning and drafting.)*";
-        // --- MOCK API RESPONSE END ---
-
-        /*
-        // ACTUAl API CALL LOGIC (Commented out until an API is chosen)
         $data = [
-            "model" => "placeholder-model-name",
-            "messages" => [
-                ["role" => "system", "content" => $systemPrompt],
-                ["role" => "user", "content" => "CONTEXT:\n" . $context . "\n\nUSER QUESTION:\n" . $prompt]
+            "contents" => [
+                [
+                    "parts" => [
+                        ["text" => $fullPrompt]
+                    ]
+                ]
             ],
-            "temperature" => 0.2
+            "generationConfig" => [
+                "temperature" => 0.2
+            ]
         ];
 
         $ch = curl_init($apiUrl);
@@ -143,8 +134,7 @@ class AICompanionController
         curl_setopt($ch, CURLOPT_POST, true);
         curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
         curl_setopt($ch, CURLOPT_HTTPHEADER, [
-            "Content-Type: application/json",
-            "Authorization: Bearer " . $apiKey
+            "Content-Type: application/json"
         ]);
 
         $response = curl_exec($ch);
@@ -153,10 +143,11 @@ class AICompanionController
 
         if ($httpCode === 200) {
             $responseData = json_decode($response, true);
-            return $responseData['choices'][0]['message']['content'] ?? "Error parsing LLM response.";
+            if (isset($responseData['candidates'][0]['content']['parts'][0]['text'])) {
+                return $responseData['candidates'][0]['content']['parts'][0]['text'];
+            }
         }
 
-        return "LLM API Error: Unable to fetch response from reasoning engine.";
-        */
+        return "⚠️ **LLM API Error:** Unable to fetch response from the Gemini reasoning engine. Check your API key and quota.";
     }
 }
