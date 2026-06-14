@@ -5,6 +5,10 @@ global $pdo;
 // 1. Create Tables
 echo "Creating tables...\n";
 
+$pdo->exec("DROP TABLE IF EXISTS `elr_precedents`");
+$pdo->exec("DROP TABLE IF EXISTS `labor_references`");
+$pdo->exec("DROP TABLE IF EXISTS `global_intelligence_cache`");
+
 $pdo->exec("
     CREATE TABLE IF NOT EXISTS `elr_precedents` (
         `id` int NOT NULL AUTO_INCREMENT,
@@ -52,8 +56,8 @@ echo "Tables created successfully.\n";
 echo "Seeding data...\n";
 
 // Clear existing to avoid duplicates if run multiple times
-$pdo->exec("TRUNCATE TABLE elr_precedents");
-$pdo->exec("TRUNCATE TABLE labor_references");
+$pdo->exec("DELETE FROM elr_precedents");
+$pdo->exec("DELETE FROM labor_references");
 
 $precedents = [
     [
