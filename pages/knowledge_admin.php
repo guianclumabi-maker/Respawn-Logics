@@ -2,6 +2,9 @@
 require_once __DIR__ . '/../bootstrap/app.php';
 require_once __DIR__ . '/../includes/auth.php';
 
+requireLogin();
+$user = getCurrentUser();
+
 // Ensure user has admin access
 if (!hasPermission('settings.manage')) {
     header("Location: dashboard.php");
