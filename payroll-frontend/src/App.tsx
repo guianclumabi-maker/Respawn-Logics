@@ -102,6 +102,9 @@ function App() {
       API.fetchGovReports().then(setGovReports)
     ]).then(() => {
       setIsLoading(false);
+    }).catch(err => {
+      console.error("API Error during load:", err);
+      setIsLoading(false);
     });
   }, []);
 
