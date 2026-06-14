@@ -62,7 +62,7 @@ export function InterviewsPage({ onViewChange }: InterviewsPageProps) {
       {/* Header */}
       <div className="relative z-10 flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight bg-gradient-to-r from-white via-white to-gray-400 bg-clip-text text-transparent" style={{ fontFamily: "'Outfit', 'Inter', sans-serif" }}>
+          <h1 className="text-2xl font-bold tracking-tight bg-gradient-to-r from-white via-white to-gray-400 bg-clip-text text-transparent" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
             Scheduled Hearings
           </h1>
           <p className="text-xs text-[#9ca3af] mt-1">Calendar agenda of scheduled mediation and investigation hearings.</p>

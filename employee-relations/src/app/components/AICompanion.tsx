@@ -68,7 +68,7 @@ export function AICompanion() {
           <Bot className="text-cyan-400" />
         </div>
         <div>
-          <h1 className="text-xl font-bold font-['Outfit']">HR AI Companion</h1>
+          <h1 className="text-xl font-bold font-['Space Grotesk']">HR AI Companion</h1>
           <p className="text-sm text-gray-400">Intelligent assistance for employee relations</p>
         </div>
       </div>

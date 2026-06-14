@@ -59,7 +59,7 @@ export function ATSDashboard({ onViewChange }: ELRDashboardProps) {
       <div className="p-8">
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight mb-2 bg-gradient-to-r from-[#00e07a] to-[#06b6d4] bg-clip-text text-transparent drop-shadow-[0_0_8px_rgba(0,224,122,0.3)]">ELR Overview</h1>
+            <h1 className="text-2xl font-bold tracking-tight bg-gradient-to-r from-white via-white to-gray-400 bg-clip-text text-transparent" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>ELR Overview</h1>
             <p className="text-slate-500 dark:text-slate-400 text-sm">Monitor employee relations health and investigations.</p>
           </div>
           <button 

@@ -117,15 +117,15 @@ export function Sidebar({ activeView, onViewChange }: SidebarProps) {
       <div className="flex items-center justify-between h-[70px] px-6 border-b border-gray-200 dark:border-white/[0.04] flex-shrink-0">
         {!collapsed && (
           <div className="flex items-center gap-3">
-            {/* ER logo circle */}
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#00e07a] to-[#009b55] flex items-center justify-center shadow-lg shadow-[#00e07a]/20 flex-shrink-0">
-              <span className="text-white font-black text-sm tracking-wider">RL</span>
+            {/* Gamepad logo icon */}
+            <div className="w-8 h-8 rounded-[7px] bg-gradient-to-br from-[#00e07a] to-[#00b8ff] flex items-center justify-center text-black text-base shadow-lg shadow-[#00e07a]/20 flex-shrink-0">
+              <i className="fa-solid fa-gamepad"></i>
             </div>
             <span
-              className="text-[1.15rem] font-bold tracking-[0.5px] uppercase bg-gradient-to-r from-slate-800 via-slate-700 to-slate-500 dark:from-white dark:via-white dark:to-gray-400 bg-clip-text text-transparent"
-              style={{ fontFamily: "'Outfit', 'Inter', sans-serif" }}
+              className="font-bold text-white text-[15px] tracking-[-0.5px]"
+              style={{ fontFamily: "'JetBrains Mono', monospace" }}
             >
-              RESPAWN
+              Employee Relations
             </span>
           </div>
         )}
@@ -144,7 +144,7 @@ export function Sidebar({ activeView, onViewChange }: SidebarProps) {
         {/* Manage section */}
         <div>
           {!collapsed && (
-            <p className="pl-3 text-[0.75rem] font-bold text-gray-500 tracking-[1px] uppercase mb-1.5" style={{ fontFamily: "'Outfit', 'Inter', sans-serif" }}>
+            <p className="pl-3 text-[0.75rem] font-bold text-gray-500 tracking-[1px] uppercase mb-1.5" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
               Manage
             </p>
           )}
@@ -232,7 +232,7 @@ export function Sidebar({ activeView, onViewChange }: SidebarProps) {
         {/* Account section */}
         <div>
           {!collapsed && (
-            <p className="pl-3 text-[0.75rem] font-bold text-gray-500 tracking-[1px] uppercase mb-1.5" style={{ fontFamily: "'Outfit', 'Inter', sans-serif" }}>
+            <p className="pl-3 text-[0.75rem] font-bold text-gray-500 tracking-[1px] uppercase mb-1.5" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
               Account
             </p>
           )}

@@ -72,7 +72,7 @@ export function InsightsPage({ onViewChange }: InsightsPageProps) {
       {/* Header */}
       <div className="relative z-10 flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight bg-gradient-to-r from-white via-white to-gray-400 bg-clip-text text-transparent" style={{ fontFamily: "'Outfit', 'Inter', sans-serif" }}>
+          <h1 className="text-2xl font-bold tracking-tight bg-gradient-to-r from-white via-white to-gray-400 bg-clip-text text-transparent" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
             Relations Insights
           </h1>
           <p className="text-xs text-[#9ca3af] mt-1">Case trends, issue categories performance, and resolution analytics.</p>
