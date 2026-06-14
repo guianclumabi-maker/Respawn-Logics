@@ -38,27 +38,27 @@ import {
 } from 'recharts';
 import './App.css';
 
-const API_BASE = window.location.origin + (window.location.hostname === 'localhost' ? '/respawn-logics' : '') + '/payroll_engine_api.php';
+const API_BASE = window.location.origin + (window.location.hostname === 'localhost' ? '/respawn-logics' : '') + '/api/index.php?route=payroll_engine';
 
 const API = {
-  fetchDashboardInfo: () => fetch(`${API_BASE}?action=dashboard_kpis`).then(r => r.json()).then(d => d.data || {
+  fetchDashboardInfo: () => fetch(`${API_BASE}&action=dashboard_kpis`).then(r => r.json()).then(d => d.data || {
     nextDate: 'N/A', estimatedCost: 0, costIncrease: 0, readiness: 'N/A', activeRunName: 'None', activeRunTotalEmployees: 0, activeRunProcessed: 0
   }),
-  fetchChartData: () => fetch(`${API_BASE}?action=chart_data`).then(r => r.json()).then(d => d.data || []),
-  fetchExceptions: () => fetch(`${API_BASE}?action=exceptions_list`).then(r => r.json()).then(d => d.data || []),
-  fetchQueue: () => fetch(`${API_BASE}?action=runs`).then(r => r.json()).then(d => {
+  fetchChartData: () => fetch(`${API_BASE}&action=chart_data`).then(r => r.json()).then(d => d.data || []),
+  fetchExceptions: () => fetch(`${API_BASE}&action=exceptions_list`).then(r => r.json()).then(d => d.data || []),
+  fetchQueue: () => fetch(`${API_BASE}&action=runs`).then(r => r.json()).then(d => {
     return (d.data || []).map((r:any) => ({
       id: `PR-${r.id}`, origin: r.schedule_name || 'Manual', period: `${r.payroll_period_start} to ${r.payroll_period_end}`, status: r.status, employees: 0, cost: 'Pending'
     }));
   }),
-  fetchCompHistory: () => fetch(`${API_BASE}?action=comp_history`).then(r => r.json()).then(d => d.data || { history: [], audits: [] }),
-  fetchSettings: () => fetch(`${API_BASE}?action=settings`).then(r => r.json()).then(d => d.data || {}),
-  fetchPayslipsList: () => fetch(`${API_BASE}?action=payslips_admin`).then(r => r.json()).then(d => {
+  fetchCompHistory: () => fetch(`${API_BASE}&action=comp_history`).then(r => r.json()).then(d => d.data || { history: [], audits: [] }),
+  fetchSettings: () => fetch(`${API_BASE}&action=settings`).then(r => r.json()).then(d => d.data || {}),
+  fetchPayslipsList: () => fetch(`${API_BASE}&action=payslips_admin`).then(r => r.json()).then(d => {
     return (d.data || []).map((ps:any) => ({ id: `PS-${ps.id}`, emp: ps.empName, period: ps.period, net: ps.net, status: ps.status }));
   }),
   fetchPayslipDetails: (id: string) => {
     const rawId = id.replace('PS-', '');
-    return fetch(`${API_BASE}?action=payslip_details&id=${rawId}`).then(r => r.json()).then(d => {
+    return fetch(`${API_BASE}&action=payslip_details&id=${rawId}`).then(r => r.json()).then(d => {
       const p = d.data;
       if(!p) return null;
       return {
@@ -67,7 +67,7 @@ const API = {
       };
     });
   },
-  fetchGovReports: () => fetch(`${API_BASE}?action=gov_reports`).then(r => r.json()).then(d => d.data || [])
+  fetchGovReports: () => fetch(`${API_BASE}&action=gov_reports`).then(r => r.json()).then(d => d.data || [])
 };
 
 function App() {
