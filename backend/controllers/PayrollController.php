@@ -10,8 +10,8 @@ class PayrollController
     public function __construct($pdo)
     {
         $this->pdo = $pdo;
-        $this->currentUser = getCurrentUser();
-        $this->tenantId = $this->currentUser['tenant_id'] ?? $_SESSION['tenant_id'] ?? '1';
+        $this->currentUser = getCurrentUser() ?: null;
+        $this->tenantId = is_array($this->currentUser) && isset($this->currentUser['tenant_id']) ? $this->currentUser['tenant_id'] : ($_SESSION['tenant_id'] ?? '1');
         
         // Load the new Service Layer
         require_once __DIR__ . '/../services/PayrollService.php';

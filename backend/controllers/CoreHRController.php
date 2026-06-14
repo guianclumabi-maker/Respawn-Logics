@@ -10,8 +10,8 @@ class CoreHRController
     {
         $this->pdo = $pdo;
         // Since we already ran isLoggedIn() in api/index.php, getCurrentUser() will work.
-        $this->currentUser = getCurrentUser();
-        $this->tenantId = $this->currentUser['tenant_id'] ?? $_SESSION['tenant_id'] ?? '1';
+        $this->currentUser = getCurrentUser() ?: null;
+        $this->tenantId = is_array($this->currentUser) && isset($this->currentUser['tenant_id']) ? $this->currentUser['tenant_id'] : ($_SESSION['tenant_id'] ?? '1');
     }
 
     public function handleRequest($action)
