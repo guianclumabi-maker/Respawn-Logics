@@ -1350,10 +1350,10 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
                         <div class="window-dot minimize"></div>
                         <div class="window-dot maximize"></div>
                     </div>
-                    <div class="window-url">http://respawn-logics/pages/leave.php</div>
+                    <div class="window-url">http://localhost/respawn-logics/pages/dashboard.php</div>
                 </div>
                 <div class="window-body">
-                    <img src="assets/images/employee_experience.png" alt="Leave Management UI Screenshot" class="window-screenshot">
+                    <img src="assets/images/dashboard.png" alt="Employee Dashboard UI Screenshot" class="window-screenshot">
                 </div>
             </div>
         </div>
