@@ -2,6 +2,7 @@
   import { createRoot } from "react-dom/client";
   import App from "./app/App.tsx";
   import "./styles/index.css";
+  import { ThemeProvider } from "next-themes";
 
   // Global fetch interceptor to handle session expiration
   const originalFetch = window.fetch;
@@ -14,5 +15,9 @@
     return response;
   };
 
-  createRoot(document.getElementById("root")!).render(<App />);
+  createRoot(document.getElementById("root")!).render(
+    <ThemeProvider attribute="class" defaultTheme="dark">
+      <App />
+    </ThemeProvider>
+  );
   

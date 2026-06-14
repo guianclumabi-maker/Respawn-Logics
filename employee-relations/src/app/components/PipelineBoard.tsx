@@ -56,15 +56,15 @@ export function PipelineBoard({ onViewChange }: { onViewChange: (v: string) => v
   };
 
   return (
-    <main className="flex-1 flex flex-col h-full bg-[#06070a] text-white overflow-hidden">
-      <div className="p-8 border-b border-white/[0.04] shrink-0">
+    <main className="flex-1 flex flex-col h-full bg-[#f4f6f8] dark:bg-[#0b0f1a] text-slate-900 dark:text-white overflow-hidden transition-colors duration-300">
+      <div className="p-8 border-b border-gray-200 dark:border-white/[0.04] shrink-0">
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight mb-2 bg-gradient-to-r from-red-400 to-orange-500 bg-clip-text text-transparent">ELR Cases</h1>
-            <p className="text-slate-400 text-sm">Manage employee relations cases and investigations</p>
+            <h1 className="text-3xl font-bold tracking-tight mb-2 bg-gradient-to-r from-[#00e07a] to-[#06b6d4] bg-clip-text text-transparent drop-shadow-[0_0_8px_rgba(0,224,122,0.3)]">ELR Cases</h1>
+            <p className="text-slate-500 dark:text-slate-400 text-sm">Manage employee relations cases and investigations</p>
           </div>
           <button 
-            className="h-10 px-4 bg-gradient-to-r from-red-500 to-orange-600 text-white rounded-lg font-medium text-sm flex items-center gap-2 hover:from-red-400 hover:to-orange-500 transition-all shadow-lg shadow-red-500/20 border border-white/10"
+            className="h-10 px-4 bg-[#00e07a] text-[#0b0f1a] rounded-lg font-bold text-sm flex items-center gap-2 hover:bg-[#00e07a]/80 transition-all shadow-lg shadow-[#00e07a]/20 border border-[#00e07a]"
           >
             <Plus size={16} />
             New Case
@@ -77,10 +77,10 @@ export function PipelineBoard({ onViewChange }: { onViewChange: (v: string) => v
             <input 
               type="text" 
               placeholder="Search by case number, employee, or department..."
-              className="w-full h-10 bg-white/[0.02] border border-white/[0.06] rounded-lg pl-10 pr-4 text-sm focus:outline-none focus:border-red-500/50 focus:bg-white/[0.04] transition-all"
+              className="w-full h-10 bg-white dark:bg-white/[0.02] border border-gray-200 dark:border-white/[0.06] rounded-lg pl-10 pr-4 text-sm focus:outline-none focus:border-[#00e07a]/50 focus:bg-white dark:focus:bg-white/[0.04] transition-all text-slate-800 dark:text-white"
             />
           </div>
-          <button className="h-10 px-4 bg-white/[0.02] border border-white/[0.06] rounded-lg font-medium text-sm flex items-center gap-2 hover:bg-white/[0.06] transition-colors">
+          <button className="h-10 px-4 bg-white dark:bg-white/[0.02] border border-gray-200 dark:border-white/[0.06] rounded-lg font-medium text-sm flex items-center gap-2 hover:bg-gray-50 dark:hover:bg-white/[0.06] transition-colors shadow-sm dark:shadow-none text-slate-700 dark:text-white">
             <Filter size={16} />
             Filters
           </button>
@@ -88,10 +88,9 @@ export function PipelineBoard({ onViewChange }: { onViewChange: (v: string) => v
       </div>
 
       <div className="flex-1 overflow-auto p-8 relative">
-        <div className="absolute inset-0 bg-gradient-to-b from-red-500/5 to-transparent pointer-events-none" />
-        <div className="bg-[#0a0c14]/80 backdrop-blur-xl border border-white/[0.04] rounded-xl overflow-hidden shadow-2xl shadow-black/40 relative z-10">
+        <div className="bg-white dark:bg-[#0f1422]/80 border border-gray-200 dark:border-[#2a2d36] rounded-xl overflow-hidden shadow-sm dark:shadow-none relative z-10">
           <table className="w-full text-left text-sm">
-            <thead className="bg-white/[0.02] border-b border-white/[0.04] text-slate-400 text-xs uppercase tracking-wider">
+            <thead className="bg-gray-50 dark:bg-white/[0.02] border-b border-gray-200 dark:border-white/[0.04] text-slate-500 dark:text-slate-400 text-xs uppercase tracking-wider">
               <tr>
                 <th className="px-6 py-4 font-medium">Case Number</th>
                 <th className="px-6 py-4 font-medium">Type</th>
@@ -101,13 +100,13 @@ export function PipelineBoard({ onViewChange }: { onViewChange: (v: string) => v
                 <th className="px-6 py-4 font-medium">Date Opened</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-white/[0.02]">
+            <tbody className="divide-y divide-gray-200 dark:divide-white/[0.02]">
               {loading ? (
                 <tr>
                   <td colSpan={6} className="px-6 py-12 text-center text-slate-500">
                     <div className="flex flex-col items-center justify-center">
                        <SpinningDonut />
-                       <div className="mt-2 text-orange-500/80 tracking-widest uppercase text-xs font-bold animate-pulse">Computing Matrix...</div>
+                       <div className="mt-2 text-[#00e07a]/80 tracking-widest uppercase text-xs font-bold animate-pulse">Computing Matrix...</div>
                     </div>
                   </td>
                 </tr>
@@ -118,20 +117,20 @@ export function PipelineBoard({ onViewChange }: { onViewChange: (v: string) => v
                       <div className="w-16 h-16 rounded-full bg-white/[0.02] flex items-center justify-center mb-2">
                         <AlertCircle className="text-slate-600" size={32} />
                       </div>
-                      <div className="text-white font-medium">Queue is Empty</div>
+                      <div className="text-slate-900 dark:text-white font-medium">Queue is Empty</div>
                       <div className="text-sm">No active ELR cases found.</div>
                     </div>
                   </td>
                 </tr>
               ) : cases.map((c) => (
-                <tr key={c.id} className="hover:bg-white/[0.02] transition-colors cursor-pointer group">
+                <tr key={c.id} className="hover:bg-gray-50 dark:hover:bg-white/[0.02] transition-colors cursor-pointer group">
                   <td className="px-6 py-4">
-                    <div className="font-medium text-white group-hover:text-red-400 transition-colors flex items-center gap-2">
+                    <div className="font-medium text-slate-800 dark:text-white group-hover:text-[#00e07a] transition-colors flex items-center gap-2">
                       {c.is_confidential == 1 && <Lock size={14} className="text-red-500" />}
                       {c.case_number}
                     </div>
                   </td>
-                  <td className="px-6 py-4 text-slate-300">{c.case_type_name || 'General'}</td>
+                  <td className="px-6 py-4 text-slate-600 dark:text-slate-300">{c.case_type_name || 'General'}</td>
                   <td className="px-6 py-4">
                     <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium border ${getSeverityColor(c.severity)}`}>
                       {c.severity}
@@ -142,10 +141,10 @@ export function PipelineBoard({ onViewChange }: { onViewChange: (v: string) => v
                       {c.status}
                     </span>
                   </td>
-                  <td className="px-6 py-4 text-slate-400">
+                  <td className="px-6 py-4 text-slate-600 dark:text-slate-400">
                     {c.investigator_id || 'Unknown'}
                   </td>
-                  <td className="px-6 py-4 text-slate-400">
+                  <td className="px-6 py-4 text-slate-600 dark:text-slate-400">
                     <div className="flex items-center gap-2">
                       <Clock size={14} />
                       {new Date(c.date_opened).toLocaleDateString()}

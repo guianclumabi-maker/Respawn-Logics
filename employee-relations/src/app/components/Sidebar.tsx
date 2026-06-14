@@ -13,6 +13,7 @@ import {
   ArrowLeft,
   BotMessageSquare
 } from "lucide-react";
+import { GamifiedThemeToggle } from "./GamifiedThemeToggle";
 
 type NavItem = {
   label: string;
@@ -108,14 +109,12 @@ export function Sidebar({ activeView, onViewChange }: SidebarProps) {
   return (
     <aside
       style={{
-        backgroundColor: "#0d0f19",
         width: collapsed ? 72 : 280,
-        borderColor: "rgba(255, 255, 255, 0.06)",
       }}
-      className="h-full flex flex-col flex-shrink-0 border-r transition-all duration-300 overflow-hidden font-sans select-none"
+      className="h-full bg-white dark:bg-[#0b0f1a] border-r border-gray-200 dark:border-white/[0.06] flex flex-col flex-shrink-0 transition-all duration-300 overflow-hidden font-sans select-none"
     >
       {/* Brand Logo Header */}
-      <div className="flex items-center justify-between h-[70px] px-6 border-b border-white/[0.04] flex-shrink-0">
+      <div className="flex items-center justify-between h-[70px] px-6 border-b border-gray-200 dark:border-white/[0.04] flex-shrink-0">
         {!collapsed && (
           <div className="flex items-center gap-3">
             {/* ER logo circle */}
@@ -123,7 +122,7 @@ export function Sidebar({ activeView, onViewChange }: SidebarProps) {
               <span className="text-white font-black text-sm tracking-wider">ER</span>
             </div>
             <span
-              className="text-[1.15rem] font-bold tracking-[0.5px] text-white uppercase bg-gradient-to-r from-white via-white to-gray-400 bg-clip-text text-transparent"
+              className="text-[1.15rem] font-bold tracking-[0.5px] uppercase bg-gradient-to-r from-slate-800 via-slate-700 to-slate-500 dark:from-white dark:via-white dark:to-gray-400 bg-clip-text text-transparent"
               style={{ fontFamily: "'Outfit', 'Inter', sans-serif" }}
             >
               RELATIONS
@@ -168,27 +167,30 @@ export function Sidebar({ activeView, onViewChange }: SidebarProps) {
                     }}
                     className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all text-left group cursor-pointer ${
                       isActive
-                        ? "bg-[#8b5cf6]/10 border border-[#8b5cf6]/20 shadow-[0_0_12px_rgba(139,92,246,0.08)]"
-                        : "hover:bg-white/[0.03] border border-transparent"
+                        ? "bg-[#00e07a]/10 border border-[#00e07a]/20 shadow-[0_0_12px_rgba(0,224,122,0.08)]"
+                        : "hover:bg-gray-100 dark:hover:bg-white/[0.03] border border-transparent"
                     }`}
-                    style={{
-                      color: isActive ? "#ffffff" : "#9ca3af",
-                    }}
                   >
                     <span
-                      className={`flex-shrink-0 transition-colors ${
-                        isActive ? "text-[#a855f7]" : "text-[#9ca3af] group-hover:text-white"
+                      className={`transition-colors ${
+                        isActive
+                          ? "text-[#00e07a]"
+                          : "text-slate-500 dark:text-[#9ca3af] group-hover:text-slate-800 dark:group-hover:text-white"
                       }`}
                     >
                       {item.icon}
                     </span>
                     {!collapsed && (
                       <>
-                        <span className={`text-[0.9rem] font-medium flex-1 ${isActive ? "text-white" : "group-hover:text-white"}`}>
+                        <span className={`text-[0.9rem] font-medium flex-1 transition-colors ${
+                          isActive
+                            ? "text-[#00e07a]"
+                            : "text-slate-600 dark:text-[#9ca3af] group-hover:text-slate-800 dark:group-hover:text-white"
+                        }`}>
                           {item.label}
                         </span>
                         {item.hasChevron && (
-                          <span className={isActive ? "text-[#a855f7]" : "text-gray-600 group-hover:text-white"}>
+                          <span className={isActive ? "text-[#00e07a]" : "text-gray-600 group-hover:text-slate-800 dark:group-hover:text-white"}>
                             {hasChildren && isExpanded ? (
                               <ChevronDown size={14} />
                             ) : (
@@ -211,8 +213,8 @@ export function Sidebar({ activeView, onViewChange }: SidebarProps) {
                             onClick={() => onViewChange("Cases")}
                             className={`w-full text-left px-4 py-2 rounded-lg text-[0.8rem] transition-all cursor-pointer ${
                               isSubActive 
-                                ? "text-[#c084fc] font-medium bg-white/[0.02]" 
-                                : "text-gray-500 hover:text-white hover:bg-white/[0.02]"
+                                ? "text-[#00e07a] font-medium bg-[#00e07a]/5" 
+                                : "text-slate-500 dark:text-gray-500 hover:text-slate-800 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-white/[0.02]"
                             }`}
                           >
                             {child}
@@ -243,15 +245,15 @@ export function Sidebar({ activeView, onViewChange }: SidebarProps) {
                 }}
                 className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl border border-transparent transition-all group cursor-pointer text-left ${
                   item.highlight
-                    ? "bg-[#ec4899]/5 hover:bg-[#ec4899]/10 text-pink-400 hover:text-pink-300 border-[#ec4899]/10"
-                    : "hover:bg-white/[0.03] text-[#9ca3af] hover:text-white"
+                    ? "bg-[#00e07a]/5 hover:bg-[#00e07a]/10 text-[#00e07a] hover:text-[#00e07a] border-[#00e07a]/10"
+                    : "hover:bg-gray-100 dark:hover:bg-white/[0.03] text-slate-500 dark:text-[#9ca3af] hover:text-slate-800 dark:hover:text-white"
                 }`}
               >
-                <span className={`flex-shrink-0 ${item.highlight ? "text-pink-400" : "text-[#9ca3af] group-hover:text-white"}`}>
+                <span className={`flex-shrink-0 ${item.highlight ? "text-[#00e07a]" : "text-slate-500 dark:text-[#9ca3af] group-hover:text-slate-800 dark:group-hover:text-white"}`}>
                   {item.icon}
                 </span>
                 {!collapsed && (
-                  <span className={`text-[0.9rem] font-medium ${item.highlight ? "text-pink-400 font-semibold" : "group-hover:text-white"}`}>
+                  <span className={`text-[0.9rem] font-medium ${item.highlight ? "text-[#00e07a] font-semibold" : "group-hover:text-slate-800 dark:group-hover:text-white"}`}>
                     {item.label}
                   </span>
                 )}
@@ -261,26 +263,33 @@ export function Sidebar({ activeView, onViewChange }: SidebarProps) {
         </div>
       </div>
 
+      {/* Theme Toggle Area */}
+      {!collapsed && (
+        <div className="px-4 py-3">
+          <GamifiedThemeToggle />
+        </div>
+      )}
+
       {/* User Footer Profile Block */}
       {!collapsed && (
-        <div className="p-4 border-t border-white/[0.04] flex-shrink-0">
+        <div className="p-4 border-t border-gray-200 dark:border-white/[0.04] flex-shrink-0">
           <div 
             onClick={() => { window.location.href = `${basePath}/pages/profile.php`; }}
-            className="flex items-center gap-3 p-2.5 bg-[#8b5cf6]/5 border border-[#8b5cf6]/10 rounded-xl cursor-pointer hover:bg-[#8b5cf6]/10 transition-all"
+            className="flex items-center gap-3 p-2.5 bg-gray-50 dark:bg-[#8b5cf6]/5 border border-gray-200 dark:border-[#8b5cf6]/10 rounded-xl cursor-pointer hover:bg-gray-100 dark:hover:bg-[#8b5cf6]/10 transition-all"
           >
             {/* User Initials Avatar */}
-            <div className="w-10 h-10 rounded-full bg-[#a855f7]/20 border border-[#a855f7]/30 flex items-center justify-center flex-shrink-0 overflow-hidden">
+            <div className="w-10 h-10 rounded-full bg-gray-200 dark:bg-[#a855f7]/20 border border-gray-300 dark:border-[#a855f7]/30 flex items-center justify-center flex-shrink-0 overflow-hidden">
               {sessionUser?.profile_image ? (
                 <img src={`${window.location.hostname === 'localhost' ? '/respawn-logics' : ''}/uploads/${sessionUser.profile_image}`} alt="Profile" className="w-full h-full object-cover" />
               ) : (
-                <span className="text-[#c084fc] font-bold text-[0.95rem]">
+                <span className="text-slate-600 dark:text-[#c084fc] font-bold text-[0.95rem]">
                   {sessionUser ? sessionUser.initials : "JD"}
                 </span>
               )}
             </div>
             
             <div className="min-w-0 flex-1">
-              <div className="text-[0.85rem] font-semibold text-white truncate">
+              <div className="text-[0.85rem] font-semibold text-slate-800 dark:text-white truncate">
                 {sessionUser ? sessionUser.full_name : "Jane Doe"}
               </div>
               <div className="text-[0.75rem] text-gray-500 truncate">

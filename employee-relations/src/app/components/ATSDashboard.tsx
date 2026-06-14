@@ -54,16 +54,16 @@ export function ATSDashboard({ onViewChange }: ELRDashboardProps) {
   ];
 
   return (
-    <main className="flex-1 flex flex-col h-full bg-[#06070a] text-white overflow-y-auto">
+    <main className="flex-1 flex flex-col h-full bg-[#f4f6f8] dark:bg-[#0b0f1a] text-slate-900 dark:text-white overflow-y-auto transition-colors duration-300">
       <div className="p-8">
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight mb-2 bg-gradient-to-r from-red-400 to-orange-500 bg-clip-text text-transparent">ELR Overview</h1>
-            <p className="text-slate-400 text-sm">Monitor employee relations health and investigations.</p>
+            <h1 className="text-3xl font-bold tracking-tight mb-2 bg-gradient-to-r from-[#00e07a] to-[#06b6d4] bg-clip-text text-transparent drop-shadow-[0_0_8px_rgba(0,224,122,0.3)]">ELR Overview</h1>
+            <p className="text-slate-500 dark:text-slate-400 text-sm">Monitor employee relations health and investigations.</p>
           </div>
           <button 
             onClick={() => onViewChange("Cases")}
-            className="h-10 px-4 bg-white/[0.03] border border-white/[0.06] rounded-lg font-medium text-sm flex items-center gap-2 hover:bg-white/[0.06] transition-colors"
+            className="px-4 py-2 bg-white dark:bg-white/[0.02] border border-gray-200 dark:border-white/[0.05] rounded-lg text-sm font-medium hover:border-[#00e07a]/50 dark:hover:bg-white/[0.04] transition-all flex items-center gap-2 shadow-sm"
           >
             View All Cases
             <ArrowRight size={16} />
@@ -72,19 +72,16 @@ export function ATSDashboard({ onViewChange }: ELRDashboardProps) {
 
         {/* Metrics Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          {metrics.map((m, i) => (
-            <div key={i} className="bg-[#0a0c14]/80 backdrop-blur-xl border border-white/[0.04] p-6 rounded-2xl shadow-xl shadow-black/20 hover:border-white/[0.08] transition-all relative overflow-hidden group">
-              <div className={`absolute top-0 right-0 w-32 h-32 bg-gradient-to-br ${m.color} opacity-5 blur-3xl group-hover:opacity-10 transition-opacity`} />
-              <div className="flex items-center justify-between mb-4 relative z-10">
-                <div className={`w-10 h-10 rounded-lg flex items-center justify-center bg-gradient-to-br ${m.color} bg-opacity-10 shadow-inner`}>
-                  <div className="text-white drop-shadow-md">
-                    {m.icon}
-                  </div>
+          {metrics.map((metric, i) => (
+            <div key={i} className="p-5 bg-white dark:bg-[#0f1422]/80 border border-gray-200 dark:border-[#2a2d36] rounded-2xl relative overflow-hidden group hover:border-[#00e07a]/30 transition-colors shadow-sm dark:shadow-none">
+              <div className="flex justify-between items-start mb-4 relative z-10">
+                <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${metric.color} flex items-center justify-center text-white shadow-lg shadow-black/20`}>
+                  {metric.icon}
                 </div>
               </div>
               <div className="relative z-10">
-                <div className="text-3xl font-bold mb-1 tracking-tight">{loading ? "-" : m.value}</div>
-                <div className="text-sm text-slate-400 font-medium">{m.label}</div>
+                <div className="text-2xl font-bold text-slate-800 dark:text-white">{loading ? "-" : metric.value}</div>
+                <div className="text-sm font-medium text-slate-500 dark:text-slate-400 mt-1">{metric.label}</div>
               </div>
             </div>
           ))}
@@ -93,35 +90,33 @@ export function ATSDashboard({ onViewChange }: ELRDashboardProps) {
         {/* Main Content Area */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           
-          <div className="lg:col-span-2 bg-[#0a0c14]/80 backdrop-blur-xl border border-white/[0.04] rounded-2xl p-6 shadow-xl shadow-black/20">
-            <div className="flex justify-between items-center mb-6">
-              <h3 className="font-semibold text-lg flex items-center gap-2">
-                <Clock size={18} className="text-orange-400" />
-                Recent Open Cases
-              </h3>
+          <div className="lg:col-span-2">
+            <div className="flex items-center gap-2 mb-4">
+              <AlertCircle size={16} className="text-[#f5a623]" />
+              <h2 className="text-sm font-semibold uppercase tracking-wider text-slate-700 dark:text-slate-300">Recent Open Cases</h2>
             </div>
             
             <div className="space-y-4">
               {loading ? (
                 <div className="flex flex-col items-center justify-center py-8">
                    <SpinningDonut />
-                   <div className="mt-2 text-orange-500/80 tracking-widest uppercase text-xs font-bold animate-pulse">Loading recent cases...</div>
+                   <div className="mt-2 text-[#00e07a]/80 tracking-widest uppercase text-xs font-bold animate-pulse">Loading recent cases...</div>
                 </div>
               ) : cases.filter(c => c.status !== 'Closed' && c.status !== 'Resolved').slice(0, 5).length === 0 ? (
-                <div className="text-center py-12 text-slate-500 bg-white/[0.01] rounded-xl border border-white/[0.02]">
-                  <CheckCircle size={32} className="mx-auto mb-3 text-emerald-500/50" />
+                <div className="text-center py-12 text-slate-500 bg-gray-50 dark:bg-white/[0.01] rounded-xl border border-gray-200 dark:border-white/[0.02]">
+                  <CheckCircle size={32} className="mx-auto mb-3 text-[#00e07a]/50" />
                   <p>All clear! No active cases require attention.</p>
                 </div>
               ) : (
                 cases.filter(c => c.status !== 'Closed' && c.status !== 'Resolved').slice(0, 5).map((c, i) => (
-                  <div key={i} className="flex items-center justify-between p-4 bg-white/[0.02] border border-white/[0.03] rounded-xl hover:bg-white/[0.04] cursor-pointer transition-colors" onClick={() => onViewChange("Cases")}>
+                  <div key={i} className="flex items-center justify-between p-4 bg-white dark:bg-white/[0.02] border border-gray-200 dark:border-white/[0.03] rounded-xl hover:border-[#00e07a]/30 dark:hover:bg-white/[0.04] cursor-pointer transition-colors shadow-sm dark:shadow-none" onClick={() => onViewChange("Cases")}>
                     <div className="flex items-center gap-4">
-                      <div className="w-10 h-10 rounded-full bg-white/[0.05] flex items-center justify-center text-xs font-bold text-slate-300">
+                      <div className="w-10 h-10 rounded-full bg-gray-100 dark:bg-white/[0.05] flex items-center justify-center text-xs font-bold text-slate-600 dark:text-slate-300">
                         {c.employee_name ? c.employee_name.substring(0, 2).toUpperCase() : '?'}
                       </div>
                       <div>
-                        <div className="font-medium text-sm mb-0.5">{c.ticket_number} • {c.subject || c.type_name}</div>
-                        <div className="text-xs text-slate-400">{c.employee_name || 'Unknown Employee'}</div>
+                        <div className="font-medium text-slate-800 dark:text-slate-200 text-sm mb-0.5">{c.ticket_number} • {c.subject || c.type_name}</div>
+                        <div className="text-xs text-slate-500 dark:text-slate-400">{c.employee_name || 'Unknown Employee'}</div>
                       </div>
                     </div>
                     <div className="flex items-center gap-4">
@@ -135,33 +130,30 @@ export function ATSDashboard({ onViewChange }: ELRDashboardProps) {
             </div>
           </div>
 
-          <div className="bg-[#0a0c14]/80 backdrop-blur-xl border border-white/[0.04] rounded-2xl p-6 shadow-xl shadow-black/20">
-            <h3 className="font-semibold text-lg mb-6 flex items-center gap-2">
-              <TrendingUp size={18} className="text-emerald-400" />
-              Quick Actions
-            </h3>
+          <div className="bg-[#0a0c14]/0">
+            <div className="flex items-center gap-2 mb-4">
+              <TrendingDown size={16} className="text-[#00e07a]" />
+              <h2 className="text-sm font-semibold uppercase tracking-wider text-slate-700 dark:text-slate-300">Quick Actions</h2>
+            </div>
             
             <div className="space-y-3">
-              <button 
-                onClick={() => onViewChange("Cases")}
-                className="w-full text-left p-4 bg-white/[0.02] border border-white/[0.04] rounded-xl hover:bg-white/[0.06] hover:border-white/[0.1] transition-all group flex items-center justify-between"
-              >
-                <div>
-                  <div className="font-medium text-sm group-hover:text-red-400 transition-colors">Start Investigation</div>
-                  <div className="text-xs text-slate-400 mt-1">Open a new confidential case file</div>
+              <button onClick={() => onViewChange("Cases")} className="w-full text-left p-4 rounded-xl bg-white dark:bg-[#0f1422]/80 border border-gray-200 dark:border-[#2a2d36] hover:border-[#00e07a]/50 transition-colors group shadow-sm dark:shadow-none">
+                <div className="flex items-center justify-between mb-1">
+                  <span className="font-medium text-slate-800 dark:text-white group-hover:text-[#00e07a] transition-colors">Start Investigation</span>
+                  <ArrowRight size={16} className="text-slate-400 group-hover:text-[#00e07a] transition-colors" />
                 </div>
-                <ArrowRight size={16} className="text-slate-500 group-hover:text-red-400 group-hover:translate-x-1 transition-all" />
+                <div className="text-xs text-slate-500 dark:text-slate-400">Open a new confidential case file</div>
               </button>
               
               <button 
                 onClick={() => onViewChange("Analytics")}
-                className="w-full text-left p-4 bg-white/[0.02] border border-white/[0.04] rounded-xl hover:bg-white/[0.06] hover:border-white/[0.1] transition-all group flex items-center justify-between"
+                className="w-full text-left p-4 rounded-xl bg-white dark:bg-[#0f1422]/80 border border-gray-200 dark:border-[#2a2d36] hover:border-[#00e07a]/50 transition-colors group shadow-sm dark:shadow-none"
               >
-                <div>
-                  <div className="font-medium text-sm group-hover:text-orange-400 transition-colors">View Analytics</div>
-                  <div className="text-xs text-slate-400 mt-1">Review department grievance metrics</div>
+                <div className="flex items-center justify-between mb-1">
+                  <span className="font-medium text-slate-800 dark:text-white group-hover:text-[#00e07a] transition-colors">View Analytics</span>
+                  <ArrowRight size={16} className="text-slate-400 group-hover:text-[#00e07a] transition-colors" />
                 </div>
-                <ArrowRight size={16} className="text-slate-500 group-hover:text-orange-400 group-hover:translate-x-1 transition-all" />
+                <div className="text-xs text-slate-500 dark:text-slate-400">Review department grievance metrics</div>
               </button>
             </div>
           </div>

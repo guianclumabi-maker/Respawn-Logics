@@ -53,7 +53,7 @@ export function SpinningDonut() {
 
   return (
     <div className="flex justify-center items-center py-8">
-      <pre className="font-mono text-[10px] sm:text-xs text-orange-500 leading-none tracking-tighter whitespace-pre drop-shadow-[0_0_8px_rgba(249,115,22,0.6)] font-bold">
+      <pre className="font-mono text-[10px] sm:text-xs text-cyan-600 dark:text-[#00e07a] leading-none tracking-tighter whitespace-pre drop-shadow-[0_0_8px_rgba(0,224,122,0.6)] font-bold">
         {frame}
       </pre>
     </div>
