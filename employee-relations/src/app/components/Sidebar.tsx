@@ -118,14 +118,14 @@ export function Sidebar({ activeView, onViewChange }: SidebarProps) {
         {!collapsed && (
           <div className="flex items-center gap-3">
             {/* ER logo circle */}
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#06b6d4] to-[#8b5cf6] flex items-center justify-center shadow-lg shadow-cyan-500/20 flex-shrink-0">
-              <span className="text-white font-black text-sm tracking-wider">ER</span>
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#00e07a] to-[#009b55] flex items-center justify-center shadow-lg shadow-[#00e07a]/20 flex-shrink-0">
+              <span className="text-white font-black text-sm tracking-wider">RL</span>
             </div>
             <span
               className="text-[1.15rem] font-bold tracking-[0.5px] uppercase bg-gradient-to-r from-slate-800 via-slate-700 to-slate-500 dark:from-white dark:via-white dark:to-gray-400 bg-clip-text text-transparent"
               style={{ fontFamily: "'Outfit', 'Inter', sans-serif" }}
             >
-              RELATIONS
+              RESPAWN
             </span>
           </div>
         )}
@@ -282,18 +282,18 @@ export function Sidebar({ activeView, onViewChange }: SidebarProps) {
               {sessionUser?.profile_image ? (
                 <img src={`${window.location.hostname === 'localhost' ? '/respawn-logics' : ''}/uploads/${sessionUser.profile_image}`} alt="Profile" className="w-full h-full object-cover" />
               ) : (
-                <span className="text-slate-600 dark:text-[#c084fc] font-bold text-[0.95rem]">
-                  {sessionUser ? sessionUser.initials : "JD"}
+                <span className="text-slate-600 dark:text-[#00e07a] font-bold text-[0.95rem]">
+                  {sessionUser ? sessionUser.initials : "GC"}
                 </span>
               )}
             </div>
             
             <div className="min-w-0 flex-1">
               <div className="text-[0.85rem] font-semibold text-slate-800 dark:text-white truncate">
-                {sessionUser ? sessionUser.full_name : "Jane Doe"}
+                {sessionUser ? sessionUser.full_name : "Guian Clumabi"}
               </div>
               <div className="text-[0.75rem] text-gray-500 truncate">
-                {sessionUser ? sessionUser.role : "Relations Officer"}
+                {sessionUser ? sessionUser.role : "System Administrator"}
               </div>
             </div>
           </div>
