@@ -1,0 +1,1 @@
+<?php require_once __DIR__ . '/bootstrap/app.php'; $_SESSION['user_email'] = 'test@test.com'; $_SESSION['user_id'] = 1; $_SESSION['tenant_id'] = 123456; loadPermissions(); require_once __DIR__ . '/backend/controllers/ESMController.php'; $controller = new ESMController($pdo); $controller->handleRequest('agent_queue'); ?>
