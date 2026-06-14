@@ -641,7 +641,7 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
             display: flex;
             flex-direction: column;
             justify-content: center;
-            max-width: 1180px;
+            max-width: 1400px;
             margin: 0 auto;
             padding: 110px 24px;
         }
@@ -1352,10 +1352,10 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
 </div>
 
 <section class="beta-wrap" id="beta">
-    <div style="display: grid; gap: 32px; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); align-items: stretch;">
+    <div style="display: grid; gap: 80px; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); align-items: stretch;">
         
         <!-- SOLO PLAN -->
-        <div class="beta-card" style="grid-template-columns: 1fr; gap: 20px; padding: 48px; position: relative;">
+        <div class="beta-card" style="grid-template-columns: 1fr; gap: 24px; padding: 60px; position: relative;">
             <div class="beta-label" style="background: rgba(0, 224, 122, 0.07); color: var(--green); border-color: rgba(0, 224, 122, 0.2);"><i class="fa-solid fa-user-astronaut"></i> SOLO FOUNDER</div>
             <h2 class="beta-h" style="font-size: 2rem;">Build your empire.</h2>
             <p class="beta-p" style="max-width: 100%; margin-bottom: 24px;">Perfect for solo developers, indie hackers, and single-member startups who need an enterprise-grade HRIS to start right.</p>
@@ -1386,7 +1386,7 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
         </div>
 
         <!-- ENTERPRISE BETA PLAN -->
-        <div class="beta-card" style="grid-template-columns: 1fr; gap: 20px; padding: 48px; position: relative;">
+        <div class="beta-card" style="grid-template-columns: 1fr; gap: 24px; padding: 60px; position: relative;">
             <div class="beta-label"><i class="fa-solid fa-flask"></i> PRIVATE BETA — LIMITED SLOTS</div>
             <h2 class="beta-h" style="font-size: 2rem;">Join before we<br>go public.</h2>
             <p class="beta-p" style="max-width: 100%; margin-bottom: 24px;">We're onboarding select enterprise partners. Every feature completely free while we battle-test the platform together.</p>
