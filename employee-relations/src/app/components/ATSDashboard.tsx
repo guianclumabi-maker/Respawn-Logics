@@ -10,6 +10,7 @@ import {
   ShieldAlert,
   Clock
 } from "lucide-react";
+import { SpinningDonut } from './SpinningDonut';
 
 type ELRDashboardProps = {
   onViewChange: (view: any) => void;
@@ -102,7 +103,10 @@ export function ATSDashboard({ onViewChange }: ELRDashboardProps) {
             
             <div className="space-y-4">
               {loading ? (
-                <div className="text-center py-8 text-slate-500">Loading recent cases...</div>
+                <div className="flex flex-col items-center justify-center py-8">
+                   <SpinningDonut />
+                   <div className="mt-2 text-orange-500/80 tracking-widest uppercase text-xs font-bold animate-pulse">Loading recent cases...</div>
+                </div>
               ) : cases.filter(c => c.status !== 'Closed' && c.status !== 'Resolved').slice(0, 5).length === 0 ? (
                 <div className="text-center py-12 text-slate-500 bg-white/[0.01] rounded-xl border border-white/[0.02]">
                   <CheckCircle size={32} className="mx-auto mb-3 text-emerald-500/50" />

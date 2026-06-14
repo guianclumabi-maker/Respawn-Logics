@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Plus, Search, Filter, AlertCircle, Clock, Lock } from "lucide-react";
+import { SpinningDonut } from './SpinningDonut';
 
 export function PipelineBoard({ onViewChange }: { onViewChange: (v: string) => void }) {
   const [cases, setCases] = useState<any[]>([]);
@@ -104,9 +105,9 @@ export function PipelineBoard({ onViewChange }: { onViewChange: (v: string) => v
               {loading ? (
                 <tr>
                   <td colSpan={6} className="px-6 py-12 text-center text-slate-500">
-                    <div className="flex flex-col items-center gap-3">
-                       <div className="w-6 h-6 border-2 border-red-500/30 border-t-red-500 rounded-full animate-spin" />
-                       Loading cases...
+                    <div className="flex flex-col items-center justify-center">
+                       <SpinningDonut />
+                       <div className="mt-2 text-orange-500/80 tracking-widest uppercase text-xs font-bold animate-pulse">Computing Matrix...</div>
                     </div>
                   </td>
                 </tr>
