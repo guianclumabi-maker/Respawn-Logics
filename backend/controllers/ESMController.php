@@ -216,7 +216,7 @@ class ESMController
         $stmt->execute([$ticketId, $this->currentUser['id'], $type, $comment, $this->currentUser['id']]);
 
         if ($this->isAgent() && $type === 'Public') {
-            $this->pdo->exec("UPDATE `service_tickets` SET `first_response_at` = CURRENT_TIMESTAMP WHERE `id` = $ticketId AND `first_response_at` IS NULL");
+            $this->pdo->prepare("UPDATE `service_tickets` SET `first_response_at` = CURRENT_TIMESTAMP WHERE `id` = ? AND `first_response_at` IS NULL")->execute([$ticketId]);
         }
 
         echo json_encode(['success' => true]);

@@ -101,10 +101,10 @@ class AICompanionController
      */
     private function callLLMAPI($prompt, $context)
     {
-        // Check ENV first, fallback to hardcoded string
-        $apiKey = getenv('GEMINI_API_KEY') ?: "AIzaSyAPKF0Jn1kDmDL0r46woa4nzGXZLUdhL2Y"; // TODO: Replace with your actual Google Gemini API Key
+        // Check ENV strictly
+        $apiKey = getenv('GEMINI_API_KEY');
 
-        if ($apiKey === "YOUR_GEMINI_API_KEY_HERE") {
+        if (empty($apiKey) || $apiKey === "YOUR_GEMINI_API_KEY_HERE") {
             return "⚠️ **SYSTEM ALERT:** The Google Gemini API key has not been configured yet. Please insert your API key in `backend/controllers/AICompanionController.php` on line 104 to enable the AI Companion's reasoning engine.\n\n**Synthesized Context:**\n" . $context;
         }
 

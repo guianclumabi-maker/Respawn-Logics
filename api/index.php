@@ -113,14 +113,12 @@ try {
     http_response_code(500);
     echo json_encode([
         'success' => false, 
-        'error' => 'Database error (Missing table or column)',
-        'details' => $e->getMessage()
+        'error' => 'A database error occurred.'
     ]);
 } catch (Exception $e) {
     http_response_code(500);
     echo json_encode([
         'success' => false, 
-        'error' => 'Server error',
-        'details' => $e->getMessage()
+        'error' => 'An internal server error occurred.'
     ]);
 }

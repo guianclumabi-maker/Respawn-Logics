@@ -218,7 +218,7 @@ class ESMSupportController
         $ticket = $stmt->fetch();
         if (!$ticket) { http_response_code(404); echo json_encode(['success' => false, 'error' => 'Not found']); return; }
 
-        $cStmt = $this->pdo->prepare("SELECT etc.*, u.full_name, u.role FROM `esm_ticket_comments` etc LEFT JOIN `users` u ON etc.user_id = u.id WHERE etc.ticket_id = ? ORDER etc.created_at ASC");
+        $cStmt = $this->pdo->prepare("SELECT etc.*, u.full_name, u.role FROM `esm_ticket_comments` etc LEFT JOIN `users` u ON etc.user_id = u.id WHERE etc.ticket_id = ? ORDER BY etc.created_at ASC");
         $cStmt->execute([$id]);
         $comments = $cStmt->fetchAll();
 
@@ -367,10 +367,10 @@ class ESMSupportController
         $sysComment = "";
 
         if ($action === 'resolve') {
-            $this->pdo->exec("UPDATE `esm_tickets` SET `status` = 'Resolved', `updated_at` = NOW() WHERE `id` IN ($idList) AND `tenant_id` = {$this->tenantId}");
+            $this->pdo->prepare("UPDATE `esm_tickets` SET `status` = 'Resolved', `updated_at` = NOW() WHERE `id` IN ($idList) AND `tenant_id` = ?")->execute([$this->tenantId]);
             $sysComment = "[SYSTEM] $uName mass-resolved this ticket.";
         } else if ($action === 'close') {
-            $this->pdo->exec("UPDATE `esm_tickets` SET `status` = 'Closed', `updated_at` = NOW() WHERE `id` IN ($idList) AND `tenant_id` = {$this->tenantId}");
+            $this->pdo->prepare("UPDATE `esm_tickets` SET `status` = 'Closed', `updated_at` = NOW() WHERE `id` IN ($idList) AND `tenant_id` = ?")->execute([$this->tenantId]);
             $sysComment = "[SYSTEM] $uName mass-closed this ticket.";
         }
         if ($sysComment) {

@@ -363,8 +363,7 @@ class CandidatesController
     }
 
     private function jobs() {
-        $where = ["j.tenant_id = '{$this->tenantId}'"];
-        $params = [];
+        $where = ["j.tenant_id = ?"]; $params = [$this->tenantId];
         if (!empty($_GET['status'])) { $where[] = "j.`status` = ?"; $params[] = $_GET['status']; }
         if (!empty($_GET['department'])) { $where[] = "j.`department` = ?"; $params[] = $_GET['department']; }
         if (!empty($_GET['priority'])) { $where[] = "j.`priority` = ?"; $params[] = $_GET['priority']; }
@@ -416,7 +415,7 @@ class CandidatesController
     private function candidates() {
         $search = $_GET['search'] ?? ''; $status = $_GET['status'] ?? ''; $source = $_GET['source'] ?? '';
         $page = max(1, (int)($_GET['page'] ?? 1)); $limit = min(100, max(10, (int)($_GET['limit'] ?? 50))); $offset = ($page - 1) * $limit;
-        $where = ["cp.tenant_id = '{$this->tenantId}'"]; $params = [];
+        $where = ["cp.tenant_id = ?"]; $params = [$this->tenantId];
         if ($search) { $where[] = "(cp.`name` LIKE ? OR cp.`email` LIKE ? OR cp.`skills` LIKE ? OR cp.`location` LIKE ?)"; $params = array_merge($params, ["%$search%", "%$search%", "%$search%", "%$search%"]); }
         if ($status) { $where[] = "cp.`status` = ?"; $params[] = $status; }
         if ($source) { $where[] = "cp.`source` = ?"; $params[] = $source; }
@@ -475,7 +474,7 @@ class CandidatesController
     }
 
     private function interviews() {
-        $where = ["i.tenant_id = '{$this->tenantId}'"]; $params = [];
+        $where = ["i.tenant_id = ?"]; $params = [$this->tenantId];
         if (!empty($_GET['status'])) { $where[] = "i.`status` = ?"; $params[] = $_GET['status']; }
         if (!empty($_GET['job_id'])) { $where[] = "i.`job_id` = ?"; $params[] = (int)$_GET['job_id']; }
         if (!empty($_GET['date_from'])) { $where[] = "DATE(i.`scheduled_at`) >= ?"; $params[] = $_GET['date_from']; }
@@ -589,7 +588,7 @@ class CandidatesController
 
     private function search() {
         $skills = $_GET['skills'] ?? ''; $minExp = (int)($_GET['min_experience'] ?? 0); $location = $_GET['location'] ?? ''; $source = $_GET['source'] ?? ''; $tags = $_GET['tags'] ?? ''; $hasInterviews = $_GET['has_interviews'] ?? ''; $poolId = (int)($_GET['pool_id'] ?? 0); $previousJobId = (int)($_GET['previous_job_id'] ?? 0);
-        $where = ["cp.tenant_id = '{$this->tenantId}'", "cp.`status` = 'Active'"]; $params = [];
+        $where = ["cp.tenant_id = ?", "cp.`status` = 'Active'"]; $params = [$this->tenantId];
         if ($skills) { foreach (array_map('trim', explode(',', $skills)) as $skill) { $where[] = "cp.`skills` LIKE ?"; $params[] = "%$skill%"; } }
         if ($minExp > 0) { $where[] = "cp.`experience_years` >= ?"; $params[] = $minExp; }
         if ($location) { $where[] = "cp.`location` LIKE ?"; $params[] = "%$location%"; }
@@ -667,7 +666,7 @@ class CandidatesController
     }
 
     private function approvals() {
-        $where = ["a.tenant_id = '{$this->tenantId}'"]; $params = [];
+        $where = ["a.tenant_id = ?"]; $params = [$this->tenantId];
         if (!empty($_GET['status'])) { $where[] = "a.`status` = ?"; $params[] = $_GET['status']; }
         $stmt = $this->pdo->prepare("SELECT a.*, CASE WHEN a.`type` = 'Job' THEN (SELECT `title` FROM `jobs` WHERE `id` = a.`reference_id`) ELSE CONCAT(a.`type`, ' #', a.`reference_id`) END as reference_title FROM `approvals` a " . (!empty($where) ? 'WHERE ' . implode(' AND ', $where) : '') . " ORDER BY a.`requested_at` DESC");
         $stmt->execute($params); $approvals = $stmt->fetchAll();

@@ -66,15 +66,26 @@ class EmployeeRelationsController
     private function getDashboard()
     {
         try {
-            $total = (int)$this->pdo->query("SELECT COUNT(*) FROM `employee_relations` WHERE `tenant_id` = '{$this->tenantId}'")->fetchColumn();
-            $interviews = (int)$this->pdo->query("SELECT COUNT(*) FROM `employee_relations` WHERE `tenant_id` = '{$this->tenantId}' AND `stage` IN ('Review', 'Investigation')")->fetchColumn();
-            $offers = (int)$this->pdo->query("SELECT COUNT(*) FROM `employee_relations` WHERE `tenant_id` = '{$this->tenantId}' AND `stage` = 'Resolution Pending'")->fetchColumn();
-            $hired = (int)$this->pdo->query("SELECT COUNT(*) FROM `employee_relations` WHERE `tenant_id` = '{$this->tenantId}' AND `stage` = 'Resolved'")->fetchColumn();
+            $stmt1 = $this->pdo->prepare("SELECT COUNT(*) FROM `employee_relations` WHERE `tenant_id` = ?");
+            $stmt1->execute([$this->tenantId]); $total = (int)$stmt1->fetchColumn();
             
-            $screened = (int)$this->pdo->query("SELECT COUNT(*) FROM `employee_relations` WHERE `tenant_id` = '{$this->tenantId}' AND `stage` NOT IN ('Reported', 'Resolved')")->fetchColumn();
-            $f2f = (int)$this->pdo->query("SELECT COUNT(*) FROM `employee_relations` WHERE `tenant_id` = '{$this->tenantId}' AND `stage` = 'Investigation'")->fetchColumn();
+            $stmt2 = $this->pdo->prepare("SELECT COUNT(*) FROM `employee_relations` WHERE `tenant_id` = ? AND `stage` IN ('Review', 'Investigation')");
+            $stmt2->execute([$this->tenantId]); $interviews = (int)$stmt2->fetchColumn();
             
-            $stmt_act = $this->pdo->query("SELECT `name`, `stage`, `applied` FROM `employee_relations` WHERE `tenant_id` = '{$this->tenantId}' ORDER BY `id` DESC LIMIT 4");
+            $stmt3 = $this->pdo->prepare("SELECT COUNT(*) FROM `employee_relations` WHERE `tenant_id` = ? AND `stage` = 'Resolution Pending'");
+            $stmt3->execute([$this->tenantId]); $offers = (int)$stmt3->fetchColumn();
+            
+            $stmt4 = $this->pdo->prepare("SELECT COUNT(*) FROM `employee_relations` WHERE `tenant_id` = ? AND `stage` = 'Resolved'");
+            $stmt4->execute([$this->tenantId]); $hired = (int)$stmt4->fetchColumn();
+            
+            $stmt5 = $this->pdo->prepare("SELECT COUNT(*) FROM `employee_relations` WHERE `tenant_id` = ? AND `stage` NOT IN ('Reported', 'Resolved')");
+            $stmt5->execute([$this->tenantId]); $screened = (int)$stmt5->fetchColumn();
+            
+            $stmt6 = $this->pdo->prepare("SELECT COUNT(*) FROM `employee_relations` WHERE `tenant_id` = ? AND `stage` = 'Investigation'");
+            $stmt6->execute([$this->tenantId]); $f2f = (int)$stmt6->fetchColumn();
+            
+            $stmt_act = $this->pdo->prepare("SELECT `name`, `stage`, `applied` FROM `employee_relations` WHERE `tenant_id` = ? ORDER BY `id` DESC LIMIT 4");
+            $stmt_act->execute([$this->tenantId]);
             $activities = $stmt_act->fetchAll();
             
             // Format activities
