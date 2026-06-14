@@ -1278,7 +1278,7 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
             </ul>
         </div>
         <div class="split-image">
-            <img src="https://images.unsplash.com/photo-1618761714954-0b8cd0026356?auto=format&fit=crop&w=800&q=80" alt="Platform Dashboard">
+            <img src="assets/images/employee_experience.png" alt="Employee Experience HR Dashboard UI" style="border-radius: 16px; border: 1px solid var(--border-color); box-shadow: 0 10px 40px rgba(0,0,0,0.5);">
         </div>
     </div>
 </section>
