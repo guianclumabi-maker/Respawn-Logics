@@ -222,6 +222,13 @@ class ESMSupportController
         $cStmt->execute([$id]);
         $comments = $cStmt->fetchAll();
 
+        // Filter out internal comments if not an agent
+        if (!$this->isESMAgent()) {
+            $comments = array_values(array_filter($comments, function($c) {
+                return $c['comment_type'] !== 'Internal';
+            }));
+        }
+
         echo json_encode(['success' => true, 'data' => ['ticket' => $ticket, 'comments' => $comments]]);
     }
 

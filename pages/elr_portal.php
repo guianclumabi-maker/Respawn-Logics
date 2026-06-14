@@ -2,15 +2,9 @@
 require_once __DIR__ . '/../bootstrap/app.php';
 requireLogin();
 
-// ELR access is currently limited to Admin/HR roles.
-if (!hasPermission('elr.view')) {
-    header('Location: ' . url('/pages/dashboard.php'));
-    exit;
-}
-
 $current_page = basename($_SERVER['SCRIPT_NAME']);
 ?>
-<?php $page_title = 'Employee Relations Console - Respawn Logic'; ?>
+<?php $page_title = 'My HR & ELR Cases - Respawn Logic'; ?>
 <?php include __DIR__ . '/../includes/head.php'; ?>
 
     <style>
@@ -88,10 +82,15 @@ $current_page = basename($_SERVER['SCRIPT_NAME']);
             
             <div class="admin-header">
                 <div class="admin-title">
-                    <h1>Employee & Labor Relations</h1>
-                    <p>Confidential Case Management (Disciplinary, PIPs, Grievances)</p>
+                    <h1>My HR & ELR Cases</h1>
+                    <p style="color:var(--text-muted); font-weight:normal;">View and manage your confidential Employee Relations cases.</p>
                 </div>
-                <div>
+                <div style="display: flex; gap: 12px; align-items: center;">
+                    <select id="caseFilter" class="form-input" style="height:36px; padding: 4px 12px;" onchange="renderQueue()">
+                        <option value="All">All Cases</option>
+                        <option value="Open">Open</option>
+                        <option value="Resolved">Resolved</option>
+                    </select>
                     <button class="btn-primary" onclick="openCreateModal()" style="background:#ef4444;">+ New ELR Case</button>
                 </div>
             </div>
@@ -112,11 +111,7 @@ $current_page = basename($_SERVER['SCRIPT_NAME']);
                             <span id="dtl-employee" style="color:white; font-size:0.875rem; font-weight:600;"></span>
                         </div>
                         <div style="display:flex; gap:8px;">
-                            <select id="dtl-status" class="form-input" style="font-size:0.75rem; padding:4px 8px; height:auto;" onchange="updateTicketStatus()">
-                                <option value="Open">Open</option>
-                                <option value="In Progress">Investigation / In Progress</option>
-                                <option value="Resolved">Resolved / Closed</option>
-                            </select>
+                            <span id="dtl-status-badge" style="font-size:0.75rem; background:rgba(255,255,255,0.1); padding:4px 8px; border-radius:4px; color:white; font-weight:bold;">Open</span>
                         </div>
                     </div>
                     
@@ -165,10 +160,6 @@ $current_page = basename($_SERVER['SCRIPT_NAME']);
                         <select name="ticket_type_id" id="ticket_type_id" class="form-input" required></select>
                     </div>
                     <div style="margin-bottom:16px;">
-                        <label style="display:block; font-size:0.75rem; color:var(--text-muted); margin-bottom:6px;">Subject Employee ID</label>
-                        <input type="number" name="employee_id" class="form-input" required placeholder="User ID of the employee">
-                    </div>
-                    <div style="margin-bottom:16px;">
                         <label style="display:block; font-size:0.75rem; color:var(--text-muted); margin-bottom:6px;">Subject</label>
                         <input type="text" name="subject" class="form-input" required placeholder="Brief summary of case">
                     </div>
@@ -188,12 +179,11 @@ $current_page = basename($_SERVER['SCRIPT_NAME']);
 
         async function loadQueue() {
             try {
-                // We use agent_queue but we will filter it for ELR specifically (assigned to ELR team or confidential)
-                const res = await fetch(`<?= url('/esm_api.php?action=agent_queue') ?>`);
+                // Fetch employee's own tickets instead of agent queue
+                const res = await fetch(`<?= url('/esm_api.php?action=my_tickets') ?>`);
                 const data = await res.json();
                 if (data.success) {
-                    // Filter for ELR Cases (Assume team name is 'Employee Relations' or ticket is confidential)
-                    // For safety, we rely on team_name 'Employee Relations'
+                    // Filter for ELR Cases (team name is 'Employee Relations' or ticket is confidential)
                     currentTickets = data.data.filter(t => t.team_name === 'Employee Relations' || t.is_confidential == 1);
                     renderQueue();
                 }
@@ -204,8 +194,16 @@ $current_page = basename($_SERVER['SCRIPT_NAME']);
 
         function renderQueue() {
             const container = document.getElementById('queue-container');
+            const filterValue = document.getElementById('caseFilter').value;
             
-            if (currentTickets.length === 0) {
+            let displayTickets = currentTickets;
+            if (filterValue === 'Open') {
+                displayTickets = currentTickets.filter(t => t.status !== 'Resolved' && t.status !== 'Closed');
+            } else if (filterValue === 'Resolved') {
+                displayTickets = currentTickets.filter(t => t.status === 'Resolved' || t.status === 'Closed');
+            }
+
+            if (displayTickets.length === 0) {
                 container.innerHTML = `
                     <div style="padding:40px 24px; text-align:center; color:var(--text-muted);">
                         <svg style="width:48px; height:48px; opacity:0.3; margin:0 auto 12px auto; display:block;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
@@ -216,7 +214,7 @@ $current_page = basename($_SERVER['SCRIPT_NAME']);
                 return;
             }
 
-            container.innerHTML = currentTickets.map(t => `
+            container.innerHTML = displayTickets.map(t => `
                 <div class="ticket-item ${t.id === activeTicketId ? 'active' : ''}" onclick="selectTicket(${t.id})">
                     <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
                         <span style="font-size:0.75rem; color:var(--text-muted);">${t.ticket_number}</span>
@@ -246,7 +244,8 @@ $current_page = basename($_SERVER['SCRIPT_NAME']);
                     document.getElementById('dtl-subject').innerText = t.subject;
                     document.getElementById('dtl-employee').innerText = `Subject: ${t.employee_name}`;
                     document.getElementById('dtl-desc').innerText = t.description;
-                    document.getElementById('dtl-status').value = t.status === 'Closed' ? 'Resolved' : t.status;
+                    document.getElementById('dtl-status-badge').innerText = t.status === 'Closed' ? 'Resolved' : t.status;
+                    document.getElementById('dtl-status-badge').style.color = (t.status === 'Open' || t.status === 'In Progress') ? '#f59e0b' : '#10b981';
 
                     const cContainer = document.getElementById('dtl-comments');
                     cContainer.innerHTML = data.data.comments.map(c => {
@@ -297,11 +296,10 @@ $current_page = basename($_SERVER['SCRIPT_NAME']);
 
         async function openCreateModal() {
             try {
-                const res = await fetch(`<?= url('/esm_api.php?action=all_ticket_types') ?>`);
+                const res = await fetch(`<?= url('/esm_api.php?action=elr_ticket_types') ?>`);
                 const data = await res.json();
                 if (data.success) {
-                    // Only show confidential types or HR types
-                    const elrTypes = data.data.filter(t => t.is_confidential == 1 || t.name.includes('HR'));
+                    const elrTypes = data.data;
                     document.getElementById('ticket_type_id').innerHTML = elrTypes.map(t => `<option value="${t.id}">${t.name}</option>`).join('');
                     document.getElementById('createModal').classList.add('active');
                 }
@@ -310,11 +308,6 @@ $current_page = basename($_SERVER['SCRIPT_NAME']);
 
         window.submitTicket = async function(e) {
             e.preventDefault();
-            // Since HR is creating this ON BEHALF of or AGAINST an employee, we will just send it to create_ticket.
-            // Wait, create_ticket uses currentUser['id'] as employee_id! We need to allow agents to set employee_id.
-            
-            alert('To create a case against a specific employee, the backend create_ticket logic would need an override. For now, creating it will assign it to your HR account.');
-            
             const formData = new FormData(document.getElementById('form-ticket'));
             try {
                 const res = await fetch(`<?= url('/esm_api.php?action=create_ticket') ?>`, { method: 'POST', body: formData });

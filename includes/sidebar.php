@@ -109,10 +109,10 @@ if ($user) {
             </a>
             <?php endif; ?>
             
-            <?php if (hasPermission('elr.view') && tenantModuleEnabled('elr')): ?>
-            <a href="<?= url('/pages/elr_admin.php') ?>" class="menu-item <?= $current_page === 'elr_admin.php' ? 'active' : '' ?>">
+            <?php if (tenantModuleEnabled('elr')): ?>
+            <a href="<?= url('/pages/elr_portal.php') ?>" class="menu-item <?= $current_page === 'elr_portal.php' ? 'active' : '' ?>">
                 <i class="fa-solid fa-shield-halved"></i>
-                <span>Notices</span>
+                <span>My HR Cases</span>
             </a>
             <?php endif; ?>
 

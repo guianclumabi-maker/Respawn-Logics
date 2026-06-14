@@ -40,6 +40,12 @@ class ESMController
                 echo json_encode(['success' => true, 'data' => $stmt->fetchAll()]);
                 break;
 
+            case 'elr_ticket_types':
+                $stmt = $this->pdo->prepare("SELECT * FROM `service_ticket_types` WHERE `tenant_id` = ? AND (`is_confidential` = 1 OR `name` LIKE '%HR%')");
+                $stmt->execute([$this->tenantId]);
+                echo json_encode(['success' => true, 'data' => $stmt->fetchAll()]);
+                break;
+
             case 'all_ticket_types':
                 if (!$this->isAgent()) { echo json_encode(['success' => false, 'error' => 'Denied']); return; }
                 $stmt = $this->pdo->prepare("SELECT * FROM `service_ticket_types` WHERE `tenant_id` = ?");
