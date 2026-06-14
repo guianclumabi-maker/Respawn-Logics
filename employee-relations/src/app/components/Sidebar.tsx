@@ -290,7 +290,7 @@ export function Sidebar({ activeView, onViewChange }: SidebarProps) {
             
             <div className="min-w-0 flex-1">
               <div className="text-[0.85rem] font-semibold text-slate-800 dark:text-white truncate">
-                {sessionUser ? sessionUser.full_name : "Guian Clumabi"}
+                {sessionUser ? sessionUser.full_name : "Jane Doe"}
               </div>
               <div className="text-[0.75rem] text-gray-500 truncate">
                 {sessionUser ? sessionUser.role : "System Administrator"}

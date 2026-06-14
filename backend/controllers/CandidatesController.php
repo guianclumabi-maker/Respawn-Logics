@@ -692,15 +692,19 @@ class CandidatesController
             unset($userPayload['password_hash']); 
             echo json_encode(['success' => true, 'user' => $userPayload]); 
         } else { 
-            // Fallback for development/beta if users table is missing
-            echo json_encode([
-                'success' => true, 
-                'user' => [
-                    'full_name' => 'Guian Clumabi', 
-                    'role' => 'System Administrator', 
-                    'department' => 'Operations'
-                ]
-            ]); 
+            // Fallback for development/beta if database lookup fails but session exists
+            if (isset($_SESSION['user_name'])) {
+                echo json_encode([
+                    'success' => true, 
+                    'user' => [
+                        'full_name' => $_SESSION['user_name'], 
+                        'role' => 'System Administrator', 
+                        'department' => 'Operations'
+                    ]
+                ]);
+            } else {
+                echo json_encode(['success' => false, 'error' => 'Not logged in']);
+            }
         }
         exit;
     }
