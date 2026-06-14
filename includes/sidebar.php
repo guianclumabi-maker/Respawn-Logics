@@ -224,7 +224,7 @@ if ($user) {
         </div>
         <?php endif; ?>
         
-        <?php if (hasRole(['Platform_Admin', 'Support_Agent', 'Implementation_Specialist', 'Super_Admin'])): ?>
+        <?php if (hasRole(['Platform_Admin', 'Support_Agent', 'Implementation_Specialist'])): ?>
         <div class="menu-group">
             <div class="group-title">Vendor Universe</div>
             
