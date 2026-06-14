@@ -55,6 +55,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                 $user = $stmt->fetch();
                 
                 if ($user && !empty($user['password_hash']) && password_verify($password, $user['password_hash'])) {
+                    session_regenerate_id(true); // Prevent Session Fixation
                     $_SESSION['login_attempts'] = 0; // Reset on success
                     $_SESSION['user_id'] = $user['id'];
                     $_SESSION['user_email'] = $user['email'];
