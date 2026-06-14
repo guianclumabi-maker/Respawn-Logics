@@ -1036,6 +1036,70 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
             box-shadow: 0 20px 40px rgba(0,0,0,0.4);
         }
 
+        /* Mock Window Screenshot */
+        .window-frame {
+            border: 1px solid var(--border2);
+            border-radius: 6px;
+            overflow: hidden;
+            background: #060913;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            width: 100%;
+        }
+        .window-header {
+            background: #111524;
+            border-bottom: 1px solid var(--border3);
+            height: 36px;
+            display: flex;
+            align-items: center;
+            padding: 0 16px;
+            position: relative;
+        }
+        .window-dots {
+            display: flex;
+            gap: 6px;
+        }
+        .window-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.1);
+        }
+        .window-dot.close { background: #ff4d6a; }
+        .window-dot.minimize { background: #f5a623; }
+        .window-dot.maximize { background: #00e07a; }
+        .window-url {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            font-family: var(--mono);
+            font-size: 0.7rem;
+            color: var(--text-dim);
+            background: #0b0f1a;
+            border: 1px solid var(--border3);
+            padding: 2px 30px;
+            border-radius: 4px;
+            text-align: center;
+            white-space: nowrap;
+            max-width: 60%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .window-body {
+            position: relative;
+            background: #0b0f1a;
+            display: block;
+        }
+        .window-screenshot {
+            display: block;
+            width: 100%;
+            height: auto;
+            max-height: 480px;
+            object-fit: cover;
+            object-position: top center;
+            border: none;
+            transition: opacity 0.3s;
+        }
+
         /* Gaming CTA */
         .gaming-cta {
             padding: 60px 24px;
@@ -1279,7 +1343,19 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
             </ul>
         </div>
         <div class="split-image">
-            <img src="assets/images/leave_management_mockup.png" alt="Leave Management HR Dashboard UI on PC" style="border-radius: 16px; border: 1px solid var(--border-color); box-shadow: 0 10px 40px rgba(0,0,0,0.5);">
+            <div class="window-frame">
+                <div class="window-header">
+                    <div class="window-dots">
+                        <div class="window-dot close"></div>
+                        <div class="window-dot minimize"></div>
+                        <div class="window-dot maximize"></div>
+                    </div>
+                    <div class="window-url">http://respawn-logics/pages/leave.php</div>
+                </div>
+                <div class="window-body">
+                    <img src="assets/images/employee_experience.png" alt="Leave Management UI Screenshot" class="window-screenshot">
+                </div>
+            </div>
         </div>
     </div>
 </section>
