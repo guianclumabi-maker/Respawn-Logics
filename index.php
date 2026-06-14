@@ -823,7 +823,8 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
             position: relative;
         }
         .story-container {
-            max-width: 1400px;
+            max-width: 1600px;
+            width: 95%;
             margin: 0 auto;
             position: relative;
             background: rgba(255, 255, 255, 0.02);
@@ -1278,7 +1279,7 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
             </ul>
         </div>
         <div class="split-image">
-            <img src="assets/images/employee_experience.png" alt="Employee Experience HR Dashboard UI" style="border-radius: 16px; border: 1px solid var(--border-color); box-shadow: 0 10px 40px rgba(0,0,0,0.5);">
+            <img src="assets/images/leave_management_mockup.png" alt="Leave Management HR Dashboard UI on PC" style="border-radius: 16px; border: 1px solid var(--border-color); box-shadow: 0 10px 40px rgba(0,0,0,0.5);">
         </div>
     </div>
 </section>
