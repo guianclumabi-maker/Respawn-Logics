@@ -26,10 +26,10 @@ $requiredPermissions = [
 
 foreach ($requiredPermissions as $perm) {
     try {
-        $stmt = $pdo->prepare("INSERT IGNORE INTO permissions (permission_key, name, description) VALUES (?, ?, ?)");
+        $stmt = $pdo->prepare("INSERT IGNORE INTO permissions (permission_key, description) VALUES (?, ?)");
         // Just title case the key for the name
         $name = ucwords(str_replace(['.', '_'], ' ', $perm));
-        $stmt->execute([$perm, $name, "Allows $name"]);
+        $stmt->execute([$perm, "Allows $name"]);
     } catch (Exception $e) {
         echo "Error on $perm: " . $e->getMessage() . "\n";
     }
