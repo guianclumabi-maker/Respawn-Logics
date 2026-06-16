@@ -27,7 +27,7 @@ $scripts = [
     'setup_db.php',
     'iam_seed.php',
     'setup_platform_tickets.php',
-    'upgrade_cache_learning.php'
+    'migrate_notifications.php'
 ];
 
 foreach ($scripts as $script) {

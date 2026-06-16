@@ -36,12 +36,12 @@ try {
 
 // Check if user has supervisor or manager responsibilities
 try {
-    $stmt_sup = $pdo->prepare("SELECT COUNT(*) FROM `users` WHERE `immediate_supervisor` = ?");
-    $stmt_sup->execute([$email]);
+    $stmt_sup = $pdo->prepare("SELECT COUNT(*) FROM `users` WHERE `immediate_supervisor` = ? AND `tenant_id` = ?");
+    $stmt_sup->execute([$email, $tenantId]);
     $is_supervisor = $stmt_sup->fetchColumn() > 0;
 
-    $stmt_mgr = $pdo->prepare("SELECT COUNT(*) FROM `users` WHERE `department_manager` = ?");
-    $stmt_mgr->execute([$email]);
+    $stmt_mgr = $pdo->prepare("SELECT COUNT(*) FROM `users` WHERE `department_manager` = ? AND `tenant_id` = ?");
+    $stmt_mgr->execute([$email, $tenantId]);
     $is_manager = $stmt_mgr->fetchColumn() > 0;
 } catch (PDOException $e) {
     $is_supervisor = false;
@@ -78,12 +78,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
             $msg_type = 'error';
         } else {
             try {
-                // Check if this employee has a supervisor. If not, auto-approve Level 1
+                // Check if this employee has a supervisor or manager.
                 $supervisor_email = trim($user ? ($user['immediate_supervisor'] ?? '') : '');
-                $tl_decision_default = empty($supervisor_email) ? 'Approved' : 'Pending';
+                $manager_email    = trim($user ? ($user['department_manager'] ?? '') : '');
                 
-                $stmt = $pdo->prepare("INSERT INTO `leave_requests` (`tenant_id`, `employee_email`, `leave_type`, `start_date`, `end_date`, `reason`, `status`, `tl_decision`, `manager_decision`) VALUES (?, ?, ?, ?, ?, ?, 'Pending', ?, 'Pending')");
-                $stmt->execute([$tenantId, $email, $leave_type, $start_date, $end_date, $reason, $tl_decision_default]);
+                $tl_decision_default = empty($supervisor_email) ? 'Approved' : 'Pending';
+                $mgr_decision_default = empty($manager_email) ? 'Approved' : 'Pending';
+                
+                // If both levels are empty, it auto-approves completely
+                $initial_status = (empty($supervisor_email) && empty($manager_email)) ? 'Approved' : 'Pending';
+                
+                $stmt = $pdo->prepare("INSERT INTO `leave_requests` (`tenant_id`, `employee_email`, `leave_type`, `start_date`, `end_date`, `reason`, `status`, `tl_decision`, `manager_decision`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                $stmt->execute([$tenantId, $email, $leave_type, $start_date, $end_date, $reason, $initial_status, $tl_decision_default, $mgr_decision_default]);
                 
                 $message = 'Your leave request has been submitted successfully!';
                 $msg_type = 'success';
@@ -114,12 +120,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
             if ($req && strtolower($req['immediate_supervisor']) === strtolower($email)) {
                 $status = ($decision === 'Rejected') ? 'Rejected' : 'Pending';
                 
-                $stmt_update = $pdo->prepare("UPDATE `leave_requests` SET `tl_decision` = ?, `tl_decided_by` = ?, `tl_decision_date` = NOW(), `tl_comments` = ?, `status` = ? WHERE `id` = ? AND `tenant_id` = ?");
-                $stmt_update->execute([$decision, $email, $comments, $status, $request_id, $tenantId]);
+                // If the employee has NO manager, and TL approves, auto-approve the whole request
+                $emp_manager = trim($user ? ($user['department_manager'] ?? '') : '');
+                if ($decision === 'Approved' && empty($emp_manager)) {
+                    $status = 'Approved';
+                    // Deduct balance
+                    $req_days = getBusinessDays($req['start_date'], $req['end_date']);
+                    $deduct_stmt = $pdo->prepare("UPDATE `leave_balances` SET `used_balance` = `used_balance` + ? WHERE `employee_email` = ? AND `leave_type` = ? AND `tenant_id` = ?");
+                    $deduct_stmt->execute([$req_days, $req['employee_email'], $req['leave_type'], $tenantId]);
+                }
+                
+                $manager_dec = (empty($emp_manager) && $decision === 'Approved') ? 'Approved' : $req['manager_decision'];
+                
+                $stmt_update = $pdo->prepare("UPDATE `leave_requests` SET `tl_decision` = ?, `tl_decided_by` = ?, `tl_decision_date` = NOW(), `tl_comments` = ?, `status` = ?, `manager_decision` = ? WHERE `id` = ? AND `tenant_id` = ?");
+                $stmt_update->execute([$decision, $email, $comments, $status, $manager_dec, $request_id, $tenantId]);
                 
                 // Write audit log entry
                 $stmt_audit = $pdo->prepare("INSERT INTO `audit_logs` (`user_email`, `action`, `details`) VALUES (?, 'Leave Decided by Supervisor', ?)");
                 $stmt_audit->execute([$email, "Supervisor {$decision} leave request #{$request_id} with comments: {$comments}"]);
+                
+                // In-app notification to employee
+                $notif_body = "Your leave request #{$request_id} has been {$decision} by your supervisor.";
+                if ($decision === 'Rejected' && !empty($comments)) {
+                    $notif_body .= " Remarks: \"{$comments}\"";
+                }
+                $pdo->prepare("INSERT INTO `notifications` (`tenant_id`, `user_email`, `title`, `body`, `type`, `link`) VALUES (?, ?, ?, ?, 'leave', '/pages/leaves.php')")
+                    ->execute([$tenantId, $req['employee_email'], "Leave Request Update", $notif_body]);
                 
                 $message = "Decision submitted successfully for request #{$request_id}!";
                 $msg_type = 'success';
@@ -168,6 +194,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                 // Write audit log entry
                 $stmt_audit = $pdo->prepare("INSERT INTO `audit_logs` (`user_email`, `action`, `details`) VALUES (?, 'Leave Decided by Manager', ?)");
                 $stmt_audit->execute([$email, "Manager {$decision} leave request #{$request_id} with comments: {$comments}"]);
+                
+                // In-app notification to employee
+                $notif_body = "Your leave request #{$request_id} has been given a final {$decision} by your manager.";
+                if ($decision === 'Rejected' && !empty($comments)) {
+                    $notif_body .= " Remarks: \"{$comments}\"";
+                }
+                $pdo->prepare("INSERT INTO `notifications` (`tenant_id`, `user_email`, `title`, `body`, `type`, `link`) VALUES (?, ?, ?, ?, 'leave', '/pages/leaves.php')")
+                    ->execute([$tenantId, $req['employee_email'], "Leave Request Final Decision", $notif_body]);
                 
                 $message = "Final decision submitted successfully for request #{$request_id}!";
                 $msg_type = 'success';
@@ -237,7 +271,8 @@ if (isset($_GET['message'])) {
 // Map email to full name for immediate supervisor resolution
 $all_users = [];
 try {
-    $all_users_stmt = $pdo->query("SELECT email, full_name FROM users");
+    $all_users_stmt = $pdo->prepare("SELECT email, full_name FROM users WHERE tenant_id = ?");
+    $all_users_stmt->execute([$tenantId]);
     while ($r = $all_users_stmt->fetch()) {
         $all_users[strtolower($r['email'])] = $r['full_name'];
     }
