@@ -119,14 +119,14 @@ try {
             align-items: center;
             justify-content: space-between;
             padding: 12px 16px;
-            background: rgba(255,255,255,0.02);
+            background: var(--alpha-5);
             border: 1px solid var(--border-color);
             border-radius: var(--radius-sm);
             transition: all 0.2s ease;
         }
         .todo-item.completed {
-            border-color: rgba(0, 224, 122, 0.2);
-            background: rgba(0, 224, 122, 0.02);
+            border-color: rgba(0, 224, 122, 0.4);
+            background: rgba(0, 224, 122, 0.05);
         }
         .todo-item:hover {
             border-color: var(--border-color-hover);
