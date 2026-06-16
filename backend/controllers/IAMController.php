@@ -53,26 +53,6 @@ class IAMController
                 return;
             }
 
-            if ($action === 'update_theme') {
-                try {
-                    $input = json_decode(file_get_contents('php://input'), true) ?? [];
-                    $theme = $input['theme'] ?? 'system';
-                    if (!in_array($theme, ['light', 'dark', 'system'])) {
-                        $theme = 'system';
-                    }
-
-                    $stmt = $this->pdo->prepare("UPDATE users SET theme_preference = ? WHERE id = ?");
-                    $stmt->execute([$theme, $this->currentUser['id']]);
-                    
-                    $_SESSION['theme_preference'] = $theme;
-                    
-                    echo json_encode(['success' => true, 'theme' => $theme]);
-                } catch (Exception $e) {
-                    http_response_code(500);
-                    echo json_encode(['success' => false, 'error' => $e->getMessage()]);
-                }
-                return;
-            }
 
             if ($action === 'roles') {
                 try {
@@ -137,7 +117,24 @@ class IAMController
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $data = json_decode(file_get_contents('php://input'), true);
-            
+
+            if ($action === 'update_theme') {
+                try {
+                    $theme = $data['theme'] ?? 'light';
+                    if (!in_array($theme, ['light', 'dark', 'system'])) {
+                        $theme = 'light';
+                    }
+                    $stmt = $this->pdo->prepare("UPDATE users SET theme_preference = ? WHERE id = ?");
+                    $stmt->execute([$theme, $this->currentUser['id']]);
+                    $_SESSION['theme_preference'] = $theme;
+                    echo json_encode(['success' => true, 'theme' => $theme]);
+                } catch (Exception $e) {
+                    http_response_code(500);
+                    echo json_encode(['success' => false, 'error' => $e->getMessage()]);
+                }
+                return;
+            }
+
             if ($action === 'assign_role') {
                 $user_id = $data['user_id'] ?? null;
                 $role_id = $data['role_id'] ?? null;

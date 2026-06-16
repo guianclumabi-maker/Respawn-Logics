@@ -30,7 +30,8 @@ return [
     'Compensation' => [
         'payroll.manage',
         'benefits.manage',
-        'expenses.manage'
+        'expenses.manage',
+        'compensation.manage'
     ],
     'Performance' => [
         'performance.manage',

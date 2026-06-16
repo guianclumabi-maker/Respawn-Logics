@@ -1,6 +1,12 @@
 <?php
 require_once __DIR__ . '/../bootstrap/app.php';
 require_once __DIR__ . '/../includes/auth.php';
+requireLogin();
+
+if (!hasPermission('compensation.manage')) {
+    header('Location: ' . url('/pages/dashboard.php'));
+    exit;
+}
 
 // Fetch Salary Bands
 $stmtBands = $pdo->query("SELECT * FROM compensation_bands ORDER BY min_salary ASC");
