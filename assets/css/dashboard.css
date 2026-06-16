@@ -10,8 +10,8 @@
     --bg-dark-surface: rgba(15, 20, 34, 0.8);
     --bg-dark-surface-solid: #0f1422;
     --bg-dark-surface-elevated: rgba(20, 26, 41, 0.9);
-    --border-color: rgba(255, 255, 255, 0.08);
-    --border-color-hover: rgba(255, 255, 255, 0.15);
+    --border-color: var(--alpha-8);
+    --border-color-hover: var(--alpha-15);
     
     /* Neon Accent Colors */
     --accent-purple: #9b6dff;
@@ -59,7 +59,7 @@
     /* Gradients / Primary Colors */
     --primary-gradient: #00e07a;
     --primary-gradient-hover: #00c96a;
-    --glass-gradient: linear-gradient(135deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.01));
+    --glass-gradient: linear-gradient(135deg, var(--alpha-3), rgba(255, 255, 255, 0.01));
     
     /* Radius & Layout */
     --radius-sm: 8px;
@@ -156,7 +156,7 @@ html, body {
     font-size: 1.25rem;
     font-weight: 600;
     margin-bottom: 20px;
-    color: #fff;
+    color: var(--text-primary);
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -223,7 +223,7 @@ html, body {
     font-weight: 600;
     padding: 14px 16px;
     border-bottom: 1px solid var(--border-color);
-    background: rgba(255,255,255,0.02);
+    background: var(--alpha-2);
 }
 .dark-table td {
     padding: 16px;
@@ -232,7 +232,7 @@ html, body {
     vertical-align: middle;
 }
 .dark-table tr:hover td {
-    background: rgba(255,255,255,0.02);
+    background: var(--alpha-2);
 }
 
 /* Status Badges */
@@ -321,7 +321,7 @@ html, body {
 }
 
 .btn-secondary {
-    background: rgba(255, 255, 255, 0.05);
+    background: var(--alpha-5);
     border: 1px solid var(--border-color);
     border-radius: var(--radius-sm);
     color: var(--text-primary);
@@ -337,9 +337,9 @@ html, body {
     gap: 8px;
 }
 .btn-secondary:hover {
-    background: rgba(255, 255, 255, 0.1);
+    background: var(--alpha-10);
     border-color: var(--border-color-hover);
-    color: #fff;
+    color: var(--text-primary);
 }
 
 /* Alert dialogs */
@@ -363,54 +363,4 @@ html, body {
     color: #a7f3d0;
 }
 
-/* GLOBAL OVERRIDES FOR ALL TABS (Gamer Aesthetic) */
-body.theme-light {
-    background-color: var(--bg-dark-base) !important;
-    color: var(--text-primary) !important;
-}
-.page-header {
-    background: var(--bg-dark-surface) !important;
-    border: 1px solid var(--border-color) !important;
-    box-shadow: 0 0 20px rgba(0, 224, 122, 0.05) !important;
-    color: #fff !important;
-}
-.title-block h1 {
-    color: #fff !important;
-    background: linear-gradient(to right, #00e07a, #00b8ff) !important;
-    -webkit-background-clip: text !important;
-    -webkit-text-fill-color: transparent !important;
-}
-.title-block p { color: var(--text-secondary) !important; }
 
-.panel {
-    background: var(--bg-dark-surface) !important;
-    border: 1px solid var(--border-color) !important;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.3) !important;
-    color: #fff !important;
-}
-.panel-header { color: #fff !important; }
-
-.data-table {
-    background: transparent !important;
-    color: var(--text-primary) !important;
-    border: 1px solid var(--border-color) !important;
-    border-radius: var(--radius-md) !important;
-    overflow: hidden !important;
-}
-.data-table th {
-    background: transparent !important;
-    color: var(--text-secondary) !important;
-    border-bottom: 1px solid var(--border-color) !important;
-    font-family: 'JetBrains Mono', monospace !important;
-    font-size: 11px !important;
-    text-transform: uppercase !important;
-    letter-spacing: 0.1em !important;
-}
-.data-table td {
-    color: var(--text-primary) !important;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
-}
-.data-table tr:hover td {
-    background: rgba(255,255,255,0.02) !important;
-}
-.data-table a { color: var(--accent-green) !important; }

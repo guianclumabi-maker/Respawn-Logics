@@ -60,7 +60,7 @@
     font-family: var(--font-heading);
     font-size: 1.375rem;
     font-weight: 700;
-    color: #fff;
+    color: var(--text-primary);
     letter-spacing: -0.02em;
 }
 
@@ -85,7 +85,7 @@
     display: flex;
     flex-direction: column;
     gap: 12px;
-    border-top: 1px solid rgba(255,255,255,0.06);
+    border-top: 1px solid var(--alpha-6);
     padding-top: 20px;
     margin-top: 4px;
 }
@@ -118,7 +118,7 @@
 .profile-tabs {
     display: flex;
     gap: 2px;
-    border-bottom: 1px solid rgba(255,255,255,0.06);
+    border-bottom: 1px solid var(--alpha-6);
     margin-bottom: 28px;
     overflow-x: auto;
     scrollbar-width: none;
@@ -145,7 +145,7 @@
 
 .profile-tab-btn:hover {
     color: #c8d0e0;
-    background: rgba(255,255,255,0.03);
+    background: var(--alpha-3);
 }
 
 .profile-tab-btn.active {
@@ -166,7 +166,7 @@
 /* ── Forms Detail Card ── */
 .profile-detail-card {
     background: rgba(15, 20, 34, 0.7);
-    border: 1px solid rgba(255,255,255,0.06);
+    border: 1px solid var(--alpha-6);
     border-radius: var(--radius-lg);
     padding: 28px;
 }

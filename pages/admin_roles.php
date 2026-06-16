@@ -24,7 +24,7 @@ $current_page = basename($_SERVER['SCRIPT_NAME']);
         .admin-title h1 {
             font-size: 1.5rem;
             font-weight: 700;
-            color: white;
+            color: var(--text-primary);
             margin-bottom: 4px;
         }
         
@@ -59,7 +59,7 @@ $current_page = basename($_SERVER['SCRIPT_NAME']);
         .panel-title {
             font-size: 1rem;
             font-weight: 700;
-            color: white;
+            color: var(--text-primary);
             display: flex;
             align-items: center;
             gap: 8px;
@@ -103,7 +103,7 @@ $current_page = basename($_SERVER['SCRIPT_NAME']);
         .role-name {
             font-size: 0.875rem;
             font-weight: 600;
-            color: white;
+            color: var(--text-primary);
             margin-bottom: 4px;
         }
 
@@ -199,7 +199,7 @@ $current_page = basename($_SERVER['SCRIPT_NAME']);
 
         .perm-item-label {
             font-size: 0.875rem;
-            color: white;
+            color: var(--text-primary);
             font-weight: 500;
             margin-bottom: 2px;
         }
