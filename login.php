@@ -61,6 +61,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                     $_SESSION['user_email'] = $user['email'];
                     $_SESSION['user_name'] = $user['full_name'];
                     $_SESSION['tenant_id'] = $user['tenant_id'];
+                    $_SESSION['theme_preference'] = $user['theme_preference'] ?? 'light';
                     
                     header('Location: ' . url('/pages/dashboard.php'));
                     exit;
@@ -106,6 +107,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                 $_SESSION['user_email'] = $user['email'];
                 $_SESSION['user_name'] = $user['full_name'];
                 $_SESSION['tenant_id'] = $user['tenant_id'];
+                $_SESSION['theme_preference'] = $user['theme_preference'] ?? 'light';
                 
                 header('Location: ' . url('/pages/dashboard.php'));
                 exit;

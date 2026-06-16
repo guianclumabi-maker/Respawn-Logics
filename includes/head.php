@@ -1,11 +1,24 @@
 <?php
 $page_title = $page_title ?? 'Respawn Logics';
-$userTheme = $_SESSION['theme_preference'] ?? 'dark';
-if ($userTheme === 'system') $userTheme = 'dark'; // Fallback to dark if system
+$userTheme = $_SESSION['theme_preference'] ?? 'light';
+if ($userTheme === 'system') $userTheme = 'light'; // Fallback to light if system
 ?>
 <!DOCTYPE html>
 <html lang="en" data-theme="<?= htmlspecialchars($userTheme) ?>">
 <head>
+    <script>
+        // Option to cache in localStorage for instant load before CSS parsing
+        (function() {
+            var sessionTheme = "<?= htmlspecialchars($userTheme) ?>";
+            var localTheme = localStorage.getItem('theme');
+            // If session says light (default) but local storage has dark, prioritize local storage as a fallback cache
+            if (!<?= isset($_SESSION['theme_preference']) ? 'true' : 'false' ?> && localTheme) {
+                document.documentElement.setAttribute('data-theme', localTheme);
+            } else if (localTheme !== sessionTheme) {
+                localStorage.setItem('theme', sessionTheme);
+            }
+        })();
+    </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= htmlspecialchars($page_title) ?></title>

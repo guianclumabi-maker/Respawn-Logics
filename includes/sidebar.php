@@ -366,9 +366,10 @@ function submitGlobalFeedback() {
 }
 
 function toggleTheme() {
-    const currentTheme = document.documentElement.getAttribute('data-theme') || 'dark';
+    const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
     const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
     document.documentElement.setAttribute('data-theme', newTheme);
+    localStorage.setItem('theme', newTheme);
     
     // Update icon if it exists
     const icon = document.getElementById('theme-icon');
@@ -385,7 +386,7 @@ function toggleTheme() {
 
 // Initial icon setup
 document.addEventListener('DOMContentLoaded', () => {
-    const currentTheme = document.documentElement.getAttribute('data-theme') || 'dark';
+    const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
     const icon = document.getElementById('theme-icon');
     if (icon) {
         icon.className = currentTheme === 'dark' ? 'fa-solid fa-circle-half-stroke' : 'fa-regular fa-sun';

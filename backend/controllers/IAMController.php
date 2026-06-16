@@ -60,11 +60,6 @@ class IAMController
                     if (!in_array($theme, ['light', 'dark', 'system'])) {
                         $theme = 'system';
                     }
-                    
-                    // Fail-safe table modification (ignores error if column exists)
-                    try {
-                        $this->pdo->exec("ALTER TABLE `users` ADD COLUMN `theme_preference` ENUM('light', 'dark', 'system') DEFAULT 'dark'");
-                    } catch (Exception $e) {}
 
                     $stmt = $this->pdo->prepare("UPDATE users SET theme_preference = ? WHERE id = ?");
                     $stmt->execute([$theme, $this->currentUser['id']]);
