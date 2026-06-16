@@ -123,8 +123,13 @@ try {
     // Role definitions
     $roleDefs = [
         'Admin' => [], // Will dynamically fetch all below
-        'HR Manager' => ['employees.view', 'employees.edit', 'leave.approve', 'attendance.manage'],
-        'Manager' => ['employees.view_team', 'leave.approve_team'],
+        'HR Manager' => [
+            'employees.view', 'employees.edit', 'leave.approve', 'attendance.manage', 
+            'users.manage', 'payroll.manage', 'benefits.manage', 'expenses.manage', 
+            'performance.manage', 'shifts.manage', 'surveys.manage', 'announcements.manage', 
+            'analytics.view'
+        ],
+        'Manager' => ['employees.view_team', 'leave.approve_team', 'performance.manage_team'],
         'Employee' => ['employees.view_self', 'leave.request'],
         'Recruiter' => ['ats.view', 'ats.edit', 'ats.create_job', 'ats.edit_job'],
         'Investigator' => ['elr.view', 'elr.investigate']

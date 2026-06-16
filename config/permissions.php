@@ -5,7 +5,8 @@ return [
         'users.view',
         'users.create',
         'users.edit',
-        'users.delete'
+        'users.delete',
+        'users.manage'
     ],
     'Employees' => [
         'employees.view',
@@ -23,7 +24,21 @@ return [
     ],
     'Attendance' => [
         'attendance.view',
-        'attendance.manage'
+        'attendance.manage',
+        'shifts.manage'
+    ],
+    'Compensation' => [
+        'payroll.manage',
+        'benefits.manage',
+        'expenses.manage'
+    ],
+    'Performance' => [
+        'performance.manage',
+        'performance.manage_team'
+    ],
+    'Engagement' => [
+        'surveys.manage',
+        'announcements.manage'
     ],
     'ATS' => [
         'ats.view',
@@ -35,10 +50,16 @@ return [
         'elr.investigate',
         'elr.close'
     ],
+    'ESM' => [
+        'esm.manage',
+        'assets.manage'
+    ],
     'Analytics' => [
-        'analytics.view'
+        'analytics.view',
+        'intelligence.view'
     ],
     'Settings' => [
-        'settings.manage'
+        'settings.manage',
+        'audit.view'
     ]
 ];

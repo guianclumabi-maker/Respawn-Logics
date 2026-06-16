@@ -27,7 +27,8 @@ $scripts = [
     'setup_db.php',
     'iam_seed.php',
     'setup_platform_tickets.php',
-    'migrate_notifications.php'
+    'migrate_notifications.php',
+    'migrate_permissions_sync.php'
 ];
 
 foreach ($scripts as $script) {
