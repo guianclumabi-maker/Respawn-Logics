@@ -279,7 +279,7 @@ if ($user) {
     
     <div class="sidebar-footer">
         <?php if (isset($user['tenant_id']) && $user['tenant_id'] !== null): ?>
-        <button onclick="openGlobalFeedbackModal()" style="width:100%; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); color:#f0f4ff; border-radius:8px; padding:8px 12px; margin-bottom:12px; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; font-size:0.875rem; transition: background 0.2s;" onmouseenter="this.style.background='rgba(255,255,255,0.1)'" onmouseleave="this.style.background='rgba(255,255,255,0.05)'">
+        <button onclick="openGlobalFeedbackModal()" class="btn-sidebar-feedback" onmouseenter="this.style.background='var(--alpha-10)'" onmouseleave="this.style.background='var(--alpha-5)'">
             <i class="fa-regular fa-comment-dots"></i>
             Give us Feedback
         </button>
@@ -307,18 +307,18 @@ if ($user) {
 </div>
 
 <!-- Global Feedback Modal -->
-<div id="globalFeedbackModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:9999; backdrop-filter:blur(4px); align-items:center; justify-content:center;">
-    <div style="background:#1e2430; border:1px solid rgba(0,224,122,0.15); border-radius:12px; width:400px; max-width:90%; padding:24px; box-shadow:0 10px 40px rgba(0,0,0,0.5);">
-        <h3 style="margin-top:0; color:#f0f4ff; font-size:1.25rem; display:flex; align-items:center; gap:10px;">
-            <i class="fa-regular fa-comment-dots" style="color:#00e07a;"></i> Give us Feedback
+<div id="globalFeedbackModal" class="modal-overlay" style="display:none;">
+    <div class="modal-card feedback-modal-card">
+        <h3 class="modal-title">
+            <i class="fa-regular fa-comment-dots" style="color:var(--accent-green);"></i> Give us Feedback
         </h3>
-        <p style="color:#8899b4; font-size:0.875rem; margin-bottom:16px;">We'd love to hear your thoughts, ideas, or report any issues.</p>
+        <p class="modal-subtitle">We'd love to hear your thoughts, ideas, or report any issues.</p>
         
-        <textarea id="globalFeedbackText" rows="5" style="width:100%; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); color:#f0f4ff; border-radius:8px; padding:12px; font-family:inherit; font-size:0.875rem; resize:vertical; outline:none; margin-bottom:16px;" placeholder="Your feedback..."></textarea>
+        <textarea id="globalFeedbackText" rows="5" class="modal-textarea" placeholder="Your feedback..."></textarea>
         
-        <div style="display:flex; justify-content:flex-end; gap:12px;">
-            <button onclick="closeGlobalFeedbackModal()" style="background:transparent; border:1px solid rgba(255,255,255,0.1); color:#8899b4; cursor:pointer; font-size:0.875rem; padding:8px 16px; border-radius:6px;">Cancel</button>
-            <button id="submitFeedbackBtn" onclick="submitGlobalFeedback()" style="background:linear-gradient(135deg, #00e07a, #00b8ff); border:none; color:#0b0f1a; cursor:pointer; font-size:0.875rem; padding:8px 16px; border-radius:6px; font-weight:700;">Submit Feedback</button>
+        <div class="modal-actions">
+            <button onclick="closeGlobalFeedbackModal()" class="btn-modal-cancel">Cancel</button>
+            <button id="submitFeedbackBtn" onclick="submitGlobalFeedback()" class="btn-modal-submit">Submit Feedback</button>
         </div>
     </div>
 </div>
