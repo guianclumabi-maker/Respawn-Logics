@@ -24,7 +24,10 @@ if ($user) {
 ?>
 <div class="app-sidebar">
     <div class="sidebar-brand">
-        <?= renderLogo('sidebar') ?>
+        <div class="brand-logo-gamepad">
+            <i class="fa-solid fa-gamepad"></i>
+        </div>
+        <span class="brand-text">Respawn Logics</span>
     </div>
     
     <div class="sidebar-menu">
@@ -265,6 +268,13 @@ if ($user) {
         <div class="menu-group">
             <div class="group-title">Account</div>
             
+            <?php if (isset($user['tenant_id']) && $user['tenant_id'] !== null): ?>
+            <a href="#" onclick="openGlobalFeedbackModal(); return false;" class="menu-item">
+                <i class="fa-regular fa-comment-dots"></i>
+                <span>Give us Feedback</span>
+            </a>
+            <?php endif; ?>
+            
             <a href="<?= url('/pages/profile.php') ?>" class="menu-item <?= $current_page === 'profile.php' ? 'active' : '' ?>">
                 <i class="fa-solid fa-circle-user"></i>
                 <span>My Profile</span>
@@ -316,30 +326,21 @@ if ($user) {
     </div>
     
     <div class="sidebar-footer">
-        <?php if (isset($user['tenant_id']) && $user['tenant_id'] !== null): ?>
-        <button onclick="openGlobalFeedbackModal()" class="btn-sidebar-feedback" onmouseenter="this.style.background='var(--alpha-10)'" onmouseleave="this.style.background='var(--alpha-5)'">
-            <i class="fa-regular fa-comment-dots"></i>
-            Give us Feedback
-        </button>
-        <?php endif; ?>
-
         <?php if ($user): ?>
-            <div class="user-footer-pill">
-                <?php if (!empty($user['profile_image'])): ?>
-                    <img class="user-footer-avatar" src="<?= url('/uploads/' . htmlspecialchars($user['profile_image'])) ?>" alt="Avatar">
-                <?php else: ?>
-                    <div class="user-footer-avatar"><?= $initials ?></div>
-                <?php endif; ?>
+            <a href="<?= url('/pages/profile.php') ?>" class="user-footer-card" title="Profile & Settings">
+                <div class="user-footer-avatar-box">
+                    <?php if (!empty($user['profile_image'])): ?>
+                        <img src="<?= url('/uploads/' . htmlspecialchars($user['profile_image'])) ?>" alt="Avatar">
+                    <?php else: ?>
+                        [<?= $initials ?>]
+                    <?php endif; ?>
+                </div>
                 
                 <div class="user-footer-info">
                     <div class="user-footer-name"><?= htmlspecialchars($user['full_name']) ?></div>
                     <div class="user-footer-role"><?= htmlspecialchars($role_desc) ?></div>
                 </div>
-                
-                <a href="<?= url('/logout.php') ?>" class="btn-signout-icon" title="Sign Out">
-                    <i class="fa-solid fa-right-from-bracket"></i>
-                </a>
-            </div>
+            </a>
         <?php endif; ?>
     </div>
 </div>
