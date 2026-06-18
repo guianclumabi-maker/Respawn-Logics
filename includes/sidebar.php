@@ -419,7 +419,10 @@ function toggleTheme() {
     fetch('<?= url("/api/index.php?route=iam&action=update_theme") ?>', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ theme: newTheme })
+        body: JSON.stringify({ 
+            theme: newTheme,
+            csrf_token: '<?= $_SESSION["csrf_token"] ?? "" ?>'
+        })
     }).then(res => res.json()).catch(err => console.error(err));
 }
 

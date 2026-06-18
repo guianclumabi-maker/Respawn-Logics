@@ -34,7 +34,10 @@ export function GamifiedThemeToggle() {
           fetch("/api/index.php?route=iam&action=update_theme", {
               method: "POST",
               headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ theme: newTheme })
+              body: JSON.stringify({ 
+                  theme: newTheme,
+                  csrf_token: (window as any).__CSRF_TOKEN__ || ""
+              })
           }).catch(err => console.error("Failed to sync theme with backend:", err));
         }}
         className={`relative w-12 h-6 rounded-full transition-all duration-300 focus:outline-none flex items-center px-1 shadow-inner ${
