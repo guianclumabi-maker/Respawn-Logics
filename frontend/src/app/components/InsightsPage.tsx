@@ -19,6 +19,7 @@ type InsightsPageProps = {
 export function InsightsPage({ onViewChange }: InsightsPageProps) {
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchAnalytics = async () => {
@@ -27,9 +28,12 @@ export function InsightsPage({ onViewChange }: InsightsPageProps) {
         const json = await res.json();
         if (json.success) {
           setData(json);
+        } else {
+          setError(json.error || "Failed to load analytics");
         }
       } catch (err) {
         console.error("Failed to fetch analytics", err);
+        setError("Unable to connect to API");
       } finally {
         setLoading(false);
       }
@@ -37,10 +41,28 @@ export function InsightsPage({ onViewChange }: InsightsPageProps) {
     fetchAnalytics();
   }, []);
 
-  if (loading || !data) {
+  if (loading) {
     return (
-      <div className="flex-1 flex items-center justify-center bg-[#0b0f1a]">
+      <div className="flex-1 flex items-center justify-center">
         <div className="animate-spin w-8 h-8 border-2 border-[#00e07a] border-t-transparent rounded-full"></div>
+      </div>
+    );
+  }
+
+  if (error || !data) {
+    return (
+      <div className="flex-1 flex flex-col items-center justify-center py-24 text-center">
+        <Target size={40} className="text-[#f5a623] mb-4" />
+        <p className="text-gray-900 dark:text-white font-medium mb-1" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
+          Unable to load analytics
+        </p>
+        <p className="text-sm text-gray-600 dark:text-gray-500 font-mono">{error || "No data available"}</p>
+        <button
+          onClick={() => window.location.reload()}
+          className="mt-4 px-4 py-2 rounded-lg text-xs font-mono font-semibold bg-purple-500/10 text-purple-600 dark:text-purple-400 border border-purple-500/20 hover:bg-purple-500/20 cursor-pointer transition-all"
+        >
+          [ RETRY SESSION ]
+        </button>
       </div>
     );
   }
@@ -118,7 +140,7 @@ export function InsightsPage({ onViewChange }: InsightsPageProps) {
   const maxDeptApps = Math.max(...deptVelocity.map((d: any) => (d.total || 0)), 1);
 
   return (
-    <div className="flex-1 flex flex-col overflow-y-auto px-8 py-6 text-white font-sans relative scrollbar-thin" style={{ backgroundColor: "#0b0f1a" }}>
+    <div className="flex-1 flex flex-col overflow-y-auto px-8 py-6 text-white font-sans relative scrollbar-thin" >
       <style>{`
         .blink {
           animation: blink-anim 1.1s step-start infinite;

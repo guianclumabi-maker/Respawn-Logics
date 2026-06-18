@@ -452,7 +452,7 @@ export function JobsPage({ onViewChange }: Props) {
   return (
     <div
       className="flex-1 flex flex-col overflow-y-auto px-8 py-6 text-white font-sans relative scrollbar-thin"
-      style={{ backgroundColor: "#0b0f1a" }}
+      
     >
       {/* Background glows */}
       <div className="absolute top-[-100px] left-[-100px] w-[500px] h-[500px] rounded-full bg-[#00e07a] blur-[120px] opacity-[0.07] pointer-events-none z-0" />

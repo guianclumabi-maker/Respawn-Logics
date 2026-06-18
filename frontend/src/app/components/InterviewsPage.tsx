@@ -550,7 +550,7 @@ export function InterviewsPage({ onViewChange }: Props) {
   const selectCls = "px-3 py-2 rounded-lg bg-white/[0.02] border border-white/[0.06] text-white text-xs font-mono focus:outline-none focus:border-[#00e07a] cursor-pointer appearance-none";
 
   return (
-    <div className="flex-1 flex flex-col overflow-y-auto px-8 py-6 text-white font-sans relative" style={{ backgroundColor: "#0b0f1a" }}>
+    <div className="flex-1 flex flex-col overflow-y-auto px-8 py-6 text-white font-sans relative" >
       {/* Background glows */}
       <div className="absolute top-[-100px] left-[-100px] w-[500px] h-[500px] rounded-full bg-[#00e07a] blur-[120px] opacity-[0.06] pointer-events-none z-0" />
       <div className="absolute bottom-[-150px] right-[-100px] w-[600px] h-[600px] rounded-full bg-[#9b6dff] blur-[140px] opacity-[0.05] pointer-events-none z-0" />

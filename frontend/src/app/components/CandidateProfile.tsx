@@ -378,7 +378,7 @@ function ProfileSkeleton() {
     "animate-pulse bg-gradient-to-r from-white/[0.03] via-white/[0.06] to-white/[0.03] rounded-lg";
 
   return (
-    <div className="flex-1 flex flex-col overflow-y-auto px-8 py-6 text-white font-sans relative scrollbar-thin" style={{ backgroundColor: "#0b0f1a" }}>
+    <div className="flex-1 flex flex-col overflow-y-auto px-8 py-6 text-white font-sans relative scrollbar-thin" >
       <div className="absolute top-[-100px] left-[-100px] w-[500px] h-[500px] rounded-full bg-[#00e07a] blur-[120px] opacity-10 pointer-events-none z-0" />
       <div className="relative z-10 space-y-6">
         <div className="flex items-center gap-4">
@@ -508,7 +508,7 @@ export function CandidateProfile({ onViewChange, candidateId }: Props) {
   return (
     <div
       className="flex-1 flex flex-col overflow-y-auto px-8 py-6 text-white font-sans relative scrollbar-thin"
-      style={{ backgroundColor: "#0b0f1a" }}
+      
     >
       <style>{`
         .blink {

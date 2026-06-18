@@ -448,11 +448,11 @@ export function PipelineBoard({ onViewChange, jobId }: Props) {
     );
   };
 
-  if (loading) return <div className="flex-1 overflow-hidden animate-pulse" style={{ backgroundColor: "#0b0f1a" }}><LoadingSkeleton /></div>;
+  if (loading) return <div className="flex-1 overflow-hidden animate-pulse" ><LoadingSkeleton /></div>;
 
   // Job selector if no specific job
   if (!job && jobs.length > 0) return (
-    <div className="flex-1 flex flex-col items-center justify-center text-white font-mono" style={{ backgroundColor: "#0b0f1a" }}>
+    <div className="flex-1 flex flex-col items-center justify-center text-white font-mono" >
       <Briefcase size={40} className="text-[#9b6dff] mb-4" />
       <h2 className="text-base font-bold mb-4">SELECT ACTIVE JOB PIPELINE</h2>
       <div className="space-y-2.5 w-80">
@@ -468,7 +468,7 @@ export function PipelineBoard({ onViewChange, jobId }: Props) {
   );
 
   if (!job) return (
-    <div className="flex-1 flex items-center justify-center text-gray-500 text-sm font-mono" style={{ backgroundColor: "#0b0f1a" }}>
+    <div className="flex-1 flex items-center justify-center text-gray-500 text-sm font-mono" >
       Job pipeline offline. Create a job first.
     </div>
   );
@@ -476,7 +476,7 @@ export function PipelineBoard({ onViewChange, jobId }: Props) {
   const h = job.health;
 
   return (
-    <div className="flex-1 flex flex-col overflow-hidden text-white font-sans relative" style={{ backgroundColor: "#0b0f1a" }}>
+    <div className="flex-1 flex flex-col overflow-hidden text-white font-sans relative" >
       <style>{`
         .blink {
           animation: blink-anim 1.1s step-start infinite;
