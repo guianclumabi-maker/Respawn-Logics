@@ -1151,7 +1151,7 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
         <?php if ($loggedIn): ?>
             <a href="<?= url('/pages/dashboard.php') ?>" class="nav-cta">[ RESUME ]</a>
         <?php else: ?>
-            <a href="login.php" class="nav-cta">[ LOGIN ]</a>
+            <a href="<?= url('/login.php') ?>" class="nav-cta">[ LOGIN ]</a>
         <?php endif; ?>
     </div>
 </nav>

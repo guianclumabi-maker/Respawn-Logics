@@ -36,7 +36,23 @@ if (!function_exists('url')) {
     function url(string $path = ''): string
     {
         global $config;
-        return rtrim($config['app']['url'], '/') . '/' . ltrim($path, '/');
+        $baseUrl = rtrim($config['app']['url'], '/');
+        
+        // Dynamically override base URL if running in a web context to prevent Railway env misconfigurations
+        if (isset($_SERVER['HTTP_HOST'])) {
+            $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' || $_SERVER['SERVER_PORT'] == 443) ? "https://" : "http://";
+            if (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https') {
+                $protocol = "https://";
+            }
+            $baseUrl = $protocol . $_SERVER['HTTP_HOST'];
+            
+            // If running on localhost inside XAMPP, append the project folder
+            if ($_SERVER['HTTP_HOST'] === 'localhost' || $_SERVER['HTTP_HOST'] === '127.0.0.1') {
+                $baseUrl .= '/respawn-logics';
+            }
+        }
+        
+        return $baseUrl . '/' . ltrim($path, '/');
     }
 }
 

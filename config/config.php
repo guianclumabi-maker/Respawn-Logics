@@ -5,7 +5,9 @@ return [
         'name' => $env['APP_NAME'] ?? 'Respawn Logic',
         'env' => $env['APP_ENV'] ?? 'production',
         'debug' => filter_var($env['APP_DEBUG'] ?? false, FILTER_VALIDATE_BOOLEAN),
-        'url' => rtrim($env['APP_URL'] ?? 'http://localhost/respawn-logics', '/')
+        'url' => isset($env['RAILWAY_PUBLIC_DOMAIN']) 
+                    ? 'https://' . rtrim($env['RAILWAY_PUBLIC_DOMAIN'], '/') 
+                    : rtrim($env['APP_URL'] ?? 'http://localhost/respawn-logics', '/')
     ],
     'database' => [
         'host' => $env['DB_HOST'] ?? 'localhost',
