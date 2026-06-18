@@ -123,15 +123,13 @@ export function Sidebar({ activeView, onViewChange, badges = {} }: SidebarProps)
   return (
     <aside
       style={{
-        backgroundColor: "#0b0f1a",
         width: collapsed ? 72 : 260,
-        borderColor: "rgba(255, 255, 255, 0.06)",
         fontFamily: "'Space Grotesk', sans-serif",
       }}
-      className="h-full flex flex-col flex-shrink-0 border-r transition-all duration-300 overflow-hidden select-none"
+      className="h-full bg-white dark:bg-[#0b0f1a] flex flex-col flex-shrink-0 border-r border-gray-200 dark:border-white/[0.06] transition-all duration-300 overflow-hidden select-none"
     >
       {/* ── Brand header ──────────────────────────────── */}
-      <div className="flex items-center justify-between h-[70px] px-5 border-b border-white/[0.06] flex-shrink-0">
+      <div className="flex items-center justify-between h-[70px] px-5 border-b border-gray-200 dark:border-white/[0.06] flex-shrink-0">
         {!collapsed && (
           <div className="flex items-center gap-3">
             <div className="w-[32px] h-[32px] rounded-[7px] bg-gradient-to-br from-[#00e07a] to-[#00b8ff] flex items-center justify-center flex-shrink-0 text-black shadow-lg shadow-[#00e07a]/15">
@@ -139,7 +137,7 @@ export function Sidebar({ activeView, onViewChange, badges = {} }: SidebarProps)
             </div>
             <div className="flex items-center gap-2">
               <span
-                className="font-bold text-white whitespace-nowrap tracking-[-0.5px] text-[15px]"
+                className="font-bold text-slate-800 dark:text-white whitespace-nowrap tracking-[-0.5px] text-[15px]"
                 style={{ fontFamily: "'JetBrains Mono', monospace" }}
               >
                 Respawn Logics
@@ -174,13 +172,13 @@ export function Sidebar({ activeView, onViewChange, badges = {} }: SidebarProps)
             {/* Section title */}
             {section.title && !collapsed && (
               <p
-                className="pl-3 text-[10px] font-bold text-[#5e6a82] tracking-[1.5px] uppercase mb-2"
+                className="pl-3 text-[10px] font-bold text-gray-500 dark:text-[#5e6a82] tracking-[1.5px] uppercase mb-2"
               >
                 {section.title}
               </p>
             )}
             {section.title && collapsed && (
-              <div className="mx-auto w-6 border-t border-white/[0.06] mb-3 mt-1" />
+              <div className="mx-auto w-6 border-t border-gray-200 dark:border-white/[0.06] mb-3 mt-1" />
             )}
 
             <nav className="space-y-1">
@@ -196,13 +194,12 @@ export function Sidebar({ activeView, onViewChange, badges = {} }: SidebarProps)
                     className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-lg border transition-all text-left group cursor-pointer ${
                       active
                         ? "bg-[#00e07a]/10 border-[#00e07a]/20 shadow-[0_0_12px_rgba(0,224,122,0.08)]"
-                        : "hover:bg-white/[0.03] border-transparent"
+                        : "hover:bg-gray-100 dark:hover:bg-white/[0.03] border-transparent"
                     }`}
-                    style={{ color: active ? "#ffffff" : "#8b95a8" }}
                   >
                     <span
                       className={`flex-shrink-0 transition-colors ${
-                        active ? "text-[#00e07a]" : "text-[#8b95a8] group-hover:text-white"
+                        active ? "text-[#00e07a]" : "text-slate-500 dark:text-[#8b95a8] group-hover:text-slate-800 dark:group-hover:text-white"
                       }`}
                     >
                       {item.icon}
@@ -212,7 +209,7 @@ export function Sidebar({ activeView, onViewChange, badges = {} }: SidebarProps)
                       <>
                         <span
                           className={`text-[0.85rem] font-medium flex-1 truncate ${
-                            active ? "text-white font-semibold" : "group-hover:text-white"
+                            active ? "text-[#00e07a]" : "text-slate-600 dark:text-[#8b95a8] group-hover:text-slate-800 dark:group-hover:text-white"
                           }`}
                         >
                           {item.label}
@@ -230,14 +227,14 @@ export function Sidebar({ activeView, onViewChange, badges = {} }: SidebarProps)
         {/* ── Return to Core HRIS ─────────────────────── */}
         <div className="px-1">
           {!collapsed && (
-            <div className="mx-3 border-t border-white/[0.04] mb-3" />
+            <div className="mx-3 border-t border-gray-200 dark:border-white/[0.04] mb-3" />
           )}
           <button
             onClick={() => { window.location.href = `${import.meta.env.VITE_API_BASE_URL}/pages/dashboard.php`; }}
-            className="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-lg border border-white/10 bg-white/[0.01] hover:bg-[#00e07a]/5 hover:border-[#00e07a]/35 text-[#8b95a8] hover:text-white transition-all group cursor-pointer font-mono text-xs uppercase tracking-wider"
+            className="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-lg border border-transparent hover:bg-gray-100 dark:hover:bg-white/[0.03] text-slate-500 dark:text-[#8b95a8] hover:text-slate-800 dark:hover:text-white transition-all group cursor-pointer font-mono text-xs uppercase tracking-wider"
             title={collapsed ? "Return to Core HRIS" : undefined}
           >
-            <span className="flex-shrink-0 text-[#8b95a8] group-hover:text-[#00e07a] transition-colors">
+            <span className="flex-shrink-0 text-slate-500 dark:text-[#8b95a8] group-hover:text-[#00e07a] transition-colors">
               <ArrowLeft size={15} />
             </span>
             {!collapsed && (
@@ -251,32 +248,34 @@ export function Sidebar({ activeView, onViewChange, badges = {} }: SidebarProps)
 
       {/* ── Gamified Theme Toggle ─────────────────────── */}
       {!collapsed && (
-        <div className="px-4 pb-2 border-t border-white/[0.04] pt-4 flex-shrink-0">
+        <div className="px-4 pb-2 border-t border-gray-200 dark:border-white/[0.04] pt-4 flex-shrink-0">
           <GamifiedThemeToggle />
         </div>
       )}
 
       {/* ── User footer ───────────────────────────────── */}
       {!collapsed && (
-        <div className="p-4 border-t border-white/[0.04] flex-shrink-0">
+        <div className="p-4 border-t border-gray-200 dark:border-white/[0.04] flex-shrink-0">
           <div
             onClick={() => { window.location.href = `${import.meta.env.VITE_API_BASE_URL}/pages/profile.php`; }}
-            className="flex items-center gap-3 p-2.5 bg-white/[0.01] border border-white/[0.06] rounded-lg cursor-pointer hover:bg-white/[0.04] transition-all"
+            className="flex items-center gap-3 p-2.5 border border-transparent rounded-lg cursor-pointer hover:bg-gray-100 dark:hover:bg-white/[0.04] transition-all"
           >
-            <div className="w-10 h-10 rounded border border-white/[0.08] bg-white/[0.02] flex items-center justify-center flex-shrink-0 overflow-hidden font-mono">
-              {user?.profile_image ? (
+            {user?.profile_image ? (
+              <div className="w-10 h-10 rounded-full overflow-hidden flex-shrink-0 border border-gray-200 dark:border-[#00e07a]/20">
                 <img src={`${import.meta.env.VITE_API_BASE_URL}/uploads/${user.profile_image}`} alt="Profile" className="w-full h-full object-cover" />
-              ) : (
-                <span className="text-[#9b6dff] font-bold text-xs">
-                  {`[ ${userInitials} ]`}
+              </div>
+            ) : (
+              <div className="w-10 h-10 rounded-full flex-shrink-0 bg-gray-100 dark:bg-[#0f1422] border border-gray-200 dark:border-[#00e07a]/20 flex items-center justify-center">
+                <span className="text-slate-600 dark:text-[#00e07a] font-bold text-[0.95rem]">
+                  {userInitials}
                 </span>
-              )}
-            </div>
+              </div>
+            )}
             <div className="min-w-0 flex-1">
-              <div className="text-[0.85rem] font-semibold text-white truncate">
+              <div className="text-[0.85rem] font-semibold text-slate-800 dark:text-white truncate">
                 {user ? user.name : "Admin User"}
               </div>
-              <div className="text-[0.75rem] font-mono text-[#5e6a82] uppercase tracking-wider truncate">
+              <div className="text-[0.75rem] font-mono text-gray-500 uppercase tracking-wider truncate">
                 {user && user.roles.length > 0 ? user.roles.join(', ') : "Employee"}
               </div>
             </div>
@@ -286,17 +285,17 @@ export function Sidebar({ activeView, onViewChange, badges = {} }: SidebarProps)
 
       {/* Collapsed user avatar */}
       {collapsed && (
-        <div className="p-3 border-t border-white/[0.04] flex-shrink-0 flex justify-center">
+        <div className="p-3 border-t border-gray-200 dark:border-white/[0.04] flex-shrink-0 flex justify-center">
           <div
             onClick={() => { window.location.href = `${import.meta.env.VITE_API_BASE_URL}/pages/profile.php`; }}
-            className="w-10 h-10 rounded border border-white/[0.08] bg-white/[0.02] flex items-center justify-center cursor-pointer hover:bg-white/[0.06] transition-all overflow-hidden font-mono text-xs"
+            className="w-10 h-10 rounded-full flex-shrink-0 border border-gray-200 dark:border-[#00e07a]/20 bg-gray-100 dark:bg-[#0f1422] flex items-center justify-center cursor-pointer hover:bg-gray-200 dark:hover:bg-white/[0.06] transition-all overflow-hidden font-mono text-xs"
             title={user ? user.name : "Admin User"}
           >
             {user?.profile_image ? (
               <img src={`${import.meta.env.VITE_API_BASE_URL}/uploads/${user.profile_image}`} alt="Profile" className="w-full h-full object-cover" />
             ) : (
-              <span className="text-[#9b6dff] font-bold">
-                {`[${userInitials}]`}
+              <span className="text-slate-600 dark:text-[#00e07a] font-bold text-[0.95rem]">
+                {userInitials}
               </span>
             )}
           </div>
