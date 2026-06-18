@@ -332,7 +332,7 @@ if ($user) {
                     <?php if (!empty($user['profile_image'])): ?>
                         <img src="<?= url('/uploads/' . htmlspecialchars($user['profile_image'])) ?>" alt="Avatar">
                     <?php else: ?>
-                        [<?= $initials ?>]
+                        <span class="user-footer-avatar-initials"><?= $initials ?></span>
                     <?php endif; ?>
                 </div>
                 
