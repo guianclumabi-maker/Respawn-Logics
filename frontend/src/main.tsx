@@ -2,6 +2,7 @@
   import { createRoot } from "react-dom/client";
   import App from "./app/App.tsx";
   import { AuthProvider } from "./app/context/AuthContext.tsx";
+  import { ThemeProvider } from "next-themes";
   import "./styles/index.css";
 
   // Global fetch interceptor to handle session expiration
@@ -21,8 +22,10 @@
   };
 
   createRoot(document.getElementById("root")!).render(
-    <AuthProvider>
-      <App />
-    </AuthProvider>
+    <ThemeProvider attribute="data-theme" defaultTheme="dark">
+      <AuthProvider>
+        <App />
+      </AuthProvider>
+    </ThemeProvider>
   );
   

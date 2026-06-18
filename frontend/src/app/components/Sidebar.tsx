@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
+import { GamifiedThemeToggle } from "./GamifiedThemeToggle";
 import {
   LayoutDashboard,
   Briefcase,
@@ -247,6 +248,13 @@ export function Sidebar({ activeView, onViewChange, badges = {} }: SidebarProps)
           </button>
         </div>
       </div>
+
+      {/* ── Gamified Theme Toggle ─────────────────────── */}
+      {!collapsed && (
+        <div className="px-4 pb-2 border-t border-white/[0.04] pt-4 flex-shrink-0">
+          <GamifiedThemeToggle />
+        </div>
+      )}
 
       {/* ── User footer ───────────────────────────────── */}
       {!collapsed && (

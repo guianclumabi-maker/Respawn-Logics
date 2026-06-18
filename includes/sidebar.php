@@ -270,10 +270,48 @@ if ($user) {
                 <span>My Profile</span>
             </a>
             
-            <button onclick="toggleTheme()" class="menu-item" style="width:100%; border:none; background:transparent; text-align:left; color:inherit; cursor:pointer;">
-                <i class="fa-solid fa-circle-half-stroke" id="theme-icon"></i>
-                <span id="theme-text">Toggle Theme</span>
-            </button>
+            <div onclick="toggleTheme()" class="gamified-theme-toggle" id="gamified-theme-btn">
+                <div class="gamified-bg-sweep"></div>
+                
+                <div class="gamified-content">
+                    <i class="fa-solid fa-gamepad gamified-icon"></i>
+                    <span class="gamified-text" id="gamified-theme-text">Night Ops</span>
+                </div>
+
+                <div class="gamified-switch">
+                    <div class="gamified-knob">
+                        <i class="fa-solid fa-moon" id="gamified-knob-icon"></i>
+                    </div>
+                </div>
+            </div>
+            
+            <script>
+                // Update the text and icon immediately on load or when toggled
+                document.addEventListener('DOMContentLoaded', function() {
+                    const updateToggleUI = () => {
+                        const theme = document.documentElement.getAttribute('data-theme') || 'dark';
+                        const textEl = document.getElementById('gamified-theme-text');
+                        const iconEl = document.getElementById('gamified-knob-icon');
+                        if (theme === 'dark') {
+                            textEl.textContent = 'Night Ops';
+                            iconEl.className = 'fa-solid fa-moon';
+                        } else {
+                            textEl.textContent = 'Day Cycle';
+                            iconEl.className = 'fa-solid fa-sun';
+                        }
+                    };
+                    
+                    // Initial update
+                    updateToggleUI();
+                    
+                    // Hook into toggleTheme to update immediately
+                    const originalToggle = window.toggleTheme;
+                    window.toggleTheme = function() {
+                        originalToggle();
+                        updateToggleUI();
+                    };
+                });
+            </script>
         </div>
     </div>
     

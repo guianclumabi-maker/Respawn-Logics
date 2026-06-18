@@ -3,6 +3,7 @@ import { TicketList } from "./components/tickets/TicketList";
 import { TicketDetail } from "./components/tickets/TicketDetail";
 import { NewTicketModal } from "./components/tickets/NewTicketModal";
 import { AnalyticsDashboard } from "./components/analytics/AnalyticsDashboard";
+import { GamifiedThemeToggle } from "./components/GamifiedThemeToggle";
 import { TICKETS, Ticket, Status, Priority } from "./components/tickets/data";
 import { Headphones, Bell, Settings, ArrowLeft, Search } from "lucide-react";
 
@@ -162,6 +163,8 @@ export default function App() {
               </div>
             )}
           </div>
+
+          <GamifiedThemeToggle />
 
           <button style={{
             background: "transparent", border: "1px solid rgba(255,255,255,0.08)",
