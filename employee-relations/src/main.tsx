@@ -16,7 +16,7 @@
   };
 
   createRoot(document.getElementById("root")!).render(
-    <ThemeProvider attribute="class" defaultTheme="dark">
+    <ThemeProvider attribute="data-theme" defaultTheme="dark">
       <App />
     </ThemeProvider>
   );

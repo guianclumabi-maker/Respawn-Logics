@@ -27,7 +27,16 @@ export function GamifiedThemeToggle() {
       </div>
 
       <button
-        onClick={() => setTheme(isDark ? "light" : "dark")}
+        onClick={() => {
+          const newTheme = isDark ? "light" : "dark";
+          setTheme(newTheme);
+          // Sync with the main PHP backend session
+          fetch("/api/index.php?route=iam&action=update_theme", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ theme: newTheme })
+          }).catch(err => console.error("Failed to sync theme with backend:", err));
+        }}
         className={`relative w-12 h-6 rounded-full transition-all duration-300 focus:outline-none flex items-center px-1 shadow-inner ${
           isDark ? 'bg-[#0f1422] border border-[#00e07a]/50 shadow-[#00e07a]/20' : 'bg-gray-200 border border-cyan-400/50 shadow-cyan-400/20'
         }`}
