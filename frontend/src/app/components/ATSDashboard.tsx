@@ -575,13 +575,13 @@ export function ATSDashboard({ onViewChange }: Props) {
           /* ── Error State ──────────────────────────────────────────────── */
           <div className="flex flex-col items-center justify-center py-24 text-center">
             <AlertTriangle size={40} className="text-[#f5a623] mb-4" />
-            <p className="text-white font-medium mb-1 font-['Space_Grotesk']">
+            <p className="text-gray-900 dark:text-white font-medium mb-1" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
               Unable to load dashboard
             </p>
-            <p className="text-sm text-gray-500 font-mono">{error}</p>
+            <p className="text-sm text-gray-600 dark:text-gray-500 font-mono">{error}</p>
             <button
               onClick={() => window.location.reload()}
-              className="mt-4 px-4 py-2 rounded-lg text-xs font-mono font-semibold bg-purple-500/10 text-purple-400 border border-purple-500/20 hover:bg-purple-500/20 cursor-pointer transition-all"
+              className="mt-4 px-4 py-2 rounded-lg text-xs font-mono font-semibold bg-purple-500/10 text-purple-600 dark:text-purple-400 border border-purple-500/20 hover:bg-purple-500/20 cursor-pointer transition-all"
             >
               [ RETRY SESSION ]
             </button>

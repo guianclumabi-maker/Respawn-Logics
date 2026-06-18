@@ -1,1 +1,10 @@
-<?php require_once __DIR__ . '/bootstrap/app.php'; $_SESSION['user_email'] = 'test@test.com'; $_SESSION['user_id'] = 1; $_SESSION['tenant_id'] = 123456; loadPermissions(); require_once __DIR__ . '/backend/controllers/ESMController.php'; $controller = new ESMController($pdo); $controller->handleRequest('agent_queue'); ?>
+<?php
+require 'bootstrap/app.php';
+$_SERVER['REQUEST_METHOD'] = 'GET';
+$_GET['route'] = 'candidates';
+$_GET['action'] = 'dashboard';
+// mock logged in
+$_SESSION['user_id'] = 1;
+$_SESSION['tenant_id'] = 1;
+
+require 'api/index.php';

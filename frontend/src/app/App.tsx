@@ -183,8 +183,7 @@ export default function App() {
 
   return (
     <div
-      className="flex h-screen w-full overflow-hidden"
-      style={{ backgroundColor: "#06070a" }}
+      className="flex h-screen w-full overflow-hidden bg-gray-50 dark:bg-[#06070a]"
     >
       <Sidebar
         activeView={activeView}

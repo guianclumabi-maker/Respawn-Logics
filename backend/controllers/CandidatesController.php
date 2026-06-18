@@ -327,10 +327,8 @@ class CandidatesController
             }
         }
         
-        $activitiesStmt = $this->pdo->prepare("SELECT a.*, cp.`name` as candidate_name, j.`title` as job_title FROM `activities` a LEFT JOIN `candidate_profiles` cp ON cp.`id` = a.`candidate_id` LEFT JOIN `jobs` j ON j.`id` = a.`job_id` WHERE a.`tenant_id` = ? ORDER BY a.`created_at` DESC LIMIT 10");
-        $activitiesStmt->execute([$this->tenantId]);
-        $activities = $activitiesStmt->fetchAll();
-        foreach ($activities as &$act) { $act['id'] = (int)$act['id']; $act['time_ago'] = humanTimeAgo($act['created_at']); }
+        // Temporary mock for activities until the ATS event engine is built
+        $activities = [];
         
         $upcomingStmt = $this->pdo->prepare("SELECT i.*, cp.`name` as candidate_name, j.`title` as job_title FROM `interviews` i JOIN `candidate_profiles` cp ON cp.`id` = i.`candidate_id` JOIN `jobs` j ON j.`id` = i.`job_id` WHERE i.`scheduled_at` >= NOW() AND i.`status` = 'Scheduled' AND i.`tenant_id` = ? ORDER BY i.`scheduled_at` ASC LIMIT 5");
         $upcomingStmt->execute([$this->tenantId]);
