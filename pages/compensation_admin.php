@@ -8,12 +8,17 @@ if (!hasPermission('compensation.manage')) {
     exit;
 }
 
+$user = getCurrentUser();
+$tenant_id = $user['tenant_id'] ?? $_SESSION['tenant_id'] ?? 1;
+
 // Fetch Salary Bands
-$stmtBands = $pdo->query("SELECT * FROM compensation_bands ORDER BY min_salary ASC");
+$stmtBands = $pdo->prepare("SELECT * FROM compensation_bands WHERE tenant_id = ? ORDER BY min_salary ASC");
+$stmtBands->execute([$tenant_id]);
 $bands = $stmtBands->fetchAll();
 
 // Fetch Equity Grants
-$stmtEq = $pdo->query("SELECT * FROM employee_equity ORDER BY grant_date DESC");
+$stmtEq = $pdo->prepare("SELECT * FROM employee_equity WHERE tenant_id = ? ORDER BY grant_date DESC");
+$stmtEq->execute([$tenant_id]);
 $equity = $stmtEq->fetchAll();
 
 $current_page = 'compensation_admin.php';

@@ -113,7 +113,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     if ($request_id > 0 && ($decision === 'Approved' || $decision === 'Rejected')) {
         try {
             // Verify that the logged-in user is indeed the supervisor of the applicant
-            $stmt = $pdo->prepare("SELECT lr.*, u.immediate_supervisor FROM `leave_requests` lr JOIN `users` u ON lr.employee_email = u.email WHERE lr.id = ? AND lr.tenant_id = ?");
+            $stmt = $pdo->prepare("SELECT lr.*, u.immediate_supervisor FROM `leave_requests` lr JOIN `users` u ON lr.employee_email = u.email AND lr.tenant_id = u.tenant_id WHERE lr.id = ? AND lr.tenant_id = ?");
             $stmt->execute([$request_id, $tenantId]);
             $req = $stmt->fetch();
             
@@ -174,7 +174,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     if ($request_id > 0 && ($decision === 'Approved' || $decision === 'Rejected')) {
         try {
             // Verify that the logged-in user is indeed the department manager of the applicant
-            $stmt = $pdo->prepare("SELECT lr.*, u.department_manager FROM `leave_requests` lr JOIN `users` u ON lr.employee_email = u.email WHERE lr.id = ? AND lr.tenant_id = ?");
+            $stmt = $pdo->prepare("SELECT lr.*, u.department_manager FROM `leave_requests` lr JOIN `users` u ON lr.employee_email = u.email AND lr.tenant_id = u.tenant_id WHERE lr.id = ? AND lr.tenant_id = ?");
             $stmt->execute([$request_id, $tenantId]);
             $req = $stmt->fetch();
             

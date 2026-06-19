@@ -2,25 +2,28 @@
 require_once __DIR__ . '/../bootstrap/app.php';
 require_once __DIR__ . '/../includes/auth.php';
 
+$user = getCurrentUser();
+$tenant_id = $user['tenant_id'] ?? $_SESSION['tenant_id'] ?? 1;
+
 // Handle POST Requests
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     if ($_POST['action'] === 'trigger_workflow') {
         $email = $_POST['employee_email'] ?? '';
         $template_id = $_POST['template_id'] ?? 0;
         
-        $emp_stmt = $pdo->prepare("SELECT full_name, role FROM users WHERE email = ?");
-        $emp_stmt->execute([$email]);
+        $emp_stmt = $pdo->prepare("SELECT full_name, role FROM users WHERE email = ? AND tenant_id = ?");
+        $emp_stmt->execute([$email, $tenant_id]);
         $emp = $emp_stmt->fetch();
         
         if ($emp && $template_id) {
             $pdo->beginTransaction();
             try {
-                $ins_wf = $pdo->prepare("INSERT INTO employee_workflows (employee_name, employee_role, template_id, status, completion_percentage, start_date) VALUES (?, ?, ?, 'In Progress', 0, CURDATE())");
-                $ins_wf->execute([$emp['full_name'], $emp['role'], $template_id]);
+                $ins_wf = $pdo->prepare("INSERT INTO employee_workflows (tenant_id, employee_name, employee_role, template_id, status, completion_percentage, start_date) VALUES (?, ?, ?, ?, 'In Progress', 0, CURDATE())");
+                $ins_wf->execute([$tenant_id, $emp['full_name'], $emp['role'], $template_id]);
                 $workflow_id = $pdo->lastInsertId();
                 
-                $tasks_stmt = $pdo->prepare("SELECT task_name, department_owner FROM workflow_tasks WHERE template_id = ?");
-                $tasks_stmt->execute([$template_id]);
+                $tasks_stmt = $pdo->prepare("SELECT task_name, department_owner FROM workflow_tasks WHERE template_id = ? AND tenant_id = ?");
+                $tasks_stmt->execute([$template_id, $tenant_id]);
                 $tasks = $tasks_stmt->fetchAll();
                 
                 $ins_task = $pdo->prepare("INSERT INTO employee_workflow_tasks (workflow_id, task_name, department_owner, is_completed) VALUES (?, ?, ?, 0)");
@@ -65,12 +68,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
 }
 
 // Fetch Active Workflows
-$stmt = $pdo->query("SELECT * FROM employee_workflows ORDER BY created_at DESC");
+$stmt = $pdo->prepare("SELECT * FROM employee_workflows WHERE tenant_id = ? ORDER BY created_at DESC");
+$stmt->execute([$tenant_id]);
 $workflows = $stmt->fetchAll();
 
 // Fetch Data for Modals
-$users = $pdo->query("SELECT email, full_name, role FROM users ORDER BY full_name ASC")->fetchAll();
-$templates = $pdo->query("SELECT * FROM workflow_templates ORDER BY name ASC")->fetchAll();
+$users = $pdo->prepare("SELECT email, full_name, role FROM users WHERE tenant_id = ? ORDER BY full_name ASC");
+$users->execute([$tenant_id]);
+$users = $users->fetchAll();
+
+$templates = $pdo->prepare("SELECT * FROM workflow_templates WHERE tenant_id = ? ORDER BY name ASC");
+$templates->execute([$tenant_id]);
+$templates = $templates->fetchAll();
 
 // Fetch Tasks if viewing a specific workflow
 $view_tasks = [];

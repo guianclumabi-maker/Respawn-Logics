@@ -16,20 +16,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
             try {
                 $pdo->beginTransaction();
                 
-                $old_stmt = $pdo->prepare("SELECT * FROM users WHERE email = ?");
-                $old_stmt->execute([$target_email]);
+                $old_stmt = $pdo->prepare("SELECT * FROM users WHERE email = ? AND tenant_id = ?");
+                $old_stmt->execute([$target_email, $user['tenant_id']]);
                 $old_user = $old_stmt->fetch();
                 
                 if ($old_user) {
-                    $upd_stmt = $pdo->prepare("UPDATE users SET job_title = ?, department = ?, immediate_supervisor = ? WHERE email = ?");
-                    $upd_stmt->execute([$new_title, $new_dept, $new_supervisor, $target_email]);
+                    $upd_stmt = $pdo->prepare("UPDATE users SET job_title = ?, department = ?, immediate_supervisor = ? WHERE email = ? AND tenant_id = ?");
+                    $upd_stmt->execute([$new_title, $new_dept, $new_supervisor, $target_email, $user['tenant_id']]);
                     
                     $hist_stmt = $pdo->prepare("INSERT INTO employment_history (tenant_id, user_id, change_type, job_title, department, manager_id, effective_date, notes, recorded_by) VALUES (?, ?, 'Reassignment', ?, ?, ?, CURDATE(), ?, ?)");
                     
                     $sup_id = null;
                     if (!empty($new_supervisor)) {
-                        $sup_id_stmt = $pdo->prepare("SELECT id FROM users WHERE email = ?");
-                        $sup_id_stmt->execute([$new_supervisor]);
+                        $sup_id_stmt = $pdo->prepare("SELECT id FROM users WHERE email = ? AND tenant_id = ?");
+                        $sup_id_stmt->execute([$new_supervisor, $user['tenant_id']]);
                         $sup_id = $sup_id_stmt->fetchColumn();
                     }
                     
@@ -62,8 +62,8 @@ $selected_emp = null;
 $selected_email = trim($_GET['email'] ?? '');
 if (!empty($selected_email)) {
     try {
-        $stmt = $pdo->prepare("SELECT * FROM `users` WHERE `email` = ?");
-        $stmt->execute([$selected_email]);
+        $stmt = $pdo->prepare("SELECT * FROM `users` WHERE `email` = ? AND `tenant_id` = ?");
+        $stmt->execute([$selected_email, $user['tenant_id']]);
         $selected_emp = $stmt->fetch();
     } catch (PDOException $e) {
         $selected_emp = null;
@@ -78,7 +78,8 @@ if (!$selected_emp) {
 // Fallback to CEO / highest role ranking user if still not set
 if (!$selected_emp) {
     try {
-        $stmt = $pdo->query("SELECT * FROM `users` ORDER BY CASE WHEN role = 'admin' THEN 1 WHEN role = 'manager' THEN 2 WHEN role = 'supervisor' THEN 3 ELSE 4 END ASC, `full_name` ASC LIMIT 1");
+        $stmt = $pdo->prepare("SELECT * FROM `users` WHERE `tenant_id` = ? ORDER BY CASE WHEN role = 'admin' THEN 1 WHEN role = 'manager' THEN 2 WHEN role = 'supervisor' THEN 3 ELSE 4 END ASC, `full_name` ASC LIMIT 1");
+        $stmt->execute([$user['tenant_id']]);
         $selected_emp = $stmt->fetch();
     } catch (PDOException $e) {
         $selected_emp = null;
@@ -98,8 +99,8 @@ if ($selected_emp) {
         $visited_emails[] = strtolower($current_supervisor_email);
         
         try {
-            $stmt = $pdo->prepare("SELECT * FROM `users` WHERE `email` = ?");
-            $stmt->execute([$current_supervisor_email]);
+            $stmt = $pdo->prepare("SELECT * FROM `users` WHERE `email` = ? AND `tenant_id` = ?");
+            $stmt->execute([$current_supervisor_email, $user['tenant_id']]);
             $sup = $stmt->fetch();
             if ($sup) {
                 $ancestors[] = $sup;
@@ -118,8 +119,8 @@ if ($selected_emp) {
 $direct_reports = [];
 if ($selected_emp) {
     try {
-        $stmt = $pdo->prepare("SELECT * FROM `users` WHERE `immediate_supervisor` = ? ORDER BY `full_name` ASC");
-        $stmt->execute([$selected_emp['email']]);
+        $stmt = $pdo->prepare("SELECT * FROM `users` WHERE `immediate_supervisor` = ? AND `tenant_id` = ? ORDER BY `full_name` ASC");
+        $stmt->execute([$selected_emp['email'], $user['tenant_id']]);
         $direct_reports = $stmt->fetchAll();
     } catch (PDOException $e) {
         $direct_reports = [];
@@ -129,7 +130,8 @@ if ($selected_emp) {
 // 4. Fetch all employees for Search Autocomplete
 $all_employees = [];
 try {
-    $stmt = $pdo->query("SELECT full_name, email, job_title FROM `users` ORDER BY `full_name` ASC");
+    $stmt = $pdo->prepare("SELECT full_name, email, job_title FROM `users` WHERE `tenant_id` = ? ORDER BY `full_name` ASC");
+    $stmt->execute([$user['tenant_id']]);
     $all_employees = $stmt->fetchAll();
 } catch (PDOException $e) {
     $all_employees = [];

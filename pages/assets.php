@@ -14,10 +14,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     
     // Add Asset
     if ($_POST['action'] === 'add_asset') {
-        $tag = trim($_POST['asset_tag']);
-        $type = trim($_POST['type']);
-        $make_model = trim($_POST['make_model']);
-        $serial = trim($_POST['serial_number']);
+        $tag = trim($_POST['asset_tag'] ?? '');
+        $type = trim($_POST['type'] ?? '');
+        $make_model = trim($_POST['make_model'] ?? '');
+        $serial = trim($_POST['serial_number'] ?? '');
         
         $stmt = $pdo->prepare("INSERT INTO assets (asset_tag, type, make_model, serial_number, status) VALUES (?, ?, ?, ?, 'Available')");
         $stmt->execute([$tag, $type, $make_model, $serial]);
@@ -27,9 +27,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     
     // Assign Asset
     if ($_POST['action'] === 'assign_asset') {
-        $asset_id = intval($_POST['asset_id']);
-        $email = trim($_POST['assigned_to_email']);
-        $notes = trim($_POST['notes']);
+        $asset_id = intval($_POST['asset_id'] ?? 0);
+        $email = trim($_POST['assigned_to_email'] ?? '');
+        $notes = trim($_POST['notes'] ?? '');
         
         $pdo->beginTransaction();
         try {
@@ -51,8 +51,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     
     // Return Asset
     if ($_POST['action'] === 'return_asset') {
-        $assignment_id = intval($_POST['assignment_id']);
-        $asset_id = intval($_POST['asset_id']);
+        $assignment_id = intval($_POST['assignment_id'] ?? 0);
+        $asset_id = intval($_POST['asset_id'] ?? 0);
         
         $pdo->beginTransaction();
         try {
