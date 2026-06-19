@@ -284,7 +284,6 @@ $current_page = basename($_SERVER['SCRIPT_NAME']);
             </div>
         </main>
     </div>
-    </div>
 
     <!-- Template Modal -->
     <div id="templateModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:9999; backdrop-filter:blur(4px); align-items:center; justify-content:center;">

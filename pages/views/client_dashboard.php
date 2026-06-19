@@ -6,7 +6,7 @@ $tenantId = $user ? $user['tenant_id'] : ($_SESSION['tenant_id'] ?? '1');
 
 // Handle task addition
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'add_task') {
-    $task_name = trim($_POST['task_name']);
+    $task_name = trim($_POST['task_name'] ?? '');
     $task_desc = trim($_POST['task_description'] ?? '');
     
     if (!empty($task_name)) {

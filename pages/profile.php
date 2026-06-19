@@ -78,9 +78,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
 // Handle password update
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'update_password') {
     $active_tab = 'password';
-    $curr_pass = $_POST['current_password'];
-    $new_pass = $_POST['new_password'];
-    $confirm_pass = $_POST['confirm_password'];
+    $curr_pass = $_POST['current_password'] ?? '';
+    $new_pass = $_POST['new_password'] ?? '';
+    $confirm_pass = $_POST['confirm_password'] ?? '';
     
     $pwd_ok = false;
     
