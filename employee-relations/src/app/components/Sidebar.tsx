@@ -206,11 +206,12 @@ export function Sidebar({ activeView, onViewChange }: SidebarProps) {
                   {!collapsed && hasChildren && isExpanded && (
                     <div className="ml-8 mt-1.5 pl-3 border-l border-white/5 space-y-1">
                       {item.children!.map((child) => {
-                        const isSubActive = activeView === "Cases"; // Highlight child
+                        const viewName = child === "Cases List" ? "Cases" : child;
+                        const isSubActive = activeView === viewName;
                         return (
                           <button
                             key={child}
-                            onClick={() => onViewChange("Cases")}
+                            onClick={() => onViewChange(viewName as any)}
                             className={`w-full text-left px-4 py-2 rounded-lg text-[0.8rem] transition-all cursor-pointer ${
                               isSubActive 
                                 ? "text-[#00e07a] font-medium bg-[#00e07a]/5" 
