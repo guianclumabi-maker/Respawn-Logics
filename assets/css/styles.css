@@ -117,7 +117,7 @@
     --ring: oklch(0.708 0 0);
 
     /* Legacy Map */
-    --bg-dark-base: var(--background);
+    --bg-dark-base: #f8fafc; /* Forced slate-100 for legacy separation */
     --bg-dark-surface: var(--card);
     --bg-dark-surface-solid: var(--card);
     --bg-dark-surface-elevated: var(--popover);
@@ -252,6 +252,14 @@ body {
 @keyframes pulse-blob {
     0% { transform: scale(1) translate(0, 0); }
     100% { transform: scale(1.2) translate(50px, 30px); }
+}
+
+/* Global Light Mode Glow */
+[data-theme="light"] .global-glow-green {
+    position: fixed; top: -100px; left: -100px; width: 500px; height: 500px; border-radius: 50%; background: #00e07a; filter: blur(120px); opacity: 0.08; pointer-events: none; z-index: -1;
+}
+[data-theme="light"] .global-glow-purple {
+    position: fixed; bottom: -150px; right: -100px; width: 600px; height: 600px; border-radius: 50%; background: #9b6dff; filter: blur(140px); opacity: 0.06; pointer-events: none; z-index: -1;
 }
 
 /* ==========================================================================
