@@ -8,13 +8,53 @@
    This file only defines layout, component, and non-color design tokens. */
 
 [data-theme="light"] {
-    --grad-t4: linear-gradient(135deg, rgba(219, 39, 119, 0.12), rgba(124, 58, 237, 0.12));
-    --grad-t3: linear-gradient(135deg, rgba(124, 58, 237, 0.12), rgba(37, 99, 235, 0.12));
-    --grad-t2: linear-gradient(135deg, rgba(13, 148, 136, 0.12), rgba(5, 150, 105, 0.12));
-    --grad-t1: linear-gradient(135deg, rgba(2, 132, 199, 0.12), rgba(37, 99, 235, 0.12));
+    --grad-t4: linear-gradient(135deg, rgba(219, 39, 119, 0.1), rgba(124, 58, 237, 0.1));
+    --grad-t3: linear-gradient(135deg, rgba(124, 58, 237, 0.1), rgba(37, 99, 235, 0.1));
+    --grad-t2: linear-gradient(135deg, rgba(13, 148, 136, 0.1), rgba(5, 150, 105, 0.1));
+    --grad-t1: linear-gradient(135deg, rgba(2, 132, 199, 0.1), rgba(37, 99, 235, 0.1));
     --primary-gradient: #059669;
     --primary-gradient-hover: #047857;
 }
+
+/* Light mode card elevation fix — solid white cards on slate bg */
+[data-theme="light"] .card-panel {
+    background: #ffffff;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    border-color: rgba(15, 23, 42, 0.1);
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.07), 0 4px 16px rgba(15, 23, 42, 0.06);
+}
+[data-theme="light"] .card-panel:hover {
+    border-color: rgba(15, 23, 42, 0.18);
+    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.1), 0 12px 32px rgba(15, 23, 42, 0.08);
+    transform: translateY(-1px);
+}
+[data-theme="light"] .metric-card {
+    background: #ffffff;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    border-color: rgba(15, 23, 42, 0.1);
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.07), 0 2px 8px rgba(15, 23, 42, 0.05);
+}
+[data-theme="light"] .ambient-glow {
+    opacity: 0.04;
+}
+[data-theme="light"] .alert-error {
+    background: rgba(220, 38, 38, 0.08);
+    border-color: rgba(220, 38, 38, 0.25);
+    color: #b91c1c;
+}
+[data-theme="light"] .alert-success {
+    background: rgba(5, 150, 105, 0.08);
+    border-color: rgba(5, 150, 105, 0.25);
+    color: #047857;
+}
+[data-theme="light"] .badge-pending { background: rgba(217, 119, 6, 0.1); color: #b45309; border-color: rgba(217, 119, 6, 0.25); }
+[data-theme="light"] .badge-approved { background: rgba(5, 150, 105, 0.1); color: #047857; border-color: rgba(5, 150, 105, 0.25); }
+[data-theme="light"] .badge-rejected { background: rgba(220, 38, 38, 0.1); color: #b91c1c; border-color: rgba(220, 38, 38, 0.25); }
+[data-theme="light"] .badge-in { background: rgba(13, 148, 136, 0.1); color: #0f766e; border-color: rgba(13, 148, 136, 0.25); }
+[data-theme="light"] .badge-out { background: rgba(124, 58, 237, 0.1); color: #6d28d9; border-color: rgba(124, 58, 237, 0.25); }
+
 
 :root {
     /* Tier Gradients (Dark Mode default) */

@@ -1,45 +1,49 @@
 @custom-variant dark (&:is([data-theme="dark"] *));
 
 :root {
+  /* ===== LIGHT MODE — Cool Slate Foundation =====
+     Page bg: hsl(220,20%,96%) so solid white cards float naturally.
+     All text meets WCAG AA minimum 4.5:1 contrast ratio. */
   --font-size: 16px;
-  --background: #ffffff;
-  --foreground: oklch(0.145 0 0);
-  --card: rgba(255, 255, 255, 0.75);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: #030213;
-  --primary-foreground: oklch(1 0 0);
-  --secondary: oklch(0.95 0.0058 264.53);
-  --secondary-foreground: #030213;
-  --muted: #ececf0;
-  --muted-foreground: #717182;
-  --accent: #e9ebef;
-  --accent-foreground: #030213;
-  --destructive: #d4183d;
+  --background: hsl(220, 20%, 96%);   /* Cool off-white page base */
+  --foreground: #0f172a;              /* slate-900 — max contrast */
+  --card: #ffffff;                    /* Solid white cards pop on slate bg */
+  --card-foreground: #0f172a;
+  --popover: #ffffff;
+  --popover-foreground: #0f172a;
+  --primary: #0f172a;
+  --primary-foreground: #ffffff;
+  --secondary: #f1f5f9;              /* slate-100 */
+  --secondary-foreground: #0f172a;
+  --muted: #f1f5f9;                   /* slate-100 */
+  --muted-foreground: #4b5563;        /* gray-600 — WCAG AA ~6.3:1 on white */
+  --accent: #e2e8f0;                  /* slate-200 */
+  --accent-foreground: #0f172a;
+  --destructive: #dc2626;            /* red-600 */
   --destructive-foreground: #ffffff;
-  --border: rgba(0, 0, 0, 0.1);
+  --border: rgba(15, 23, 42, 0.11);  /* Slate tinted, clearly visible */
   --input: transparent;
-  --input-background: #f3f3f5;
-  --switch-background: #cbced4;
+  --input-background: #f8fafc;
+  --switch-background: #cbd5e1;
   --font-weight-medium: 500;
   --font-weight-normal: 400;
-  --ring: oklch(0.708 0 0);
+  --ring: #0ea5e9;                   /* sky-500 focus ring */
   --chart-1: oklch(0.646 0.222 41.116);
   --chart-2: oklch(0.6 0.118 184.704);
   --chart-3: oklch(0.398 0.07 227.392);
   --chart-4: oklch(0.828 0.189 84.429);
   --chart-5: oklch(0.769 0.188 70.08);
   --radius: 0.625rem;
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: #030213;
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+  --sidebar: #ffffff;                /* Solid white sidebar */
+  --sidebar-foreground: #0f172a;
+  --sidebar-primary: #0f172a;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #f1f5f9;
+  --sidebar-accent-foreground: #0f172a;
+  --sidebar-border: rgba(15, 23, 42, 0.09);
+  --sidebar-ring: #0ea5e9;
 }
+
 
 [data-theme="dark"] {
   --background: oklch(0.145 0 0);
