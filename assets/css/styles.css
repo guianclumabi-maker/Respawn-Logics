@@ -13,7 +13,7 @@
     --card-foreground: #f8fafc;
     --popover: #0f172a;
     --popover-foreground: #f8fafc;
-    --primary: #00e07a;
+    --primary: #10b981; /* emerald-500 */
     --primary-foreground: #020617;
     --secondary: #1e293b; /* slate-800 */
     --secondary-foreground: #f8fafc;
@@ -25,7 +25,7 @@
     --destructive-foreground: #ffffff;
     --border: rgba(255, 255, 255, 0.08);
     --input: rgba(255, 255, 255, 0.08);
-    --ring: #00e07a;
+    --ring: #10b981;
 
     /* Glassmorphism Variables */
     --glass-bg: #0f172a; /* Solid slate-900 for cleaner dark mode cards */
@@ -59,14 +59,14 @@
     --alpha-70: rgba(255, 255, 255, 0.7);
     --alpha-80: rgba(255, 255, 255, 0.8);
     
-    /* Neon Accent Colors */
-    --accent-purple: #9b6dff;
-    --accent-pink: #9b6dff;
-    --accent-cyan: #06b6d4;
-    --accent-blue: #4f8ef7;
-    --accent-teal: #00c9b1;
-    --accent-green: #00e07a;
-    --accent-yellow: #f5a623;
+    /* Curated SaaS Accent Colors */
+    --accent-purple: #8b5cf6; /* violet-500 */
+    --accent-pink: #ec4899;   /* pink-500 */
+    --accent-cyan: #06b6d4;   /* cyan-500 */
+    --accent-blue: #3b82f6;   /* blue-500 */
+    --accent-teal: #14b8a6;   /* teal-500 */
+    --accent-green: #10b981;  /* emerald-500 */
+    --accent-yellow: #f59e0b; /* amber-500 */
     --accent-red: var(--destructive);
     
     /* Card/Node Specific Gradients */
@@ -82,8 +82,8 @@
     --font-mono: 'JetBrains Mono', monospace;
     
     /* Gradients */
-    --primary-gradient: #00e07a;
-    --primary-gradient-hover: #00c96a;
+    --primary-gradient: #10b981;
+    --primary-gradient-hover: #059669; /* emerald-600 */
     --glass-gradient: linear-gradient(135deg, var(--alpha-3), rgba(255, 255, 255, 0.01));
     
     /* Shadows & Effects */
