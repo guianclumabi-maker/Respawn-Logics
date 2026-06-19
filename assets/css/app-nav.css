@@ -92,7 +92,7 @@
     font-size: 0.9rem;
     font-weight: 500;
     border-radius: 12px;
-    transition: all 0.2s ease;
+    transition: all 0.2s ease, transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
     border: 1px solid transparent;
 }
 
@@ -103,7 +103,9 @@
 .menu-item:hover {
     color: var(--text-primary);
     background: var(--alpha-3);
+    transform: translateX(4px);
 }
+
 
 [data-theme='dark'] .menu-item:hover {
     background: rgba(255, 255, 255, 0.03);

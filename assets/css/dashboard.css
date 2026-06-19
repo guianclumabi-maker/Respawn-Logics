@@ -144,6 +144,19 @@ html, body {
     flex-direction: column;
     gap: 30px;
     min-width: 0;
+    opacity: 0;
+    animation: fade-in-up 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.1s forwards;
+}
+
+@keyframes fade-in-up {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 /* Card components */
@@ -192,8 +205,18 @@ html, body {
     gap: 10px;
     position: relative;
     overflow: hidden;
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease, border-color 0.3s ease;
+}
+.metric-card:hover {
+    transform: translateY(-4px) scale(1.01);
+    box-shadow: 0 12px 30px rgba(0,0,0,0.15);
+    border-color: var(--border-color-hover);
+}
+[data-theme="light"] .metric-card:hover {
+    box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
 }
 .metric-card::before {
+
     content: '';
     position: absolute;
     top: 0;
@@ -244,9 +267,10 @@ html, body {
     border-bottom: 1px solid var(--border-color);
     color: var(--text-primary);
     vertical-align: middle;
+    transition: background-color 0.2s ease;
 }
 .dark-table tr:hover td {
-    background: var(--alpha-2);
+    background-color: var(--alpha-3);
 }
 
 /* Status Badges */
@@ -318,7 +342,7 @@ html, body {
     font-weight: 700;
     letter-spacing: 0.03em;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -327,11 +351,11 @@ html, body {
 }
 .btn-primary:hover {
     background: var(--primary-gradient-hover);
-    transform: translateY(-1px);
+    transform: translateY(-2px);
     box-shadow: 0 6px 20px rgba(0, 224, 122, 0.4);
 }
 .btn-primary:active {
-    transform: translateY(0);
+    transform: translateY(0) scale(0.97);
 }
 
 .btn-secondary {
@@ -344,7 +368,7 @@ html, body {
     font-size: 0.875rem;
     font-weight: 500;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -354,6 +378,10 @@ html, body {
     background: var(--alpha-10);
     border-color: var(--border-color-hover);
     color: var(--text-primary);
+    transform: translateY(-2px);
+}
+.btn-secondary:active {
+    transform: translateY(0) scale(0.97);
 }
 
 /* Alert dialogs */
