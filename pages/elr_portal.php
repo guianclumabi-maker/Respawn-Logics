@@ -26,11 +26,12 @@ $current_page = basename($_SERVER['SCRIPT_NAME']);
         }
 
         .ticket-list {
-            background: rgba(255, 255, 255, 0.02);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(239, 68, 68, 0.2);
-            border-radius: 16px;
+            background: rgba(255, 255, 255, 0.4);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05);
             height: calc(100vh - 180px);
             overflow-y: auto;
             animation: elr-pulse 4s infinite alternate;
@@ -46,11 +47,12 @@ $current_page = basename($_SERVER['SCRIPT_NAME']);
         .ticket-item.active { background: rgba(239, 68, 68, 0.1); border-left: 3px solid #ef4444; }
         
         .ticket-detail {
-            background: rgba(255, 255, 255, 0.02);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(239, 68, 68, 0.2);
-            border-radius: 16px;
+            background: rgba(255, 255, 255, 0.4);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05);
             padding: 32px;
             display: none;
             height: calc(100vh - 180px);
@@ -124,13 +126,25 @@ $current_page = basename($_SERVER['SCRIPT_NAME']);
                     <div class="comment-thread" id="dtl-comments" style="display:flex; flex-direction:column;"></div>
 
                     <!-- Add Comment Form -->
-                    <form id="form-comment" onsubmit="submitComment(event)" style="margin-top:24px; background:rgba(0,0,0,0.2); padding:16px; border-radius:8px; border:1px solid var(--border-color);">
-                        <textarea id="comment-text" class="form-input" rows="3" placeholder="Log evidence, internal discussion, or reply..." required></textarea>
+                    <form id="form-comment" onsubmit="submitComment(event)" style="margin-top:24px; background:rgba(0,0,0,0.05); padding:16px; border-radius:8px; border:1px solid var(--border-color);">
+                        <textarea id="comment-text" name="comment" class="form-input" rows="3" placeholder="Log evidence, internal discussion, or reply..." required></textarea>
+                        
+                        <!-- Attachment Input -->
+                        <div style="margin-top: 12px; margin-bottom: 12px;">
+                            <label style="font-size: 0.75rem; color: var(--text-muted); display: block; margin-bottom: 4px;">Attach Evidence/File (Optional)</label>
+                            <input type="file" id="comment-attachment" name="attachment" class="form-input" style="padding: 8px;">
+                        </div>
+
                         <div style="display:flex; justify-content:space-between; align-items:center; margin-top:12px;">
-                            <select id="comment-type" class="form-input" style="width:200px;">
+                            <?php if (hasPermission('esm.manage')): ?>
+                            <select id="comment-type" name="comment_type" class="form-input" style="width:200px;">
                                 <option value="Internal" selected>Internal Note (Default)</option>
                                 <option value="Public">Public Reply (Visible to Employee)</option>
                             </select>
+                            <?php else: ?>
+                            <input type="hidden" id="comment-type" name="comment_type" value="Public">
+                            <div></div>
+                            <?php endif; ?>
                             <button type="submit" class="btn-primary" style="background:#ef4444;">Post to Case</button>
                         </div>
                     </form>
@@ -180,12 +194,11 @@ $current_page = basename($_SERVER['SCRIPT_NAME']);
 
         async function loadQueue() {
             try {
-                // Fetch employee's own tickets instead of agent queue
-                const res = await fetch(`<?= url('/esm_api.php?action=my_tickets') ?>`);
+                // Fetch employee's own ELR cases specifically
+                const res = await fetch(`<?= url('/esm_api.php?action=my_elr_cases') ?>`);
                 const data = await res.json();
                 if (data.success) {
-                    // Filter for ELR Cases (team name is 'Employee Relations' or ticket is confidential)
-                    currentTickets = data.data.filter(t => t.team_name === 'Employee Relations' || t.is_confidential == 1);
+                    currentTickets = data.data;
                     renderQueue();
                 }
             } catch(e){
@@ -250,12 +263,24 @@ $current_page = basename($_SERVER['SCRIPT_NAME']);
 
                     const cContainer = document.getElementById('dtl-comments');
                     cContainer.innerHTML = data.data.comments.map(c => {
+                        let attachmentHtml = '';
+                        if (c.attachment_url) {
+                            const isImage = c.attachment_url.match(/\.(jpeg|jpg|gif|png)$/i);
+                            if (isImage) {
+                                attachmentHtml = `<div style="margin-top:8px;"><a href="<?= url() ?>${c.attachment_url}" target="_blank"><img src="<?= url() ?>${c.attachment_url}" style="max-width: 200px; border-radius: 8px; border: 1px solid rgba(0,0,0,0.1);"></a></div>`;
+                            } else {
+                                attachmentHtml = `<div style="margin-top:8px;"><a href="<?= url() ?>${c.attachment_url}" target="_blank" style="color:#60a5fa; text-decoration:underline; font-size: 0.8rem;">📎 View Attachment</a></div>`;
+                            }
+                        }
+
+                        let commentText = (c.comment || '').replace(/\n/g, '<br>');
+
                         if (c.comment_type === 'System') {
-                            return `<div class="comment-bubble comment-system">${c.comment} <br><span style="font-size:0.65rem;">${c.created_at}</span></div>`;
+                            return `<div class="comment-bubble comment-system">${commentText} <br><span style="font-size:0.65rem;">${c.created_at}</span></div>`;
                         } else if (c.comment_type === 'Internal') {
-                            return `<div class="comment-bubble comment-internal" style="border-color:#ef4444; color:#ef4444; background:rgba(239,68,68,0.1);"><strong>${c.author_name} (Confidential Note)</strong><br>${c.comment} <br><span style="font-size:0.65rem; opacity:0.7;">${c.created_at}</span></div>`;
+                            return `<div class="comment-bubble comment-internal" style="border-color:#ef4444; color:#ef4444; background:rgba(239,68,68,0.1);"><strong>${c.author_name} (Confidential Note)</strong><br>${commentText} ${attachmentHtml}<br><span style="font-size:0.65rem; opacity:0.7;">${c.created_at}</span></div>`;
                         } else {
-                            return `<div class="comment-bubble comment-public"><strong>${c.author_name || 'System'}</strong><br>${c.comment} <br><span style="font-size:0.65rem; color:var(--text-muted);">${c.created_at}</span></div>`;
+                            return `<div class="comment-bubble comment-public" style="background:var(--alpha-5); border:1px solid var(--border-color); color:var(--text-color);"><strong>${c.author_name || 'System'}</strong><br>${commentText} ${attachmentHtml}<br><span style="font-size:0.65rem; color:var(--text-muted);">${c.created_at}</span></div>`;
                         }
                     }).join('');
                 }
@@ -279,17 +304,19 @@ $current_page = basename($_SERVER['SCRIPT_NAME']);
         window.submitComment = async function(e) {
             e.preventDefault();
             if (!activeTicketId) return;
-            const comment = document.getElementById('comment-text').value;
-            const type = document.getElementById('comment-type').value;
+            
+            const form = document.getElementById('form-comment');
+            const formData = new FormData(form);
+            formData.append('ticket_id', activeTicketId);
+            
             try {
                 const res = await fetch(`<?= url('/esm_api.php?action=add_comment') ?>`, {
                     method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({ ticket_id: activeTicketId, comment: comment, comment_type: type })
+                    body: formData
                 });
                 const data = await res.json();
                 if(data.success) {
-                    document.getElementById('comment-text').value = '';
+                    form.reset();
                     selectTicket(activeTicketId);
                 }
             } catch(e){}

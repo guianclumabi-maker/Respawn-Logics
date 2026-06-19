@@ -19,8 +19,9 @@ $isAdmin = hasPermission('surveys.manage');
         .survey-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px; }
         
         .survey-card {
-            background: var(--bg-secondary); border: 1px solid var(--border-color);
-            border-radius: var(--radius-lg); padding: 20px; display: flex; flex-direction: column;
+            background: var(--glass-bg); border: 1px solid var(--glass-border);
+            border-radius: 20px; box-shadow: var(--glass-shadow); backdrop-filter: blur(var(--glass-blur)); -webkit-backdrop-filter: blur(var(--glass-blur));
+            padding: 20px; display: flex; flex-direction: column;
             transition: transform 0.2s;
         }
         .survey-card:hover { transform: translateY(-3px); border-color: rgba(255,255,255,0.2); }

@@ -24,6 +24,11 @@ class ESMController
 
     public function handleRequest($action)
     {
+        if (!$this->currentUser || !isset($this->currentUser['id'])) {
+            echo json_encode(['success' => false, 'error' => 'User not authenticated or missing ID']);
+            return;
+        }
+
         if ($_SERVER['REQUEST_METHOD'] === 'POST' && strpos($_SERVER['CONTENT_TYPE'] ?? '', 'application/json') !== false) {
             $input = json_decode(file_get_contents('php://input'), true) ?? [];
         } else {
@@ -67,6 +72,19 @@ class ESMController
                         JOIN `service_ticket_types` tt ON st.ticket_type_id = tt.id
                         LEFT JOIN `service_teams` tm ON st.assigned_team_id = tm.id
                         WHERE st.employee_id = ? AND st.tenant_id = ? AND tt.is_confidential = 0
+                        ORDER BY st.created_at DESC
+                    ");
+                    $stmt->execute([$this->currentUser['id'], $this->tenantId]);
+                    echo json_encode(['success' => true, 'data' => $stmt->fetchAll()]);
+                    break;
+
+                case 'my_elr_cases':
+                    $stmt = $this->pdo->prepare("
+                        SELECT st.*, tt.name as type_name, tm.name as team_name
+                        FROM `service_tickets` st
+                        JOIN `service_ticket_types` tt ON st.ticket_type_id = tt.id
+                        LEFT JOIN `service_teams` tm ON st.assigned_team_id = tm.id
+                        WHERE st.employee_id = ? AND st.tenant_id = ? AND (tt.is_confidential = 1 OR tm.name = 'Employee Relations' OR tt.name LIKE '%HR%')
                         ORDER BY st.created_at DESC
                     ");
                     $stmt->execute([$this->currentUser['id'], $this->tenantId]);
@@ -179,7 +197,7 @@ class ESMController
 
         if (!$ticket) { echo json_encode(['success' => false, 'error' => 'Not found']); return; }
 
-        if (!$this->isAgent() && $ticket['is_confidential'] == 1) {
+        if (!$this->isAgent() && $ticket['is_confidential'] == 1 && $ticket['employee_id'] !== $this->currentUser['id']) {
             echo json_encode(['success' => false, 'error' => 'Denied - Confidential Case']); return;
         }
         if ($ticket['employee_id'] !== $this->currentUser['id'] && !$this->isAgent()) {
@@ -222,8 +240,19 @@ class ESMController
 
         if (!$this->isAgent()) $type = 'Public';
 
-        $stmt = $this->pdo->prepare("INSERT INTO `ticket_comments` (`ticket_id`, `user_id`, `comment_type`, `comment`, `created_by`) VALUES (?, ?, ?, ?, ?)");
-        $stmt->execute([$ticketId, $this->currentUser['id'], $type, $comment, $this->currentUser['id']]);
+        $attachmentUrl = null;
+        if (isset($_FILES['attachment']) && $_FILES['attachment']['error'] === UPLOAD_ERR_OK) {
+            $uploadDir = __DIR__ . '/../../uploads/tickets/';
+            if (!is_dir($uploadDir)) mkdir($uploadDir, 0777, true);
+            $filename = time() . '_' . preg_replace('/[^a-zA-Z0-9.\-_]/', '', basename($_FILES['attachment']['name']));
+            $dest = $uploadDir . $filename;
+            if (move_uploaded_file($_FILES['attachment']['tmp_name'], $dest)) {
+                $attachmentUrl = '/uploads/tickets/' . $filename;
+            }
+        }
+
+        $stmt = $this->pdo->prepare("INSERT INTO `ticket_comments` (`ticket_id`, `user_id`, `comment_type`, `comment`, `created_by`, `attachment_url`) VALUES (?, ?, ?, ?, ?, ?)");
+        $stmt->execute([$ticketId, $this->currentUser['id'], $type, $comment, $this->currentUser['id'], $attachmentUrl]);
 
         if ($this->isAgent() && $type === 'Public') {
             $this->pdo->prepare("UPDATE `service_tickets` SET `first_response_at` = CURRENT_TIMESTAMP WHERE `id` = ? AND `first_response_at` IS NULL")->execute([$ticketId]);

@@ -186,11 +186,13 @@ try {
             margin-bottom: 30px;
         }
         .vendor-card {
-            background: #0f1422;
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            border-radius: 8px;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            box-shadow: var(--glass-shadow);
             padding: 25px;
-            backdrop-filter: blur(10px);
+            backdrop-filter: blur(var(--glass-blur));
+            -webkit-backdrop-filter: blur(var(--glass-blur));
             transition: all 0.2s;
             position: relative;
             overflow: hidden;

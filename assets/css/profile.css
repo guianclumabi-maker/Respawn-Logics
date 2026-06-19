@@ -19,9 +19,12 @@
     flex-direction: column;
     align-items: center;
     gap: 20px;
-    background: rgba(15, 20, 34, 0.7);
-    border: 1px solid rgba(0, 224, 122, 0.12);
-    border-radius: var(--radius-lg);
+    background: var(--glass-bg);
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+    border: 1px solid var(--glass-border);
+    border-radius: 20px;
+    box-shadow: var(--glass-shadow);
     padding: 32px 24px;
     position: relative;
     overflow: hidden;
@@ -165,9 +168,12 @@
 
 /* ── Forms Detail Card ── */
 .profile-detail-card {
-    background: rgba(15, 20, 34, 0.7);
-    border: 1px solid var(--alpha-6);
-    border-radius: var(--radius-lg);
+    background: var(--glass-bg);
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+    border: 1px solid var(--glass-border);
+    border-radius: 20px;
+    box-shadow: var(--glass-shadow);
     padding: 28px;
 }
 

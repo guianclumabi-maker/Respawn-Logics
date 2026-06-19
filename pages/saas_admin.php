@@ -89,11 +89,13 @@ $current_page = 'saas_admin.php';
             margin-bottom: 30px;
         }
         .stat-card {
-            background: #0f1422;
+            background: var(--glass-bg);
             padding: 25px;
-            border-radius: 8px;
-            border: 1px solid rgba(255,255,255,0.05);
-            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            border: 1px solid var(--glass-border);
+            box-shadow: var(--glass-shadow);
+            backdrop-filter: blur(var(--glass-blur));
+            -webkit-backdrop-filter: blur(var(--glass-blur));
             transition: all 0.2s;
             position: relative;
             overflow: hidden;

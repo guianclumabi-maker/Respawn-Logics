@@ -160,7 +160,7 @@ $current_page = basename($_SERVER['SCRIPT_NAME']);
 
         /* Dashboard specific */
         .dash-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 20px; }
-        .dash-card { background: rgba(22, 25, 34, 0.7); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 20px; }
+        .dash-card { background: var(--glass-bg); backdrop-filter: blur(var(--glass-blur)); -webkit-backdrop-filter: blur(var(--glass-blur)); border: 1px solid var(--glass-border); border-radius: 20px; box-shadow: var(--glass-shadow); padding: 20px; }
         .dash-card-value { font-size: 1.5rem; font-weight: 700; color: white; margin-top: 10px; }
         .dash-card-label { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600; margin-top: 4px; }
 
