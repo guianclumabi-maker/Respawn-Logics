@@ -109,18 +109,36 @@ function App() {
     });
   }, []);
 
-  // Theme sync: listen for changes made by the main platform in other tabs.
-  // The main platform's toggleTheme() in sidebar.php writes to localStorage('theme').
-  // The storage event fires in OTHER open tabs on the same origin.
+  // Cross-tab theme sync: BroadcastChannel fires in ALL open same-origin tabs instantly.
+  // The main platform's toggleTheme() in sidebar.php broadcasts on 'respawn_theme'.
+  // storage event is kept as fallback for browsers without BroadcastChannel support.
   useEffect(() => {
+    const applyTheme = (theme: string) => {
+      document.documentElement.setAttribute('data-theme', theme);
+      try { localStorage.setItem('theme', theme); } catch(e) {}
+    };
+
+    // Primary: BroadcastChannel (instant across ALL tabs)
+    let themeChannel: BroadcastChannel | null = null;
+    try {
+      themeChannel = new BroadcastChannel('respawn_theme');
+      themeChannel.onmessage = (e: MessageEvent) => {
+        if (e.data?.theme) applyTheme(e.data.theme);
+      };
+    } catch(e) {}
+
+    // Fallback: storage event (only fires in OTHER tabs)
     const handleStorageChange = (e: StorageEvent) => {
-      if (e.key === 'theme' && e.newValue) {
-        document.documentElement.setAttribute('data-theme', e.newValue);
-      }
+      if (e.key === 'theme' && e.newValue) applyTheme(e.newValue);
     };
     window.addEventListener('storage', handleStorageChange);
-    return () => window.removeEventListener('storage', handleStorageChange);
+
+    return () => {
+      themeChannel?.close();
+      window.removeEventListener('storage', handleStorageChange);
+    };
   }, []);
+
 
   // Set initial processed amount once dashInfo loads
   useEffect(() => {

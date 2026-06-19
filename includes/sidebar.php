@@ -405,10 +405,17 @@ function submitGlobalFeedback() {
 }
 
 function toggleTheme() {
-    const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
+    const currentTheme = document.documentElement.getAttribute('data-theme') || 'dark';
     const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
     document.documentElement.setAttribute('data-theme', newTheme);
     localStorage.setItem('theme', newTheme);
+
+    // Broadcast to ALL open tabs on the same origin instantly
+    try {
+        const bc = new BroadcastChannel('respawn_theme');
+        bc.postMessage({ theme: newTheme });
+        bc.close();
+    } catch(e) {}
     
     // Update icon if it exists
     const icon = document.getElementById('theme-icon');
@@ -425,6 +432,27 @@ function toggleTheme() {
         })
     }).then(res => res.json()).catch(err => console.error(err));
 }
+
+// Persistent BroadcastChannel listener — syncs theme when ANY other tab (PHP or React)
+// calls toggleTheme() and broadcasts. Keeps PHP pages already open in sync.
+(function() {
+    try {
+        const _respawnThemeChannel = new BroadcastChannel('respawn_theme');
+        _respawnThemeChannel.onmessage = function(e) {
+            if (!e.data || !e.data.theme) return;
+            const t = e.data.theme;
+            document.documentElement.setAttribute('data-theme', t);
+            localStorage.setItem('theme', t);
+            // Update gamified toggle UI text and icon
+            const textEl = document.getElementById('gamified-theme-text');
+            const iconEl = document.getElementById('gamified-knob-icon');
+            const themeIcon = document.getElementById('theme-icon');
+            if (textEl) textEl.textContent = t === 'dark' ? 'Night Ops' : 'Day Cycle';
+            if (iconEl) iconEl.className = t === 'dark' ? 'fa-solid fa-moon' : 'fa-solid fa-sun';
+            if (themeIcon) themeIcon.className = t === 'dark' ? 'fa-solid fa-circle-half-stroke' : 'fa-regular fa-sun';
+        };
+    } catch(e) {}
+})();
 
 // Initial icon setup
 document.addEventListener('DOMContentLoaded', () => {
