@@ -82,7 +82,7 @@ $isAdmin = hasPermission('surveys.manage');
                         <p>Company-wide pulse surveys and eNPS tracking.</p>
                     </div>
                     <?php if ($isAdmin): ?>
-                        <button class="btn btn-primary" onclick="openBuilderModal()"><i class="fa-solid fa-plus"></i> Create New Survey</button>
+                        <button class="btn btn-primary" onclick="openBuilderModal()"><i data-lucide="plus"></i> Create New Survey</button>
                     <?php endif; ?>
                 </div>
 
@@ -100,7 +100,7 @@ $isAdmin = hasPermission('surveys.manage');
         <div class="modal-content">
             <div class="modal-header">
                 <h3>Survey Builder</h3>
-                <button class="btn btn-secondary" style="padding: 4px 8px;" onclick="closeBuilderModal()"><i class="fa-solid fa-times"></i></button>
+                <button class="btn btn-secondary" style="padding: 4px 8px;" onclick="closeBuilderModal()"><i data-lucide="x"></i></button>
             </div>
             <div class="modal-body">
                 <div class="form-group" style="margin-bottom: 16px;">
@@ -113,13 +113,13 @@ $isAdmin = hasPermission('surveys.manage');
                 </div>
                 
                 <div style="background: rgba(0, 224, 122,0.1); border: 1px solid rgba(0, 224, 122,0.3); border-radius: 6px; padding: 12px; margin-bottom: 24px;">
-                    <div style="color: #00e07a; font-weight: 600; font-size: 0.85rem; margin-bottom: 4px;"><i class="fa-solid fa-magic"></i> Auto-Injected</div>
+                    <div style="color: #00e07a; font-weight: 600; font-size: 0.85rem; margin-bottom: 4px;"><i data-lucide="wand-2"></i> Auto-Injected</div>
                     <div style="color: #d1d5db; font-size: 0.9rem;">The standard 0-10 eNPS question will automatically be added to this survey to calculate your score.</div>
                 </div>
 
                 <h4>Custom Questions</h4>
                 <div id="customQuestionsList"></div>
-                <button class="btn btn-secondary" onclick="addQuestionField()" style="width: 100%; margin-top: 12px;"><i class="fa-solid fa-plus"></i> Add Text Question</button>
+                <button class="btn btn-secondary" onclick="addQuestionField()" style="width: 100%; margin-top: 12px;"><i data-lucide="plus"></i> Add Text Question</button>
             </div>
             <div class="modal-footer">
                 <button class="btn btn-secondary" onclick="closeBuilderModal()">Cancel</button>
@@ -134,13 +134,13 @@ $isAdmin = hasPermission('surveys.manage');
         <div class="modal-content" style="width: 700px;">
             <div class="modal-header">
                 <h3 id="takeTitle">Taking Survey</h3>
-                <button class="btn btn-secondary" style="padding: 4px 8px;" onclick="closeTakeModal()"><i class="fa-solid fa-times"></i></button>
+                <button class="btn btn-secondary" style="padding: 4px 8px;" onclick="closeTakeModal()"><i data-lucide="x"></i></button>
             </div>
             <div class="modal-body" id="takeBody" style="background: var(--bg-primary);">
                 <!-- Dynamic Questions -->
             </div>
             <div class="modal-footer">
-                <div style="flex-grow: 1; font-size: 0.85rem; color: var(--text-muted);"><i class="fa-solid fa-user-secret"></i> Your responses are 100% anonymous.</div>
+                <div style="flex-grow: 1; font-size: 0.85rem; color: var(--text-muted);"><i data-lucide="incognito"></i> Your responses are 100% anonymous.</div>
                 <button class="btn btn-secondary" onclick="closeTakeModal()">Cancel</button>
                 <button class="btn btn-primary" onclick="submitSurvey()">Submit Anonymous Answers</button>
             </div>
@@ -194,7 +194,7 @@ $isAdmin = hasPermission('surveys.manage');
                             `;
 
                             if (s.status === 'Draft') {
-                                html += `<button class="btn btn-primary" onclick="launchSurvey(${s.id})" style="width:100%;"><i class="fa-solid fa-rocket"></i> Launch to Company</button>`;
+                                html += `<button class="btn btn-primary" onclick="launchSurvey(${s.id})" style="width:100%;"><i data-lucide="rocket"></i> Launch to Company</button>`;
                             } else {
                                 html += `<button class="btn btn-secondary" disabled style="width:100%;">Live / Tracking</button>`;
                             }
@@ -206,9 +206,9 @@ $isAdmin = hasPermission('surveys.manage');
                             html += `<p class="survey-desc">${s.description || 'Please take a moment to fill out this pulse survey.'}</p>`;
                             
                             if (s.has_completed == 0) {
-                                html += `<button class="btn btn-primary" onclick="openTakeModal(${s.id})" style="width:100%;"><i class="fa-solid fa-pen-to-square"></i> Take Survey</button>`;
+                                html += `<button class="btn btn-primary" onclick="openTakeModal(${s.id})" style="width:100%;"><i data-lucide="edit"></i> Take Survey</button>`;
                             } else {
-                                html += `<button class="btn btn-secondary" disabled style="width:100%;"><i class="fa-solid fa-check"></i> Completed</button>`;
+                                html += `<button class="btn btn-secondary" disabled style="width:100%;"><i data-lucide="check"></i> Completed</button>`;
                             }
                         }
 
@@ -242,7 +242,7 @@ $isAdmin = hasPermission('surveys.manage');
                 html += `
                 <div style="display:flex; gap:8px; margin-bottom:8px;">
                     <input type="text" class="form-input" placeholder="Type your question..." value="${q.text}" onchange="customQuestions[${idx}].text = this.value">
-                    <button class="btn btn-secondary" onclick="customQuestions.splice(${idx}, 1); renderCustomQuestions();" style="padding: 0 12px;"><i class="fa-solid fa-trash"></i></button>
+                    <button class="btn btn-secondary" onclick="customQuestions.splice(${idx}, 1); renderCustomQuestions();" style="padding: 0 12px;"><i data-lucide="trash-2"></i></button>
                 </div>`;
             });
             document.getElementById('customQuestionsList').innerHTML = html;

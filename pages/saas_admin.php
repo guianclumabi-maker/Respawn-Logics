@@ -234,7 +234,7 @@ $current_page = 'saas_admin.php';
                             <td><?= number_format($t['foot_traffic_score']) ?> sessions</td>
                             <td>
                                 <a href="<?= url('/pages/impersonate.php?action=start&tenant_id=' . urlencode($t['id'])) ?>" style="display: inline-block; padding: 6px 12px; background: rgba(0, 224, 122, 0.1); color: #00e07a; border: 1px solid rgba(0, 224, 122, 0.2); text-decoration: none; border-radius: 4px; font-size: 11px; font-family: 'JetBrains Mono', monospace; font-weight: 600; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.background='#00e07a'; this.style.color='#111827';" onmouseout="this.style.background='rgba(0, 224, 122, 0.1)'; this.style.color='#00e07a';">
-                                    <i class="fa-solid fa-mask"></i> IMPERSONATE
+                                    <i data-lucide="venetian-mask"></i> IMPERSONATE
                                 </a>
                             </td>
                         </tr>

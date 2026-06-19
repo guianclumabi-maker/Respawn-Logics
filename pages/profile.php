@@ -211,7 +211,7 @@ if ($user) {
                     <div class="profile-tabs">
                         <button class="profile-tab-btn <?= $active_tab === 'details' ? 'active' : '' ?>" id="tabBtnDetails">Personal Info</button>
                         <button class="profile-tab-btn" id="tabBtnTimeline">Career Timeline</button>
-                        <button class="profile-tab-btn" id="tabBtnInsights" style="color: #f59e0b;"><i class="fa-solid fa-brain"></i> Career Insights</button>
+                        <button class="profile-tab-btn" id="tabBtnInsights" style="color: #f59e0b;"><i data-lucide="brain"></i> Career Insights</button>
                         <button class="profile-tab-btn" id="tabBtnPayslips">Payslips</button>
                         <button class="profile-tab-btn" id="tabBtnPerformance">Performance & Goals</button>
                         <button class="profile-tab-btn" id="tabBtnExpenses">Expenses & Claims</button>

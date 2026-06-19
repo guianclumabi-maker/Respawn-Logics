@@ -271,7 +271,7 @@ $current_page = 'saas_staff.php';
                         <div class="hq-subtitle">Manage internal SaaS operators and support agents</div>
                     </div>
                     <button class="btn-add" onclick="openModal()">
-                        <i class="fa-solid fa-user-plus"></i> Provision Staff
+                        <i data-lucide="user-plus"></i> Provision Staff
                     </button>
                 </div>
 
@@ -301,7 +301,7 @@ $current_page = 'saas_staff.php';
         <div class="modal-content">
             <div style="display: flex; justify-content: space-between; margin-bottom: 20px;">
                 <h2 style="font-family: 'Space Grotesk'; margin: 0;">Provision Internal Staff</h2>
-                <button onclick="closeModal()" style="background: none; border: none; cursor: pointer; color: #6b7280;"><i class="fa-solid fa-xmark fa-xl"></i></button>
+                <button onclick="closeModal()" style="background: none; border: none; cursor: pointer; color: #6b7280;"><i data-lucide="x"></i></button>
             </div>
             
             <form id="provisionForm">
@@ -361,7 +361,7 @@ $current_page = 'saas_staff.php';
                             <td>
                                 ${(s.id != currentUserId && s.id != 901) ? `
                                 <button onclick="deleteStaff(${s.id})" style="background: none; border: none; color: #ef4444; cursor: pointer;" title="Revoke Access">
-                                    <i class="fa-solid fa-trash"></i>
+                                    <i data-lucide="trash-2"></i>
                                 </button>
                                 ` : '<span style="color: #9ca3af; font-size: 0.8125rem;">Protected</span>'}
                             </td>

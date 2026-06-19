@@ -17,7 +17,7 @@ function renderLogo($variant = 'centered') {
     } elseif ($variant === 'sidebar') {
         $html .= '
         <div style="width: 32px; height: 32px; background: linear-gradient(135deg, #00e07a, #00b8ff); border-radius: 7px; display: flex; align-items: center; justify-content: center; color: #000; font-size: 16px; margin-right: 12px;">
-            <i class="fa-solid fa-gamepad"></i>
+            <i data-lucide="gamepad-2"></i>
         </div>
         <div style="display: flex; align-items: center; gap: 8px;">
             <span class="brand-text" style="font-family: \'JetBrains Mono\', monospace; font-weight: 700; color: var(--text-primary); text-transform: none; font-size: 15px; letter-spacing: -0.5px;">Respawn Logics</span>
@@ -27,7 +27,7 @@ function renderLogo($variant = 'centered') {
     } elseif ($variant === 'navbar') {
         $html .= '
         <a href="#" class="nav-logo">
-            <div class="logo-mark"><i class="fa-solid fa-gamepad"></i></div>
+            <div class="logo-mark"><i data-lucide="gamepad-2"></i></div>
             Respawn Logics
             <span class="version-pill">v2.0</span>
         </a>

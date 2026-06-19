@@ -295,22 +295,22 @@ try {
 
                 <div class="vendor-grid">
                     <div class="vendor-card">
-                        <div class="v-card-icon"><i class="fa-solid fa-server"></i></div>
+                        <div class="v-card-icon"><i data-lucide="server"></i></div>
                         <div class="v-card-label">// Active_Sandboxes</div>
                         <div class="v-card-value" id="active-sandboxes-val"><?= number_format($tenantCount) ?></div>
                     </div>
                     <div class="vendor-card">
-                        <div class="v-card-icon"><i class="fa-solid fa-users"></i></div>
+                        <div class="v-card-icon"><i data-lucide="users"></i></div>
                         <div class="v-card-label">// Global_Users</div>
                         <div class="v-card-value" id="global-users-val"><?= number_format($userCount) ?></div>
                     </div>
                     <div class="vendor-card">
-                        <div class="v-card-icon"><i class="fa-solid fa-money-bill-trend-up"></i></div>
+                        <div class="v-card-icon"><i data-lucide="money-bill-trend-up"></i></div>
                         <div class="v-card-label">// Platform_MRR</div>
                         <div class="v-card-value" id="platform-mrr-val">$<?= number_format($mockMRR) ?></div>
                     </div>
                     <div class="vendor-card" id="action-needed-card" style="border-color: <?= $breachedTickets > 0 ? 'rgba(239,68,68,0.5)' : 'rgba(255,255,255,0.05)' ?>;">
-                        <div class="v-card-icon" id="action-needed-icon" style="color: <?= $breachedTickets > 0 ? '#ef4444' : '#00e07a' ?>;"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                        <div class="v-card-icon" id="action-needed-icon" style="color: <?= $breachedTickets > 0 ? '#ef4444' : '#00e07a' ?>;"><i data-lucide="alert-triangle"></i></div>
                         <div class="v-card-label">// Action_Needed</div>
                         <div class="v-card-value" id="action-needed-val">
                             <?= $openTickets ?> <span style="font-size:14px; color:#5e6a82; font-weight:500;">(<?= $breachedTickets ?> Breached)</span>

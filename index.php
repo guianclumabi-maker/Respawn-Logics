@@ -11,7 +11,12 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
     <title>Respawn Logics — HR That Levels Up Your Team</title>
     <meta name="description" content="Respawn Logics is the enterprise HR platform built for companies that think differently. Payroll, ATS, performance, and more — all in one respawn point.">
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://unpkg.com/lucide@latest" defer></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            lucide.createIcons();
+        });
+    </script>
     <link rel="icon" type="image/svg+xml" href="<?= url('/assets/favicon.svg') ?>">
     <style>
         :root {
@@ -1175,14 +1180,14 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
     <div class="hero-actions">
         <?php if ($loggedIn): ?>
             <a href="<?= url('/pages/dashboard.php') ?>" class="btn-primary">
-                <i class="fa-solid fa-play"></i> Resume Session
+                <i data-lucide="play"></i> Resume Session
             </a>
         <?php else: ?>
             <a href="<?= url('/onboarding/') ?>" class="btn-primary">
-                <i class="fa-solid fa-play"></i> Initialize Setup
+                <i data-lucide="play"></i> Initialize Setup
             </a>
             <a href="<?= url('/login.php') ?>" class="btn-ghost">
-                <i class="fa-solid fa-floppy-disk"></i> Continue Save File
+                <i data-lucide="save"></i> Continue Save File
             </a>
         <?php endif; ?>
     </div>
@@ -1218,14 +1223,14 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
         <p class="sub">Forget the messy spreadsheets and clunky onboarding forms. We treat your employees like players logging into a AAA MMO. From their very first tutorial (onboarding) to their end-game progression (performance reviews), everything is tracked, rewarded, and managed in one seamless ecosystem.</p>
         
         <div class="journey-flow">
-            <div class="journey-node"><i class="fa-solid fa-crosshairs"></i> Recruit</div> <i class="fa-solid fa-chevron-right journey-arrow"></i>
-            <div class="journey-node"><i class="fa-solid fa-handshake"></i> Hire</div> <i class="fa-solid fa-chevron-right journey-arrow"></i>
-            <div class="journey-node"><i class="fa-solid fa-bolt"></i> Onboard</div> <i class="fa-solid fa-chevron-right journey-arrow"></i>
-            <div class="journey-node"><i class="fa-solid fa-briefcase"></i> Work</div> <i class="fa-solid fa-chevron-right journey-arrow"></i>
-            <div class="journey-node"><i class="fa-solid fa-coins"></i> Pay</div> <i class="fa-solid fa-chevron-right journey-arrow"></i>
-            <div class="journey-node"><i class="fa-solid fa-ranking-star"></i> Develop</div> <i class="fa-solid fa-chevron-right journey-arrow"></i>
-            <div class="journey-node"><i class="fa-solid fa-shield-heart"></i> Support</div> <i class="fa-solid fa-chevron-right journey-arrow"></i>
-            <div class="journey-node" style="background: rgba(155,109,255,0.1); border-color: var(--purple); color: var(--purple);"><i class="fa-solid fa-level-up-alt"></i> Grow</div>
+            <div class="journey-node"><i data-lucide="crosshair"></i> Recruit</div> <i data-lucide="chevron-right" class="journey-arrow"></i>
+            <div class="journey-node"><i data-lucide="handshake"></i> Hire</div> <i data-lucide="chevron-right" class="journey-arrow"></i>
+            <div class="journey-node"><i data-lucide="zap"></i> Onboard</div> <i data-lucide="chevron-right" class="journey-arrow"></i>
+            <div class="journey-node"><i data-lucide="briefcase"></i> Work</div> <i data-lucide="chevron-right" class="journey-arrow"></i>
+            <div class="journey-node"><i data-lucide="coins"></i> Pay</div> <i data-lucide="chevron-right" class="journey-arrow"></i>
+            <div class="journey-node"><i data-lucide="star"></i> Develop</div> <i data-lucide="chevron-right" class="journey-arrow"></i>
+            <div class="journey-node"><i data-lucide="shield-alert"></i> Support</div> <i data-lucide="chevron-right" class="journey-arrow"></i>
+            <div class="journey-node" style="background: rgba(155,109,255,0.1); border-color: var(--purple); color: var(--purple);"><i data-lucide="corner-right-up"></i> Grow</div>
         </div>
     </div>
 </section>
@@ -1237,12 +1242,12 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
         <p class="sub">Are you still tracking PTO in an Excel sheet, approving payroll via email chains, and storing performance reviews in a dusty Google Drive? That's the equivalent of playing on dial-up. It's time to wipe the board clean.</p>
         
         <div class="problems-grid">
-            <div class="problem-card"><i class="fa-solid fa-skull"></i> Spreadsheets</div>
-            <div class="problem-card"><i class="fa-solid fa-hourglass-half"></i> Manual Tracking</div>
-            <div class="problem-card"><i class="fa-solid fa-envelope-circle-xmark"></i> Email Approvals</div>
-            <div class="problem-card"><i class="fa-solid fa-triangle-exclamation"></i> Payroll Rework</div>
-            <div class="problem-card"><i class="fa-solid fa-ghost"></i> Scattered Documents</div>
-            <div class="problem-card"><i class="fa-solid fa-plug-circle-xmark"></i> Disconnected Records</div>
+            <div class="problem-card"><i data-lucide="skull"></i> Spreadsheets</div>
+            <div class="problem-card"><i data-lucide="hourglass"></i> Manual Tracking</div>
+            <div class="problem-card"><i data-lucide="mail-x"></i> Email Approvals</div>
+            <div class="problem-card"><i data-lucide="alert-triangle"></i> Payroll Rework</div>
+            <div class="problem-card"><i data-lucide="ghost"></i> Scattered Documents</div>
+            <div class="problem-card"><i data-lucide="unplug"></i> Disconnected Records</div>
         </div>
 
         <div class="solution-block">
@@ -1259,7 +1264,7 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
 
         <div class="pillars-grid">
             <div class="pillar-card">
-                <h3><i class="fa-solid fa-users-viewfinder"></i> Workforce</h3>
+                <h3><i data-lucide="users"></i> Workforce</h3>
                 <ul>
                     <li>Attendance</li>
                     <li>Leave Management</li>
@@ -1268,7 +1273,7 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
                 </ul>
             </div>
             <div class="pillar-card">
-                <h3><i class="fa-solid fa-coins"></i> Pay & Benefits</h3>
+                <h3><i data-lucide="coins"></i> Pay & Benefits</h3>
                 <ul>
                     <li>Enterprise Payroll</li>
                     <li>Government Contributions</li>
@@ -1277,7 +1282,7 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
                 </ul>
             </div>
             <div class="pillar-card">
-                <h3><i class="fa-solid fa-star"></i> Talent & Growth</h3>
+                <h3><i data-lucide="star"></i> Talent & Growth</h3>
                 <ul>
                     <li>Recruitment / ATS</li>
                     <li>Automated Onboarding</li>
@@ -1286,7 +1291,7 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
                 </ul>
             </div>
             <div class="pillar-card">
-                <h3><i class="fa-solid fa-headset"></i> Employee Support</h3>
+                <h3><i data-lucide="headphones"></i> Employee Support</h3>
                 <ul>
                     <li>Employee Relations</li>
                     <li>Knowledge Base</li>
@@ -1306,22 +1311,22 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
 
         <div class="why-grid">
             <div class="why-card">
-                <i class="fa-solid fa-gamepad"></i>
+                <i data-lucide="gamepad-2"></i>
                 <h3>One Platform</h3>
                 <p>Manage employee data, payroll, performance, and employee support from a unified system without messy integrations.</p>
             </div>
             <div class="why-card">
-                <i class="fa-solid fa-microchip"></i>
+                <i data-lucide="cpu"></i>
                 <h3>Configurable Workflows</h3>
                 <p>Adapt processes to your organization's needs. Build approval chains, document requirements, and custom fields.</p>
             </div>
             <div class="why-card">
-                <i class="fa-solid fa-bolt"></i>
+                <i data-lucide="zap"></i>
                 <h3>Employee Self-Service</h3>
                 <p>Give employees access to the information and tools they need to request leave, check payslips, and log attendance.</p>
             </div>
             <div class="why-card">
-                <i class="fa-solid fa-book-journal-whills"></i>
+                <i data-lucide="book"></i>
                 <h3>Knowledge-Driven</h3>
                 <p>Policies, procedures, and guidance available when your teams need them. Integrated directly into the support flow.</p>
             </div>
@@ -1368,13 +1373,13 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
         <p style="color: var(--text-mid); font-size: 1.125rem; max-width: 600px; margin: 0 auto;">Equip your HR team with the ultimate loadout. No more juggling ten different tabs just to onboard a single employee or process payroll.</p>
         
         <div class="gaming-flow">
-            <div class="gaming-step"><i class="fa-solid fa-location-dot"></i> Spawn Point</div>
-            <i class="fa-solid fa-chevron-right gaming-divider"></i>
-            <div class="gaming-step"><i class="fa-solid fa-users"></i> Build Your Team</div>
-            <i class="fa-solid fa-chevron-right gaming-divider"></i>
-            <div class="gaming-step"><i class="fa-solid fa-arrow-trend-up"></i> Level Up Performance</div>
-            <i class="fa-solid fa-chevron-right gaming-divider"></i>
-            <div class="gaming-step"><i class="fa-solid fa-shield-heart"></i> Support Your People</div>
+            <div class="gaming-step"><i data-lucide="map-pin"></i> Spawn Point</div>
+            <i data-lucide="chevron-right" class="gaming-divider"></i>
+            <div class="gaming-step"><i data-lucide="users"></i> Build Your Team</div>
+            <i data-lucide="chevron-right" class="gaming-divider"></i>
+            <div class="gaming-step"><i data-lucide="trending-up"></i> Level Up Performance</div>
+            <i data-lucide="chevron-right" class="gaming-divider"></i>
+            <div class="gaming-step"><i data-lucide="shield-alert"></i> Support Your People</div>
         </div>
     </div>
 </section>
@@ -1434,15 +1439,15 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
         
         <!-- SOLO PLAN -->
         <div class="beta-card" style="grid-template-columns: 1fr; gap: 24px; padding: 60px; position: relative;">
-            <div class="beta-label" style="background: rgba(0, 224, 122, 0.07); color: var(--green); border-color: rgba(0, 224, 122, 0.2);"><i class="fa-solid fa-user-astronaut"></i> SOLO FOUNDER</div>
+            <div class="beta-label" style="background: rgba(0, 224, 122, 0.07); color: var(--green); border-color: rgba(0, 224, 122, 0.2);"><i data-lucide="user"></i> SOLO FOUNDER</div>
             <h2 class="beta-h" style="font-size: 2rem;">Build your empire.</h2>
             <p class="beta-p" style="max-width: 100%; margin-bottom: 24px;">Perfect for solo developers, indie hackers, and single-member startups who need an enterprise-grade HRIS to start right.</p>
             
             <div class="perks" style="grid-template-columns: 1fr; margin-bottom: 32px; gap: 12px;">
-                <div class="perk"><i class="fa-solid fa-circle-check"></i> 1 Sandbox Environment</div>
-                <div class="perk"><i class="fa-solid fa-circle-check"></i> 1 Administrator Seat</div>
-                <div class="perk"><i class="fa-solid fa-circle-check"></i> All Core Modules included</div>
-                <div class="perk"><i class="fa-solid fa-circle-check"></i> Community Support</div>
+                <div class="perk"><i data-lucide="check-circle"></i> 1 Sandbox Environment</div>
+                <div class="perk"><i data-lucide="check-circle"></i> 1 Administrator Seat</div>
+                <div class="perk"><i data-lucide="check-circle"></i> All Core Modules included</div>
+                <div class="perk"><i data-lucide="check-circle"></i> Community Support</div>
             </div>
             
             <div class="price-panel" style="text-align: left; margin-top: auto;">
@@ -1450,11 +1455,11 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
                 <div class="price-tag">FOREVER FREE</div>
                 <?php if ($loggedIn): ?>
                     <a href="<?= url('/pages/dashboard.php') ?>" class="btn-primary" style="width:100%; justify-content:center;">
-                        <i class="fa-solid fa-play"></i> Go to Dashboard
+                        <i data-lucide="play"></i> Go to Dashboard
                     </a>
                 <?php else: ?>
                     <a href="<?= url('/register.php') ?>" class="btn-primary" style="width:100%; justify-content:center;">
-                        <i class="fa-solid fa-rocket"></i> Create Solo Workspace
+                        <i data-lucide="rocket"></i> Create Solo Workspace
                     </a>
                     <a href="<?= url('/login.php') ?>" class="btn-ghost" style="width:100%; justify-content:center; margin-top: 10px;">
                         Sign In
@@ -1465,15 +1470,15 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
 
         <!-- ENTERPRISE BETA PLAN -->
         <div class="beta-card" style="grid-template-columns: 1fr; gap: 24px; padding: 60px; position: relative;">
-            <div class="beta-label"><i class="fa-solid fa-flask"></i> PRIVATE BETA — LIMITED SLOTS</div>
+            <div class="beta-label"><i data-lucide="flask-conical"></i> PRIVATE BETA — LIMITED SLOTS</div>
             <h2 class="beta-h" style="font-size: 2rem;">Join before we<br>go public.</h2>
             <p class="beta-p" style="max-width: 100%; margin-bottom: 24px;">We're onboarding select enterprise partners. Every feature completely free while we battle-test the platform together.</p>
             
             <div class="perks" style="grid-template-columns: 1fr; margin-bottom: 32px; gap: 12px;">
-                <div class="perk"><i class="fa-solid fa-circle-check"></i> Unlimited employee seats</div>
-                <div class="perk"><i class="fa-solid fa-circle-check"></i> Batch structure onboarding</div>
-                <div class="perk"><i class="fa-solid fa-circle-check"></i> Direct line to the dev team</div>
-                <div class="perk"><i class="fa-solid fa-circle-check"></i> Priority onboarding support</div>
+                <div class="perk"><i data-lucide="check-circle"></i> Unlimited employee seats</div>
+                <div class="perk"><i data-lucide="check-circle"></i> Batch structure onboarding</div>
+                <div class="perk"><i data-lucide="check-circle"></i> Direct line to the dev team</div>
+                <div class="perk"><i data-lucide="check-circle"></i> Priority onboarding support</div>
             </div>
             
             <div class="price-panel" style="text-align: left; margin-top: auto;">
@@ -1481,11 +1486,11 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
                 <div class="price-tag">DURING BETA PERIOD</div>
                 <?php if ($loggedIn): ?>
                     <a href="<?= url('/pages/dashboard.php') ?>" class="btn-primary" style="width:100%; justify-content:center;">
-                        <i class="fa-solid fa-play"></i> Go to Dashboard
+                        <i data-lucide="play"></i> Go to Dashboard
                     </a>
                 <?php else: ?>
                     <a href="<?= url('/onboarding/') ?>" class="btn-primary" style="width:100%; justify-content:center;">
-                        <i class="fa-solid fa-building"></i> Claim Enterprise Slot
+                        <i data-lucide="building"></i> Claim Enterprise Slot
                     </a>
                     <a href="<?= url('/login.php') ?>" class="btn-ghost" style="width:100%; justify-content:center; margin-top: 10px;">
                         Sign In
@@ -1504,9 +1509,9 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
             © <?= date('Y') ?> Respawn Logics Inc. &nbsp;·&nbsp; Built in the Philippines <img src="https://flagcdn.com/ph.svg" width="16" alt="PH" style="vertical-align: middle; margin-left: 2px; margin-top: -2px; border-radius: 2px;">
         </div>
         <div class="footer-socials">
-            <a href="#"><i class="fa-brands fa-linkedin"></i></a>
-            <a href="#"><i class="fa-brands fa-twitter"></i></a>
-            <a href="#"><i class="fa-brands fa-github"></i></a>
+            <a href="#"><i data-lucide="linkedin"></i></a>
+            <a href="#"><i data-lucide="twitter"></i></a>
+            <a href="#"><i data-lucide="github"></i></a>
         </div>
     </div>
 </footer>

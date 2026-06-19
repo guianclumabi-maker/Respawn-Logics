@@ -104,16 +104,16 @@ $current_page = 'audit_logs.php';
                         <h1>System Audit Trail</h1>
                         <p>Immutable ledger of all critical system events and user actions.</p>
                     </div>
-                    <button class="btn btn-secondary" onclick="fetchLogs()"><i class="fa-solid fa-rotate-right"></i> Refresh Logs</button>
+                    <button class="btn btn-secondary" onclick="fetchLogs()"><i data-lucide="rotate-cw"></i> Refresh Logs</button>
                 </div>
 
                 <div class="filter-bar">
                     <div class="filter-group">
-                        <i class="fa-solid fa-search"></i>
+                        <i data-lucide="search"></i>
                         <input type="text" id="searchInput" class="filter-input" placeholder="Search by name, email, or payload details..." oninput="debounceSearch()">
                     </div>
                     <div class="filter-group" style="flex: 0.5;">
-                        <i class="fa-solid fa-filter"></i>
+                        <i data-lucide="filter"></i>
                         <select id="actionFilter" class="filter-select" onchange="resetPageAndFetch()">
                             <option value="">All Actions</option>
                             <!-- Injected dynamically -->
@@ -191,7 +191,7 @@ $current_page = 'audit_logs.php';
             const search = document.getElementById('searchInput').value;
             const action = document.getElementById('actionFilter').value;
             
-            document.getElementById('logsBody').innerHTML = `<tr><td colspan="4" style="text-align:center; padding: 40px; color:var(--text-muted);"><i class="fa-solid fa-spinner fa-spin"></i> Fetching records...</td></tr>`;
+            document.getElementById('logsBody').innerHTML = `<tr><td colspan="4" style="text-align:center; padding: 40px; color:var(--text-muted);"><i data-lucide="loader-2" class="lucide-spin"></i> Fetching records...</td></tr>`;
 
             try {
                 const url = `<?= url('/api/index.php?route=audit&action=fetch_logs') ?>&page=${currentPage}&limit=${limit}&search=${encodeURIComponent(search)}&action_filter=${encodeURIComponent(action)}`;

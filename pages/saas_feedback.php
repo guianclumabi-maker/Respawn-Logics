@@ -223,7 +223,7 @@ foreach ($feedbacks as $fb) {
                                 <div class="fc-score">
                                     <?php for($i=1; $i<=5; $i++): ?>
                                         <?php if ($i <= $fb['csat_score']): ?>
-                                            <i class="fa-solid fa-star"></i>
+                                            <i data-lucide="star"></i>
                                         <?php else: ?>
                                             <i class="fa-regular fa-star" style="color: rgba(245, 158, 11, 0.3);"></i>
                                         <?php endif; ?>
@@ -261,7 +261,7 @@ foreach ($feedbacks as $fb) {
                                 </div>
                                 
                                 <div style="color: #6366f1; font-size: 0.85rem; font-weight: 500; margin-bottom: 12px; display: inline-block; background: rgba(99,102,241,0.1); padding: 4px 8px; border-radius: 4px;">
-                                    <i class="fa-solid fa-lightbulb"></i> Suggestion
+                                    <i data-lucide="lightbulb"></i> Suggestion
                                 </div>
 
                                 <?php if ($fb['csat_comment']): ?>

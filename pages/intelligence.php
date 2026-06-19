@@ -183,7 +183,7 @@ $current_page = 'intelligence.php';
                         highRisks.forEach(r => {
                             let factorsHTML = '';
                             r.factors.forEach(f => {
-                                factorsHTML += `<li class="zone-${r.zone}"><i class="fa-solid fa-circle-exclamation"></i> ${f}</li>`;
+                                factorsHTML += `<li class="zone-${r.zone}"><i data-lucide="alert-circle"></i> ${f}</li>`;
                             });
 
                             const initials = r.full_name.split(' ').map(n=>n[0]).join('').substring(0,2).toUpperCase();

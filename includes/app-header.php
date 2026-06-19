@@ -144,7 +144,7 @@ if ($user) {
         <span><strong>IMPERSONATION MODE:</strong> You are currently viewing the system as a client Super Admin.</span>
     </div>
     <a href="<?= url('/pages/impersonate.php?action=stop') ?>">
-        <i class="fa-solid fa-right-from-bracket"></i> Return to SaaS Control Center
+        <i data-lucide="log-out"></i> Return to SaaS Control Center
     </a>
 </div>
 <?php endif; ?>

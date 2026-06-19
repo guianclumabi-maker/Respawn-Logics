@@ -108,19 +108,19 @@ $current_page = 'scheduling.php';
                         <p>Manage your weekly team roster and automate shift notifications.</p>
                     </div>
                     <div style="display: flex; gap: 12px;">
-                        <button class="btn btn-secondary" onclick="openShiftModal()"><i class="fa-solid fa-gear"></i> Manage Shift Types</button>
-                        <button class="btn btn-primary" onclick="publishSchedule()"><i class="fa-solid fa-paper-plane"></i> Publish Schedule</button>
+                        <button class="btn btn-secondary" onclick="openShiftModal()"><i data-lucide="settings"></i> Manage Shift Types</button>
+                        <button class="btn btn-primary" onclick="publishSchedule()"><i data-lucide="send"></i> Publish Schedule</button>
                     </div>
                 </div>
 
                 <div class="controls-bar">
                     <div class="week-selector">
-                        <button class="week-nav-btn" onclick="prevWeek()"><i class="fa-solid fa-chevron-left"></i></button>
+                        <button class="week-nav-btn" onclick="prevWeek()"><i data-lucide="chevron-left"></i></button>
                         <div class="week-label" id="weekLabel">Loading Week...</div>
-                        <button class="week-nav-btn" onclick="nextWeek()"><i class="fa-solid fa-chevron-right"></i></button>
+                        <button class="week-nav-btn" onclick="nextWeek()"><i data-lucide="chevron-right"></i></button>
                     </div>
                     <div style="color: var(--text-muted); font-size: 0.85rem;">
-                        <i class="fa-solid fa-circle-info"></i> Changes made here must be published to notify employees.
+                        <i data-lucide="info"></i> Changes made here must be published to notify employees.
                     </div>
                 </div>
 
@@ -146,7 +146,7 @@ $current_page = 'scheduling.php';
         <div class="modal-content">
             <div class="modal-header">
                 <h3>Manage Shift Types</h3>
-                <button class="btn btn-secondary" style="padding: 4px 8px;" onclick="closeShiftModal()"><i class="fa-solid fa-times"></i></button>
+                <button class="btn btn-secondary" style="padding: 4px 8px;" onclick="closeShiftModal()"><i data-lucide="x"></i></button>
             </div>
             <div class="modal-body">
                 <div id="existingShifts" style="margin-bottom: 24px; max-height: 150px; overflow-y: auto;"></div>

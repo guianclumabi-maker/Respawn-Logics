@@ -112,7 +112,7 @@ $can_post = hasPermission('announcements.manage');
                             </div>
                             
                             <div class="image-preview-container" id="previewContainer">
-                                <div class="remove-image" onclick="removeImage()"><i class="fa-solid fa-times"></i></div>
+                                <div class="remove-image" onclick="removeImage()"><i data-lucide="x"></i></div>
                                 <img id="imagePreview" class="image-preview" src="">
                             </div>
 
@@ -121,7 +121,7 @@ $can_post = hasPermission('announcements.manage');
                                     <i class="fa-solid fa-image" style="color: #00e07a;"></i> Attach Image
                                     <input type="file" id="postImage" accept="image/*" style="display: none;" onchange="previewFile()">
                                 </label>
-                                <button type="button" class="btn btn-primary" onclick="submitPost()" id="submitBtn"><i class="fa-solid fa-paper-plane"></i> Post Announcement</button>
+                                <button type="button" class="btn btn-primary" onclick="submitPost()" id="submitBtn"><i data-lucide="send"></i> Post Announcement</button>
                             </div>
                         </form>
                     </div>
@@ -250,7 +250,7 @@ $can_post = hasPermission('announcements.manage');
             }
 
             btn.disabled = true;
-            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Posting...';
+            btn.innerHTML = '<i data-lucide="loader-2" class="lucide-spin"></i> Posting...';
 
             const formData = new FormData();
             formData.append('caption', caption);
@@ -283,7 +283,7 @@ $can_post = hasPermission('announcements.manage');
                 alert('Failed to post announcement.');
             } finally {
                 btn.disabled = false;
-                btn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Post Announcement';
+                btn.innerHTML = '<i data-lucide="send"></i> Post Announcement';
             }
         }
 

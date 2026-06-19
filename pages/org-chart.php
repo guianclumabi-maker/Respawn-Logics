@@ -290,20 +290,20 @@ function getInitials($fullName) {
                         <!-- Teams Interactive Command Icon Actions -->
                         <div class="active-card-actions">
                             <a href="mailto:<?= htmlspecialchars($selected_emp['email']) ?>" class="action-icon-btn" title="Send Email">
-                                <i class="fa-solid fa-envelope"></i>
+                                <i data-lucide="mail"></i>
                             </a>
                             <button type="button" class="action-icon-btn" title="Send Message" onclick="alert('Starting mock chat with <?= htmlspecialchars(addslashes($selected_emp['full_name'])) ?>...')">
-                                <i class="fa-solid fa-comment"></i>
+                                <i data-lucide="message-square"></i>
                             </button>
                             <button type="button" class="action-icon-btn" title="Phone Call" onclick="alert('Calling phone of <?= htmlspecialchars(addslashes($selected_emp['full_name'])) ?>...')">
-                                <i class="fa-solid fa-phone"></i>
+                                <i data-lucide="phone"></i>
                             </button>
                             <button type="button" class="action-icon-btn" title="Video Meeting" onclick="alert('Starting mock video session with <?= htmlspecialchars(addslashes($selected_emp['full_name'])) ?>...')">
-                                <i class="fa-solid fa-video"></i>
+                                <i data-lucide="video"></i>
                             </button>
                             <?php if (strtolower($user['role'] ?? '') === 'admin' || strtolower($user['role'] ?? '') === 'hr'): ?>
                                 <button type="button" class="action-icon-btn" title="Edit Structure" style="color: #00e07a; border-color: rgba(0, 224, 122, 0.4);" onclick="document.getElementById('reassignModal').classList.add('active')">
-                                    <i class="fa-solid fa-pen-to-square"></i>
+                                    <i data-lucide="edit"></i>
                                 </button>
                             <?php endif; ?>
                         </div>

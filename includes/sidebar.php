@@ -25,7 +25,7 @@ if ($user) {
 <div class="app-sidebar">
     <div class="sidebar-brand">
         <div class="brand-logo-gamepad">
-            <i class="fa-solid fa-gamepad"></i>
+            <i data-lucide="gamepad-2"></i>
         </div>
         <span class="brand-text">Respawn Logics <span style="font-size: 0.65em; color: var(--accent-green); vertical-align: super; font-weight: 800;">v.2</span></span>
     </div>
@@ -35,86 +35,86 @@ if ($user) {
             <div class="group-title">Workspace</div>
             
             <a href="<?= url('/pages/dashboard.php') ?>" class="menu-item <?= $current_page === 'dashboard.php' ? 'active' : '' ?>">
-                <i class="fa-solid fa-table-cells-large"></i>
+                <i data-lucide="layout-grid"></i>
                 <span>Dashboard</span>
             </a>
 
             <?php if (tenantModuleEnabled('announcements')): ?>
             <a href="<?= url('/pages/announcements.php') ?>" class="menu-item <?= $current_page === 'announcements.php' ? 'active' : '' ?>">
-                <i class="fa-solid fa-bullhorn"></i>
+                <i data-lucide="megaphone"></i>
                 <span>Company Feed</span>
             </a>
             <?php endif; ?>
 
             <?php if (tenantModuleEnabled('surveys')): ?>
             <a href="<?= url('/pages/surveys.php') ?>" class="menu-item <?= $current_page === 'surveys.php' ? 'active' : '' ?>">
-                <i class="fa-solid fa-chart-simple"></i>
+                <i data-lucide="bar-chart-2"></i>
                 <span>Engagement Surveys</span>
             </a>
             <?php endif; ?>
 
             <a href="<?= url('/pages/ai_companion.php') ?>" class="menu-item <?= $current_page === 'ai_companion.php' ? 'active' : '' ?>">
-                <i class="fa-solid fa-wand-magic-sparkles"></i>
+                <i data-lucide="sparkles"></i>
                 <span>AI Companion</span>
             </a>
             
             <?php if (hasPermission('attendance.view') && tenantModuleEnabled('attendance')): ?>
             <a href="<?= url('/pages/attendance.php') ?>" class="menu-item <?= $current_page === 'attendance.php' ? 'active' : '' ?>">
-                <i class="fa-solid fa-clock"></i>
+                <i data-lucide="clock"></i>
                 <span>Attendance Tracking</span>
             </a>
             <?php endif; // end attendance ?>
 
             <?php if (hasPermission('shifts.manage') && tenantModuleEnabled('shifts')): ?>
             <a href="<?= url('/pages/scheduling.php') ?>" class="menu-item <?= $current_page === 'scheduling.php' ? 'active' : '' ?>">
-                <i class="fa-solid fa-calendar-days"></i>
+                <i data-lucide="calendar"></i>
                 <span>Shift Scheduler</span>
             </a>
             <?php endif; // end shifts ?>
             
             <?php if ((hasPermission('leave.view') || hasPermission('leave.request')) && tenantModuleEnabled('leave')): ?>
             <a href="<?= url('/pages/leaves.php') ?>" class="menu-item <?= $current_page === 'leaves.php' ? 'active' : '' ?>">
-                <i class="fa-solid fa-calendar-check"></i>
+                <i data-lucide="calendar-check"></i>
                 <span>Leave Requests</span>
             </a>
             <?php endif; ?>
 
             <a href="<?= url('/pages/org-chart.php') ?>" class="menu-item <?= $current_page === 'org-chart.php' ? 'active' : '' ?>">
-                <i class="fa-solid fa-sitemap"></i>
+                <i data-lucide="network"></i>
                 <span>Org Chart Directory</span>
             </a>
 
             <?php if (hasPermission('users.manage') && tenantModuleEnabled('onboarding')): ?>
             <a href="<?= url('/pages/onboarding_admin.php') ?>" class="menu-item <?= $current_page === 'onboarding_admin.php' ? 'active' : '' ?>">
-                <i class="fa-solid fa-bolt-lightning"></i>
+                <i data-lucide="zap"></i>
                 <span>Onboarding</span>
             </a>
             <?php endif; ?>
 
             <?php if (hasPermission('assets.manage') && tenantModuleEnabled('assets')): ?>
             <a href="<?= url('/pages/assets.php') ?>" class="menu-item <?= $current_page === 'assets.php' ? 'active' : '' ?>">
-                <i class="fa-solid fa-laptop"></i>
+                <i data-lucide="laptop"></i>
                 <span>Asset Management</span>
             </a>
             <?php endif; ?>
 
             <?php if (hasPermission('intelligence.view') && tenantModuleEnabled('intelligence')): ?>
             <a href="<?= url('/pages/intelligence.php') ?>" class="menu-item <?= $current_page === 'intelligence.php' ? 'active' : '' ?>" style="color: #f59e0b;">
-                <i class="fa-solid fa-brain"></i>
+                <i data-lucide="brain"></i>
                 <span style="font-weight: 600;">Predictive AI</span>
             </a>
             <?php endif; ?>
             
             <?php if (hasPermission('ats.view') && tenantModuleEnabled('ats')): ?>
             <a href="<?= url('/frontend/dist/index.html#/ats') ?>" class="menu-item">
-                <i class="fa-solid fa-crosshairs"></i>
+                <i data-lucide="crosshair"></i>
                 <span>Recruitment / ATS</span>
             </a>
             <?php endif; ?>
             
             <?php if (tenantModuleEnabled('elr')): ?>
             <a href="<?= url('/pages/elr_portal.php') ?>" class="menu-item <?= $current_page === 'elr_portal.php' ? 'active' : '' ?>">
-                <i class="fa-solid fa-shield-halved"></i>
+                <i data-lucide="shield-half"></i>
                 <span>My HR Cases</span>
             </a>
             <?php endif; ?>
@@ -124,7 +124,7 @@ if ($user) {
             $esmLink = hasPermission('esm.manage') ? '/pages/esm_admin.php' : '/pages/esm_employee.php';
             ?>
             <a href="<?= url($esmLink) ?>" class="menu-item <?= ($current_page === 'esm_admin.php' || $current_page === 'esm_employee.php') ? 'active' : '' ?>">
-                <i class="fa-solid fa-headset"></i>
+                <i data-lucide="headphones"></i>
                 <span>IT/HR Service Desk</span>
             </a>
             <?php endif; ?>
@@ -136,91 +136,91 @@ if ($user) {
             
             <?php if (hasPermission('analytics.view') && tenantModuleEnabled('analytics')): ?>
             <a href="<?= url('/pages/analytics.php') ?>" class="menu-item <?= $current_page === 'analytics.php' ? 'active' : '' ?>">
-                <i class="fa-solid fa-chart-pie"></i>
+                <i data-lucide="pie-chart"></i>
                 <span>Workforce Analytics</span>
             </a>
             <?php endif; ?>
 
             <?php if (hasPermission('users.manage') || hasPermission('shifts.manage')): ?>
             <a href="<?= url('/pages/hr_directory.php') ?>" class="menu-item <?= $current_page === 'hr_directory.php' ? 'active' : '' ?>">
-                <i class="fa-solid fa-users"></i>
+                <i data-lucide="users"></i>
                 <span>Employee Directory</span>
             </a>
             <?php endif; ?>
 
             <?php if (hasPermission('payroll.manage') && tenantModuleEnabled('payroll')): ?>
             <a href="<?= url('/payroll-frontend/dist/index.html') ?>" class="menu-item">
-                <i class="fa-solid fa-peso-sign"></i>
+                <i data-lucide="philippine-peso"></i>
                 <span>Payroll Engine</span>
             </a>
             <?php endif; ?>
 
             <?php if (hasPermission('compensation.manage')): ?>
             <a href="<?= url('/pages/compensation_admin.php') ?>" class="menu-item <?= $current_page === 'compensation_admin.php' ? 'active' : '' ?>">
-                <i class="fa-solid fa-scale-balanced"></i>
+                <i data-lucide="scale"></i>
                 <span>Compensation &amp; Equity</span>
             </a>
             <?php endif; ?>
 
             <?php if (hasPermission('performance.manage') && tenantModuleEnabled('performance')): ?>
             <a href="<?= url('/pages/performance_admin.php') ?>" class="menu-item <?= $current_page === 'performance_admin.php' ? 'active' : '' ?>">
-                <i class="fa-solid fa-ranking-star"></i>
+                <i data-lucide="star"></i>
                 <span>Performance</span>
             </a>
             <?php endif; ?>
 
             <?php if (hasPermission('expenses.manage') && tenantModuleEnabled('expenses')): ?>
             <a href="<?= url('/pages/expenses_admin.php') ?>" class="menu-item <?= $current_page === 'expenses_admin.php' ? 'active' : '' ?>">
-                <i class="fa-solid fa-receipt"></i>
+                <i data-lucide="receipt"></i>
                 <span>Expenses &amp; Claims</span>
             </a>
             <?php endif; ?>
 
             <?php if (hasPermission('benefits.manage') && tenantModuleEnabled('benefits')): ?>
             <a href="<?= url('/pages/benefits_admin.php') ?>" class="menu-item <?= $current_page === 'benefits_admin.php' ? 'active' : '' ?>">
-                <i class="fa-solid fa-gift"></i>
+                <i data-lucide="gift"></i>
                 <span>Benefits &amp; HMO</span>
             </a>
             <?php endif; ?>
 
             <?php if (hasPermission('elr.view') && tenantModuleEnabled('elr')): ?>
             <a href="<?= url('/employee-relations-dist/dist/index.html') ?>" class="menu-item <?= $current_page === 'index.html' ? 'active' : '' ?>" style="color:#ef4444;">
-                <i class="fa-solid fa-gavel"></i>
+                <i data-lucide="gavel"></i>
                 <span style="font-weight:600;">ELR Admin Console</span>
             </a>
             <?php endif; ?>
 
             <?php if (hasPermission('users.view')): ?>
             <a href="<?= url('/pages/admin_users.php') ?>" class="menu-item <?= $current_page === 'admin_users.php' ? 'active' : '' ?>">
-                <i class="fa-solid fa-user-gear"></i>
+                <i data-lucide="user-cog"></i>
                 <span>Users</span>
             </a>
             <?php endif; ?>
             
             <?php if (hasPermission('users.manage')): ?>
             <a href="<?= url('/pages/admin_roles.php') ?>" class="menu-item <?= $current_page === 'admin_roles.php' ? 'active' : '' ?>">
-                <i class="fa-solid fa-shield-halved"></i>
+                <i data-lucide="shield-half"></i>
                 <span>Roles &amp; Permissions</span>
             </a>
             <?php endif; ?>
             
             <?php if (hasPermission('settings.manage')): ?>
             <a href="<?= url('/pages/tenant_settings.php') ?>" class="menu-item <?= $current_page === 'tenant_settings.php' ? 'active' : '' ?>">
-                <i class="fa-solid fa-gear"></i>
+                <i data-lucide="settings"></i>
                 <span>Tenant Settings</span>
             </a>
             <?php endif; ?>
             
             <?php if (hasPermission('settings.manage')): ?>
             <a href="<?= url('/pages/knowledge_admin.php') ?>" class="menu-item <?= $current_page === 'knowledge_admin.php' ? 'active' : '' ?>">
-                <i class="fa-solid fa-book-open"></i>
+                <i data-lucide="book-open"></i>
                 <span>Knowledge Base Review</span>
             </a>
             <?php endif; ?>
 
             <?php if (isset($user['tenant_id']) && $user['tenant_id'] !== null): ?>
             <a href="<?= url('/pages/admin_platform_support.php') ?>" class="menu-item <?= $current_page === 'admin_platform_support.php' ? 'active' : '' ?>" style="color:#00e07a;">
-                <i class="fa-solid fa-satellite-dish"></i>
+                <i data-lucide="satellite"></i>
                 <span style="font-weight:600;">Platform Support</span>
             </a>
             <?php endif; ?>
@@ -232,24 +232,24 @@ if ($user) {
             <div class="group-title">Vendor Universe</div>
             
             <a href="<?= url('/pages/saas_admin.php') ?>" class="menu-item <?= $current_page === 'saas_admin.php' ? 'active' : '' ?>">
-                <i class="fa-solid fa-earth-asia"></i>
+                <i data-lucide="globe"></i>
                 <span>SaaS Headquarters</span>
             </a>
             
             <?php if (hasRole('Platform_Admin')): ?>
             <a href="<?= url('/pages/saas_staff.php') ?>" class="menu-item <?= $current_page === 'saas_staff.php' ? 'active' : '' ?>">
-                <i class="fa-solid fa-id-badge"></i>
+                <i data-lucide="badge-info"></i>
                 <span>Vendor Staff</span>
             </a>
             <?php endif; ?>
 
             <a href="<?= url('/pages/saas_support.php') ?>" class="menu-item <?= $current_page === 'saas_support.php' ? 'active' : '' ?>">
-                <i class="fa-solid fa-inbox"></i>
+                <i data-lucide="inbox"></i>
                 <span>Global Support Inbox</span>
             </a>
 
             <a href="<?= url('/pages/saas_feedback.php') ?>" class="menu-item <?= $current_page === 'saas_feedback.php' ? 'active' : '' ?>">
-                <i class="fa-solid fa-star-half-stroke"></i>
+                <i data-lucide="star-half"></i>
                 <span>Feedback Corner</span>
             </a>
         </div>
@@ -259,7 +259,7 @@ if ($user) {
         <div class="menu-group">
             <div class="group-title">System</div>
             <a href="<?= url('/pages/audit_logs.php') ?>" class="menu-item <?= $current_page === 'audit_logs.php' ? 'active' : '' ?>">
-                <i class="fa-solid fa-scroll"></i>
+                <i data-lucide="scroll"></i>
                 <span>Audit Trail</span>
             </a>
         </div>
@@ -270,13 +270,13 @@ if ($user) {
             
             <?php if (isset($user['tenant_id']) && $user['tenant_id'] !== null): ?>
             <a href="#" onclick="openGlobalFeedbackModal(); return false;" class="menu-item">
-                <i class="fa-regular fa-comment-dots"></i>
+                <i data-lucide="message-circle"></i>
                 <span>Give us Feedback</span>
             </a>
             <?php endif; ?>
             
             <a href="<?= url('/pages/profile.php') ?>" class="menu-item <?= $current_page === 'profile.php' ? 'active' : '' ?>">
-                <i class="fa-solid fa-circle-user"></i>
+                <i data-lucide="user-circle"></i>
                 <span>My Profile</span>
             </a>
             
@@ -284,7 +284,7 @@ if ($user) {
                 <div class="gamified-bg-sweep"></div>
                 
                 <div class="gamified-content">
-                    <i class="fa-solid fa-gamepad gamified-icon"></i>
+                    <i data-lucide="gamepad-2" class="gamified-icon"></i>
                     <span class="gamified-text" id="gamified-theme-text">Night Ops</span>
                 </div>
 
