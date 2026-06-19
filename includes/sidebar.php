@@ -27,7 +27,7 @@ if ($user) {
         <div class="brand-logo-gamepad">
             <i class="fa-solid fa-gamepad"></i>
         </div>
-        <span class="brand-text">Respawn Logics</span>
+        <span class="brand-text">Respawn Logics <span style="font-size: 0.65em; color: var(--accent-green); vertical-align: super; font-weight: 800;">v.2</span></span>
     </div>
     
     <div class="sidebar-menu">
