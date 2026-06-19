@@ -13,9 +13,7 @@ $current_page = 'scheduling.php';
 <?php $page_title = 'Shift Scheduler - Respawn Logics'; ?>
 <?php include __DIR__ . '/../includes/head.php'; ?>
 
-    .global-glow-purple {
-            position: fixed; bottom: -150px; right: -100px; width: 600px; height: 600px; border-radius: 50%; background: #9b6dff; filter: blur(140px); opacity: 0.06; pointer-events: none; z-index: -1;
-        }
+    <style>
 
         .page-header {
             display: flex; justify-content: space-between; align-items: center;

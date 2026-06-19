@@ -14,9 +14,7 @@ $current_page = 'saas_staff.php';
 <?php $page_title = 'Vendor Staff - SaaS Control Center - Respawn Logic'; ?>
 <?php include __DIR__ . '/../includes/head.php'; ?>
 
-    .global-glow-purple {
-            position: fixed; bottom: -150px; right: -100px; width: 600px; height: 600px; border-radius: 50%; background: #9b6dff; filter: blur(140px); opacity: 0.06; pointer-events: none; z-index: -1;
-        }
+    <style>
 
         .staff-header {
             background: #0f1422;
