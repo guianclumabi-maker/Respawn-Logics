@@ -5,6 +5,7 @@ import { ATSDashboard } from "./components/ATSDashboard";
 import { JobsPage } from "./components/JobsPage";
 import { InsightsPage } from "./components/InsightsPage";
 import { AICompanion } from "./components/AICompanion";
+import { TasksPipeline } from "./components/TasksPipeline";
 
 export default function App() {
   const [activeView, setActiveView] = useState<"Dashboard" | "AICompanion" | "Cases" | "Incident Reports" | "Investigations" | "Tasks" | "Approvals" | "Daily Reports" | "Analytics" | "Case Types" | "Settings">("Dashboard");
@@ -34,6 +35,10 @@ export default function App() {
         <JobsPage onViewChange={setActiveView} />
       )}
       
+      {activeView === "Tasks" && (
+        <TasksPipeline onViewChange={setActiveView} />
+      )}
+
       {activeView === "Analytics" && (
         <InsightsPage onViewChange={setActiveView} />
       )}
