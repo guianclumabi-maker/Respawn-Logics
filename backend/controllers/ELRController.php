@@ -23,37 +23,41 @@ class ELRController
              $action = $input['action'] ?? $action;
         }
 
-        switch ($action) {
-            case 'cases':
-                $this->getCases();
-                break;
-            case 'case':
-                $this->getCase();
-                break;
-            case 'case_types':
-                $this->getCaseTypes();
-                break;
-            case 'analytics':
-                $this->getAnalytics();
-                break;
-            case 'create_case':
-                if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-                    $this->createCase($input);
-                } else {
-                    echo json_encode(['success' => false, 'error' => 'Invalid method']);
-                }
-                break;
-            case 'update_case':
-                if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-                    $this->updateCase($input);
-                } else {
-                    echo json_encode(['success' => false, 'error' => 'Invalid method']);
-                }
-                break;
-            default:
-                http_response_code(400);
-                echo json_encode(['success' => false, 'error' => 'Invalid action']);
-                break;
+        try {
+            switch ($action) {
+                case 'cases':
+                    $this->getCases();
+                    break;
+                case 'case':
+                    $this->getCase();
+                    break;
+                case 'case_types':
+                    $this->getCaseTypes();
+                    break;
+                case 'analytics':
+                    $this->getAnalytics();
+                    break;
+                case 'create_case':
+                    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+                        $this->createCase($input);
+                    } else {
+                        echo json_encode(['success' => false, 'error' => 'Invalid method']);
+                    }
+                    break;
+                case 'update_case':
+                    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+                        $this->updateCase($input);
+                    } else {
+                        echo json_encode(['success' => false, 'error' => 'Invalid method']);
+                    }
+                    break;
+                default:
+                    http_response_code(400);
+                    echo json_encode(['success' => false, 'error' => 'Invalid action']);
+                    break;
+            }
+        } catch (\Exception $e) {
+            echo json_encode(['success' => false, 'error' => 'Database error']);
         }
     }
 

@@ -33,70 +33,79 @@ class CandidatesController
             requirePermission('ats.edit');
         }
 
-        switch ($action) {
-            // GET
-            case 'dashboard': $this->dashboard(); break;
-            case 'jobs': $this->jobs(); break;
-            case 'job': $this->job(); break;
-            case 'candidates': $this->candidates(); break;
-            case 'candidate': $this->candidate(); break;
-            case 'interviews': $this->interviews(); break;
-            case 'analytics': $this->analytics(); break;
-            case 'talent_pools': $this->talentPools(); break;
-            case 'pool': $this->pool(); break;
-            case 'search': $this->search(); break;
-            case 'ai_match': $this->aiMatch(); break;
-            case 'ai_actions': $this->aiActions(); break;
-            case 'activities': $this->activities(); break;
-            case 'approvals': $this->approvals(); break;
-            case 'permissions': $this->permissions(); break;
-            case 'current_user': $this->currentUserAction(); break;
+        try {
+            switch ($action) {
+                // GET
+                case 'dashboard': $this->dashboard(); break;
+                case 'jobs': $this->jobs(); break;
+                case 'job': $this->job(); break;
+                case 'candidates': $this->candidates(); break;
+                case 'candidate': $this->candidate(); break;
+                case 'interviews': $this->interviews(); break;
+                case 'analytics': $this->analytics(); break;
+                case 'talent_pools': $this->talentPools(); break;
+                case 'pool': $this->pool(); break;
+                case 'search': $this->search(); break;
+                case 'ai_match': $this->aiMatch(); break;
+                case 'ai_actions': $this->aiActions(); break;
+                case 'activities': $this->activities(); break;
+                case 'approvals': $this->approvals(); break;
+                case 'permissions': $this->permissions(); break;
+                case 'current_user': $this->currentUserAction(); break;
 
-            // POST
-            case 'add_job': $this->addJob($input); break;
-            case 'update_job': $this->updateJob($input); break;
-            case 'duplicate_job': $this->duplicateJob($input); break;
-            case 'add_candidate': $this->addCandidate($input); break;
-            case 'update_candidate': $this->updateCandidate($input); break;
-            case 'add_application': $this->addApplication($input); break;
-            case 'update_stage': $this->updateStage($input); break;
-            case 'update_rating': $this->updateRating($input); break;
-            case 'bulk_advance': $this->bulkAdvance($input); break;
-            case 'bulk_reject': $this->bulkReject($input); break;
-            case 'bulk_delete': $this->bulkDelete($input); break;
-            case 'delete_candidate': $this->deleteCandidate($input); break;
-            case 'add_interview': $this->addInterview($input); break;
-            case 'update_interview': $this->updateInterview($input); break;
-            case 'add_scorecard': $this->addScorecard($input); break;
-            case 'add_note': $this->addNote($input); break;
-            case 'add_pool': $this->addPool($input); break;
-            case 'update_pool': $this->updatePool($input); break;
-            case 'add_to_pool': $this->addToPool($input); break;
-            case 'remove_from_pool': $this->removeFromPool($input); break;
-            case 'delete_pool': $this->deletePool($input); break;
-            case 'submit_approval': $this->submitApproval($input); break;
-            case 'resolve_approval': $this->resolveApproval($input); break;
-            case 'compute_ai_scores': $this->computeAiScores($input); break;
-            case 'add': $this->legacyAdd($input); break;
-            case 'delete': $this->legacyDelete($input); break;
+                // POST
+                case 'add_job': $this->addJob($input); break;
+                case 'update_job': $this->updateJob($input); break;
+                case 'duplicate_job': $this->duplicateJob($input); break;
+                case 'add_candidate': $this->addCandidate($input); break;
+                case 'update_candidate': $this->updateCandidate($input); break;
+                case 'add_application': $this->addApplication($input); break;
+                case 'update_stage': $this->updateStage($input); break;
+                case 'update_rating': $this->updateRating($input); break;
+                case 'bulk_advance': $this->bulkAdvance($input); break;
+                case 'bulk_reject': $this->bulkReject($input); break;
+                case 'bulk_delete': $this->bulkDelete($input); break;
+                case 'delete_candidate': $this->deleteCandidate($input); break;
+                case 'add_interview': $this->addInterview($input); break;
+                case 'update_interview': $this->updateInterview($input); break;
+                case 'add_scorecard': $this->addScorecard($input); break;
+                case 'add_note': $this->addNote($input); break;
+                case 'add_pool': $this->addPool($input); break;
+                case 'update_pool': $this->updatePool($input); break;
+                case 'add_to_pool': $this->addToPool($input); break;
+                case 'remove_from_pool': $this->removeFromPool($input); break;
+                case 'delete_pool': $this->deletePool($input); break;
+                case 'submit_approval': $this->submitApproval($input); break;
+                case 'resolve_approval': $this->resolveApproval($input); break;
+                case 'compute_ai_scores': $this->computeAiScores($input); break;
+                case 'add': $this->legacyAdd($input); break;
+                case 'delete': $this->legacyDelete($input); break;
 
-            default:
-                if ($action !== '') {
-                    http_response_code(400);
-                    echo json_encode(['success' => false, 'error' => 'Invalid action: ' . $action]);
-                    exit;
-                } else {
-                    $this->fallbackCandidates();
-                }
-                break;
+                default:
+                    if ($action !== '') {
+                        http_response_code(400);
+                        echo json_encode(['success' => false, 'error' => 'Invalid action: ' . $action]);
+                        exit;
+                    } else {
+                        $this->fallbackCandidates();
+                    }
+                    break;
+            }
+        } catch (\Exception $e) {
+            echo json_encode(['success' => false, 'error' => 'Database error']);
         }
     }
 
     // --- HELPERS ---
     private function logActivity($action, $description, $candidateId = null, $jobId = null, $applicationId = null, $actor = null) {
         $actor = $actor ?? ($this->currentUser['full_name'] ?? 'System');
-        $stmt = $this->pdo->prepare("INSERT INTO `activities` (`tenant_id`, `candidate_id`, `job_id`, `application_id`, `action`, `description`, `actor_name`) VALUES (?, ?, ?, ?, ?, ?, ?)");
-        $stmt->execute([$this->tenantId, $candidateId, $jobId, $applicationId, $action, $description, $actor]);
+        try {
+            $stmt = $this->pdo->prepare("INSERT INTO `activities` (`tenant_id`, `candidate_id`, `job_id`, `application_id`, `action`, `description`, `actor_name`) VALUES (?, ?, ?, ?, ?, ?, ?)");
+            $stmt->execute([$this->tenantId, $candidateId, $jobId, $applicationId, $action, $description, $actor]);
+        } catch (PDOException $e) {
+            // Ignore missing activities table error for now to prevent crashes
+            error_log("Failed to log activity: " . $e->getMessage());
+        }
     }
 
     private function computeAIMatchScore($candidateId, $jobId) {

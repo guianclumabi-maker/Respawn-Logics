@@ -17,8 +17,8 @@ if (!isLoggedIn()) {
     exit;
 }
 
-$route = $_GET['route'] ?? '';
-$action = $_GET['action'] ?? '';
+$route = isset($_GET['route']) ? $_GET['route'] : '';
+$action = isset($_GET['action']) ? $_GET['action'] : '';
 
 if (empty($route)) {
     http_response_code(400);

@@ -34,34 +34,38 @@ class ExpensesController
             }
         }
 
-        switch ($action) {
-            case 'categories':
-                $this->getCategories();
-                break;
+        try {
+            switch ($action) {
+                case 'categories':
+                    $this->getCategories();
+                    break;
 
-            case 'my_claims':
-                $this->getMyClaims();
-                break;
+                case 'my_claims':
+                    $this->getMyClaims();
+                    break;
 
-            case 'submit_claim':
-                $this->submitClaim($input);
-                break;
+                case 'submit_claim':
+                    $this->submitClaim($input);
+                    break;
 
-            case 'manager_pending':
-                $this->getManagerPending();
-                break;
+                case 'manager_pending':
+                    $this->getManagerPending();
+                    break;
 
-            case 'finance_pending':
-                $this->getFinancePending();
-                break;
+                case 'finance_pending':
+                    $this->getFinancePending();
+                    break;
 
-            case 'approve_claim':
-                $this->approveClaim($input);
-                break;
+                case 'approve_claim':
+                    $this->approveClaim($input);
+                    break;
 
-            default:
-                echo json_encode(['success' => false, 'error' => 'Unknown action']);
-                break;
+                default:
+                    echo json_encode(['success' => false, 'error' => 'Unknown action']);
+                    break;
+            }
+        } catch (\Exception $e) {
+            echo json_encode(['success' => false, 'error' => 'Database error']);
         }
     }
 

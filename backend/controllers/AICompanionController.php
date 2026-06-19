@@ -15,12 +15,16 @@ class AICompanionController
 
     public function handleRequest($action)
     {
-        $input = json_decode(file_get_contents('php://input'), true) ?? [];
+        try {
+            $input = json_decode(file_get_contents('php://input'), true) ?? [];
 
-        if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'chat') {
-            $this->chat($input);
-        } else {
-            echo json_encode(['success' => false, 'error' => 'Unknown action or invalid endpoint']);
+            if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'chat') {
+                $this->chat($input);
+            } else {
+                echo json_encode(['success' => false, 'error' => 'Unknown action or invalid endpoint']);
+            }
+        } catch (\Exception $e) {
+            echo json_encode(['success' => false, 'error' => 'Database error']);
         }
     }
 

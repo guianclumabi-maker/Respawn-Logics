@@ -35,6 +35,7 @@ export function CandidatesList({ onViewChange }: { onViewChange: (v: ViewState) 
       .then((d) => {
         if (d.success) setCandidates(d.candidates);
       })
+      .catch((err) => console.error("Error fetching candidates:", err))
       .finally(() => setLoading(false));
   }, [search, statusFilter]);
 

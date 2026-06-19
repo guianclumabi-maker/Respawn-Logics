@@ -21,22 +21,26 @@ class ShiftController
             return;
         }
 
-        switch ($action) {
-            case 'fetch_shift_types':
-                $this->fetchShiftTypes();
-                break;
-            case 'create_shift_type':
-                $this->createShiftType();
-                break;
-            case 'fetch_roster':
-                $this->fetchRoster();
-                break;
-            case 'publish_roster':
-                $this->publishRoster();
-                break;
-            default:
-                echo json_encode(['success' => false, 'error' => 'Unknown action']);
-                break;
+        try {
+            switch ($action) {
+                case 'fetch_shift_types':
+                    $this->fetchShiftTypes();
+                    break;
+                case 'create_shift_type':
+                    $this->createShiftType();
+                    break;
+                case 'fetch_roster':
+                    $this->fetchRoster();
+                    break;
+                case 'publish_roster':
+                    $this->publishRoster();
+                    break;
+                default:
+                    echo json_encode(['success' => false, 'error' => 'Unknown action']);
+                    break;
+            }
+        } catch (\Exception $e) {
+            echo json_encode(['success' => false, 'error' => 'Database error']);
         }
     }
 

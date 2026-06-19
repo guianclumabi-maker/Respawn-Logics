@@ -26,34 +26,38 @@ class BenefitsController
             $input = $_POST;
         }
 
-        switch ($action) {
-            case 'plans':
-                $this->plans();
-                break;
-            case 'my_benefits':
-                $this->myBenefits();
-                break;
-            case 'enroll':
-                $this->enroll($input);
-                break;
-            case 'my_statutory':
-                $this->myStatutory();
-                break;
-            case 'update_statutory':
-                $this->updateStatutory($input);
-                break;
-            case 'hr_plans':
-                $this->hrPlans();
-                break;
-            case 'hr_create_plan':
-                $this->hrCreatePlan($input);
-                break;
-            case 'hr_enrollments':
-                $this->hrEnrollments();
-                break;
-            default:
-                echo json_encode(['success' => false, 'error' => 'Unknown action']);
-                break;
+        try {
+            switch ($action) {
+                case 'plans':
+                    $this->plans();
+                    break;
+                case 'my_benefits':
+                    $this->myBenefits();
+                    break;
+                case 'enroll':
+                    $this->enroll($input);
+                    break;
+                case 'my_statutory':
+                    $this->myStatutory();
+                    break;
+                case 'update_statutory':
+                    $this->updateStatutory($input);
+                    break;
+                case 'hr_plans':
+                    $this->hrPlans();
+                    break;
+                case 'hr_create_plan':
+                    $this->hrCreatePlan($input);
+                    break;
+                case 'hr_enrollments':
+                    $this->hrEnrollments();
+                    break;
+                default:
+                    echo json_encode(['success' => false, 'error' => 'Unknown action']);
+                    break;
+            }
+        } catch (\Exception $e) {
+            echo json_encode(['success' => false, 'error' => 'Database error']);
         }
     }
 

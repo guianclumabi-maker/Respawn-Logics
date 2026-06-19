@@ -138,8 +138,12 @@ function App() {
   };
 
   const handleViewPayslip = async (id: string) => {
-    const details = await API.fetchPayslipDetails(id);
-    setSelectedPayslipDetails(details);
+    try {
+      const details = await API.fetchPayslipDetails(id);
+      setSelectedPayslipDetails(details);
+    } catch (err) {
+      console.error("Failed to fetch payslip details:", err);
+    }
   };
 
   const formatCurrency = (amount: number) => {

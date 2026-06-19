@@ -21,22 +21,26 @@ class AnalyticsController
             return;
         }
 
-        switch ($action) {
-            case 'headcount_by_dept':
-                $this->headcountByDept();
-                break;
-            case 'payroll_trend':
-                $this->payrollTrend();
-                break;
-            case 'talent_density':
-                $this->talentDensity();
-                break;
-            case 'attrition_risks':
-                $this->attritionRisks();
-                break;
-            default:
-                echo json_encode(['success' => false, 'error' => 'Unknown action']);
-                break;
+        try {
+            switch ($action) {
+                case 'headcount_by_dept':
+                    $this->headcountByDept();
+                    break;
+                case 'payroll_trend':
+                    $this->payrollTrend();
+                    break;
+                case 'talent_density':
+                    $this->talentDensity();
+                    break;
+                case 'attrition_risks':
+                    $this->attritionRisks();
+                    break;
+                default:
+                    echo json_encode(['success' => false, 'error' => 'Unknown action']);
+                    break;
+            }
+        } catch (\Exception $e) {
+            echo json_encode(['success' => false, 'error' => 'Database error']);
         }
     }
 

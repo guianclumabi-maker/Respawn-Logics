@@ -20,46 +20,50 @@ class EmployeeRelationsController
              $action = $input['action'] ?? $action;
         }
 
-        switch ($action) {
-            case 'dashboard':
-                $this->getDashboard();
-                break;
-            case 'add':
-                if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-                    $this->addCase($input);
-                } else {
-                    echo json_encode(['success' => false, 'error' => 'Invalid method']);
-                }
-                break;
-            case 'update_stage':
-                if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-                    $this->updateStage($input);
-                } else {
-                    echo json_encode(['success' => false, 'error' => 'Invalid method']);
-                }
-                break;
-            case 'update_rating':
-                if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-                    $this->updateRating($input);
-                } else {
-                    echo json_encode(['success' => false, 'error' => 'Invalid method']);
-                }
-                break;
-            case 'delete':
-                if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-                    $this->deleteCase($input);
-                } else {
-                    echo json_encode(['success' => false, 'error' => 'Invalid method']);
-                }
-                break;
-            default:
-                if ($_SERVER['REQUEST_METHOD'] === 'GET' && empty($action)) {
-                    $this->getAllCases();
-                } else {
-                    http_response_code(400);
-                    echo json_encode(['success' => false, 'error' => 'Invalid action']);
-                }
-                break;
+        try {
+            switch ($action) {
+                case 'dashboard':
+                    $this->getDashboard();
+                    break;
+                case 'add':
+                    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+                        $this->addCase($input);
+                    } else {
+                        echo json_encode(['success' => false, 'error' => 'Invalid method']);
+                    }
+                    break;
+                case 'update_stage':
+                    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+                        $this->updateStage($input);
+                    } else {
+                        echo json_encode(['success' => false, 'error' => 'Invalid method']);
+                    }
+                    break;
+                case 'update_rating':
+                    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+                        $this->updateRating($input);
+                    } else {
+                        echo json_encode(['success' => false, 'error' => 'Invalid method']);
+                    }
+                    break;
+                case 'delete':
+                    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+                        $this->deleteCase($input);
+                    } else {
+                        echo json_encode(['success' => false, 'error' => 'Invalid method']);
+                    }
+                    break;
+                default:
+                    if ($_SERVER['REQUEST_METHOD'] === 'GET' && empty($action)) {
+                        $this->getAllCases();
+                    } else {
+                        http_response_code(400);
+                        echo json_encode(['success' => false, 'error' => 'Invalid action']);
+                    }
+                    break;
+            }
+        } catch (\Exception $e) {
+            echo json_encode(['success' => false, 'error' => 'Database error']);
         }
     }
 

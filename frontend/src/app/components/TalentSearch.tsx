@@ -39,6 +39,7 @@ export function TalentSearch({ onViewChange }: { onViewChange: (v: ViewState) =>
       .then((d) => {
         if (d.success) setResults(d.results);
       })
+      .catch((err) => console.error("Error executing search:", err))
       .finally(() => setLoading(false));
   };
 

@@ -20,41 +20,45 @@ class AttendanceController
             $data = $_POST;
         }
 
-        if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-            switch ($action) {
-                case 'status':
-                    $this->status();
-                    break;
-                case 'timesheet':
-                    $this->timesheet();
-                    break;
-                case 'pending_approvals':
-                    $this->pendingApprovals();
-                    break;
-                case 'shifts':
-                    $this->shifts();
-                    break;
-                default:
-                    http_response_code(400);
-                    echo json_encode(['success' => false, 'error' => 'Invalid action']);
-                    break;
+        try {
+            if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+                switch ($action) {
+                    case 'status':
+                        $this->status();
+                        break;
+                    case 'timesheet':
+                        $this->timesheet();
+                        break;
+                    case 'pending_approvals':
+                        $this->pendingApprovals();
+                        break;
+                    case 'shifts':
+                        $this->shifts();
+                        break;
+                    default:
+                        http_response_code(400);
+                        echo json_encode(['success' => false, 'error' => 'Invalid action']);
+                        break;
+                }
+            } elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
+                switch ($action) {
+                    case 'clock_in':
+                        $this->clockIn();
+                        break;
+                    case 'clock_out':
+                        $this->clockOut();
+                        break;
+                    case 'approve_timesheet':
+                        $this->approveTimesheet($data);
+                        break;
+                    default:
+                        http_response_code(400);
+                        echo json_encode(['success' => false, 'error' => 'Invalid action']);
+                        break;
+                }
             }
-        } elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            switch ($action) {
-                case 'clock_in':
-                    $this->clockIn();
-                    break;
-                case 'clock_out':
-                    $this->clockOut();
-                    break;
-                case 'approve_timesheet':
-                    $this->approveTimesheet($data);
-                    break;
-                default:
-                    http_response_code(400);
-                    echo json_encode(['success' => false, 'error' => 'Invalid action']);
-                    break;
-            }
+        } catch (\Exception $e) {
+            echo json_encode(['success' => false, 'error' => 'Database error']);
         }
     }
 

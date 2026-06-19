@@ -158,7 +158,7 @@ export function Sidebar({ activeView, onViewChange, badges = {} }: SidebarProps)
         )}
         <button
           onClick={() => setCollapsed((c) => !c)}
-          className="p-1.5 rounded-lg hover:bg-white/5 transition-colors text-gray-500 hover:text-white cursor-pointer ml-auto"
+          className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-white/5 transition-colors text-gray-500 hover:text-slate-800 dark:hover:text-white cursor-pointer ml-auto"
           title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
         >
           {collapsed ? <Menu size={16} /> : <Layers size={16} />}

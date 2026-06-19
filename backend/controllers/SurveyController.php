@@ -20,28 +20,32 @@ class SurveyController
             return;
         }
 
-        switch ($action) {
-            case 'create_survey':
-                $this->createSurvey();
-                break;
-            case 'launch_survey':
-                $this->launchSurvey();
-                break;
-            case 'fetch_my_surveys':
-                $this->fetchMySurveys();
-                break;
-            case 'fetch_admin_surveys':
-                $this->fetchAdminSurveys();
-                break;
-            case 'fetch_survey':
-                $this->fetchSurvey();
-                break;
-            case 'submit_survey':
-                $this->submitSurvey();
-                break;
-            default:
-                echo json_encode(['success' => false, 'error' => 'Unknown action']);
-                break;
+        try {
+            switch ($action) {
+                case 'create_survey':
+                    $this->createSurvey();
+                    break;
+                case 'launch_survey':
+                    $this->launchSurvey();
+                    break;
+                case 'fetch_my_surveys':
+                    $this->fetchMySurveys();
+                    break;
+                case 'fetch_admin_surveys':
+                    $this->fetchAdminSurveys();
+                    break;
+                case 'fetch_survey':
+                    $this->fetchSurvey();
+                    break;
+                case 'submit_survey':
+                    $this->submitSurvey();
+                    break;
+                default:
+                    echo json_encode(['success' => false, 'error' => 'Unknown action']);
+                    break;
+            }
+        } catch (\Exception $e) {
+            echo json_encode(['success' => false, 'error' => 'Database error']);
         }
     }
 

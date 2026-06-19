@@ -32,55 +32,59 @@ class PlatformSupportController
             }
         }
 
-        switch ($action) {
-            case 'tenant_create':
-                $this->tenantCreate($input);
-                break;
-            case 'tenant_list':
-                $this->tenantList();
-                break;
-            case 'vendor_list':
-                $this->vendorList();
-                break;
-            case 'ticket_details':
-                $this->getDetails();
-                break;
-            case 'add_comment':
-                $this->addComment($input);
-                break;
-            case 'update_status':
-                $this->updateStatus($input);
-                break;
-            case 'update_ticket':
-                $this->updateTicket($input);
-                break;
-            case 'add_ticket_tag':
-                $this->addTicketTag($input);
-                break;
-            case 'remove_ticket_tag':
-                $this->removeTicketTag($input);
-                break;
-            case 'export_report':
-                $this->exportReport();
-                break;
-            case 'bulk_action':
-                $this->bulkAction($input);
-                break;
-            case 'canned_responses':
-                $this->cannedResponses();
-                break;
-            case 'upload_attachment':
-                $this->uploadAttachment();
-                break;
-            case 'submit_feedback':
-                $this->submitFeedback($input);
-                break;
-            case 'submit_csat':
-                $this->submitCSAT($input);
-                break;
-            default:
-                echo json_encode(['success' => false, 'error' => 'Unknown action']);
-                break;
+        try {
+            switch ($action) {
+                case 'tenant_create':
+                    $this->tenantCreate($input);
+                    break;
+                case 'tenant_list':
+                    $this->tenantList();
+                    break;
+                case 'vendor_list':
+                    $this->vendorList();
+                    break;
+                case 'ticket_details':
+                    $this->getDetails();
+                    break;
+                case 'add_comment':
+                    $this->addComment($input);
+                    break;
+                case 'update_status':
+                    $this->updateStatus($input);
+                    break;
+                case 'update_ticket':
+                    $this->updateTicket($input);
+                    break;
+                case 'add_ticket_tag':
+                    $this->addTicketTag($input);
+                    break;
+                case 'remove_ticket_tag':
+                    $this->removeTicketTag($input);
+                    break;
+                case 'export_report':
+                    $this->exportReport();
+                    break;
+                case 'bulk_action':
+                    $this->bulkAction($input);
+                    break;
+                case 'canned_responses':
+                    $this->cannedResponses();
+                    break;
+                case 'upload_attachment':
+                    $this->uploadAttachment();
+                    break;
+                case 'submit_feedback':
+                    $this->submitFeedback($input);
+                    break;
+                case 'submit_csat':
+                    $this->submitCSAT($input);
+                    break;
+                default:
+                    echo json_encode(['success' => false, 'error' => 'Unknown action']);
+                    break;
+            }
+        } catch (\Exception $e) {
+            echo json_encode(['success' => false, 'error' => 'Database error']);
         }
     }
 

@@ -33,79 +33,83 @@ class ESMController
             }
         }
 
-        switch ($action) {
-            case 'ticket_types':
-                $stmt = $this->pdo->prepare("SELECT * FROM `service_ticket_types` WHERE `tenant_id` = ? AND `is_confidential` = 0");
-                $stmt->execute([$this->tenantId]);
-                echo json_encode(['success' => true, 'data' => $stmt->fetchAll()]);
-                break;
+        try {
+            switch ($action) {
+                case 'ticket_types':
+                    $stmt = $this->pdo->prepare("SELECT * FROM `service_ticket_types` WHERE `tenant_id` = ? AND `is_confidential` = 0");
+                    $stmt->execute([$this->tenantId]);
+                    echo json_encode(['success' => true, 'data' => $stmt->fetchAll()]);
+                    break;
 
-            case 'elr_ticket_types':
-                $stmt = $this->pdo->prepare("SELECT * FROM `service_ticket_types` WHERE `tenant_id` = ? AND (`is_confidential` = 1 OR `name` LIKE '%HR%')");
-                $stmt->execute([$this->tenantId]);
-                echo json_encode(['success' => true, 'data' => $stmt->fetchAll()]);
-                break;
+                case 'elr_ticket_types':
+                    $stmt = $this->pdo->prepare("SELECT * FROM `service_ticket_types` WHERE `tenant_id` = ? AND (`is_confidential` = 1 OR `name` LIKE '%HR%')");
+                    $stmt->execute([$this->tenantId]);
+                    echo json_encode(['success' => true, 'data' => $stmt->fetchAll()]);
+                    break;
 
-            case 'all_ticket_types':
-                if (!$this->isAgent()) { echo json_encode(['success' => false, 'error' => 'Denied']); return; }
-                $stmt = $this->pdo->prepare("SELECT * FROM `service_ticket_types` WHERE `tenant_id` = ?");
-                $stmt->execute([$this->tenantId]);
-                echo json_encode(['success' => true, 'data' => $stmt->fetchAll()]);
-                break;
+                case 'all_ticket_types':
+                    if (!$this->isAgent()) { echo json_encode(['success' => false, 'error' => 'Denied']); return; }
+                    $stmt = $this->pdo->prepare("SELECT * FROM `service_ticket_types` WHERE `tenant_id` = ?");
+                    $stmt->execute([$this->tenantId]);
+                    echo json_encode(['success' => true, 'data' => $stmt->fetchAll()]);
+                    break;
 
-            case 'teams':
-                $stmt = $this->pdo->prepare("SELECT * FROM `service_teams` WHERE `tenant_id` = ?");
-                $stmt->execute([$this->tenantId]);
-                echo json_encode(['success' => true, 'data' => $stmt->fetchAll()]);
-                break;
+                case 'teams':
+                    $stmt = $this->pdo->prepare("SELECT * FROM `service_teams` WHERE `tenant_id` = ?");
+                    $stmt->execute([$this->tenantId]);
+                    echo json_encode(['success' => true, 'data' => $stmt->fetchAll()]);
+                    break;
 
-            case 'my_tickets':
-                $stmt = $this->pdo->prepare("
-                    SELECT st.*, tt.name as type_name, tm.name as team_name
-                    FROM `service_tickets` st
-                    JOIN `service_ticket_types` tt ON st.ticket_type_id = tt.id
-                    LEFT JOIN `service_teams` tm ON st.assigned_team_id = tm.id
-                    WHERE st.employee_id = ? AND st.tenant_id = ? AND tt.is_confidential = 0
-                    ORDER BY st.created_at DESC
-                ");
-                $stmt->execute([$this->currentUser['id'], $this->tenantId]);
-                echo json_encode(['success' => true, 'data' => $stmt->fetchAll()]);
-                break;
+                case 'my_tickets':
+                    $stmt = $this->pdo->prepare("
+                        SELECT st.*, tt.name as type_name, tm.name as team_name
+                        FROM `service_tickets` st
+                        JOIN `service_ticket_types` tt ON st.ticket_type_id = tt.id
+                        LEFT JOIN `service_teams` tm ON st.assigned_team_id = tm.id
+                        WHERE st.employee_id = ? AND st.tenant_id = ? AND tt.is_confidential = 0
+                        ORDER BY st.created_at DESC
+                    ");
+                    $stmt->execute([$this->currentUser['id'], $this->tenantId]);
+                    echo json_encode(['success' => true, 'data' => $stmt->fetchAll()]);
+                    break;
 
-            case 'create_ticket':
-                $this->createTicket($input);
-                break;
+                case 'create_ticket':
+                    $this->createTicket($input);
+                    break;
 
-            case 'ticket_details':
-                $this->getTicketDetails();
-                break;
+                case 'ticket_details':
+                    $this->getTicketDetails();
+                    break;
 
-            case 'add_comment':
-                $this->addComment($input);
-                break;
+                case 'add_comment':
+                    $this->addComment($input);
+                    break;
 
-            case 'agent_queue':
-                if (!$this->isAgent()) { echo json_encode(['success' => false, 'error' => 'Denied']); return; }
-                $stmt = $this->pdo->prepare("
-                    SELECT st.*, tt.name as type_name, tm.name as team_name, u.full_name as employee_name
-                    FROM `service_tickets` st
-                    JOIN `service_ticket_types` tt ON st.ticket_type_id = tt.id
-                    JOIN `users` u ON st.employee_id = u.id
-                    LEFT JOIN `service_teams` tm ON st.assigned_team_id = tm.id
-                    WHERE st.tenant_id = ?
-                    ORDER BY st.created_at DESC
-                ");
-                $stmt->execute([$this->tenantId]);
-                echo json_encode(['success' => true, 'data' => $stmt->fetchAll()]);
-                break;
+                case 'agent_queue':
+                    if (!$this->isAgent()) { echo json_encode(['success' => false, 'error' => 'Denied']); return; }
+                    $stmt = $this->pdo->prepare("
+                        SELECT st.*, tt.name as type_name, tm.name as team_name, u.full_name as employee_name
+                        FROM `service_tickets` st
+                        JOIN `service_ticket_types` tt ON st.ticket_type_id = tt.id
+                        JOIN `users` u ON st.employee_id = u.id
+                        LEFT JOIN `service_teams` tm ON st.assigned_team_id = tm.id
+                        WHERE st.tenant_id = ?
+                        ORDER BY st.created_at DESC
+                    ");
+                    $stmt->execute([$this->tenantId]);
+                    echo json_encode(['success' => true, 'data' => $stmt->fetchAll()]);
+                    break;
 
-            case 'update_ticket':
-                $this->updateTicket($input);
-                break;
+                case 'update_ticket':
+                    $this->updateTicket($input);
+                    break;
 
-            default:
-                echo json_encode(['success' => false, 'error' => 'Unknown action']);
-                break;
+                default:
+                    echo json_encode(['success' => false, 'error' => 'Unknown action']);
+                    break;
+            }
+        } catch (\Exception $e) {
+            echo json_encode(['success' => false, 'error' => 'Database error']);
         }
     }
 

@@ -393,7 +393,8 @@ export function JobsPage({ onViewChange }: Props) {
       .then((r) => r.json())
       .then((data) => {
         if (data.success) fetchJobs();
-      });
+      })
+      .catch((err) => console.error("Error duplicating job:", err));
   };
 
   const handleTogglePause = (job: Job) => {
@@ -413,7 +414,8 @@ export function JobsPage({ onViewChange }: Props) {
       .then((r) => r.json())
       .then((data) => {
         if (data.success) fetchJobs();
-      });
+      })
+      .catch((err) => console.error("Error toggling job pause state:", err));
   };
 
   const handleAddCandidate = () => {

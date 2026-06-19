@@ -391,48 +391,62 @@ export function PipelineBoard({ onViewChange, jobId }: Props) {
 
   // ── API mutations ──
   const updateStage = async (appId: number, stage: string) => {
-    await fetch(API, { method: "POST", headers: { 
-      "Content-Type": "application/json",
-      "X-CSRF-Token": (window as any).__CSRF_TOKEN__ || ""
-    }, body: JSON.stringify({ action: "update_stage", id: appId, stage }) });
-    loadJob();
+    try {
+      await fetch(API, { method: "POST", headers: { 
+        "Content-Type": "application/json",
+        "X-CSRF-Token": (window as any).__CSRF_TOKEN__ || ""
+      }, body: JSON.stringify({ action: "update_stage", id: appId, stage }) });
+      loadJob();
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   const updateRating = async (appId: number, rating: number) => {
     setJob(prev => prev ? { ...prev, applications: prev.applications.map(a => a.id === appId ? { ...a, rating } : a) } : prev);
-    await fetch(API, { method: "POST", headers: { 
-      "Content-Type": "application/json",
-      "X-CSRF-Token": (window as any).__CSRF_TOKEN__ || ""
-    }, body: JSON.stringify({ action: "update_rating", id: appId, rating }) });
+    try {
+      await fetch(API, { method: "POST", headers: { 
+        "Content-Type": "application/json",
+        "X-CSRF-Token": (window as any).__CSRF_TOKEN__ || ""
+      }, body: JSON.stringify({ action: "update_rating", id: appId, rating }) });
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   const bulkAdvance = async (stage: string) => {
     const ids = Array.from(selected);
-    await fetch(API, { method: "POST", headers: { 
-      "Content-Type": "application/json",
-      "X-CSRF-Token": (window as any).__CSRF_TOKEN__ || ""
-    }, body: JSON.stringify({ action: "bulk_advance", ids, stage }) });
-    setSelected(new Set()); showToast(`${ids.length} candidate(s) moved to ${stage}`); loadJob();
+    try {
+      await fetch(API, { method: "POST", headers: { 
+        "Content-Type": "application/json",
+        "X-CSRF-Token": (window as any).__CSRF_TOKEN__ || ""
+      }, body: JSON.stringify({ action: "bulk_advance", ids, stage }) });
+      setSelected(new Set()); showToast(`${ids.length} candidate(s) moved to ${stage}`); loadJob();
+    } catch (err) { console.error(err); }
   };
 
   const bulkReject = async () => {
     const ids = Array.from(selected);
     if (!confirm(`Reject ${ids.length} candidate(s)?`)) return;
-    await fetch(API, { method: "POST", headers: { 
-      "Content-Type": "application/json",
-      "X-CSRF-Token": (window as any).__CSRF_TOKEN__ || ""
-    }, body: JSON.stringify({ action: "bulk_reject", ids }) });
-    setSelected(new Set()); showToast(`${ids.length} candidate(s) rejected`); loadJob();
+    try {
+      await fetch(API, { method: "POST", headers: { 
+        "Content-Type": "application/json",
+        "X-CSRF-Token": (window as any).__CSRF_TOKEN__ || ""
+      }, body: JSON.stringify({ action: "bulk_reject", ids }) });
+      setSelected(new Set()); showToast(`${ids.length} candidate(s) rejected`); loadJob();
+    } catch (err) { console.error(err); }
   };
 
   const bulkDelete = async () => {
     const ids = Array.from(selected);
     if (!confirm(`Archive ${ids.length} candidate(s)? This cannot be undone.`)) return;
-    await fetch(API, { method: "POST", headers: { 
-      "Content-Type": "application/json",
-      "X-CSRF-Token": (window as any).__CSRF_TOKEN__ || ""
-    }, body: JSON.stringify({ action: "bulk_delete", ids }) });
-    setSelected(new Set()); showToast(`${ids.length} candidate(s) archived`); loadJob();
+    try {
+      await fetch(API, { method: "POST", headers: { 
+        "Content-Type": "application/json",
+        "X-CSRF-Token": (window as any).__CSRF_TOKEN__ || ""
+      }, body: JSON.stringify({ action: "bulk_delete", ids }) });
+      setSelected(new Set()); showToast(`${ids.length} candidate(s) archived`); loadJob();
+    } catch (err) { console.error(err); }
   };
 
   const handleDrop = (appId: number, stage: string) => { updateStage(appId, stage); showToast(`Moved to ${stage}`); };

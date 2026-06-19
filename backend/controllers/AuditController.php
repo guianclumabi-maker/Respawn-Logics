@@ -20,16 +20,20 @@ class AuditController
             return;
         }
 
-        switch ($action) {
-            case 'fetch_logs':
-                $this->fetchLogs();
-                break;
-            case 'fetch_actions':
-                $this->fetchActions();
-                break;
-            default:
-                echo json_encode(['success' => false, 'error' => 'Unknown action']);
-                break;
+        try {
+            switch ($action) {
+                case 'fetch_logs':
+                    $this->fetchLogs();
+                    break;
+                case 'fetch_actions':
+                    $this->fetchActions();
+                    break;
+                default:
+                    echo json_encode(['success' => false, 'error' => 'Unknown action']);
+                    break;
+            }
+        } catch (\Exception $e) {
+            echo json_encode(['success' => false, 'error' => 'Database error']);
         }
     }
 

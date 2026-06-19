@@ -24,6 +24,7 @@ export function TalentPools({ onViewChange }: { onViewChange: (v: ViewState) => 
       .then((d) => {
         if (d.success) setPools(d.pools);
       })
+      .catch((err) => console.error("Error fetching talent pools:", err))
       .finally(() => setLoading(false));
   }, []);
 

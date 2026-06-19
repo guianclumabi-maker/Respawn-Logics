@@ -21,19 +21,23 @@ class NotificationController
             return;
         }
 
-        switch ($action) {
-            case 'fetch_unread':
-                $this->fetchUnread();
-                break;
-            case 'mark_read':
-                $this->markRead();
-                break;
-            case 'mark_all_read':
-                $this->markAllRead();
-                break;
-            default:
-                echo json_encode(['success' => false, 'error' => 'Unknown action']);
-                break;
+        try {
+            switch ($action) {
+                case 'fetch_unread':
+                    $this->fetchUnread();
+                    break;
+                case 'mark_read':
+                    $this->markRead();
+                    break;
+                case 'mark_all_read':
+                    $this->markAllRead();
+                    break;
+                default:
+                    echo json_encode(['success' => false, 'error' => 'Unknown action']);
+                    break;
+            }
+        } catch (\Exception $e) {
+            echo json_encode(['success' => false, 'error' => 'Database error']);
         }
     }
 

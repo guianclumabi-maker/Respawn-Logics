@@ -170,27 +170,32 @@ function ScheduleModal({
     if (!applicationId) { setSaving(false); return; }
 
     const scheduled_at = `${form.date} ${form.time}:00`;
-    await fetch(API, {
-      method: "POST",
-      headers: { 
-        "Content-Type": "application/json",
-        "X-CSRF-Token": (window as any).__CSRF_TOKEN__ || ""
-      },
-      body: JSON.stringify({
-        action: "add_interview",
-        application_id: applicationId,
-        candidate_id: form.candidate_id,
-        job_id: form.job_id,
-        interview_type: form.interview_type,
-        scheduled_at,
-        duration_minutes: form.duration_minutes,
-        interviewer_name: form.interviewer_name,
-        location: form.location,
-        meeting_link: form.meeting_link,
-      }),
-    });
-    setSaving(false);
-    onSaved();
+    try {
+      await fetch(API, {
+        method: "POST",
+        headers: { 
+          "Content-Type": "application/json",
+          "X-CSRF-Token": (window as any).__CSRF_TOKEN__ || ""
+        },
+        body: JSON.stringify({
+          action: "add_interview",
+          application_id: applicationId,
+          candidate_id: form.candidate_id,
+          job_id: form.job_id,
+          interview_type: form.interview_type,
+          scheduled_at,
+          duration_minutes: form.duration_minutes,
+          interviewer_name: form.interviewer_name,
+          location: form.location,
+          meeting_link: form.meeting_link,
+        }),
+      });
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setSaving(false);
+      onSaved();
+    }
   };
 
   const inputCls = "w-full px-3 py-2 rounded-lg bg-white/[0.02] border border-white/[0.06] text-white text-xs font-mono placeholder-gray-600 outline-none focus:border-[#00e07a] focus:shadow-[0_0_10px_rgba(0,224,122,0.15)] transition-all";
@@ -320,16 +325,21 @@ function ScorecardModal({
 
   const handleSubmit = async () => {
     setSaving(true);
-    await fetch(API, {
-      method: "POST",
-      headers: { 
-        "Content-Type": "application/json",
-        "X-CSRF-Token": (window as any).__CSRF_TOKEN__ || ""
-      },
-      body: JSON.stringify({ action: "add_scorecard", interview_id: interview.id, ...form }),
-    });
-    setSaving(false);
-    onSaved();
+    try {
+      await fetch(API, {
+        method: "POST",
+        headers: { 
+          "Content-Type": "application/json",
+          "X-CSRF-Token": (window as any).__CSRF_TOKEN__ || ""
+        },
+        body: JSON.stringify({ action: "add_scorecard", interview_id: interview.id, ...form }),
+      });
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setSaving(false);
+      onSaved();
+    }
   };
 
   const inputCls = "w-full px-3 py-2 rounded-lg bg-white/[0.02] border border-white/[0.06] text-white text-xs font-mono placeholder-gray-600 outline-none focus:border-[#00e07a] focus:shadow-[0_0_10px_rgba(0,224,122,0.15)] transition-all";

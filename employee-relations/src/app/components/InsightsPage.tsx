@@ -29,7 +29,8 @@ export function InsightsPage({ onViewChange }: InsightsPageProps) {
           setChannels(data.channels);
           setTrendData(data.trend);
         }
-      });
+      })
+      .catch(err => console.error("Error fetching analytics:", err));
   }, []);
 
   // Helper to dynamically draw graph points based on returned trend Data

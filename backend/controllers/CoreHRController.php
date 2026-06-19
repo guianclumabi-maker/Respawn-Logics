@@ -18,25 +18,29 @@ class CoreHRController
     {
         $input = json_decode(file_get_contents('php://input'), true) ?? [];
 
-        switch ($action) {
-            case 'master_record':
-                $this->masterRecord();
-                break;
-            case 'update_master_record':
-                $this->updateMasterRecord($input);
-                break;
-            case 'custom_fields_def':
-                $this->customFieldsDef($input);
-                break;
-            case 'upload_document':
-                $this->uploadDocument();
-                break;
-            case 'save_tenant_modules':
-                $this->saveTenantModules($input);
-                break;
-            default:
-                echo json_encode(['success' => false, 'error' => 'Unknown action']);
-                break;
+        try {
+            switch ($action) {
+                case 'master_record':
+                    $this->masterRecord();
+                    break;
+                case 'update_master_record':
+                    $this->updateMasterRecord($input);
+                    break;
+                case 'custom_fields_def':
+                    $this->customFieldsDef($input);
+                    break;
+                case 'upload_document':
+                    $this->uploadDocument();
+                    break;
+                case 'save_tenant_modules':
+                    $this->saveTenantModules($input);
+                    break;
+                default:
+                    echo json_encode(['success' => false, 'error' => 'Unknown action']);
+                    break;
+            }
+        } catch (\Exception $e) {
+            echo json_encode(['success' => false, 'error' => 'Database error']);
         }
     }
 
@@ -51,7 +55,7 @@ class CoreHRController
         $userId = intval($_GET['user_id'] ?? 0);
         
         // Fetch user basic
-        $stmt = $this->pdo->prepare("SELECT `id`, `employee_id`, `employee_number`, `full_name`, `email`, `work_email`, `role`, `employment_status`, `department`, `work_location`, `immediate_supervisor`, `manager_id`, `job_title`, `base_salary`, `hire_date`, `phone`, `emergency_name`, `emergency_phone`, `profile_image` FROM `users` WHERE `id` = ? AND `tenant_id` = ?");
+        $stmt = $this->pdo->prepare("SELECT * FROM `users` WHERE `id` = ? AND `tenant_id` = ?");
         $stmt->execute([$userId, $this->tenantId]);
         $user = $stmt->fetch();
         
@@ -128,7 +132,7 @@ class CoreHRController
         // Prepare update
         $fields = [];
         $params = [];
-        $updatable = ['employee_number', 'full_name', 'work_email', 'employment_status', 'department', 'work_location', 'job_title', 'base_salary', 'hire_date', 'manager_id'];
+        $updatable = ['full_name', 'employment_status', 'department', 'work_location', 'job_title', 'base_salary'];
         
         $changedCoreFields = false;
 
@@ -153,7 +157,7 @@ class CoreHRController
         if ($changedCoreFields || $changeType !== 'Profile Update') {
             $newTitle = $input['job_title'] ?? $oldUser['job_title'];
             $newDept = $input['department'] ?? $oldUser['department'];
-            $newMgr = $input['manager_id'] ?? $oldUser['manager_id'];
+            $newMgr = $input['manager_id'] ?? ($oldUser['manager_id'] ?? null);
             $newSal = $input['base_salary'] ?? $oldUser['base_salary'];
 
             $this->logEmploymentHistory($userId, $changeType, $newTitle, $newDept, $newMgr, $newSal, $notes, $this->currentUser['full_name']);

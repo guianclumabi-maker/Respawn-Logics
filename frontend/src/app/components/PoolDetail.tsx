@@ -34,6 +34,7 @@ export function PoolDetail({ onViewChange, poolId }: { onViewChange: (v: ViewSta
       .then((d) => {
         if (d.success) setPool(d.pool);
       })
+      .catch((err) => console.error("Error fetching pool details:", err))
       .finally(() => setLoading(false));
   }, [poolId]);
 

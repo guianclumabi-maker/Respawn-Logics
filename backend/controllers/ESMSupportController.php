@@ -34,52 +34,56 @@ class ESMSupportController
             }
         }
 
-        switch ($action) {
-            case 'employee_create':
-                $this->employeeCreate($input);
-                break;
-            case 'employee_list':
-                $this->employeeList();
-                break;
-            case 'agent_list':
-                $this->agentList();
-                break;
-            case 'ticket_details':
-                $this->getDetails();
-                break;
-            case 'add_comment':
-                $this->addComment($input);
-                break;
-            case 'update_status':
-                $this->updateStatus($input);
-                break;
-            case 'update_ticket':
-                $this->updateTicket($input);
-                break;
-            case 'add_ticket_tag':
-                $this->addTicketTag($input);
-                break;
-            case 'remove_ticket_tag':
-                $this->removeTicketTag($input);
-                break;
-            case 'export_report':
-                $this->exportReport();
-                break;
-            case 'bulk_action':
-                $this->bulkAction($input);
-                break;
-            case 'canned_responses':
-                $this->cannedResponses();
-                break;
-            case 'upload_attachment':
-                $this->uploadAttachment();
-                break;
-            case 'submit_csat':
-                $this->submitCSAT($input);
-                break;
-            default:
-                echo json_encode(['success' => false, 'error' => 'Unknown action']);
-                break;
+        try {
+            switch ($action) {
+                case 'employee_create':
+                    $this->employeeCreate($input);
+                    break;
+                case 'employee_list':
+                    $this->employeeList();
+                    break;
+                case 'agent_list':
+                    $this->agentList();
+                    break;
+                case 'ticket_details':
+                    $this->getDetails();
+                    break;
+                case 'add_comment':
+                    $this->addComment($input);
+                    break;
+                case 'update_status':
+                    $this->updateStatus($input);
+                    break;
+                case 'update_ticket':
+                    $this->updateTicket($input);
+                    break;
+                case 'add_ticket_tag':
+                    $this->addTicketTag($input);
+                    break;
+                case 'remove_ticket_tag':
+                    $this->removeTicketTag($input);
+                    break;
+                case 'export_report':
+                    $this->exportReport();
+                    break;
+                case 'bulk_action':
+                    $this->bulkAction($input);
+                    break;
+                case 'canned_responses':
+                    $this->cannedResponses();
+                    break;
+                case 'upload_attachment':
+                    $this->uploadAttachment();
+                    break;
+                case 'submit_csat':
+                    $this->submitCSAT($input);
+                    break;
+                default:
+                    echo json_encode(['success' => false, 'error' => 'Unknown action']);
+                    break;
+            }
+        } catch (\Exception $e) {
+            echo json_encode(['success' => false, 'error' => 'Database error']);
         }
     }
 

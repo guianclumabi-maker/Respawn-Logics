@@ -21,16 +21,20 @@ class AnnouncementsController
             return;
         }
 
-        switch ($action) {
-            case 'fetch_posts':
-                $this->fetchPosts();
-                break;
-            case 'create_post':
-                $this->createPost();
-                break;
-            default:
-                echo json_encode(['success' => false, 'error' => 'Unknown action']);
-                break;
+        try {
+            switch ($action) {
+                case 'fetch_posts':
+                    $this->fetchPosts();
+                    break;
+                case 'create_post':
+                    $this->createPost();
+                    break;
+                default:
+                    echo json_encode(['success' => false, 'error' => 'Unknown action']);
+                    break;
+            }
+        } catch (\Exception $e) {
+            echo json_encode(['success' => false, 'error' => 'Database error']);
         }
     }
 

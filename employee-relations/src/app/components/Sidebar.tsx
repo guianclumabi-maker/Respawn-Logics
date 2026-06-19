@@ -122,7 +122,7 @@ export function Sidebar({ activeView, onViewChange }: SidebarProps) {
               <i className="fa-solid fa-gamepad"></i>
             </div>
             <span
-              className="font-bold text-white text-[15px] tracking-[-0.5px]"
+              className="font-bold text-slate-800 dark:text-white text-[15px] tracking-[-0.5px]"
               style={{ fontFamily: "'JetBrains Mono', monospace" }}
             >
               Employee Relations
@@ -133,7 +133,7 @@ export function Sidebar({ activeView, onViewChange }: SidebarProps) {
         {/* Toggle icon */}
         <button
           onClick={() => setCollapsed((c) => !c)}
-          className="p-1.5 rounded-lg hover:bg-white/5 transition-colors text-gray-400 hover:text-white cursor-pointer ml-auto"
+          className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-white/5 transition-colors text-gray-500 dark:text-gray-400 hover:text-slate-800 dark:hover:text-white cursor-pointer ml-auto"
         >
           {collapsed ? <Menu size={16} /> : <Layers size={16} />}
         </button>
