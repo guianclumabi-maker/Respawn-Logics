@@ -93,11 +93,11 @@
     --shadow-glow-purple: 0 0 20px rgba(155, 109, 255, 0.25);
     --shadow-glow-cyan: 0 0 20px rgba(0, 201, 177, 0.25);
     
-    /* Layout Sizes */
-    --radius-sm: 6px;
-    --radius-md: 12px;
-    --radius-lg: 20px;
-    --sidebar-width: 260px;
+    /* Layout Sizes & Radii (Premium SaaS Spacing) */
+    --radius-sm: 8px;
+    --radius-md: 16px;
+    --radius-lg: 24px;
+    --sidebar-width: 280px;
 }
 
 [data-theme="light"] {
