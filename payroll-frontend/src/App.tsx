@@ -109,14 +109,34 @@ function App() {
     });
   }, []);
 
+  // Theme sync: listen for changes made by the main platform in other tabs.
+  // The main platform's toggleTheme() in sidebar.php writes to localStorage('theme').
+  // The storage event fires in OTHER open tabs on the same origin.
+  useEffect(() => {
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'theme' && e.newValue) {
+        document.documentElement.setAttribute('data-theme', e.newValue);
+      }
+    };
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
+  }, []);
+
   // Set initial processed amount once dashInfo loads
   useEffect(() => {
     if (dashInfo) {
       setProcessedEmployees(dashInfo.activeRunProcessed);
       setProgress(Math.floor((dashInfo.activeRunProcessed / dashInfo.activeRunTotalEmployees) * 100));
-      
-      if (dashInfo.themePreference) {
-          document.documentElement.setAttribute('data-theme', dashInfo.themePreference);
+
+      // Theme priority: localStorage (set by main platform toggle) > server preference.
+      // The index.html script already applied the theme before React loaded, but
+      // we re-apply here as a safety net and write back if only the server knows.
+      const savedTheme = localStorage.getItem('theme');
+      if (savedTheme) {
+        document.documentElement.setAttribute('data-theme', savedTheme);
+      } else if (dashInfo.themePreference) {
+        document.documentElement.setAttribute('data-theme', dashInfo.themePreference);
+        localStorage.setItem('theme', dashInfo.themePreference);
       }
     }
   }, [dashInfo]);

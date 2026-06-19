@@ -4,7 +4,21 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>payroll-module-ui</title>
+    <title>Respawn Logics — Payroll Engine</title>
+    <!--
+      Theme initialization: runs synchronously before any CSS or React loads.
+      Reads the 'theme' key from localStorage (written by the main platform's
+      toggleTheme() in sidebar.php) to ensure both apps stay in unison.
+      Falls back to 'dark' if nothing is saved.
+    -->
+    <script>
+      (function() {
+        try {
+          var theme = localStorage.getItem('theme') || 'dark';
+          document.documentElement.setAttribute('data-theme', theme);
+        } catch(e) {}
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>
