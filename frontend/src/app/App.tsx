@@ -183,8 +183,12 @@ export default function App() {
 
   return (
     <div
-      className="flex h-screen w-full overflow-hidden bg-gray-50 dark:bg-[#06070a]"
+      className="flex h-screen w-full overflow-hidden bg-slate-100 dark:bg-[#06070a] relative z-0"
     >
+      {/* Global Background Glow Effects */}
+      <div className="absolute top-[-100px] left-[-100px] w-[500px] h-[500px] rounded-full bg-[#00e07a] blur-[120px] opacity-[0.05] dark:opacity-[0.06] pointer-events-none z-[-1]" />
+      <div className="absolute bottom-[-150px] right-[-100px] w-[600px] h-[600px] rounded-full bg-[#9b6dff] blur-[140px] opacity-[0.03] dark:opacity-[0.05] pointer-events-none z-[-1]" />
+      
       <Sidebar
         activeView={activeView}
         onViewChange={setActiveView}
@@ -194,3 +198,4 @@ export default function App() {
     </div>
   );
 }
+

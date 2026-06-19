@@ -814,7 +814,11 @@ function App() {
   );
 
   return (
-    <div className="app-container">
+    <div className="app-container relative z-0">
+      {/* Global Background Glow Effects */}
+      <div style={{ position: "absolute", top: -100, left: -100, width: 500, height: 500, borderRadius: "50%", background: "#00e07a", filter: "blur(120px)", opacity: 0.06, pointerEvents: "none", zIndex: -1 }} />
+      <div style={{ position: "absolute", bottom: -150, right: -100, width: 600, height: 600, borderRadius: "50%", background: "#9b6dff", filter: "blur(140px)", opacity: 0.05, pointerEvents: "none", zIndex: -1 }} />
+      
       {/* Sidebar */}
       <aside className="sidebar glass">
         <div className="sidebar-brand" style={{ display: 'flex', alignItems: 'center', padding: '16px' }}>
