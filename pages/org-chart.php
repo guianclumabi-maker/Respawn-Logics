@@ -152,6 +152,22 @@ function getInitials($fullName) {
 <?php include __DIR__ . '/../includes/head.php'; ?>
 
     <style>
+        body {
+            background-color: #f8fafc !important; /* slate-100 for separation */
+        }
+        .main-content {
+            background-color: #f8fafc !important; /* slate-100 for separation */
+            position: relative;
+            z-index: 0;
+        }
+        /* Global Background Glow Effects for Light Mode */
+        .global-glow-green {
+            position: fixed; top: -100px; left: -100px; width: 500px; height: 500px; border-radius: 50%; background: #00e07a; filter: blur(120px); opacity: 0.08; pointer-events: none; z-index: -1;
+        }
+        .global-glow-purple {
+            position: fixed; bottom: -150px; right: -100px; width: 600px; height: 600px; border-radius: 50%; background: #9b6dff; filter: blur(140px); opacity: 0.06; pointer-events: none; z-index: -1;
+        }
+
         .org-controls { display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap; margin-bottom: 30px; background: var(--bg-dark-surface); border: 1px solid var(--border-color); padding: 16px 24px; border-radius: var(--radius-md); }
         .search-group { position: relative; flex: 1; max-width: 400px; }
         .search-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-muted); pointer-events: none; width: 18px; height: 18px; }
@@ -195,8 +211,8 @@ function getInitials($fullName) {
 
 
 <body>
-    <div class="ambient-glow glow-green" style="background: radial-gradient(circle, rgba(0,224,122,0.15) 0%, transparent 70%);"></div>
-    <div class="ambient-glow glow-cyan" style="background: radial-gradient(circle, rgba(6,182,212,0.1) 0%, transparent 70%);"></div>
+    <div class="global-glow-green"></div>
+    <div class="global-glow-purple"></div>
 
     <div class="app-wrapper">
         <!-- Sidebar Navigation -->

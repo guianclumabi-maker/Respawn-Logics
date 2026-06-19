@@ -11,6 +11,22 @@ $isAdmin = hasPermission('surveys.manage');
 <?php include __DIR__ . '/../includes/head.php'; ?>
 
     <style>
+        body {
+            background-color: #f8fafc !important; /* slate-100 for separation */
+        }
+        .main-content {
+            background-color: #f8fafc !important; /* slate-100 for separation */
+            position: relative;
+            z-index: 0;
+        }
+        /* Global Background Glow Effects for Light Mode */
+        .global-glow-green {
+            position: fixed; top: -100px; left: -100px; width: 500px; height: 500px; border-radius: 50%; background: #00e07a; filter: blur(120px); opacity: 0.08; pointer-events: none; z-index: -1;
+        }
+        .global-glow-purple {
+            position: fixed; bottom: -150px; right: -100px; width: 600px; height: 600px; border-radius: 50%; background: #9b6dff; filter: blur(140px); opacity: 0.06; pointer-events: none; z-index: -1;
+        }
+
         .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid var(--border-color); }
         .title-block h1 { font-family: 'Space Grotesk'; font-size: 1.75rem; color: var(--text-primary); margin: 0 0 4px 0; }
         .title-block p { color: var(--text-muted); margin: 0; font-size: 0.95rem; }

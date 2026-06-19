@@ -139,8 +139,8 @@ if ($user) {
 <link rel="stylesheet" href="<?= url('/assets/css/profile.css') ?>">
 
 <body>
-    <div class="ambient-glow glow-green"></div>
-    <div class="ambient-glow glow-cyan"></div>
+    <div class="global-glow-green"></div>
+    <div class="global-glow-purple"></div>
 
     <div class="app-wrapper">
         <!-- Sidebar Navigation -->

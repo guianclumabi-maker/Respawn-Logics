@@ -25,6 +25,22 @@ $current_page = basename($_SERVER['SCRIPT_NAME']);
 <?php include __DIR__ . '/../includes/head.php'; ?>
 
     <style>
+        body {
+            background-color: #f8fafc !important; /* slate-100 for separation */
+        }
+        .main-content {
+            background-color: #f8fafc !important; /* slate-100 for separation */
+            position: relative;
+            z-index: 0;
+        }
+        /* Global Background Glow Effects for Light Mode */
+        .global-glow-green {
+            position: fixed; top: -100px; left: -100px; width: 500px; height: 500px; border-radius: 50%; background: #00e07a; filter: blur(120px); opacity: 0.08; pointer-events: none; z-index: -1;
+        }
+        .global-glow-purple {
+            position: fixed; bottom: -150px; right: -100px; width: 600px; height: 600px; border-radius: 50%; background: #9b6dff; filter: blur(140px); opacity: 0.06; pointer-events: none; z-index: -1;
+        }
+
         .admin-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px; }
         .admin-title h1 { font-size: 1.5rem; font-weight: 700; color: white; margin-bottom: 4px; }
         .admin-title p { font-size: 0.875rem; color: var(--text-muted); }
@@ -86,7 +102,7 @@ $current_page = basename($_SERVER['SCRIPT_NAME']);
 
 
 <body>
-    <div class="ambient-glow glow-green"></div>
+    <div class="global-glow-green"></div>
 
     <div class="app-wrapper">
         <?php include __DIR__ . '/../includes/sidebar.php'; ?>
