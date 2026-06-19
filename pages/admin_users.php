@@ -536,8 +536,8 @@ $current_page = basename($_SERVER['SCRIPT_NAME']);
         async function loadData() {
             try {
                 const [rolesRes, usersRes] = await Promise.all([
-                    fetch('<?= url('/iam_api.php?action=roles') ?>').then(r => r.json()),
-                    fetch('<?= url('/iam_api.php?action=users') ?>').then(r => r.json())
+                    fetch('<?= url('/api/index.php?route=iam&action=roles') ?>').then(r => r.json()),
+                    fetch('<?= url('/api/index.php?route=iam&action=users') ?>').then(r => r.json())
                 ]);
 
                 if (rolesRes.success) globalRoles = rolesRes.data;
@@ -655,7 +655,7 @@ $current_page = basename($_SERVER['SCRIPT_NAME']);
             const action = isAssigning ? 'assign_role' : 'remove_role';
             
             try {
-                const res = await fetch(`<?= url('/iam_api.php?action=${action}') ?>`, {
+                const res = await fetch(`<?= url('/api/index.php?route=iam&action=${action}') ?>`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ user_id: activeUserId, role_id: roleId })
@@ -701,7 +701,7 @@ $current_page = basename($_SERVER['SCRIPT_NAME']);
             btn.disabled = true;
 
             try {
-                const res = await fetch(`<?= url('/iam_api.php?action=invite_user') ?>`, {
+                const res = await fetch(`<?= url('/api/index.php?route=iam&action=invite_user') ?>`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ full_name: name, email: email })

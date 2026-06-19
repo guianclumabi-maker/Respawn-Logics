@@ -220,7 +220,7 @@ $is_manager = hasPermission('attendance.manage');
     </div>
 
 <script>
-const API_URL = "<?= url('/attendance_api.php') ?>";
+const API_URL = "<?= url('/api/index.php?route=attendance') ?>";
 
 // Real-time clock
 setInterval(() => {

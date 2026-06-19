@@ -162,7 +162,7 @@ $current_page = basename($_SERVER['SCRIPT_NAME']);
 
         async function loadHeadcount() {
             try {
-                const res = await fetch(`<?= url('/analytics_api.php?action=headcount_by_dept') ?>`);
+                const res = await fetch(`<?= url('/api/index.php?route=analytics&action=headcount_by_dept') ?>`);
                 const data = await res.json();
                 
                 if (data.success && data.labels.length > 0) {
@@ -196,7 +196,7 @@ $current_page = basename($_SERVER['SCRIPT_NAME']);
 
         async function loadTalentDensity() {
             try {
-                const res = await fetch(`<?= url('/analytics_api.php?action=talent_density') ?>`);
+                const res = await fetch(`<?= url('/api/index.php?route=analytics&action=talent_density') ?>`);
                 const data = await res.json();
                 
                 // Only render if there is at least one non-zero value
@@ -236,7 +236,7 @@ $current_page = basename($_SERVER['SCRIPT_NAME']);
 
         async function loadPayrollTrend() {
             try {
-                const res = await fetch(`<?= url('/analytics_api.php?action=payroll_trend') ?>`);
+                const res = await fetch(`<?= url('/api/index.php?route=analytics&action=payroll_trend') ?>`);
                 const data = await res.json();
                 
                 if (data.success && data.labels.length > 0) {

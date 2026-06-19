@@ -185,7 +185,7 @@ $current_page = basename($_SERVER['SCRIPT_NAME']);
 
         async function loadPlans() {
             try {
-                const res = await fetch(`<?= url('/benefits_api.php?action=hr_plans') ?>`);
+                const res = await fetch(`<?= url('/api/index.php?route=benefits&action=hr_plans') ?>`);
                 const data = await res.json();
                 const tbody = document.getElementById('plans-tbody');
                 if (data.success && data.data.length > 0) {
@@ -207,7 +207,7 @@ $current_page = basename($_SERVER['SCRIPT_NAME']);
 
         async function loadEnrollments() {
             try {
-                const res = await fetch(`<?= url('/benefits_api.php?action=hr_enrollments') ?>`);
+                const res = await fetch(`<?= url('/api/index.php?route=benefits&action=hr_enrollments') ?>`);
                 const data = await res.json();
                 const tbody = document.getElementById('enrollments-tbody');
                 if (data.success && data.data.length > 0) {
@@ -231,7 +231,7 @@ $current_page = basename($_SERVER['SCRIPT_NAME']);
             e.preventDefault();
             const formData = new FormData(document.getElementById('form-plan'));
             try {
-                const res = await fetch(`<?= url('/benefits_api.php?action=hr_create_plan') ?>`, { method: 'POST', body: formData });
+                const res = await fetch(`<?= url('/api/index.php?route=benefits&action=hr_create_plan') ?>`, { method: 'POST', body: formData });
                 const data = await res.json();
                 if(data.success) {
                     document.getElementById('planModal').classList.remove('active');

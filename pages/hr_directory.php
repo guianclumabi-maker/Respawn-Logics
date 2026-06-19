@@ -550,8 +550,8 @@ $current_page = basename($_SERVER['SCRIPT_NAME']);
         async function loadDirectory() {
             try {
                 // We'll borrow the IAM api for the raw user list, or core_hr if we had an endpoint. 
-                // iam_api.php?action=users returns all basic info.
-                const res = await fetch('<?= url('/iam_api.php?action=users') ?>');
+                // api/index.php?route=iam&action=users returns all basic info.
+                const res = await fetch('<?= url('/api/index.php?route=iam&action=users') ?>');
                 const data = await res.json();
                 if (data.success) {
                     allUsers = data.data;
@@ -641,7 +641,7 @@ $current_page = basename($_SERVER['SCRIPT_NAME']);
             document.querySelector('[data-tab="profile"]').classList.add('active');
 
             try {
-                const res = await fetch(`<?= url('/core_hr_api.php?action=master_record&user_id=') ?>${userId}`);
+                const res = await fetch(`<?= url('/api/index.php?route=core_hr&action=master_record&user_id=') ?>${userId}`);
                 const data = await res.json();
                 
                 if (data.success) {
@@ -738,7 +738,7 @@ $current_page = basename($_SERVER['SCRIPT_NAME']);
             };
 
             try {
-                const res = await fetch(`<?= url('/core_hr_api.php?action=update_master_record') ?>`, {
+                const res = await fetch(`<?= url('/api/index.php?route=core_hr&action=update_master_record') ?>`, {
                     method: 'POST',
                     headers: {'Content-Type':'application/json'},
                     body: JSON.stringify(payload)
@@ -765,7 +765,7 @@ $current_page = basename($_SERVER['SCRIPT_NAME']);
             fd.append('document', document.getElementById('d_file').files[0]);
 
             try {
-                const res = await fetch(`<?= url('/core_hr_api.php?action=upload_document') ?>`, {
+                const res = await fetch(`<?= url('/api/index.php?route=core_hr&action=upload_document') ?>`, {
                     method: 'POST',
                     body: fd
                 });

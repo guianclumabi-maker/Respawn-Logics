@@ -265,7 +265,7 @@ $current_page = basename($_SERVER['SCRIPT_NAME']);
 
         async function loadTeamReviews() {
             try {
-                const res = await fetch(`<?= url('/performance_api.php?action=team_reviews') ?>`);
+                const res = await fetch(`<?= url('/api/index.php?route=performance&action=team_reviews') ?>`);
                 const data = await res.json();
                 if(data.success) {
                     document.getElementById('team-reviews-list').innerHTML = data.data.map(r => `
@@ -301,7 +301,7 @@ $current_page = basename($_SERVER['SCRIPT_NAME']);
                 manager_comments: document.getElementById('eval_comments').value
             };
             try {
-                const res = await fetch(`<?= url('/performance_api.php?action=submit_manager_eval') ?>`, {
+                const res = await fetch(`<?= url('/api/index.php?route=performance&action=submit_manager_eval') ?>`, {
                     method: 'POST', body: JSON.stringify(payload)
                 });
                 const data = await res.json();
@@ -315,7 +315,7 @@ $current_page = basename($_SERVER['SCRIPT_NAME']);
         <?php if (hasPermission('performance.manage')): ?>
         async function loadCycles() {
             try {
-                const res = await fetch(`<?= url('/performance_api.php?action=cycles') ?>`);
+                const res = await fetch(`<?= url('/api/index.php?route=performance&action=cycles') ?>`);
                 const data = await res.json();
                 if(data.success) {
                     document.getElementById('cycles-list').innerHTML = data.data.map(c => `
@@ -341,7 +341,7 @@ $current_page = basename($_SERVER['SCRIPT_NAME']);
                 end_date: document.getElementById('cycle_end').value
             };
             try {
-                const res = await fetch(`<?= url('/performance_api.php?action=create_cycle') ?>`, {
+                const res = await fetch(`<?= url('/api/index.php?route=performance&action=create_cycle') ?>`, {
                     method: 'POST', body: JSON.stringify(payload)
                 });
                 if((await res.json()).success) { closeModals(); loadCycles(); }
@@ -351,7 +351,7 @@ $current_page = basename($_SERVER['SCRIPT_NAME']);
         async function initReviews(id) {
             if(!confirm("Deploy review shells to all active employees and managers?")) return;
             try {
-                const res = await fetch(`<?= url('/performance_api.php?action=initialize_reviews') ?>`, {
+                const res = await fetch(`<?= url('/api/index.php?route=performance&action=initialize_reviews') ?>`, {
                     method: 'POST', body: JSON.stringify({cycle_id: id})
                 });
                 if((await res.json()).success) { alert("Successfully deployed."); }
@@ -374,7 +374,7 @@ $current_page = basename($_SERVER['SCRIPT_NAME']);
             }
 
             try {
-                const res = await fetch(`<?= url('/performance_api.php?action=nine_box_data&cycle_id=') ?>` + cycleId);
+                const res = await fetch(`<?= url('/api/index.php?route=performance&action=nine_box_data&cycle_id=') ?>` + cycleId);
                 const data = await res.json();
                 if(data.success) {
                     data.data.forEach(r => {

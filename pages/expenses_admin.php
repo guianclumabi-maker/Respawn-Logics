@@ -122,7 +122,7 @@ $current_page = basename($_SERVER['SCRIPT_NAME']);
 
         async function loadManager() {
             try {
-                const res = await fetch(`<?= url('/expenses_api.php?action=manager_pending') ?>`);
+                const res = await fetch(`<?= url('/api/index.php?route=expenses&action=manager_pending') ?>`);
                 const data = await res.json();
                 if(data.success) {
                     const c = document.getElementById('manager-list');
@@ -149,7 +149,7 @@ $current_page = basename($_SERVER['SCRIPT_NAME']);
         <?php if (hasPermission('expenses.manage')): ?>
         async function loadFinance() {
             try {
-                const res = await fetch(`<?= url('/expenses_api.php?action=finance_pending') ?>`);
+                const res = await fetch(`<?= url('/api/index.php?route=expenses&action=finance_pending') ?>`);
                 const data = await res.json();
                 if(data.success) {
                     const c = document.getElementById('finance-list');
@@ -179,7 +179,7 @@ $current_page = basename($_SERVER['SCRIPT_NAME']);
             if (comments === null) return; // Cancelled
             
             try {
-                const res = await fetch(`<?= url('/expenses_api.php?action=approve_claim') ?>`, {
+                const res = await fetch(`<?= url('/api/index.php?route=expenses&action=approve_claim') ?>`, {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify({claim_id: id, decision: decision, comments: comments})

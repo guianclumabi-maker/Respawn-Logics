@@ -474,7 +474,7 @@ $current_page = basename($_SERVER['SCRIPT_NAME']);
 
         async function loadDashboard() {
             try {
-                const res = await fetch(`<?= url('/payroll_engine_api.php?action=dashboard_kpis') ?>`);
+                const res = await fetch(`<?= url('/api/index.php?route=payroll_engine&action=dashboard_kpis') ?>`);
                 const data = await res.json();
                 if(data.success) {
                     const d = data.data;
@@ -488,7 +488,7 @@ $current_page = basename($_SERVER['SCRIPT_NAME']);
 
         async function loadSchedules() {
             try {
-                const res = await fetch(`<?= url('/payroll_engine_api.php?action=schedules') ?>`);
+                const res = await fetch(`<?= url('/api/index.php?route=payroll_engine&action=schedules') ?>`);
                 const data = await res.json();
                 if(data.success) {
                     document.getElementById('run_schedule').innerHTML = data.data.map(s => `<option value="${s.id}">${s.name} (${s.frequency})</option>`).join('');
@@ -498,7 +498,7 @@ $current_page = basename($_SERVER['SCRIPT_NAME']);
 
         async function loadRuns() {
             try {
-                const res = await fetch(`<?= url('/payroll_engine_api.php?action=runs') ?>`);
+                const res = await fetch(`<?= url('/api/index.php?route=payroll_engine&action=runs') ?>`);
                 const data = await res.json();
                 if(data.success) {
                     document.getElementById('runs-list').innerHTML = data.data.map(r => `
@@ -519,7 +519,7 @@ $current_page = basename($_SERVER['SCRIPT_NAME']);
 
         async function loadPayslips() {
             try {
-                const res = await fetch(`<?= url('/payroll_engine_api.php?action=payslips_admin') ?>`);
+                const res = await fetch(`<?= url('/api/index.php?route=payroll_engine&action=payslips_admin') ?>`);
                 const data = await res.json();
                 if(data.success) {
                     document.getElementById('payslips-list').innerHTML = data.data.map(ps => `
@@ -542,7 +542,7 @@ $current_page = basename($_SERVER['SCRIPT_NAME']);
             document.getElementById('payslipModal').classList.add('active');
             document.getElementById('payslip-print-content').innerHTML = `<div>Loading...</div>`;
             try {
-                const res = await fetch(`<?= url('/payroll_engine_api.php?action=payslip_details&id=') ?>` + id);
+                const res = await fetch(`<?= url('/api/index.php?route=payroll_engine&action=payslip_details&id=') ?>` + id);
                 const data = await res.json();
                 if(data.success) {
                     const ps = data.data;
@@ -609,7 +609,7 @@ $current_page = basename($_SERVER['SCRIPT_NAME']);
                 pay_date: document.getElementById('run_pay_date').value
             };
             try {
-                const res = await fetch(`<?= url('/payroll_engine_api.php?action=generate_run') ?>`, {
+                const res = await fetch(`<?= url('/api/index.php?route=payroll_engine&action=generate_run') ?>`, {
                     method: 'POST',
                     body: JSON.stringify(payload)
                 });
@@ -633,7 +633,7 @@ $current_page = basename($_SERVER['SCRIPT_NAME']);
             document.getElementById('runDetailsModal').classList.add('active');
             document.getElementById('details-employees').innerHTML = `<tr><td colspan="4">Loading...</td></tr>`;
             try {
-                const res = await fetch(`<?= url('/payroll_engine_api.php?action=run_details&id=') ?>` + id);
+                const res = await fetch(`<?= url('/api/index.php?route=payroll_engine&action=run_details&id=') ?>` + id);
                 const data = await res.json();
                 if(data.success) {
                     const r = data.data.run;
@@ -671,7 +671,7 @@ $current_page = basename($_SERVER['SCRIPT_NAME']);
         async function updateRunStatus(id, status) {
             if(!confirm(`Are you sure you want to change status to ${status}?`)) return;
             try {
-                const res = await fetch(`<?= url('/payroll_engine_api.php?action=update_run_status') ?>`, {
+                const res = await fetch(`<?= url('/api/index.php?route=payroll_engine&action=update_run_status') ?>`, {
                     method: 'POST',
                     body: JSON.stringify({run_id: id, status: status})
                 });

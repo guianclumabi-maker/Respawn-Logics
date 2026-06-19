@@ -528,7 +528,7 @@ if ($user) {
         // Helpdesk JS
         async function loadMyTickets() {
             try {
-                const res = await fetch(`<?= url('/esm_api.php?action=my_tickets') ?>`);
+                const res = await fetch(`<?= url('/api/index.php?route=esm&action=my_tickets') ?>`);
                 const data = await res.json();
                 const container = document.getElementById('my-tickets-container');
                 if (data.success) {
@@ -558,7 +558,7 @@ if ($user) {
 
         async function openTicketModal() {
             try {
-                const res = await fetch(`<?= url('/esm_api.php?action=ticket_types') ?>`);
+                const res = await fetch(`<?= url('/api/index.php?route=esm&action=ticket_types') ?>`);
                 const data = await res.json();
                 if (data.success) {
                     document.getElementById('ticket_type_id').innerHTML = data.data.map(t => `<option value="${t.id}">${t.name}</option>`).join('');
@@ -571,7 +571,7 @@ if ($user) {
             e.preventDefault();
             const formData = new FormData(document.getElementById('form-ticket'));
             try {
-                const res = await fetch(`<?= url('/esm_api.php?action=create_ticket') ?>`, { method: 'POST', body: formData });
+                const res = await fetch(`<?= url('/api/index.php?route=esm&action=create_ticket') ?>`, { method: 'POST', body: formData });
                 const data = await res.json();
                 if(data.success) {
                     document.getElementById('ticketModal').classList.remove('active');
@@ -583,7 +583,7 @@ if ($user) {
         // Benefits & Statutory JS
         async function loadStatutory() {
             try {
-                const res = await fetch(`<?= url('/benefits_api.php?action=my_statutory') ?>`);
+                const res = await fetch(`<?= url('/api/index.php?route=benefits&action=my_statutory') ?>`);
                 const data = await res.json();
                 if(data.success && data.data) {
                     document.getElementById('stat_sss').value = data.data.sss_number || '';
@@ -598,7 +598,7 @@ if ($user) {
             e.preventDefault();
             const formData = new FormData(document.getElementById('form-statutory'));
             try {
-                const res = await fetch(`<?= url('/benefits_api.php?action=update_statutory') ?>`, { method: 'POST', body: formData });
+                const res = await fetch(`<?= url('/api/index.php?route=benefits&action=update_statutory') ?>`, { method: 'POST', body: formData });
                 const data = await res.json();
                 if(data.success) alert('Statutory IDs updated successfully.');
                 else alert(data.error);
@@ -607,7 +607,7 @@ if ($user) {
 
         async function loadMyBenefits() {
             try {
-                const res = await fetch(`<?= url('/benefits_api.php?action=my_benefits') ?>`);
+                const res = await fetch(`<?= url('/api/index.php?route=benefits&action=my_benefits') ?>`);
                 const data = await res.json();
                 if(data.success) {
                     const c = document.getElementById('my-benefits-container');
@@ -629,7 +629,7 @@ if ($user) {
 
         async function loadAvailablePlans() {
             try {
-                const res = await fetch(`<?= url('/benefits_api.php?action=plans') ?>`);
+                const res = await fetch(`<?= url('/api/index.php?route=benefits&action=plans') ?>`);
                 const data = await res.json();
                 if(data.success) {
                     document.getElementById('enroll_plan').innerHTML = data.data.map(p => `<option value="${p.id}">${p.name} (${p.provider})</option>`).join('');
@@ -641,7 +641,7 @@ if ($user) {
             e.preventDefault();
             const formData = new FormData(document.getElementById('form-enroll'));
             try {
-                const res = await fetch(`<?= url('/benefits_api.php?action=enroll') ?>`, { method: 'POST', body: formData });
+                const res = await fetch(`<?= url('/api/index.php?route=benefits&action=enroll') ?>`, { method: 'POST', body: formData });
                 const data = await res.json();
                 if(data.success) {
                     document.getElementById('enrollModal').classList.remove('active');
@@ -652,7 +652,7 @@ if ($user) {
 
         async function loadExpenses() {
             try {
-                const res = await fetch(`<?= url('/expenses_api.php?action=my_claims') ?>`);
+                const res = await fetch(`<?= url('/api/index.php?route=expenses&action=my_claims') ?>`);
                 const data = await res.json();
                 if(data.success) {
                     const c = document.getElementById('expenses-container');
@@ -677,7 +677,7 @@ if ($user) {
 
         async function loadCategories() {
             try {
-                const res = await fetch(`<?= url('/expenses_api.php?action=categories') ?>`);
+                const res = await fetch(`<?= url('/api/index.php?route=expenses&action=categories') ?>`);
                 const data = await res.json();
                 if(data.success) {
                     document.getElementById('exp_category').innerHTML = data.data.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
@@ -690,7 +690,7 @@ if ($user) {
             const form = document.getElementById('form-expense');
             const formData = new FormData(form);
             try {
-                const res = await fetch(`<?= url('/expenses_api.php?action=submit_claim') ?>`, {
+                const res = await fetch(`<?= url('/api/index.php?route=expenses&action=submit_claim') ?>`, {
                     method: 'POST', body: formData
                 });
                 const data = await res.json();
@@ -704,7 +704,7 @@ if ($user) {
 
         async function loadGoals() {
             try {
-                const res = await fetch(`<?= url('/performance_api.php?action=my_goals') ?>`);
+                const res = await fetch(`<?= url('/api/index.php?route=performance&action=my_goals') ?>`);
                 const data = await res.json();
                 if(data.success) {
                     const c = document.getElementById('goals-container');
@@ -731,7 +731,7 @@ if ($user) {
 
         async function loadReviews() {
             try {
-                const res = await fetch(`<?= url('/performance_api.php?action=my_reviews') ?>`);
+                const res = await fetch(`<?= url('/api/index.php?route=performance&action=my_reviews') ?>`);
                 const data = await res.json();
                 if(data.success) {
                     const c = document.getElementById('reviews-container');
@@ -762,7 +762,7 @@ if ($user) {
             const comments = document.getElementById('self_eval_' + id).value;
             if(!comments) { alert('Please enter your self evaluation'); return; }
             try {
-                const res = await fetch(`<?= url('/performance_api.php?action=submit_self_eval') ?>`, {
+                const res = await fetch(`<?= url('/api/index.php?route=performance&action=submit_self_eval') ?>`, {
                     method: 'POST', body: JSON.stringify({review_id: id, self_comments: comments})
                 });
                 const data = await res.json();
@@ -772,7 +772,7 @@ if ($user) {
 
         async function loadPayslips() {
             try {
-                const res = await fetch(`<?= url('/payroll_engine_api.php?action=my_payslips') ?>`);
+                const res = await fetch(`<?= url('/api/index.php?route=payroll_engine&action=my_payslips') ?>`);
                 const data = await res.json();
                 const container = document.getElementById('payslips-container');
                 if (data.success) {
@@ -795,7 +795,7 @@ if ($user) {
 
         async function loadTimeline() {
             try {
-                const res = await fetch(`<?= url('/core_hr_api.php?action=master_record&user_id='.$user['id']) ?>`);
+                const res = await fetch(`<?= url('/api/index.php?route=core_hr&action=master_record&user_id='.$user['id']) ?>`);
                 const data = await res.json();
                 const container = document.getElementById('timeline-container');
                 if (data.success) {

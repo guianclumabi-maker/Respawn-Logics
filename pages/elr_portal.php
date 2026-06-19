@@ -195,7 +195,7 @@ $current_page = basename($_SERVER['SCRIPT_NAME']);
         async function loadQueue() {
             try {
                 // Fetch employee's own ELR cases specifically
-                const res = await fetch(`<?= url('/esm_api.php?action=my_elr_cases') ?>`);
+                const res = await fetch(`<?= url('/api/index.php?route=esm&action=my_elr_cases') ?>`);
                 const data = await res.json();
                 if (data.success) {
                     currentTickets = data.data;
@@ -248,7 +248,7 @@ $current_page = basename($_SERVER['SCRIPT_NAME']);
             renderQueue();
             
             try {
-                const res = await fetch(`<?= url('/esm_api.php?action=ticket_details&id=') ?>` + id);
+                const res = await fetch(`<?= url('/api/index.php?route=esm&action=ticket_details&id=') ?>` + id);
                 const data = await res.json();
                 if (data.success) {
                     const t = data.data.ticket;
@@ -291,7 +291,7 @@ $current_page = basename($_SERVER['SCRIPT_NAME']);
             if (!activeTicketId) return;
             const status = document.getElementById('dtl-status').value;
             try {
-                await fetch(`<?= url('/esm_api.php?action=update_ticket') ?>`, {
+                await fetch(`<?= url('/api/index.php?route=esm&action=update_ticket') ?>`, {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify({ ticket_id: activeTicketId, status: status })
@@ -310,7 +310,7 @@ $current_page = basename($_SERVER['SCRIPT_NAME']);
             formData.append('ticket_id', activeTicketId);
             
             try {
-                const res = await fetch(`<?= url('/esm_api.php?action=add_comment') ?>`, {
+                const res = await fetch(`<?= url('/api/index.php?route=esm&action=add_comment') ?>`, {
                     method: 'POST',
                     body: formData
                 });
@@ -324,7 +324,7 @@ $current_page = basename($_SERVER['SCRIPT_NAME']);
 
         async function openCreateModal() {
             try {
-                const res = await fetch(`<?= url('/esm_api.php?action=elr_ticket_types') ?>`);
+                const res = await fetch(`<?= url('/api/index.php?route=esm&action=elr_ticket_types') ?>`);
                 const data = await res.json();
                 if (data.success) {
                     const elrTypes = data.data;
@@ -338,7 +338,7 @@ $current_page = basename($_SERVER['SCRIPT_NAME']);
             e.preventDefault();
             const formData = new FormData(document.getElementById('form-ticket'));
             try {
-                const res = await fetch(`<?= url('/esm_api.php?action=create_ticket') ?>`, { method: 'POST', body: formData });
+                const res = await fetch(`<?= url('/api/index.php?route=esm&action=create_ticket') ?>`, { method: 'POST', body: formData });
                 const data = await res.json();
                 if(data.success) {
                     document.getElementById('createModal').classList.remove('active');
