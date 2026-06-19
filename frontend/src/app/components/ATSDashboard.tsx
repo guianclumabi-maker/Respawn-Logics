@@ -517,29 +517,29 @@ export function ATSDashboard({ onViewChange }: Props) {
       <div className="p-8 max-w-[1440px] mx-auto hide-scrollbar">
         {/* ── Welcome Header ─────────────────────────────────── */}
         <div
-          className="mb-8 flex flex-col md:flex-row md:items-end md:justify-between border-b border-white/[0.04] pb-6"
+          className="mb-8 flex flex-col md:flex-row md:items-end md:justify-between border-b border-border pb-6"
           style={{ animation: "fadeSlideUp 0.4s ease-out both" }}
         >
           <div>
             <h1
-              className="text-2xl font-bold tracking-tight text-white font-['Space_Grotesk'] flex items-center gap-2"
+              className="text-2xl font-bold tracking-tight text-foreground font-['Space_Grotesk'] flex items-center gap-2"
             >
               RESPAWN LOGICS // ATS CONTROLLER v2.0
-              <span className="inline-block w-2.5 h-5 bg-[#00e07a] blink"></span>
+              <span className="inline-block w-2.5 h-5 bg-emerald-500 blink"></span>
             </h1>
-            <p className="text-xs font-mono text-gray-500 mt-1 uppercase tracking-wider">
+            <p className="text-xs font-mono text-muted-foreground mt-1 uppercase tracking-wider">
               System initialization complete. Operator authenticated.
             </p>
           </div>
           <div className="flex flex-wrap items-center gap-3 mt-4 md:mt-0 font-mono text-[10px]">
-            <span className="px-2.5 py-1 rounded bg-[#00e07a]/10 text-[#00e07a] border border-[#00e07a]/20 flex items-center gap-1.5 font-bold">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#00e07a] animate-ping" />
+            <span className="px-2.5 py-1 rounded bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 flex items-center gap-1.5 font-bold">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping" />
               STATUS: SECURE
             </span>
-            <span className="px-2.5 py-1 rounded bg-white/[0.02] text-gray-400 border border-white/[0.05]">
+            <span className="px-2.5 py-1 rounded bg-muted text-muted-foreground border border-border">
               LOCATION: RESPAWN-HQ
             </span>
-            <span className="px-2.5 py-1 rounded bg-white/[0.02] text-gray-400 border border-white/[0.05]">
+            <span className="px-2.5 py-1 rounded bg-muted text-muted-foreground border border-border">
               {today}
             </span>
           </div>

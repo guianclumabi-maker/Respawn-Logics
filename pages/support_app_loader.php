@@ -206,6 +206,9 @@ if (is_dir($assetDir)) {
 ?>
 <?php $page_title = $pageTitle; ?>
 <?php include __DIR__ . '/../includes/head.php'; ?>
+<?php if ($cssFile): ?>
+    <link rel="stylesheet" href="<?= url('/assets/ticket-dashboard/' . $cssFile) ?>">
+<?php endif; ?>
 <body>
     <script>
         window.__INITIAL_DATA__ = <?= json_encode(array_values($reactTickets)) ?>;
