@@ -639,7 +639,7 @@ function JobCard({
 }) {
   return (
     <div
-      className="bg-background border border-border rounded-xl p-5 hover:border-[#9b6dff]/40 hover:bg-[#141929] hover:shadow-[0_0_15px_rgba(155,109,255,0.1)] transition-all flex flex-col justify-between group"
+      className="bg-card border border-border rounded-xl p-5 hover:border-[#9b6dff]/40 hover:bg-purple-500/5 dark:hover:bg-[#141929] hover:shadow-[0_0_15px_rgba(155,109,255,0.1)] transition-all flex flex-col justify-between group"
     >
       {/* Top badges */}
       <div>

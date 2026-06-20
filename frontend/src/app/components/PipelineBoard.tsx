@@ -177,7 +177,7 @@ function KanbanCard({ app, onClick }: { app: Application; onClick: () => void })
   return (
     <div draggable onDragStart={e => { e.dataTransfer.setData("application/json", JSON.stringify({ id: app.id })); e.dataTransfer.effectAllowed = "move"; }}
       onClick={onClick}
-      className="bg-background border border-border rounded-xl p-3.5 cursor-grab hover:border-[#9b6dff]/40 hover:bg-[#141929] hover:shadow-[0_0_12px_rgba(155,109,255,0.08)] transition-all group">
+      className="bg-card border border-border rounded-xl p-3.5 cursor-grab hover:border-[#9b6dff]/40 hover:bg-purple-500/5 dark:hover:bg-[#141929] hover:shadow-[0_0_12px_rgba(155,109,255,0.08)] transition-all group">
       <div className="flex items-start justify-between mb-1.5">
         <span className="text-xs font-bold text-foreground group-hover:text-primary transition-colors truncate flex-1">{app.name}</span>
         <div className="flex items-center gap-1 ml-1.5"><SourceIcon source={app.source || app.candidate_source || ""} /></div>

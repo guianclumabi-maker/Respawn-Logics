@@ -132,7 +132,7 @@ function Skeleton({ className = "" }: { className?: string }) {
 
 function CardSkeleton() {
   return (
-    <div className="bg-background border border-border rounded-xl p-5 space-y-3">
+    <div className="bg-card border border-border rounded-xl p-5 space-y-3">
       <div className="flex items-center justify-between">
         <Skeleton className="w-10 h-10 rounded-full" />
         <Skeleton className="w-16 h-4" />
@@ -315,7 +315,7 @@ function JobHealthCard({
   ];
 
   return (
-    <div className="bg-background border border-border rounded-xl p-5 flex flex-col justify-between transition-all hover:border-[#9b6dff]/40 hover:bg-[#141929] hover:shadow-[0_0_15px_rgba(155,109,255,0.1)]">
+    <div className="bg-card border border-border rounded-xl p-5 flex flex-col justify-between transition-all hover:border-[#9b6dff]/40 hover:bg-purple-500/5 dark:hover:bg-[#141929] hover:shadow-[0_0_15px_rgba(155,109,255,0.1)]">
       {/* Header */}
       <div className="mb-4">
         <div className="flex items-start justify-between mb-2">
@@ -626,7 +626,7 @@ export function ATSDashboard({ onViewChange }: Props) {
 
             {/* ── Action Center ────────────────────── */}
             <div
-              className="bg-background border border-border rounded-xl p-6 mb-8 relative overflow-hidden"
+              className="bg-card border border-border rounded-xl p-6 mb-8 relative overflow-hidden"
               style={{ animation: "fadeSlideUp 0.5s ease-out 200ms both" }}
             >
               <div className="flex items-center gap-2 mb-5 justify-between">
@@ -703,7 +703,7 @@ export function ATSDashboard({ onViewChange }: Props) {
                   ))}
                 </div>
               ) : (
-                <div className="bg-background border border-border rounded-xl p-10 text-center">
+                <div className="bg-card border border-border rounded-xl p-10 text-center">
                   <Briefcase
                     size={32}
                     className="text-muted-foreground mx-auto mb-3"
@@ -730,7 +730,7 @@ export function ATSDashboard({ onViewChange }: Props) {
               style={{ animation: "fadeSlideUp 0.5s ease-out 400ms both" }}
             >
               {/* Left: Recent Activity Feed (60%) */}
-              <div className="lg:col-span-3 bg-background border border-border rounded-xl p-6">
+              <div className="lg:col-span-3 bg-card border border-border rounded-xl p-6">
                 <div className="flex items-center gap-2 mb-5">
                   <Activity size={18} className="text-[#9b6dff]" />
                   <h2
@@ -785,7 +785,7 @@ export function ATSDashboard({ onViewChange }: Props) {
               </div>
 
               {/* Right: Upcoming Interviews (40%) */}
-              <div className="lg:col-span-2 bg-background border border-border rounded-xl p-6">
+              <div className="lg:col-span-2 bg-card border border-border rounded-xl p-6">
                 <div className="flex items-center gap-2 mb-5">
                   <Calendar size={18} className="text-[#4f8ef7]" />
                   <h2
