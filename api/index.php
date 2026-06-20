@@ -10,15 +10,15 @@ require_once __DIR__ . '/../bootstrap/app.php';
 // Force JSON response
 header('Content-Type: application/json');
 
+$route = isset($_GET['route']) ? $_GET['route'] : '';
+$action = isset($_GET['action']) ? $_GET['action'] : '';
+
 // Middleware: Verify Authentication before ANY controller logic runs
-if (!isLoggedIn()) {
+if (!isLoggedIn() && $route !== 'auth') {
     http_response_code(401);
     echo json_encode(['success' => false, 'error' => 'Unauthorized']);
     exit;
 }
-
-$route = isset($_GET['route']) ? $_GET['route'] : '';
-$action = isset($_GET['action']) ? $_GET['action'] : '';
 
 if (empty($route)) {
     http_response_code(400);
@@ -83,6 +83,7 @@ if ($now - $_SESSION['rate_limit']['start'] > 60) {
 
 // Map routes to Controller classes
 $controllers = [
+    'auth' => 'AuthController',
     'core_hr' => 'CoreHRController',
     'ai_companion' => 'AICompanionController',
     'analytics' => 'AnalyticsController',

@@ -1,5 +1,6 @@
 import { createRoot } from "react-dom/client";
-import App from "./app/App.tsx";
+import { RouterProvider } from "react-router-dom";
+import { router } from "./app/Router";
 import { AuthProvider } from "./app/context/AuthContext.tsx";
 import { ThemeProvider } from "next-themes";
 import "./styles/index.css";
@@ -58,7 +59,7 @@ async function boot() {
   createRoot(document.getElementById("root")!).render(
     <ThemeProvider attribute="data-theme" defaultTheme="dark" storageKey="theme">
       <AuthProvider>
-        <App />
+        <RouterProvider router={router} />
       </AuthProvider>
     </ThemeProvider>
   );
