@@ -131,14 +131,14 @@ export default function MainLayout() {
         const res = await fetch(`${API}&action=dashboard`);
         if (!res.ok) return;
         const data = await res.json();
-        if (data.success && data.data) {
-          const d = data.data;
+        if (data.success && data.action_summary) {
+          const s = data.action_summary;
           setBadges({
-            actions: d.action_items ?? d.actions ?? 0,
-            urgentJobs: d.urgent_jobs ?? 0,
-            todayInterviews: d.today_interviews ?? d.interviews_today ?? 0,
-            pendingApprovals: d.pending_approvals ?? 0,
-            copilotAlerts: d.copilot_alerts ?? 0,
+            actions: s.awaiting_review ?? 0,
+            urgentJobs: 0,
+            todayInterviews: s.interviews_today ?? 0,
+            pendingApprovals: s.pending_approvals ?? 0,
+            copilotAlerts: 0,
           });
         }
       } catch {

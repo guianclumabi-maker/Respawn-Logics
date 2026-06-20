@@ -26,8 +26,20 @@ class CandidatesController
             requirePermission('ats.create_job');
         } elseif ($action === 'update_job') {
             requirePermission('ats.edit_job');
-        } elseif ($action === 'update_stage' || $action === 'bulk_advance' || $action === 'bulk_reject' || $action === 'bulk_delete') {
+        } elseif (
+            $action === 'update_stage' || $action === 'bulk_advance' || $action === 'bulk_reject' || $action === 'bulk_delete' ||
+            $action === 'add_candidate' || $action === 'update_candidate' || $action === 'add_application' ||
+            $action === 'update_rating' || $action === 'add' || $action === 'add_interview' ||
+            $action === 'update_interview' || $action === 'add_scorecard' || $action === 'add_note' ||
+            $action === 'add_pool' || $action === 'update_pool' || $action === 'add_to_pool' ||
+            $action === 'remove_from_pool' || $action === 'submit_approval' || $action === 'compute_ai_scores'
+        ) {
             requirePermission('ats.edit');
+        } elseif (
+            $action === 'delete_candidate' || $action === 'delete_pool' || 
+            $action === 'delete' || $action === 'resolve_approval'
+        ) {
+            requirePermission('ats.delete');
         }
 
         try {
@@ -387,7 +399,9 @@ class CandidatesController
             $job['days_since_activity'] = $lastActivity ? (int)((time() - strtotime($lastActivity)) / 86400) : $daysOpen;
             $job['formatted_date'] = date('M j, Y', strtotime($job['created_at']));
         }
-        $departments = $this->pdo->query("SELECT DISTINCT `department` FROM `jobs` WHERE `department` IS NOT NULL AND `department` != '' ORDER BY `department`")->fetchAll(PDO::FETCH_COLUMN);
+        $deptStmt = $this->pdo->prepare("SELECT DISTINCT `department` FROM `jobs` WHERE `tenant_id` = ? AND `department` IS NOT NULL AND `department` != '' ORDER BY `department`");
+        $deptStmt->execute([$this->tenantId]);
+        $departments = $deptStmt->fetchAll(PDO::FETCH_COLUMN);
         echo json_encode(['success' => true, 'jobs' => $jobs, 'departments' => $departments]);
         exit;
     }
@@ -424,8 +438,6 @@ class CandidatesController
         if ($status) { $where[] = "cp.`status` = ?"; $params[] = $status; }
         if ($source) { $where[] = "cp.`source` = ?"; $params[] = $source; }
         $whereClause = !empty($where) ? 'WHERE ' . implode(' AND ', $where) : '';
-        $totalCount = (int)$this->pdo->prepare("SELECT COUNT(*) FROM `candidate_profiles` cp $whereClause")->execute($params) ? $this->pdo->query("SELECT FOUND_ROWS()")->fetchColumn() : 0; // Quick fix for pagination
-        // Actually PDO prepare with execute and fetchColumn:
         $countStmt = $this->pdo->prepare("SELECT COUNT(*) FROM `candidate_profiles` cp $whereClause");
         $countStmt->execute($params);
         $totalCount = (int)$countStmt->fetchColumn();
@@ -829,10 +841,22 @@ class CandidatesController
         $id = (int)($input['id'] ?? 0); $stage = trim($input['stage'] ?? '');
         if (!$id || empty($stage)) { http_response_code(400); echo json_encode(['success' => false, 'error' => 'Missing ID or stage']); exit; }
         $oldStage = $this->pdo->prepare("SELECT `stage`, `candidate_id`, `job_id` FROM `candidate_applications` WHERE `id` = ? AND `tenant_id` = ?"); $oldStage->execute([$id, $this->tenantId]); $old = $oldStage->fetch();
-        $updateFields = "`stage` = ?, `stage_entered_at` = NOW()"; $updateParams = [$stage];
-        if ($stage === 'Hired') { $updateFields .= ", `hired_at` = NOW()"; }
+        $updateFields = "`stage` = ?, `stage_entered_at` = NOW()";
+        $updateParams = [$stage];
+
+        if ($stage === 'Hired') {
+            $updateFields .= ", `hired_at` = NOW()";
+        } else {
+            $updateFields .= ", `hired_at` = NULL";
+        }
+        
+        if ($stage !== 'Rejected') {
+            $updateFields .= ", `rejected_at` = NULL, `rejection_reason` = NULL";
+        }
+
         $updateParams[] = $id;
-        $updateParams[] = $this->tenantId; $this->pdo->prepare("UPDATE `candidate_applications` SET $updateFields WHERE `id` = ? AND `tenant_id` = ?")->execute($updateParams);
+        $updateParams[] = $this->tenantId;
+        $this->pdo->prepare("UPDATE `candidate_applications` SET $updateFields WHERE `id` = ? AND `tenant_id` = ?")->execute($updateParams);
         if ($old) { $this->logActivity('stage_changed', "Moved from {$old['stage']} to $stage", (int)$old['candidate_id'], (int)$old['job_id'], $id); }
         echo json_encode(['success' => true]);
         exit;
@@ -852,10 +876,16 @@ class CandidatesController
         if (empty($ids) || empty($stage)) { http_response_code(400); echo json_encode(['success' => false, 'error' => 'Missing IDs or stage']); exit; }
         $placeholders = implode(',', array_fill(0, count($ids), '?'));
         if ($stage === 'Hired') {
-            $params = array_merge([$stage], $ids); $params[] = $this->tenantId; $this->pdo->prepare("UPDATE `candidate_applications` SET `stage` = ?, `stage_entered_at` = NOW(), `hired_at` = NOW() WHERE `id` IN ($placeholders) AND `tenant_id` = ?")->execute($params);
+            $set = "`stage` = ?, `stage_entered_at` = NOW(), `hired_at` = NOW(), `rejected_at` = NULL, `rejection_reason` = NULL";
         } else {
-            $params = array_merge([$stage], $ids); $params[] = $this->tenantId; $this->pdo->prepare("UPDATE `candidate_applications` SET `stage` = ?, `stage_entered_at` = NOW() WHERE `id` IN ($placeholders) AND `tenant_id` = ?")->execute($params);
+            $set = "`stage` = ?, `stage_entered_at` = NOW(), `hired_at` = NULL";
+            if ($stage !== 'Rejected') {
+                $set .= ", `rejected_at` = NULL, `rejection_reason` = NULL";
+            }
         }
+        $params = array_merge([$stage], $ids);
+        $params[] = $this->tenantId;
+        $this->pdo->prepare("UPDATE `candidate_applications` SET $set WHERE `id` IN ($placeholders) AND `tenant_id` = ?")->execute($params);
         foreach ($ids as $appId) {
             $app = $this->pdo->prepare("SELECT `candidate_id`, `job_id` FROM `candidate_applications` WHERE `id` = ? AND `tenant_id` = ?"); $app->execute([$appId, $this->tenantId]); $a = $app->fetch();
             if ($a) $this->logActivity('bulk_advance', "Bulk advanced to $stage", (int)$a['candidate_id'], (int)$a['job_id'], (int)$appId);

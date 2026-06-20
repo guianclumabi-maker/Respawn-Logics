@@ -44,7 +44,9 @@ return [
     'ATS' => [
         'ats.view',
         'ats.create_job',
-        'ats.edit_job'
+        'ats.edit_job',
+        'ats.edit',
+        'ats.delete'
     ],
     'ELR' => [
         'elr.view',
