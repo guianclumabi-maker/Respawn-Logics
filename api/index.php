@@ -28,9 +28,23 @@ if (empty($route)) {
 
 // CSRF Protection
 if ($_SERVER['REQUEST_METHOD'] !== 'GET' && $_SERVER['REQUEST_METHOD'] !== 'OPTIONS') {
-    $headers = getallheaders();
-    $requestCsrf = $headers['X-CSRF-Token'] ?? $headers['x-csrf-token'] ?? '';
+    $requestCsrf = '';
     
+    // Check all headers case-insensitively
+    if (function_exists('getallheaders')) {
+        foreach (getallheaders() as $name => $value) {
+            if (strtolower($name) === 'x-csrf-token') {
+                $requestCsrf = $value;
+                break;
+            }
+        }
+    }
+    
+    // Fallback to $_SERVER superglobal
+    if (empty($requestCsrf) && isset($_SERVER['HTTP_X_CSRF_TOKEN'])) {
+        $requestCsrf = $_SERVER['HTTP_X_CSRF_TOKEN'];
+    }
+
     // Also check JSON body if not in headers
     if (empty($requestCsrf)) {
         $input = json_decode(file_get_contents('php://input'), true);
