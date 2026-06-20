@@ -480,42 +480,76 @@ export function PipelineBoard({ onViewChange, jobId }: Props) {
       (j.department || "").toLowerCase().includes(jobSearch.toLowerCase()) || 
       (j.location || "").toLowerCase().includes(jobSearch.toLowerCase())
     );
+
+    // Compute mini dashboard metrics
+    const totalCandidates = jobs.reduce((sum, j) => sum + (j.health?.total || 0), 0);
+    const totalVelocity = jobs.reduce((sum, j) => sum + (j.health?.velocity || 0), 0);
+    const totalOffers = jobs.reduce((sum, j) => sum + (j.health?.offer || 0), 0);
     
     return (
-      <div className="flex-1 flex flex-col items-center justify-center text-foreground font-mono p-4" >
-        <div className="bg-card border border-border rounded-xl p-8 shadow-xl max-w-md w-full flex flex-col items-center">
-          <div className="w-16 h-16 rounded-full bg-[#00e07a]/10 flex items-center justify-center mb-4">
-            <Briefcase size={28} className="text-[#00e07a]" />
-          </div>
-          <h2 className="text-sm font-bold mb-2 tracking-widest text-[#00e07a] uppercase">[ PIPELINE SELECTION ]</h2>
-          <p className="text-xs text-muted-foreground mb-6 text-center">Select an active job to view its recruitment pipeline</p>
+      <div className="flex-1 flex flex-col items-center justify-start text-foreground font-mono p-6 overflow-y-auto custom-scrollbar" >
+        <div className="w-full max-w-4xl space-y-8 mt-4">
           
-          <div className="w-full relative mb-4">
-            <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-            <input
-              type="text"
-              value={jobSearch}
-              onChange={(e) => setJobSearch(e.target.value)}
-              placeholder="Filter by title, department..."
-              className="w-full bg-background border border-border rounded-lg pl-9 pr-3 py-2 text-xs text-foreground placeholder-muted-foreground focus:outline-none focus:border-[#00e07a]/40 transition-colors"
-            />
+          <div className="text-center">
+            <div className="w-16 h-16 rounded-full bg-[#00e07a]/10 flex items-center justify-center mx-auto mb-4">
+              <Briefcase size={28} className="text-[#00e07a]" />
+            </div>
+            <h2 className="text-xl font-bold mb-2 tracking-widest text-[#00e07a] uppercase">[ PIPELINE SELECTION ]</h2>
+            <p className="text-sm text-muted-foreground">Select an active job to view its recruitment pipeline</p>
           </div>
 
-          <div className="space-y-3 w-full max-h-[50vh] overflow-y-auto pr-2 custom-scrollbar">
-            {filteredJobs.length === 0 ? (
-              <div className="text-center py-6 text-xs text-muted-foreground">No jobs match your filter.</div>
-            ) : (
-              filteredJobs.map(j => (
-                <button key={j.id} onClick={() => setSelectedJobId(j.id)}
-                  className="w-full flex items-center justify-between px-4 py-3 rounded-lg border border-border bg-background text-left hover:border-[#00e07a]/40 hover:bg-[#00e07a]/5 hover:shadow-[0_0_15px_rgba(0,224,122,0.1)] transition-all cursor-pointer group">
-                  <div>
-                    <span className="text-sm font-semibold text-foreground group-hover:text-[#00e07a] transition-colors">{j.title}</span>
-                    <span className="text-[10px] text-muted-foreground block mt-1 uppercase tracking-wider">{`DEP: ${j.department || 'N/A'} • ${j.location || 'Remote'}`}</span>
-                  </div>
-                  <ChevronRight size={16} className="text-muted-foreground group-hover:text-[#00e07a] group-hover:translate-x-1 transition-all" />
-                </button>
-              ))
-            )}
+          {/* Mini Dashboard */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="bg-card border border-border rounded-xl p-5 shadow-lg flex flex-col items-center justify-center">
+              <span className="text-[#00e07a] text-2xl font-bold mb-1">{jobs.length}</span>
+              <span className="text-[10px] text-muted-foreground uppercase tracking-widest">Active Jobs</span>
+            </div>
+            <div className="bg-card border border-border rounded-xl p-5 shadow-lg flex flex-col items-center justify-center">
+              <span className="text-[#9b6dff] text-2xl font-bold mb-1">{totalCandidates}</span>
+              <span className="text-[10px] text-muted-foreground uppercase tracking-widest">Total Candidates</span>
+            </div>
+            <div className="bg-card border border-border rounded-xl p-5 shadow-lg flex flex-col items-center justify-center">
+              <span className="text-amber-400 text-2xl font-bold mb-1">{totalVelocity}</span>
+              <span className="text-[10px] text-muted-foreground uppercase tracking-widest">New This Week</span>
+            </div>
+            <div className="bg-card border border-border rounded-xl p-5 shadow-lg flex flex-col items-center justify-center">
+              <span className="text-emerald-400 text-2xl font-bold mb-1">{totalOffers}</span>
+              <span className="text-[10px] text-muted-foreground uppercase tracking-widest">Pending Offers</span>
+            </div>
+          </div>
+
+          <div className="bg-card border border-border rounded-xl p-6 shadow-xl w-full">
+            <div className="w-full relative mb-6">
+              <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground" />
+              <input
+                type="text"
+                value={jobSearch}
+                onChange={(e) => setJobSearch(e.target.value)}
+                placeholder="Search active jobs by title, department, or location..."
+                className="w-full bg-background border border-border rounded-lg pl-12 pr-4 py-3 text-sm text-foreground placeholder-muted-foreground focus:outline-none focus:border-[#00e07a]/40 transition-colors shadow-inner"
+              />
+            </div>
+
+            <div className="space-y-3 w-full max-h-[50vh] overflow-y-auto pr-2 custom-scrollbar">
+              {filteredJobs.length === 0 ? (
+                <div className="text-center py-10 text-sm text-muted-foreground">No jobs match your filter.</div>
+              ) : (
+                filteredJobs.map(j => (
+                  <button key={j.id} onClick={() => setSelectedJobId(j.id)}
+                    className="w-full flex items-center justify-between px-5 py-4 rounded-lg border border-border bg-background text-left hover:border-[#00e07a]/40 hover:bg-[#00e07a]/5 hover:shadow-[0_0_20px_rgba(0,224,122,0.1)] transition-all cursor-pointer group">
+                    <div>
+                      <span className="text-base font-semibold text-foreground group-hover:text-[#00e07a] transition-colors">{j.title}</span>
+                      <div className="flex items-center gap-3 mt-1.5">
+                        <span className="text-xs text-muted-foreground uppercase tracking-wider">{`DEP: ${j.department || 'N/A'}`}</span>
+                        <span className="text-xs text-muted-foreground uppercase tracking-wider">{`LOC: ${j.location || 'Remote'}`}</span>
+                        <span className="text-[10px] bg-[#00e07a]/10 text-[#00e07a] px-2 py-0.5 rounded-full">{j.health?.total || 0} Candidates</span>
+                      </div>
+                    </div>
+                    <ChevronRight size={20} className="text-muted-foreground group-hover:text-[#00e07a] group-hover:translate-x-1 transition-all" />
+                  </button>
+                ))
+              )}
+            </div>
           </div>
         </div>
       </div>
