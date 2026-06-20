@@ -343,7 +343,7 @@ export function PipelineBoard({ onViewChange, jobId }: Props) {
       fetch(`${API}&action=jobs`).then(r => r.json()).then(d => {
         if (d.success && d.jobs?.length) {
           setJobs(d.jobs);
-          setSelectedJobId(d.jobs[0].id);
+          // Do NOT auto-select the first job, let the user choose from the list
         }
         setLoading(false);
       }).catch(() => setLoading(false));
@@ -474,16 +474,24 @@ export function PipelineBoard({ onViewChange, jobId }: Props) {
   // Job selector if no specific job
   if (!job && jobs.length > 0) return (
     <div className="flex-1 flex flex-col items-center justify-center text-foreground font-mono" >
-      <Briefcase size={40} className="text-[#9b6dff] mb-4" />
-      <h2 className="text-base font-bold mb-4">SELECT ACTIVE JOB PIPELINE</h2>
-      <div className="space-y-2.5 w-80">
-        {jobs.map(j => (
-          <button key={j.id} onClick={() => setSelectedJobId(j.id)}
-            className="w-full flex items-center justify-between px-4 py-3 rounded-xl border border-border bg-muted text-left hover:border-[#00e07a]/40 hover:bg-primary/[0.02] transition-all cursor-pointer">
-            <div><span className="text-sm font-semibold text-foreground">{j.title}</span><span className="text-[10px] text-muted-foreground block">{`DEPARTMENT: ${j.department}`}</span></div>
-            <ChevronRight size={14} className="text-muted-foreground" />
-          </button>
-        ))}
+      <div className="bg-card border border-border rounded-xl p-8 shadow-xl max-w-md w-full flex flex-col items-center">
+        <div className="w-16 h-16 rounded-full bg-[#00e07a]/10 flex items-center justify-center mb-4">
+          <Briefcase size={28} className="text-[#00e07a]" />
+        </div>
+        <h2 className="text-sm font-bold mb-2 tracking-widest text-[#00e07a] uppercase">[ PIPELINE SELECTION ]</h2>
+        <p className="text-xs text-muted-foreground mb-6 text-center">Select an active job to view its recruitment pipeline</p>
+        <div className="space-y-3 w-full max-h-[60vh] overflow-y-auto pr-2 custom-scrollbar">
+          {jobs.map(j => (
+            <button key={j.id} onClick={() => setSelectedJobId(j.id)}
+              className="w-full flex items-center justify-between px-4 py-3 rounded-lg border border-border bg-background text-left hover:border-[#00e07a]/40 hover:bg-[#00e07a]/5 hover:shadow-[0_0_15px_rgba(0,224,122,0.1)] transition-all cursor-pointer group">
+              <div>
+                <span className="text-sm font-semibold text-foreground group-hover:text-[#00e07a] transition-colors">{j.title}</span>
+                <span className="text-[10px] text-muted-foreground block mt-1 uppercase tracking-wider">{`DEP: ${j.department || 'N/A'} • ${j.location || 'Remote'}`}</span>
+              </div>
+              <ChevronRight size={16} className="text-muted-foreground group-hover:text-[#00e07a] group-hover:translate-x-1 transition-all" />
+            </button>
+          ))}
+        </div>
       </div>
     </div>
   );
