@@ -1254,6 +1254,110 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
     </div>
 </section>
 
+<!-- DEMOS WORKFLOW SECTION -->
+<section class="story-section" id="demos" style="background: var(--bg2); border-top: 1px solid var(--border3); border-bottom: 1px solid var(--border3); padding-top: 80px; padding-bottom: 80px;">
+    <div class="story-container">
+        <h2 style="text-align: center; margin-bottom: 15px;">Experience the Workflow</h2>
+        <p class="sub" style="text-align: center; margin-bottom: 50px;">Drag-and-drop candidates through your custom recruitment pipeline. No training required.</p>
+        
+        <!-- Interactive Mockup of the ATS Board -->
+        <div style="background: var(--bg3); border: 1px solid var(--border2); border-radius: 16px; padding: 24px; box-shadow: 0 20px 40px rgba(0,0,0,0.4); max-width: 1000px; margin: 0 auto; overflow-x: auto;">
+            <!-- Header -->
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border3); padding-bottom: 16px; margin-bottom: 24px;">
+                <div style="display: flex; gap: 16px; align-items: center;">
+                    <div style="width: 40px; height: 40px; background: rgba(0,224,122,0.1); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: var(--green);">
+                        <i data-lucide="layout-dashboard"></i>
+                    </div>
+                    <div>
+                        <h3 style="margin: 0; font-size: 1.2rem; color: #fff;">ATS Pipeline</h3>
+                        <p style="margin: 0; font-size: 0.85rem; color: #8899b4;">Senior React Engineer</p>
+                    </div>
+                </div>
+                <div>
+                    <button style="background: var(--green); color: #000; border: none; padding: 8px 16px; border-radius: 6px; font-weight: 600; cursor: pointer;">+ Add Candidate</button>
+                </div>
+            </div>
+
+            <!-- Board -->
+            <div style="display: flex; gap: 24px; min-width: 800px; padding-bottom: 10px;">
+                <!-- Column 1 -->
+                <div style="flex: 1; min-width: 250px; background: var(--bg4); border-radius: 12px; padding: 16px;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 16px;">
+                        <span style="color: #8899b4; font-size: 0.85rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;">Sourced</span>
+                        <span style="background: rgba(255,255,255,0.1); padding: 2px 8px; border-radius: 10px; font-size: 0.75rem; color: #fff;">2</span>
+                    </div>
+                    <!-- Card 1 -->
+                    <div style="background: var(--bg2); border: 1px solid var(--border2); border-radius: 8px; padding: 16px; margin-bottom: 12px; cursor: grab; transition: transform 0.2s; box-shadow: 0 4px 10px rgba(0,0,0,0.2);" onmouseover="this.style.transform='translateY(-2px)';" onmouseout="this.style.transform='translateY(0)';">
+                        <div style="font-weight: 600; color: #fff; margin-bottom: 4px;">Alex Mercer</div>
+                        <div style="font-size: 0.8rem; color: #8899b4; margin-bottom: 12px;">Google • 5 YOE</div>
+                        <div style="display: flex; gap: 6px;">
+                            <span style="background: rgba(0,224,122,0.1); color: var(--green); padding: 2px 6px; border-radius: 4px; font-size: 0.7rem;">React</span>
+                            <span style="background: rgba(79,142,247,0.1); color: var(--blue); padding: 2px 6px; border-radius: 4px; font-size: 0.7rem;">Node.js</span>
+                        </div>
+                    </div>
+                    <!-- Card 2 -->
+                    <div style="background: var(--bg2); border: 1px solid var(--border2); border-radius: 8px; padding: 16px; margin-bottom: 12px; cursor: grab; transition: transform 0.2s; box-shadow: 0 4px 10px rgba(0,0,0,0.2);" onmouseover="this.style.transform='translateY(-2px)';" onmouseout="this.style.transform='translateY(0)';">
+                        <div style="font-weight: 600; color: #fff; margin-bottom: 4px;">Sarah Chen</div>
+                        <div style="font-size: 0.8rem; color: #8899b4; margin-bottom: 12px;">Stripe • 3 YOE</div>
+                        <div style="display: flex; gap: 6px;">
+                            <span style="background: rgba(0,224,122,0.1); color: var(--green); padding: 2px 6px; border-radius: 4px; font-size: 0.7rem;">React</span>
+                            <span style="background: rgba(245,166,35,0.1); color: var(--amber); padding: 2px 6px; border-radius: 4px; font-size: 0.7rem;">TypeScript</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Column 2 -->
+                <div style="flex: 1; min-width: 250px; background: var(--bg4); border-radius: 12px; padding: 16px; border: 2px dashed rgba(79,142,247,0.3); position: relative;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 16px;">
+                        <span style="color: var(--blue); font-size: 0.85rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;">Interviewing</span>
+                        <span style="background: rgba(79,142,247,0.2); padding: 2px 8px; border-radius: 10px; font-size: 0.75rem; color: var(--blue);">1</span>
+                    </div>
+                    <!-- Animated Drop Target Overlay -->
+                    <div style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: rgba(79,142,247,0.05); border-radius: 12px; pointer-events: none; opacity: 0; transition: opacity 0.3s;" id="drop-target-demo">
+                        <div style="color: var(--blue); font-weight: 600; display: flex; align-items: center; gap: 8px;">
+                            <i data-lucide="download"></i> Drop Here
+                        </div>
+                    </div>
+                    <!-- Card 3 -->
+                    <div style="background: var(--bg2); border: 1px solid var(--border2); border-radius: 8px; padding: 16px; margin-bottom: 12px; cursor: grab; box-shadow: 0 4px 10px rgba(0,0,0,0.2);">
+                        <div style="font-weight: 600; color: #fff; margin-bottom: 4px;">David Kim</div>
+                        <div style="font-size: 0.8rem; color: #8899b4; margin-bottom: 12px;">Amazon • 7 YOE</div>
+                        <div style="display: flex; gap: 6px;">
+                            <span style="background: rgba(155,109,255,0.1); color: var(--purple); padding: 2px 6px; border-radius: 4px; font-size: 0.7rem;">System Design</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Column 3 -->
+                <div style="flex: 1; min-width: 250px; background: var(--bg4); border-radius: 12px; padding: 16px;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 16px;">
+                        <span style="color: var(--green); font-size: 0.85rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;">Offer Extended</span>
+                        <span style="background: rgba(0,224,122,0.2); padding: 2px 8px; border-radius: 10px; font-size: 0.75rem; color: var(--green);">0</span>
+                    </div>
+                    <div style="height: 100px; display: flex; align-items: center; justify-content: center; color: #8899b4; font-size: 0.85rem; font-style: italic;">
+                        Empty Stage
+                    </div>
+                </div>
+            </div>
+            
+            <script>
+                // Add simple hover effect to column to simulate drag target
+                const cols = document.querySelectorAll('.story-section#demos [style*="min-width: 250px"]');
+                cols.forEach(col => {
+                    col.addEventListener('mouseenter', () => {
+                        const target = col.querySelector('#drop-target-demo');
+                        if(target) target.style.opacity = '1';
+                    });
+                    col.addEventListener('mouseleave', () => {
+                        const target = col.querySelector('#drop-target-demo');
+                        if(target) target.style.opacity = '0';
+                    });
+                });
+            </script>
+        </div>
+    </div>
+</section>
+
 <!-- SECTION 1: JOURNEY -->
 <section class="story-section" id="journey">
     <div class="story-container">
@@ -1547,12 +1651,12 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
             <div class="footer-col">
                 <h4>Platform Modules</h4>
                 <ul>
-                    <li><a href="<?= url('/pages/hr_directory.php') ?>">Core HR & People</a></li>
+                    <li><a href="<?= url('/frontend/dist/index.html') ?>">Core HR & People</a></li>
                     <li><a href="<?= url('/frontend/dist/index.html') ?>">ATS Pipeline</a></li>
-                    <li><a href="<?= url('/pages/payroll_admin.php') ?>">Enterprise Payroll</a></li>
-                    <li><a href="<?= url('/pages/esm_employee.php') ?>">Service Desk</a></li>
-                    <li><a href="<?= url('/employee-relations-dist/dist/index.html') ?>">Employee Relations</a></li>
-                    <li><a href="<?= url('/pages/attendance.php') ?>">Attendance & Leaves</a></li>
+                    <li><a href="<?= url('/frontend/dist/index.html') ?>">Enterprise Payroll</a></li>
+                    <li><a href="<?= url('/frontend/dist/index.html') ?>">Service Desk</a></li>
+                    <li><a href="<?= url('/frontend/dist/index.html') ?>">Employee Relations</a></li>
+                    <li><a href="<?= url('/frontend/dist/index.html') ?>">Attendance & Leaves</a></li>
                 </ul>
             </div>
             <div class="footer-col">
@@ -1566,8 +1670,8 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
             <div class="footer-col">
                 <h4>Resources</h4>
                 <ul>
-                    <li><a href="<?= url('/pages/dashboard.php') ?>">Platform Dashboard</a></li>
-                    <li><a href="<?= url('/pages/support_app_loader.php') ?>">Help Center</a></li>
+                    <li><a href="<?= url('/frontend/dist/index.html') ?>">Platform Dashboard</a></li>
+                    <li><a href="<?= url('/pages/admin_platform_support.php') ?>">Help Center</a></li>
                 </ul>
             </div>
             <div class="footer-col">
@@ -1580,8 +1684,8 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
             <div class="footer-col">
                 <h4>Legal</h4>
                 <ul>
-                    <li><a href="#">Privacy Policy</a></li>
-                    <li><a href="#">Terms of Service</a></li>
+                    <li><a href="<?= url('/privacy.php') ?>">Privacy Policy</a></li>
+                    <li><a href="<?= url('/terms.php') ?>">Terms of Service</a></li>
                 </ul>
             </div>
         </div>

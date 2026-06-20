@@ -36,8 +36,26 @@ class IAMController
 
         // All other IAM endpoints require the Admin role
         if (!hasPermission('users.manage')) {
-            http_response_code(403);
-            echo json_encode(['success' => false, 'error' => 'Forbidden']);
+            // Exception for grant_support_access which can be triggered by Super Admins/Tenant Admins
+            if ($action === 'grant_support_access' && hasPermission('settings.manage')) {
+                // allowed
+            } else {
+                http_response_code(403);
+                echo json_encode(['success' => false, 'error' => 'Forbidden']);
+                return;
+            }
+        }
+
+        if ($action === 'grant_support_access' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+            try {
+                // Grant access for 24 hours
+                $stmt = $this->pdo->prepare("UPDATE tenants SET support_access_expires_at = DATE_ADD(NOW(), INTERVAL 24 HOUR) WHERE id = ?");
+                $stmt->execute([$this->tenantId]);
+                echo json_encode(['success' => true]);
+            } catch (Exception $e) {
+                http_response_code(500);
+                echo json_encode(['success' => false, 'error' => $e->getMessage()]);
+            }
             return;
         }
 

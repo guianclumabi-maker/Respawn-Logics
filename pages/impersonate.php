@@ -66,6 +66,15 @@ if ($action === 'start') {
         die("Unable to impersonate: Failed to resolve or create a target user for tenant ID " . htmlspecialchars($tenant_id));
     }
     
+    // 2.5 Ensure the tenant has explicitly granted support access
+    $tCheckStmt = $pdo->prepare("SELECT support_access_expires_at FROM tenants WHERE id = ?");
+    $tCheckStmt->execute([$tenant_id]);
+    $tCheck = $tCheckStmt->fetch();
+    
+    if (!$tCheck || empty($tCheck['support_access_expires_at']) || strtotime($tCheck['support_access_expires_at']) < time()) {
+        die("<strong>Access Denied:</strong> This tenant has not granted support access, or their 24-hour access window has expired. Please ask the Tenant Admin to navigate to Tenant Settings -> 'Grant Support Access'.");
+    }
+    
     // Log start event to audit_logs
     $stmtLog = $pdo->prepare("INSERT INTO audit_logs (tenant_id, user_email, action, details) VALUES (?, ?, ?, ?)");
     $logTenantId = $targetUser['tenant_id'] ?? 1;
