@@ -21,6 +21,18 @@ import {
   Gamepad2,
   Banknote,
   Headphones,
+  UserPlus,
+  FileText,
+  HeartPulse,
+  DollarSign,
+  Wallet,
+  Activity,
+  GraduationCap,
+  ClipboardList,
+  BookOpen,
+  User,
+  Lock,
+  Key
 } from "lucide-react";
 
 // ── Types ──────────────────────────────────────────────────
@@ -68,27 +80,52 @@ const getSections = (hasPermission: (p: string) => boolean): NavSection[] => [
     title: "Workspace",
     items: [
       { label: "Dashboard", view: "Dashboard", icon: <LayoutDashboard size={19} />, badgeKey: "actions" },
+      { label: "Onboarding", view: "Onboarding", icon: <UserPlus size={19} /> },
+      { label: "Employee Relations", view: "Employee Relations", icon: <Shield size={19} /> },
       ...(hasPermission("leave.view") || hasPermission("leave.request") ? [
         { label: "Leave Requests", view: "Leaves", icon: <Calendar size={19} /> }
       ] : []),
       { label: "IT / HR Service Desk", view: "IT / HR Service Desk", icon: <Headphones size={19} /> },
     ],
   },
-  ...(hasPermission("ats.edit_job") || hasPermission("ats.create_job") ? [{
-    title: "Hiring",
+  {
+    title: "Core HR",
     items: [
+      { label: "HR Directory", view: "HR Directory", icon: <Users size={19} /> },
+      { label: "Org Chart", view: "Org Chart", icon: <GitBranch size={19} /> },
+      { label: "Time & Attendance", view: "Attendance", icon: <Clock size={19} /> },
+      { label: "Shifts & Scheduling", view: "Scheduling", icon: <Calendar size={19} /> },
+    ]
+  },
+  {
+    title: "Finance & Services",
+    items: [
+      ...(hasPermission("payroll.manage") ? [{ label: "Payroll Engine", view: "Payroll Engine", icon: <Banknote size={19} /> }] : []),
+      { label: "Benefits Admin", view: "Benefits", icon: <HeartPulse size={19} /> },
+      { label: "Compensation Admin", view: "Compensation", icon: <DollarSign size={19} /> },
+      { label: "Expenses Admin", view: "Expenses", icon: <Wallet size={19} /> },
+    ]
+  },
+  {
+    title: "Talent & Performance",
+    items: [
+      { label: "Performance Admin", view: "Performance", icon: <Activity size={19} /> },
+      { label: "Knowledge Base", view: "Knowledge Base", icon: <BookOpen size={19} /> },
+      { label: "Surveys", view: "Surveys", icon: <ClipboardList size={19} /> },
+    ]
+  },
+  ...(hasPermission("ats.edit_job") || hasPermission("ats.create_job") ? [{
+    title: "Hiring (ATS)",
+    items: [
+      { label: "ATS Dashboard", view: "ATS Dashboard", icon: <LayoutDashboard size={19} /> },
       { label: "Jobs", view: "Jobs", icon: <Briefcase size={19} />, badgeKey: "urgentJobs" },
       { label: "Pipeline", view: "Pipeline", icon: <GitBranch size={19} /> },
       { label: "Interviews", view: "Interviews", icon: <Calendar size={19} />, badgeKey: "todayInterviews" },
       { label: "Approvals", view: "Approvals", icon: <CheckCircle size={19} />, badgeKey: "pendingApprovals" },
-    ],
-  }] : []),
-  ...(hasPermission("ats.edit") ? [{
-    title: "Talent",
-    items: [
       { label: "Candidates", view: "Candidates", icon: <Users size={19} /> },
       { label: "Talent Pools", view: "Talent Pools", icon: <Database size={19} /> },
       { label: "Talent Search", view: "Talent Search", icon: <Search size={19} /> },
+      { label: "Insights", view: "Insights", icon: <BarChart3 size={19} /> },
     ],
   }] : []),
   ...(hasPermission("analytics.view") ? [{
@@ -96,17 +133,16 @@ const getSections = (hasPermission: (p: string) => boolean): NavSection[] => [
     items: [
       { label: "Analytics", view: "Analytics", icon: <BarChart3 size={19} /> },
       { label: "Recruiting Copilot", view: "Recruiting Copilot", icon: <Bot size={19} />, badgeKey: "copilotAlerts" },
+      { label: "AI Companion", view: "AI Companion", icon: <Bot size={19} /> },
     ],
   }] : []),
-  ...(hasPermission("users.manage") || hasPermission("shifts.manage") || hasPermission("payroll.manage") ? [{
+  ...(hasPermission("users.manage") ? [{
     title: "Administration",
     items: [
-      ...(hasPermission("users.manage") || hasPermission("shifts.manage") ? [
-        { label: "Employee Directory", view: "HR Directory", icon: <Users size={19} /> }
-      ] : []),
-      ...(hasPermission("payroll.manage") ? [
-        { label: "Payroll Engine", view: "Payroll Engine", icon: <Banknote size={19} /> }
-      ] : []),
+      { label: "Admin Users", view: "Admin Users", icon: <User size={19} /> },
+      { label: "Admin Roles", view: "Admin Roles", icon: <Key size={19} /> },
+      { label: "Tenant Settings", view: "Tenant Settings", icon: <Settings size={19} /> },
+      { label: "Audit Logs", view: "Audit Logs", icon: <Lock size={19} /> },
     ],
   }] : []),
 ];
