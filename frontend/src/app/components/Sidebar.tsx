@@ -18,6 +18,7 @@ import {
   Menu,
   Layers,
   Clock,
+  Gamepad2,
 } from "lucide-react";
 
 // ── Types ──────────────────────────────────────────────────
@@ -133,7 +134,7 @@ export function Sidebar({ activeView, onViewChange, badges = {} }: SidebarProps)
         {!collapsed && (
           <div className="flex items-center gap-3">
             <div className="w-[32px] h-[32px] rounded-[7px] bg-gradient-to-br from-[#00e07a] to-[#00b8ff] flex items-center justify-center flex-shrink-0 text-black shadow-lg shadow-[#00e07a]/15">
-              <i className="fa-solid fa-gamepad" style={{ fontSize: "15px", color: "#000" }}></i>
+              <Gamepad2 size={17} color="#000" />
             </div>
             <div className="flex items-center gap-2">
               <span
@@ -153,7 +154,7 @@ export function Sidebar({ activeView, onViewChange, badges = {} }: SidebarProps)
         )}
         {collapsed && (
           <div className="w-[32px] h-[32px] rounded-[7px] bg-gradient-to-br from-[#00e07a] to-[#00b8ff] flex items-center justify-center flex-shrink-0 mx-auto text-black shadow-lg shadow-[#00e07a]/15">
-            <i className="fa-solid fa-gamepad" style={{ fontSize: "15px", color: "#000" }}></i>
+            <Gamepad2 size={17} color="#000" />
           </div>
         )}
         <button
