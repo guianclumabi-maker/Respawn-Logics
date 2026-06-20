@@ -377,21 +377,31 @@ export function JobsPage({ onViewChange }: Props) {
         salary_max: jobForm.salary_max ? parseFloat(jobForm.salary_max) : null,
       }),
     })
-      .then((r) => r.json())
-      .then((data) => {
-        if (data.success) {
-          setShowCreateModal(false);
-          setJobForm(emptyJobForm);
-          fetchJobs();
-          if (data.job_id) {
-            onViewChange({ view: "Pipeline", jobId: data.job_id });
+      .then((r) => r.text())
+      .then((text) => {
+        try {
+          const data = JSON.parse(text);
+          if (data.success) {
+            setShowCreateModal(false);
+            setJobForm(emptyJobForm);
+            fetchJobs();
+            if (data.job_id) {
+              onViewChange({ view: "Pipeline", jobId: data.job_id });
+            } else {
+              onViewChange({ view: "Pipeline" });
+            }
           } else {
-            onViewChange({ view: "Pipeline" });
+            alert("API Error: " + (data.error || JSON.stringify(data)));
           }
+        } catch (e) {
+          alert("Server Response Error: " + text.substring(0, 100));
         }
         setSubmitting(false);
       })
-      .catch(() => setSubmitting(false));
+      .catch((err) => {
+        alert("Fetch Error: " + err);
+        setSubmitting(false);
+      });
   };
 
   const handleDuplicate = (jobId: number) => {
