@@ -71,7 +71,7 @@ export function TalentPools({ onViewChange }: { onViewChange: (v: ViewState) => 
               <div
                 key={p.id}
                 onClick={() => onViewChange({ view: "Pool Detail", poolId: p.id })}
-                className="p-5 rounded-xl border border-border bg-background hover:border-[#00e07a]/40 hover:bg-background/80 transition-all cursor-pointer group flex flex-col justify-between"
+                className="p-5 rounded-xl border border-border bg-card hover:border-[#00e07a]/40 hover:bg-muted/30 transition-all cursor-pointer group flex flex-col justify-between"
               >
                 <div>
                   <div className="flex items-center justify-between mb-4">

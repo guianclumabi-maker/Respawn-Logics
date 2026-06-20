@@ -73,7 +73,7 @@ export function TalentSearch({ onViewChange }: { onViewChange: (v: ViewState) =>
         <p className="text-xs font-mono text-muted-foreground mt-1 uppercase tracking-wider">Candidate Rediscovery Engine - scan historic records to match active roles.</p>
       </div>
 
-      <div className="bg-background border border-white/10 rounded-2xl p-5 mb-8 relative z-10">
+      <div className="bg-card border border-border rounded-2xl p-5 mb-8 relative z-10">
         <form onSubmit={handleSearch} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <div className="space-y-1.5">
             <label className={labelCls}>Skills (comma separated)</label>
@@ -182,7 +182,7 @@ export function TalentSearch({ onViewChange }: { onViewChange: (v: ViewState) =>
                 <div
                   key={r.id}
                   onClick={() => onViewChange({ view: "Candidate Profile", candidateId: r.id })}
-                  className="flex p-4 rounded-xl border border-white/10 bg-background hover:border-[#00e07a]/40 hover:bg-background/80 transition-all cursor-pointer group"
+                  className="flex p-4 rounded-xl border border-border bg-card hover:border-[#00e07a]/40 hover:bg-muted/30 transition-all cursor-pointer group"
                 >
                   <div className="w-10 h-10 rounded bg-muted border border-border flex items-center justify-center text-xs font-bold text-[#9b6dff] shrink-0 mr-4">
                     {`[ ${r.name.substring(0, 2).toUpperCase()} ]`}
