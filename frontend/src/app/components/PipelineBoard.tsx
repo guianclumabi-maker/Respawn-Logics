@@ -322,6 +322,7 @@ export function PipelineBoard({ onViewChange, jobId }: Props) {
   const [viewMode, setViewMode] = useState<"table" | "kanban">("table");
   const [activeStage, setActiveStage] = useState("All");
   const [search, setSearch] = useState("");
+  const [jobSearch, setJobSearch] = useState("");
   const [selected, setSelected] = useState<Set<number>>(new Set());
   const [sortKey, setSortKey] = useState<SortKey>("name");
   const [sortDir, setSortDir] = useState<"asc" | "desc">("asc");
@@ -472,29 +473,54 @@ export function PipelineBoard({ onViewChange, jobId }: Props) {
   if (loading) return <div className="flex-1 overflow-hidden animate-pulse" ><LoadingSkeleton /></div>;
 
   // Job selector if no specific job
-  if (!job && jobs.length > 0) return (
-    <div className="flex-1 flex flex-col items-center justify-center text-foreground font-mono" >
-      <div className="bg-card border border-border rounded-xl p-8 shadow-xl max-w-md w-full flex flex-col items-center">
-        <div className="w-16 h-16 rounded-full bg-[#00e07a]/10 flex items-center justify-center mb-4">
-          <Briefcase size={28} className="text-[#00e07a]" />
-        </div>
-        <h2 className="text-sm font-bold mb-2 tracking-widest text-[#00e07a] uppercase">[ PIPELINE SELECTION ]</h2>
-        <p className="text-xs text-muted-foreground mb-6 text-center">Select an active job to view its recruitment pipeline</p>
-        <div className="space-y-3 w-full max-h-[60vh] overflow-y-auto pr-2 custom-scrollbar">
-          {jobs.map(j => (
-            <button key={j.id} onClick={() => setSelectedJobId(j.id)}
-              className="w-full flex items-center justify-between px-4 py-3 rounded-lg border border-border bg-background text-left hover:border-[#00e07a]/40 hover:bg-[#00e07a]/5 hover:shadow-[0_0_15px_rgba(0,224,122,0.1)] transition-all cursor-pointer group">
-              <div>
-                <span className="text-sm font-semibold text-foreground group-hover:text-[#00e07a] transition-colors">{j.title}</span>
-                <span className="text-[10px] text-muted-foreground block mt-1 uppercase tracking-wider">{`DEP: ${j.department || 'N/A'} • ${j.location || 'Remote'}`}</span>
-              </div>
-              <ChevronRight size={16} className="text-muted-foreground group-hover:text-[#00e07a] group-hover:translate-x-1 transition-all" />
-            </button>
-          ))}
+  if (!job && jobs.length > 0) {
+    const filteredJobs = jobs.filter(j => 
+      !jobSearch || 
+      j.title.toLowerCase().includes(jobSearch.toLowerCase()) || 
+      (j.department || "").toLowerCase().includes(jobSearch.toLowerCase()) || 
+      (j.location || "").toLowerCase().includes(jobSearch.toLowerCase())
+    );
+    
+    return (
+      <div className="flex-1 flex flex-col items-center justify-center text-foreground font-mono p-4" >
+        <div className="bg-card border border-border rounded-xl p-8 shadow-xl max-w-md w-full flex flex-col items-center">
+          <div className="w-16 h-16 rounded-full bg-[#00e07a]/10 flex items-center justify-center mb-4">
+            <Briefcase size={28} className="text-[#00e07a]" />
+          </div>
+          <h2 className="text-sm font-bold mb-2 tracking-widest text-[#00e07a] uppercase">[ PIPELINE SELECTION ]</h2>
+          <p className="text-xs text-muted-foreground mb-6 text-center">Select an active job to view its recruitment pipeline</p>
+          
+          <div className="w-full relative mb-4">
+            <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+            <input
+              type="text"
+              value={jobSearch}
+              onChange={(e) => setJobSearch(e.target.value)}
+              placeholder="Filter by title, department..."
+              className="w-full bg-background border border-border rounded-lg pl-9 pr-3 py-2 text-xs text-foreground placeholder-muted-foreground focus:outline-none focus:border-[#00e07a]/40 transition-colors"
+            />
+          </div>
+
+          <div className="space-y-3 w-full max-h-[50vh] overflow-y-auto pr-2 custom-scrollbar">
+            {filteredJobs.length === 0 ? (
+              <div className="text-center py-6 text-xs text-muted-foreground">No jobs match your filter.</div>
+            ) : (
+              filteredJobs.map(j => (
+                <button key={j.id} onClick={() => setSelectedJobId(j.id)}
+                  className="w-full flex items-center justify-between px-4 py-3 rounded-lg border border-border bg-background text-left hover:border-[#00e07a]/40 hover:bg-[#00e07a]/5 hover:shadow-[0_0_15px_rgba(0,224,122,0.1)] transition-all cursor-pointer group">
+                  <div>
+                    <span className="text-sm font-semibold text-foreground group-hover:text-[#00e07a] transition-colors">{j.title}</span>
+                    <span className="text-[10px] text-muted-foreground block mt-1 uppercase tracking-wider">{`DEP: ${j.department || 'N/A'} • ${j.location || 'Remote'}`}</span>
+                  </div>
+                  <ChevronRight size={16} className="text-muted-foreground group-hover:text-[#00e07a] group-hover:translate-x-1 transition-all" />
+                </button>
+              ))
+            )}
+          </div>
         </div>
       </div>
-    </div>
-  );
+    );
+  }
 
   if (!job) return (
     <div className="flex-1 flex items-center justify-center text-muted-foreground text-sm font-mono" >
