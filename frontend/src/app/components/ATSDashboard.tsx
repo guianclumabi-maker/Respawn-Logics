@@ -514,7 +514,7 @@ export function ATSDashboard({ onViewChange }: Props) {
         }
       `}</style>
 
-      <div className="p-8 max-w-[1440px] mx-auto hide-scrollbar">
+      <div className="p-8 w-full hide-scrollbar">
         {/* ── Welcome Header ─────────────────────────────────── */}
         <div
           className="mb-8 flex flex-col md:flex-row md:items-end md:justify-between border-b border-border pb-6"
