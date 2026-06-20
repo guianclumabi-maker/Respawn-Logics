@@ -374,8 +374,8 @@ Error generating stack: `+o.message+`
         }
         .hide-scrollbar::-webkit-scrollbar { display: none; }
         .hud-card {
-          background: rgba(15, 20, 34, 0.65);
-          border: 1px solid rgba(255, 255, 255, 0.06);
+          background: var(--card);
+          border: 1px solid var(--border);
           position: relative;
           overflow: hidden;
           transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -390,7 +390,7 @@ Error generating stack: `+o.message+`
           transition: opacity 0.3s;
         }
         .hud-card:hover {
-          background: rgba(20, 25, 41, 0.85);
+          background: var(--accent-glow, rgba(255, 255, 255, 0.04));
           border-color: var(--accent-color, #00e07a);
           box-shadow: 0 0 20px var(--accent-glow, rgba(0, 224, 122, 0.15));
           transform: translateY(-2px);
