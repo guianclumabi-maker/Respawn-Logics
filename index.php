@@ -1545,41 +1545,36 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
     <div class="footer-inner">
         <div class="footer-grid">
             <div class="footer-col">
-                <h4>Platform</h4>
+                <h4>Platform Modules</h4>
                 <ul>
-                    <li><a href="#">Core HR & People</a></li>
-                    <li><a href="#">ATS Controller v2</a></li>
-                    <li><a href="#">Enterprise Payroll</a></li>
-                    <li><a href="#">Service Desk (ESM)</a></li>
-                    <li><a href="#">Employee Relations</a></li>
-                    <li><a href="#">Performance & Goals</a></li>
+                    <li><a href="<?= url('/pages/hr_directory.php') ?>">Core HR & People</a></li>
+                    <li><a href="<?= url('/frontend/dist/index.html') ?>">ATS Pipeline</a></li>
+                    <li><a href="<?= url('/pages/payroll_admin.php') ?>">Enterprise Payroll</a></li>
+                    <li><a href="<?= url('/pages/esm_employee.php') ?>">Service Desk</a></li>
+                    <li><a href="<?= url('/employee-relations-dist/dist/index.html') ?>">Employee Relations</a></li>
+                    <li><a href="<?= url('/pages/attendance.php') ?>">Attendance & Leaves</a></li>
                 </ul>
             </div>
             <div class="footer-col">
-                <h4>Solutions</h4>
+                <h4>Portals</h4>
                 <ul>
-                    <li><a href="#">For Startups</a></li>
-                    <li><a href="#">For Enterprise</a></li>
-                    <li><a href="#">Global Compliance</a></li>
-                    <li><a href="#">Remote Workforce</a></li>
+                    <li><a href="<?= url('/login.php') ?>">Employee Login</a></li>
+                    <li><a href="<?= url('/register.php') ?>">Create Workspace</a></li>
+                    <li><a href="<?= url('/onboarding/') ?>">Enterprise Onboarding</a></li>
                 </ul>
             </div>
             <div class="footer-col">
                 <h4>Resources</h4>
                 <ul>
-                    <li><a href="#">Knowledge Base</a></li>
-                    <li><a href="#">API Documentation</a></li>
-                    <li><a href="#">System Status</a></li>
-                    <li><a href="#">Patch Notes</a></li>
+                    <li><a href="<?= url('/pages/dashboard.php') ?>">Platform Dashboard</a></li>
+                    <li><a href="<?= url('/pages/support_app_loader.php') ?>">Help Center</a></li>
                 </ul>
             </div>
             <div class="footer-col">
                 <h4>Company</h4>
                 <ul>
-                    <li><a href="#">About Respawn</a></li>
-                    <li><a href="#">Careers</a></li>
-                    <li><a href="#">Contact Us</a></li>
-                    <li><a href="#">Partner Program</a></li>
+                    <li><a href="#story">Our Story</a></li>
+                    <li><a href="#beta">Pricing</a></li>
                 </ul>
             </div>
             <div class="footer-col">
@@ -1587,8 +1582,6 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
                 <ul>
                     <li><a href="#">Privacy Policy</a></li>
                     <li><a href="#">Terms of Service</a></li>
-                    <li><a href="#">Data Processing</a></li>
-                    <li><a href="#">Security</a></li>
                 </ul>
             </div>
         </div>
@@ -1598,9 +1591,9 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
                 © <?= date('Y') ?> Respawn Logics Inc. &nbsp;·&nbsp; Built in the Philippines <img src="https://flagcdn.com/ph.svg" width="16" alt="PH" style="vertical-align: middle; margin-left: 2px; margin-top: -2px; border-radius: 2px;">
             </div>
             <div class="footer-socials">
-                <a href="#"><i data-lucide="linkedin"></i></a>
-                <a href="#"><i data-lucide="twitter"></i></a>
-                <a href="#"><i data-lucide="github"></i></a>
+                <a href="#"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect width="4" height="12" x="2" y="9"/><circle cx="4" cy="4" r="2"/></svg></a>
+                <a href="#"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4l11.733 16h4.267l-11.733 -16z"/><path d="M4 20l6.768 -6.768m2.46 -2.46l6.772 -6.772"/></svg></a>
+                <a href="#"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.2c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"/><path d="M9 18c-4.51 2-5-2-7-2"/></svg></a>
             </div>
         </div>
     </div>
