@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/../bootstrap/app.php';
+require_once __DIR__ . '/logo.php';
 $user = getCurrentUser();
 $current_page = basename($_SERVER['SCRIPT_NAME']);
 
@@ -24,13 +25,7 @@ if ($user) {
 ?>
 <div class="app-sidebar">
     <div class="sidebar-brand">
-        <div class="brand-logo-gamepad">
-            <i class="fa-solid fa-gamepad" style="color: #000; font-size: 20px;"></i>
-        </div>
-        <div style="display:flex; align-items:baseline; gap:5px;">
-            <span class="brand-text">Respawn Logics</span>
-            <span style="font-family:'JetBrains Mono',monospace; font-size:9px; font-weight:700; color:#00e07a;">v2.0</span>
-        </div>
+        <?= renderLogo('sidebar') ?>
     </div>
     
     <div class="sidebar-menu">
