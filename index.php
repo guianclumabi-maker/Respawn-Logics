@@ -760,16 +760,58 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
         /* 🎮 FOOTER 🎮 */
         footer {
             border-top: 1px solid var(--border2);
+            padding: 60px 0 30px;
         }
 
         .footer-inner {
             max-width: 1600px;
             width: 95%;
             margin: 0 auto;
-            padding: 36px 24px;
+            padding: 0 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 60px;
+        }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 40px;
+        }
+
+        .footer-col h4 {
+            font-family: var(--sans);
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 20px;
+        }
+
+        .footer-col ul {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .footer-col a {
+            font-family: var(--sans);
+            font-size: 0.85rem;
+            color: var(--text-dim);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .footer-col a:hover {
+            color: #fff;
+        }
+
+        .footer-bottom {
             display: flex;
             justify-content: space-between;
             align-items: center;
+            padding-top: 30px;
+            border-top: 1px solid var(--border2);
         }
 
         .footer-copy {
@@ -786,7 +828,7 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
         .footer-socials a {
             color: var(--text-dim);
             text-decoration: none;
-            font-size: 1rem;
+            font-size: 1.1rem;
             transition: color 0.2s;
         }
 
@@ -796,16 +838,15 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
         @media (max-width: 960px) {
             nav { padding: 0 20px; }
             .nav-links a:not(.nav-cta) { display: none; }
-            .hero { padding: 110px 20px 70px; }
-            .hud { grid-template-columns: repeat(2, 1fr); }
-            .hud-item:nth-child(2) { border-right: none; }
-            .module-grid { grid-template-columns: 1fr 1fr; }
+            .hero h1 { font-size: 3.5rem; }
+            .terminal-window { min-height: 400px; }
+            .module-grid { grid-template-columns: repeat(2, 1fr); }
             .mod-card.wide { grid-column: span 2; }
             .story-inner { grid-template-columns: 1fr; gap: 40px; }
             .beta-card { grid-template-columns: 1fr; padding: 36px 28px; }
             .perks { grid-template-columns: 1fr; }
             .price-panel { text-align: left; }
-            .footer-inner { flex-direction: column; gap: 16px; text-align: center; }
+            .footer-bottom { flex-direction: column; gap: 16px; text-align: center; }
         }
 
         @media (max-width: 600px) {
@@ -1502,13 +1543,65 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
 <!-- FOOTER -->
 <footer>
     <div class="footer-inner">
-        <div class="footer-copy">
-            © <?= date('Y') ?> Respawn Logics Inc. &nbsp;·&nbsp; Built in the Philippines <img src="https://flagcdn.com/ph.svg" width="16" alt="PH" style="vertical-align: middle; margin-left: 2px; margin-top: -2px; border-radius: 2px;">
+        <div class="footer-grid">
+            <div class="footer-col">
+                <h4>Platform</h4>
+                <ul>
+                    <li><a href="#">Core HR & People</a></li>
+                    <li><a href="#">ATS Controller v2</a></li>
+                    <li><a href="#">Enterprise Payroll</a></li>
+                    <li><a href="#">Service Desk (ESM)</a></li>
+                    <li><a href="#">Employee Relations</a></li>
+                    <li><a href="#">Performance & Goals</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>Solutions</h4>
+                <ul>
+                    <li><a href="#">For Startups</a></li>
+                    <li><a href="#">For Enterprise</a></li>
+                    <li><a href="#">Global Compliance</a></li>
+                    <li><a href="#">Remote Workforce</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>Resources</h4>
+                <ul>
+                    <li><a href="#">Knowledge Base</a></li>
+                    <li><a href="#">API Documentation</a></li>
+                    <li><a href="#">System Status</a></li>
+                    <li><a href="#">Patch Notes</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>Company</h4>
+                <ul>
+                    <li><a href="#">About Respawn</a></li>
+                    <li><a href="#">Careers</a></li>
+                    <li><a href="#">Contact Us</a></li>
+                    <li><a href="#">Partner Program</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>Legal</h4>
+                <ul>
+                    <li><a href="#">Privacy Policy</a></li>
+                    <li><a href="#">Terms of Service</a></li>
+                    <li><a href="#">Data Processing</a></li>
+                    <li><a href="#">Security</a></li>
+                </ul>
+            </div>
         </div>
-        <div class="footer-socials">
-            <a href="#"><i data-lucide="linkedin"></i></a>
-            <a href="#"><i data-lucide="twitter"></i></a>
-            <a href="#"><i data-lucide="github"></i></a>
+        
+        <div class="footer-bottom">
+            <div class="footer-copy">
+                © <?= date('Y') ?> Respawn Logics Inc. &nbsp;·&nbsp; Built in the Philippines <img src="https://flagcdn.com/ph.svg" width="16" alt="PH" style="vertical-align: middle; margin-left: 2px; margin-top: -2px; border-radius: 2px;">
+            </div>
+            <div class="footer-socials">
+                <a href="#"><i data-lucide="linkedin"></i></a>
+                <a href="#"><i data-lucide="twitter"></i></a>
+                <a href="#"><i data-lucide="github"></i></a>
+            </div>
         </div>
     </div>
 </footer>
