@@ -400,10 +400,14 @@ export function PipelineBoard({ onViewChange, jobId }: Props) {
   // ── API mutations ──
   const updateStage = async (appId: number, stage: string) => {
     try {
-      await fetch(API, { method: "POST", headers: { 
+      const res = await fetch(API, { method: "POST", headers: { 
         "Content-Type": "application/json",
         "X-CSRF-Token": (window as any).__CSRF_TOKEN__ || ""
-      }, body: JSON.stringify({ action: "update_stage", id: appId, stage }) });
+      }, body: JSON.stringify({ action: "update_stage", id: appId, stage }), credentials: "include" });
+      if (!res.ok) {
+        const text = await res.text();
+        showToast(`Failed: ${res.status} ${text}`);
+      }
       loadJob();
     } catch (err) {
       console.error(err);
@@ -425,11 +429,17 @@ export function PipelineBoard({ onViewChange, jobId }: Props) {
   const bulkAdvance = async (stage: string) => {
     const ids = Array.from(selected);
     try {
-      await fetch(API, { method: "POST", headers: { 
+      const res = await fetch(API, { method: "POST", headers: { 
         "Content-Type": "application/json",
         "X-CSRF-Token": (window as any).__CSRF_TOKEN__ || ""
-      }, body: JSON.stringify({ action: "bulk_advance", ids, stage }) });
-      setSelected(new Set()); showToast(`${ids.length} candidate(s) moved to ${stage}`); loadJob();
+      }, body: JSON.stringify({ action: "bulk_advance", ids, stage }), credentials: "include" });
+      if (!res.ok) {
+        const text = await res.text();
+        showToast(`Failed: ${res.status} ${text}`);
+      } else {
+        setSelected(new Set()); showToast(`${ids.length} candidate(s) moved to ${stage}`); 
+      }
+      loadJob();
     } catch (err) { console.error(err); }
   };
 

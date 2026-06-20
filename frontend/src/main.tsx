@@ -44,7 +44,9 @@ window.fetch = async (...args) => {
 
 async function boot() {
   try {
-    const res = await originalFetch(`${API_BASE}/api/index.php?route=auth&action=csrf`);
+    const res = await originalFetch(`${API_BASE}/api/index.php?route=auth&action=csrf`, {
+      credentials: "include"
+    });
     const data = await res.json();
     if (data.success) {
       (window as any).__CSRF_TOKEN__ = data.csrf_token;
