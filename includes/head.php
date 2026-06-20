@@ -26,7 +26,8 @@ if ($userTheme === 'system') $userTheme = 'light'; // Fallback to light if syste
     <!-- Unified Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
     
-    <!-- Unified Icons (Lucide replacing FontAwesome) -->
+    <!-- Unified Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <script src="https://unpkg.com/lucide@latest" defer></script>
     <script>
         document.addEventListener("DOMContentLoaded", function() {
