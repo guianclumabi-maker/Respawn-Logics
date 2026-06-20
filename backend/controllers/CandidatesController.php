@@ -702,7 +702,7 @@ class CandidatesController
                     'success' => true, 
                     'user' => [
                         'full_name' => $_SESSION['user_name'], 
-                        'role' => 'System Administrator', 
+                        'role' => 'Employee', 
                         'department' => 'Operations'
                     ]
                 ]);

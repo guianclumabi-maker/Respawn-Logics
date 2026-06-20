@@ -87,7 +87,7 @@ export function Sidebar({ activeView, onViewChange }: SidebarProps) {
           const names = data.user.full_name.split(" ");
           const initials = names.map((n: string) => n[0]).join("").substring(0, 2).toUpperCase();
           
-          let roleFallback = data.user.role ? (data.user.role.toLowerCase() === 'super_admin' ? 'System Administrator' : data.user.role.charAt(0).toUpperCase() + data.user.role.slice(1)) : "Employee";
+          let roleFallback = data.user.role ? (data.user.role.toLowerCase() === 'super_admin' ? 'Employee' : data.user.role.charAt(0).toUpperCase() + data.user.role.slice(1)) : "Employee";
           let roleDesc = data.user.job_title ? data.user.job_title : roleFallback;
           if (data.user.department) {
             roleDesc += ` • ${data.user.department}`;
@@ -306,8 +306,8 @@ export function Sidebar({ activeView, onViewChange }: SidebarProps) {
               <div className="text-[0.85rem] font-semibold text-slate-800 dark:text-white truncate">
                 {sessionUser ? sessionUser.full_name : "Jane Doe"}
               </div>
-              <div className="text-[0.75rem] text-gray-500 truncate">
-                {sessionUser ? sessionUser.role : "System Administrator"}
+              <div className="text-[10px] text-gray-500 font-mono mt-0.5 truncate uppercase">
+                {sessionUser ? sessionUser.role : "Employee"}
               </div>
             </div>
           </div>
