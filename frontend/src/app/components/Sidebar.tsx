@@ -133,10 +133,10 @@ export function Sidebar({ activeView, onViewChange, badges = {} }: SidebarProps)
       <div className="flex items-center justify-between h-[70px] px-5 border-b border-gray-200 dark:border-white/[0.06] flex-shrink-0">
         {!collapsed && (
           <div className="flex items-center gap-3">
-            <div className="w-[32px] h-[32px] rounded-[7px] bg-gradient-to-br from-[#00e07a] to-[#00b8ff] flex items-center justify-center flex-shrink-0 text-black shadow-lg shadow-[#00e07a]/15">
-              <Gamepad2 size={17} color="#000" />
+            <div className="w-10 h-10 rounded-[10px] bg-gradient-to-br from-[#00e07a] to-[#00b8ff] flex items-center justify-center flex-shrink-0 shadow-lg shadow-[#00e07a]/20">
+              <Gamepad2 size={20} color="#000" strokeWidth={2.2} />
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-baseline gap-1.5">
               <span
                 className="font-bold text-slate-800 dark:text-white whitespace-nowrap tracking-[-0.5px] text-[15px]"
                 style={{ fontFamily: "'JetBrains Mono', monospace" }}
@@ -144,7 +144,7 @@ export function Sidebar({ activeView, onViewChange, badges = {} }: SidebarProps)
                 Respawn Logics
               </span>
               <span 
-                className="font-bold text-[#00e07a] bg-[#00e07a]/10 px-1 py-0.5 border border-[#00e07a]/22 rounded text-[9px] leading-none"
+                className="font-bold text-[#00e07a] text-[9px]"
                 style={{ fontFamily: "'JetBrains Mono', monospace" }}
               >
                 v2.0
@@ -153,8 +153,8 @@ export function Sidebar({ activeView, onViewChange, badges = {} }: SidebarProps)
           </div>
         )}
         {collapsed && (
-          <div className="w-[32px] h-[32px] rounded-[7px] bg-gradient-to-br from-[#00e07a] to-[#00b8ff] flex items-center justify-center flex-shrink-0 mx-auto text-black shadow-lg shadow-[#00e07a]/15">
-            <Gamepad2 size={17} color="#000" />
+          <div className="w-10 h-10 rounded-[10px] bg-gradient-to-br from-[#00e07a] to-[#00b8ff] flex items-center justify-center flex-shrink-0 mx-auto shadow-lg shadow-[#00e07a]/20">
+            <Gamepad2 size={20} color="#000" strokeWidth={2.2} />
           </div>
         )}
         <button

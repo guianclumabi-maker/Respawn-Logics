@@ -859,13 +859,13 @@ function App() {
       
       {/* Sidebar */}
       <aside className="sidebar glass">
-        <div className="sidebar-brand" style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '16px 16px' }}>
-          <div style={{ width: '32px', height: '32px', flexShrink: 0, background: 'linear-gradient(135deg, #00e07a, #00b8ff)', borderRadius: '7px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#000', boxShadow: '0 0 12px rgba(0,224,122,0.25)' }}>
-            <Gamepad2 size={17} color="#000" />
+        <div className="sidebar-brand" style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '16px' }}>
+          <div style={{ width: '40px', height: '40px', flexShrink: 0, background: 'linear-gradient(135deg, #00e07a, #00b8ff)', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 8px 20px rgba(0,224,122,0.25)' }}>
+            <Gamepad2 size={20} color="#000" strokeWidth={2.2} />
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-            <span className="brand-text" style={{ fontFamily: "'JetBrains Mono', monospace", fontWeight: 700, color: 'var(--text-primary)', textTransform: 'none', fontSize: '15px', letterSpacing: '-0.5px', whiteSpace: 'nowrap' }}>Respawn Logics</span>
-            <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: '9px', fontWeight: 700, letterSpacing: '0.1em', color: '#00e07a', background: 'rgba(0,224,122,0.1)', padding: '2px 4px', border: '1px solid rgba(0,224,122,0.22)', borderRadius: '4px' }}>v2.0</span>
+          <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px' }}>
+            <span className="brand-text" style={{ fontFamily: "'JetBrains Mono', monospace", fontWeight: 700, color: 'var(--text-primary)', fontSize: '15px', letterSpacing: '-0.5px', whiteSpace: 'nowrap' }}>Respawn Logics</span>
+            <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: '9px', fontWeight: 700, color: '#00e07a' }}>v2.0</span>
           </div>
         </div>
         

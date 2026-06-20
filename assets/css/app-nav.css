@@ -27,16 +27,15 @@
 }
 
 .brand-logo-gamepad {
-    width: 32px;
-    height: 32px;
-    border-radius: 7px;
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
     background: linear-gradient(to bottom right, #00e07a, #00b8ff);
     display: flex;
     align-items: center;
     justify-content: center;
     color: #000;
-    font-size: 16px;
-    box-shadow: 0 10px 15px -3px rgba(0, 224, 122, 0.2), 0 4px 6px -4px rgba(0, 224, 122, 0.1);
+    box-shadow: 0 8px 20px rgba(0, 224, 122, 0.25);
     flex-shrink: 0;
 }
 

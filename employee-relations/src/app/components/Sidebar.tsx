@@ -119,10 +119,10 @@ export function Sidebar({ activeView, onViewChange }: SidebarProps) {
         {!collapsed && (
           <div className="flex items-center gap-3">
             {/* Gamepad logo icon */}
-            <div className="w-8 h-8 rounded-[7px] bg-gradient-to-br from-[#00e07a] to-[#00b8ff] flex items-center justify-center text-black shadow-lg shadow-[#00e07a]/20 flex-shrink-0">
-              <Gamepad2 size={17} color="#000" />
+            <div className="w-10 h-10 rounded-[10px] bg-gradient-to-br from-[#00e07a] to-[#00b8ff] flex items-center justify-center flex-shrink-0 shadow-lg shadow-[#00e07a]/20">
+              <Gamepad2 size={20} color="#000" strokeWidth={2.2} />
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-baseline gap-1.5">
               <span
                 className="font-bold text-slate-800 dark:text-white text-[15px] tracking-[-0.5px] whitespace-nowrap"
                 style={{ fontFamily: "'JetBrains Mono', monospace" }}
@@ -130,7 +130,7 @@ export function Sidebar({ activeView, onViewChange }: SidebarProps) {
                 Employee Relations
               </span>
               <span
-                className="font-bold text-[#00e07a] bg-[#00e07a]/10 px-1 py-0.5 border border-[#00e07a]/20 rounded text-[9px] leading-none"
+                className="font-bold text-[#00e07a] text-[9px]"
                 style={{ fontFamily: "'JetBrains Mono', monospace" }}
               >
                 v2.0
