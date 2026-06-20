@@ -26,6 +26,11 @@ if (empty($route)) {
     exit;
 }
 
+if ($route === 'auth' && $action === 'csrf') {
+    echo json_encode(['success' => true, 'csrf_token' => $_SESSION['csrf_token'] ?? '']);
+    exit;
+}
+
 // CSRF Protection
 if ($_SERVER['REQUEST_METHOD'] !== 'GET' && $_SERVER['REQUEST_METHOD'] !== 'OPTIONS') {
     $requestCsrf = '';
