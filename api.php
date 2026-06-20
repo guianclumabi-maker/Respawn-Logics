@@ -49,9 +49,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         $stmt->execute([$user['id']]);
         $roles = $stmt->fetchAll(PDO::FETCH_COLUMN);
 
+        // Generate CSRF if missing
+        if (empty($_SESSION['csrf_token'])) {
+            $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+        }
+
         echo json_encode([
             'success' => true,
-            'csrf_token' => $_SESSION['csrf_token'] ?? null,
+            'csrf_token' => $_SESSION['csrf_token'],
             'user' => [
                 'id' => $user['id'],
                 'name' => $user['full_name'],
