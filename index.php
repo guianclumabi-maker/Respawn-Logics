@@ -1343,9 +1343,9 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
                 Employees can access leave balances, attendance records, payroll information, company policies, and more from a single, intelligent experience.
             </p>
             <ul style="list-style: none; color: var(--text); font-size: 1rem; display: flex; flex-direction: column; gap: 16px;">
-                <li><i class="fa-solid fa-check" style="color: var(--green); margin-right: 12px;"></i> Instant policy lookups</li>
-                <li><i class="fa-solid fa-check" style="color: var(--green); margin-right: 12px;"></i> Self-service document generation</li>
-                <li><i class="fa-solid fa-check" style="color: var(--green); margin-right: 12px;"></i> 24/7 autonomous support</li>
+                <li><i data-lucide="check-circle-2" style="color: var(--green); margin-right: 12px; width: 18px; height: 18px; display: inline-block; vertical-align: middle;"></i> Instant policy lookups</li>
+                <li><i data-lucide="check-circle-2" style="color: var(--green); margin-right: 12px; width: 18px; height: 18px; display: inline-block; vertical-align: middle;"></i> Self-service document generation</li>
+                <li><i data-lucide="check-circle-2" style="color: var(--green); margin-right: 12px; width: 18px; height: 18px; display: inline-block; vertical-align: middle;"></i> 24/7 autonomous support</li>
             </ul>
         </div>
         <div class="split-image">
