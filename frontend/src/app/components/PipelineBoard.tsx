@@ -238,24 +238,24 @@ function BulkBar({ count, onAdvance, onReject, onDelete }: {
 }) {
   const [showStages, setShowStages] = useState(false);
   return (
-    <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 flex items-center gap-4 px-5 py-3 rounded-2xl border border-[#00e07a]/20 bg-background/95 backdrop-blur-xl shadow-2xl shadow-green-500/10 font-mono text-xs">
-      <span className="text-muted-foreground"><span className="font-bold text-primary">{count}</span> CANDIDATES SELECTED</span>
-      <div className="w-px h-5 bg-white/10" />
+    <div className="fixed bottom-10 left-1/2 -translate-x-1/2 z-50 flex items-center gap-6 px-8 py-4 rounded-[2rem] border border-[#00e07a]/30 bg-background/95 backdrop-blur-2xl shadow-[0_20px_50px_rgba(0,224,122,0.15)] font-mono text-sm">
+      <span className="text-muted-foreground whitespace-nowrap"><span className="font-bold text-primary text-base">{count}</span> CANDIDATES SELECTED</span>
+      <div className="w-px h-6 bg-white/10" />
       <div className="relative">
-        <button onClick={() => setShowStages(s => !s)} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-bold bg-[#9b6dff]/10 border border-[#9b6dff]/20 text-[#9b6dff] hover:bg-[#9b6dff]/20 cursor-pointer border-0">
-          [ ADVANCE STAGE ] <ChevronDown size={10} />
+        <button onClick={() => setShowStages(s => !s)} className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold bg-[#9b6dff]/10 border border-[#9b6dff]/20 text-[#9b6dff] hover:bg-[#9b6dff]/20 hover:shadow-[0_0_15px_rgba(155,109,255,0.2)] transition-all cursor-pointer whitespace-nowrap border-0">
+          [ ADVANCE STAGE ] <ChevronDown size={14} />
         </button>
         {showStages && (
-          <div className="absolute bottom-full mb-2 left-0 w-44 bg-[#0d0f19] border border-white/10 rounded-xl shadow-2xl z-50 py-1">
+          <div className="absolute bottom-full mb-3 left-0 w-48 bg-[#0d0f19] border border-white/10 rounded-xl shadow-2xl z-50 py-2">
             {STAGES.map(s => (
               <button key={s} onClick={() => { onAdvance(s); setShowStages(false); }}
-                className="w-full text-left px-3 py-2 text-[10px] font-bold text-gray-300 hover:bg-white/5 cursor-pointer border-0 bg-transparent">{s}</button>
+                className="w-full text-left px-4 py-2.5 text-xs font-bold text-gray-300 hover:bg-white/5 transition-colors cursor-pointer border-0 bg-transparent">{s}</button>
             ))}
           </div>
         )}
       </div>
-      <button onClick={onReject} className="px-3 py-1.5 rounded-lg text-[10px] font-bold border border-rose-500/20 bg-rose-500/10 text-rose-400 hover:bg-rose-500/20 cursor-pointer bg-transparent">[ REJECT ]</button>
-      <button onClick={onDelete} className="px-3 py-1.5 rounded-lg text-[10px] font-bold border border-red-500/20 bg-red-500/10 text-red-400 hover:bg-red-500/20 cursor-pointer flex items-center gap-1 bg-transparent"><Trash2 size={10} /> [ ARCHIVE ]</button>
+      <button onClick={onReject} className="px-4 py-2.5 rounded-xl text-xs font-bold border border-rose-500/20 bg-rose-500/10 text-rose-400 hover:bg-rose-500/20 hover:shadow-[0_0_15px_rgba(244,63,94,0.2)] transition-all cursor-pointer whitespace-nowrap bg-transparent">[ REJECT ]</button>
+      <button onClick={onDelete} className="px-4 py-2.5 rounded-xl text-xs font-bold border border-red-500/20 bg-red-500/10 text-red-400 hover:bg-red-500/20 hover:shadow-[0_0_15px_rgba(239,68,68,0.2)] transition-all cursor-pointer flex items-center gap-2 whitespace-nowrap bg-transparent"><Trash2 size={14} /> [ ARCHIVE ]</button>
     </div>
   );
 }
