@@ -12,6 +12,7 @@ $pdo->exec("SET FOREIGN_KEY_CHECKS = 0;");
 $scripts = [
     'migrate_tenants.php',
     'migrate_core_hr.php',
+    'migrate_ats_tables.php',
     'migrate_ats_queries.php',
     'migrate_benefits.php',
     'migrate_compensation.php',
