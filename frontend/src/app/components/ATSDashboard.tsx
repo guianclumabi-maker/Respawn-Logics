@@ -656,10 +656,10 @@ export function ATSDashboard({ onViewChange }: Props) {
                   ))}
                 </div>
               ) : (
-                <div className="flex items-center gap-3 p-4 rounded-lg bg-primary border border-[#00e07a]/15 font-mono">
-                  <CheckCircle2 size={20} className="text-primary" />
+                <div className="flex items-center gap-3 p-4 rounded-lg bg-[#00e07a]/10 border border-[#00e07a]/15 font-mono">
+                  <CheckCircle2 size={20} className="text-[#00e07a]" />
                   <div>
-                    <p className="text-sm font-medium text-primary">
+                    <p className="text-sm font-medium text-[#00e07a]">
                       All caught up!
                     </p>
                     <p className="text-xs text-muted-foreground">
