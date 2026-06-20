@@ -448,7 +448,7 @@ export function ATSDashboard({ onViewChange }: Props) {
         if (json.success) {
           setData(json);
         } else {
-          setError("Failed to load dashboard data");
+          setError(json.error || "Failed to load dashboard data");
         }
         setLoading(false);
       })
@@ -525,7 +525,7 @@ export function ATSDashboard({ onViewChange }: Props) {
               className="text-2xl font-bold tracking-tight text-foreground font-['Space_Grotesk'] flex items-center gap-3"
             >
               <i className="fa-solid fa-gamepad text-gray-900 bg-white p-1.5 rounded shadow-sm"></i>
-              RESPAWN LOGICS // ATS CONTROLLER v2.0
+              ATS CONTROLLER v2.0
               <span className="inline-block w-2.5 h-5 bg-emerald-500 blink"></span>
             </h1>
             <p className="text-xs font-mono text-muted-foreground mt-1 uppercase tracking-wider">

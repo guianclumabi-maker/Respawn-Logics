@@ -89,7 +89,7 @@ class CandidatesController
                     break;
             }
         } catch (\Exception $e) {
-            echo json_encode(['success' => false, 'error' => 'Database error']);
+            echo json_encode(['success' => false, 'error' => $e->getMessage()]);
         }
     }
 
