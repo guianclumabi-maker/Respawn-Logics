@@ -524,7 +524,6 @@ export function ATSDashboard({ onViewChange }: Props) {
             <h1
               className="text-2xl font-bold tracking-tight text-foreground font-['Space_Grotesk'] flex items-center gap-3"
             >
-              <i className="fa-solid fa-gamepad text-gray-900 bg-white p-1.5 rounded shadow-sm"></i>
               ATS CONTROLLER v2.0
               <span className="inline-block w-2.5 h-5 bg-emerald-500 blink"></span>
             </h1>
