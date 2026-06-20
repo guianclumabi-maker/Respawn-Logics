@@ -333,7 +333,7 @@ export function JobsPage({ onViewChange }: Props) {
     if (selectedStatus) params.set("status", selectedStatus);
     if (selectedPriority) params.set("priority", selectedPriority);
 
-    fetch(`${API}&${params.toString()}`)
+    fetch(`${API}&${params.toString()}`, { credentials: "include" })
       .then((r) => r.json())
       .then((data) => {
         if (data.success) {
@@ -364,7 +364,7 @@ export function JobsPage({ onViewChange }: Props) {
     if (!jobForm.title.trim()) return;
     setSubmitting(true);
 
-    fetch(API, {
+    fetch(API, { credentials: "include",
       method: "POST",
       headers: { 
         "Content-Type": "application/json",
@@ -405,7 +405,7 @@ export function JobsPage({ onViewChange }: Props) {
   };
 
   const handleDuplicate = (jobId: number) => {
-    fetch(API, {
+    fetch(API, { credentials: "include",
       method: "POST",
       headers: { 
         "Content-Type": "application/json",
@@ -422,7 +422,7 @@ export function JobsPage({ onViewChange }: Props) {
 
   const handleTogglePause = (job: Job) => {
     const newStatus = job.status === "Paused" ? "Open" : "Paused";
-    fetch(API, {
+    fetch(API, { credentials: "include",
       method: "POST",
       headers: { 
         "Content-Type": "application/json",
@@ -445,7 +445,7 @@ export function JobsPage({ onViewChange }: Props) {
     if (!candidateForm.name.trim() || !activeJobId) return;
     setSubmitting(true);
 
-    fetch(API, {
+    fetch(API, { credentials: "include",
       method: "POST",
       headers: { 
         "Content-Type": "application/json",

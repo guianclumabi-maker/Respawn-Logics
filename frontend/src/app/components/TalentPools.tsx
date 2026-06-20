@@ -19,7 +19,7 @@ export function TalentPools({ onViewChange }: { onViewChange: (v: ViewState) => 
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch(`${API}&action=talent_pools`)
+    fetch(`${API}&action=talent_pools`, { credentials: "include" })
       .then((r) => r.json())
       .then((d) => {
         if (d.success) setPools(d.pools);

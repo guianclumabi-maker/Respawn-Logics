@@ -31,7 +31,7 @@ export function GamifiedThemeToggle() {
           const newTheme = isDark ? "light" : "dark";
           setTheme(newTheme);
           // Sync with the main PHP backend session
-          fetch("/api/index.php?route=iam&action=update_theme", {
+          fetch("/api/index.php?route=iam&action=update_theme", { credentials: "include", 
               method: "POST",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({ 

@@ -249,7 +249,7 @@ function AddToPoolModal({
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch(`${API}&action=talent_pools`)
+    fetch(`${API}&action=talent_pools`, { credentials: "include" })
       .then((r) => r.json())
       .then((d) => {
         if (d.pools) setPools(d.pools.filter((p: Pool) => !existingPools.includes(p.id)));
@@ -417,7 +417,7 @@ export function CandidateProfile({ onViewChange, candidateId }: Props) {
   const fetchCandidate = useCallback(() => {
     setLoading(true);
     setError(null);
-    fetch(`${API}&action=candidate&id=${candidateId}`)
+    fetch(`${API}&action=candidate&id=${candidateId}`, { credentials: "include" })
       .then((r) => {
         if (!r.ok) throw new Error("Failed to fetch candidate");
         return r.json();
@@ -438,7 +438,7 @@ export function CandidateProfile({ onViewChange, candidateId }: Props) {
   }, [fetchCandidate]);
 
   const handleAddNote = (content: string, noteType: string) => {
-    fetch(API, {
+    fetch(API, { credentials: "include",
       method: "POST",
       headers: { 
         "Content-Type": "application/json",
@@ -457,7 +457,7 @@ export function CandidateProfile({ onViewChange, candidateId }: Props) {
   };
 
   const handleAddToPool = (poolId: number) => {
-    fetch(API, {
+    fetch(API, { credentials: "include",
       method: "POST",
       headers: { 
         "Content-Type": "application/json",

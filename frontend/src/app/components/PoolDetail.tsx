@@ -29,7 +29,7 @@ export function PoolDetail({ onViewChange, poolId }: { onViewChange: (v: ViewSta
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch(`${API}&action=pool&id=${poolId}`)
+    fetch(`${API}&action=pool&id=${poolId}`, { credentials: "include" })
       .then((r) => r.json())
       .then((d) => {
         if (d.success) setPool(d.pool);

@@ -442,7 +442,7 @@ export function ATSDashboard({ onViewChange }: Props) {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    fetch(`${API}&action=dashboard`)
+    fetch(`${API}&action=dashboard`, { credentials: "include" })
       .then((res) => res.json())
       .then((json) => {
         if (json.success) {

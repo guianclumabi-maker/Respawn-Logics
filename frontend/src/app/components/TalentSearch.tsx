@@ -34,7 +34,7 @@ export function TalentSearch({ onViewChange }: { onViewChange: (v: ViewState) =>
     if (query.min_experience) url += `&min_experience=${encodeURIComponent(query.min_experience)}`;
     if (query.source) url += `&source=${encodeURIComponent(query.source)}`;
 
-    fetch(url)
+    fetch(url, { credentials: "include" })
       .then((r) => r.json())
       .then((d) => {
         if (d.success) setResults(d.results);

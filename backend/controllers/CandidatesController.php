@@ -10,11 +10,28 @@ class CandidatesController
     {
         $this->pdo = $pdo;
         $this->currentUser = getCurrentUser() ?: null;
-        $this->tenantId = is_array($this->currentUser) && isset($this->currentUser['tenant_id']) ? $this->currentUser['tenant_id'] : ($_SESSION['tenant_id'] ?? '1');
+        $tenant = null;
+        if (is_array($this->currentUser)
+            && isset($this->currentUser['tenant_id'])
+            && $this->currentUser['tenant_id'] !== ''
+            && $this->currentUser['tenant_id'] !== null) {
+            $tenant = $this->currentUser['tenant_id'];
+        } elseif (isset($_SESSION['tenant_id'])
+            && $_SESSION['tenant_id'] !== ''
+            && $_SESSION['tenant_id'] !== null) {
+            $tenant = $_SESSION['tenant_id'];
+        }
+        $this->tenantId = $tenant; // null when unresolved
     }
 
     public function handleRequest($action)
     {
+        if ($this->tenantId === null || $this->tenantId === '') {
+            http_response_code(403);
+            echo json_encode(['success' => false, 'error' => 'Unable to resolve tenant context']);
+            exit;
+        }
+
         $input = json_decode(file_get_contents('php://input'), true) ?? [];
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $action = $input['action'] ?? $action;

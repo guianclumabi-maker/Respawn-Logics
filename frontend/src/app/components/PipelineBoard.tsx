@@ -113,7 +113,7 @@ function AddCandidateModal({ jobId, onClose, onSuccess }: { jobId: number; onClo
     if (!form.name.trim()) return;
     setSaving(true);
     try {
-      const res = await fetch(API, { method: "POST", headers: { 
+      const res = await fetch(API, { credentials: "include", method: "POST", headers: { 
         "Content-Type": "application/json",
         "X-CSRF-Token": (window as any).__CSRF_TOKEN__ || ""
       },
@@ -341,7 +341,7 @@ export function PipelineBoard({ onViewChange, jobId }: Props) {
   // Fetch job list if no jobId
   useEffect(() => {
     if (!jobId) {
-      fetch(`${API}&action=jobs`).then(r => r.json()).then(d => {
+      fetch(`${API}&action=jobs`, { credentials: "include" }).then(r => r.json()).then(d => {
         if (d.success && d.jobs?.length) {
           setJobs(d.jobs);
           // Do NOT auto-select the first job, let the user choose from the list
@@ -357,7 +357,7 @@ export function PipelineBoard({ onViewChange, jobId }: Props) {
     if (!id) return;
     setLoading(true);
     try {
-      const res = await fetch(`${API}&action=job&id=${id}&t=${Date.now()}`);
+      const res = await fetch(`${API}&action=job&id=${id}&t=${Date.now()}`, { credentials: "include" });
       const data = await res.json();
       if (data.success) setJob(data.job);
     } catch (e) { console.error(e); }
@@ -417,7 +417,7 @@ export function PipelineBoard({ onViewChange, jobId }: Props) {
   const updateRating = async (appId: number, rating: number) => {
     setJob(prev => prev ? { ...prev, applications: prev.applications.map(a => a.id === appId ? { ...a, rating } : a) } : prev);
     try {
-      await fetch(API, { method: "POST", headers: { 
+      await fetch(API, { credentials: "include", method: "POST", headers: { 
         "Content-Type": "application/json",
         "X-CSRF-Token": (window as any).__CSRF_TOKEN__ || ""
       }, body: JSON.stringify({ action: "update_rating", id: appId, rating }) });
@@ -447,7 +447,7 @@ export function PipelineBoard({ onViewChange, jobId }: Props) {
     const ids = Array.from(selected);
     if (!confirm(`Reject ${ids.length} candidate(s)?`)) return;
     try {
-      await fetch(API, { method: "POST", headers: { 
+      await fetch(API, { credentials: "include", method: "POST", headers: { 
         "Content-Type": "application/json",
         "X-CSRF-Token": (window as any).__CSRF_TOKEN__ || ""
       }, body: JSON.stringify({ action: "bulk_reject", ids }) });
@@ -459,7 +459,7 @@ export function PipelineBoard({ onViewChange, jobId }: Props) {
     const ids = Array.from(selected);
     if (!confirm(`Archive ${ids.length} candidate(s)? This cannot be undone.`)) return;
     try {
-      await fetch(API, { method: "POST", headers: { 
+      await fetch(API, { credentials: "include", method: "POST", headers: { 
         "Content-Type": "application/json",
         "X-CSRF-Token": (window as any).__CSRF_TOKEN__ || ""
       }, body: JSON.stringify({ action: "bulk_delete", ids }) });

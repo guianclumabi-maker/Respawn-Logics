@@ -30,7 +30,7 @@ export function CandidatesList({ onViewChange }: { onViewChange: (v: ViewState) 
     if (search) url += `&search=${encodeURIComponent(search)}`;
     if (statusFilter) url += `&status=${encodeURIComponent(statusFilter)}`;
 
-    fetch(url)
+    fetch(url, { credentials: "include" })
       .then((r) => r.json())
       .then((d) => {
         if (d.success) setCandidates(d.candidates);

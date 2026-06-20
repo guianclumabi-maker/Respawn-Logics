@@ -10,7 +10,7 @@ export function ManagerApprovals() {
 
   const fetchPending = async () => {
     try {
-      const res = await fetch(`${API}&action=pending_approvals`);
+      const res = await fetch(`${API}&action=pending_approvals`, { credentials: "include" });
       const data = await res.json();
       if (data.success) {
         setLogs(data.data);
@@ -28,7 +28,7 @@ export function ManagerApprovals() {
 
   const handleApprove = async (id: number) => {
     try {
-      const res = await fetch(`${API}&action=approve_timesheet`, {
+      const res = await fetch(`${API}&action=approve_timesheet`, { credentials: "include",
         method: "POST",
         headers: { 
           "Content-Type": "application/json",

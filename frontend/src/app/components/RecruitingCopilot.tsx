@@ -20,7 +20,7 @@ export function RecruitingCopilot({ onViewChange }: { onViewChange: (v: ViewStat
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch(`${API}&action=ai_actions`)
+    fetch(`${API}&action=ai_actions`, { credentials: "include" })
       .then((r) => r.json())
       .then((d) => {
         if (d.success) setActions(d.recommendations || []);
