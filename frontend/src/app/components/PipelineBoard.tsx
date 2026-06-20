@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import {
   Search, Plus, Star, ChevronDown, ChevronUp, X, Check, Trash2,
   ArrowRight, ChevronRight, LayoutList, Columns3, Linkedin, Globe,
-  UserPlus, Briefcase, Clock,
+  UserPlus, Briefcase, Clock, Users, Zap, Award, MapPin, User
 } from "lucide-react";
 
 // ─── API ──────────────────────────────────────────────────────────────────────
@@ -500,21 +500,29 @@ export function PipelineBoard({ onViewChange, jobId }: Props) {
 
           {/* Mini Dashboard */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div className="bg-card border border-border rounded-xl p-5 shadow-lg flex flex-col items-center justify-center">
-              <span className="text-[#00e07a] text-2xl font-bold mb-1">{jobs.length}</span>
-              <span className="text-[10px] text-muted-foreground uppercase tracking-widest">Active Jobs</span>
+            <div className="bg-background/40 border border-border/50 rounded-xl p-5 shadow-lg flex flex-col items-center justify-center relative overflow-hidden group">
+              <div className="absolute top-0 right-0 w-16 h-16 bg-[#00e07a]/5 rounded-bl-full -z-10 group-hover:bg-[#00e07a]/10 transition-colors"></div>
+              <Briefcase size={20} className="text-[#00e07a] mb-2 opacity-80" />
+              <span className="text-foreground text-3xl font-bold mb-1 font-sans">{jobs.length}</span>
+              <span className="text-[10px] text-muted-foreground uppercase tracking-widest font-sans font-bold">Active Jobs</span>
             </div>
-            <div className="bg-card border border-border rounded-xl p-5 shadow-lg flex flex-col items-center justify-center">
-              <span className="text-[#9b6dff] text-2xl font-bold mb-1">{totalCandidates}</span>
-              <span className="text-[10px] text-muted-foreground uppercase tracking-widest">Total Candidates</span>
+            <div className="bg-background/40 border border-border/50 rounded-xl p-5 shadow-lg flex flex-col items-center justify-center relative overflow-hidden group">
+              <div className="absolute top-0 right-0 w-16 h-16 bg-[#9b6dff]/5 rounded-bl-full -z-10 group-hover:bg-[#9b6dff]/10 transition-colors"></div>
+              <Users size={20} className="text-[#9b6dff] mb-2 opacity-80" />
+              <span className="text-foreground text-3xl font-bold mb-1 font-sans">{totalCandidates}</span>
+              <span className="text-[10px] text-muted-foreground uppercase tracking-widest font-sans font-bold">Total Candidates</span>
             </div>
-            <div className="bg-card border border-border rounded-xl p-5 shadow-lg flex flex-col items-center justify-center">
-              <span className="text-amber-400 text-2xl font-bold mb-1">{totalVelocity}</span>
-              <span className="text-[10px] text-muted-foreground uppercase tracking-widest">New This Week</span>
+            <div className="bg-background/40 border border-border/50 rounded-xl p-5 shadow-lg flex flex-col items-center justify-center relative overflow-hidden group">
+              <div className="absolute top-0 right-0 w-16 h-16 bg-amber-400/5 rounded-bl-full -z-10 group-hover:bg-amber-400/10 transition-colors"></div>
+              <Zap size={20} className="text-amber-400 mb-2 opacity-80" />
+              <span className="text-foreground text-3xl font-bold mb-1 font-sans">{totalVelocity}</span>
+              <span className="text-[10px] text-muted-foreground uppercase tracking-widest font-sans font-bold">New This Week</span>
             </div>
-            <div className="bg-card border border-border rounded-xl p-5 shadow-lg flex flex-col items-center justify-center">
-              <span className="text-emerald-400 text-2xl font-bold mb-1">{totalOffers}</span>
-              <span className="text-[10px] text-muted-foreground uppercase tracking-widest">Pending Offers</span>
+            <div className="bg-background/40 border border-border/50 rounded-xl p-5 shadow-lg flex flex-col items-center justify-center relative overflow-hidden group">
+              <div className="absolute top-0 right-0 w-16 h-16 bg-emerald-400/5 rounded-bl-full -z-10 group-hover:bg-emerald-400/10 transition-colors"></div>
+              <Award size={20} className="text-emerald-400 mb-2 opacity-80" />
+              <span className="text-foreground text-3xl font-bold mb-1 font-sans">{totalOffers}</span>
+              <span className="text-[10px] text-muted-foreground uppercase tracking-widest font-sans font-bold">Pending Offers</span>
             </div>
           </div>
 
@@ -532,20 +540,56 @@ export function PipelineBoard({ onViewChange, jobId }: Props) {
 
             <div className="space-y-3 w-full max-h-[50vh] overflow-y-auto pr-2 custom-scrollbar">
               {filteredJobs.length === 0 ? (
-                <div className="text-center py-10 text-sm text-muted-foreground">No jobs match your filter.</div>
+                <div className="text-center py-10 text-sm text-muted-foreground font-sans">No jobs match your filter.</div>
               ) : (
                 filteredJobs.map(j => (
                   <button key={j.id} onClick={() => setSelectedJobId(j.id)}
-                    className="w-full flex items-center justify-between px-5 py-4 rounded-lg border border-border bg-background text-left hover:border-[#00e07a]/40 hover:bg-[#00e07a]/5 hover:shadow-[0_0_20px_rgba(0,224,122,0.1)] transition-all cursor-pointer group">
-                    <div>
-                      <span className="text-base font-semibold text-foreground group-hover:text-[#00e07a] transition-colors">{j.title}</span>
-                      <div className="flex items-center gap-3 mt-1.5">
-                        <span className="text-xs text-muted-foreground uppercase tracking-wider">{`DEP: ${j.department || 'N/A'}`}</span>
-                        <span className="text-xs text-muted-foreground uppercase tracking-wider">{`LOC: ${j.location || 'Remote'}`}</span>
-                        <span className="text-[10px] bg-[#00e07a]/10 text-[#00e07a] px-2 py-0.5 rounded-full">{j.health?.total || 0} Candidates</span>
+                    className="w-full flex flex-col lg:flex-row items-start lg:items-center justify-between p-5 rounded-xl border border-border bg-background hover:bg-card/80 text-left hover:border-[#00e07a]/40 hover:shadow-[0_8px_30px_rgba(0,224,122,0.1)] transition-all cursor-pointer group gap-4 relative overflow-hidden">
+                    
+                    {/* Left: Job Info */}
+                    <div className="flex-1">
+                      <div className="flex flex-wrap items-center gap-3 mb-2">
+                        <span className="text-lg font-bold text-foreground group-hover:text-[#00e07a] transition-colors">{j.title}</span>
+                        {j.priority === 'High' && <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-red-500/10 text-red-400 border border-red-500/20 uppercase tracking-wider font-sans">High Priority</span>}
+                        <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider font-sans border ${
+                          j.status === 'Open' ? 'bg-[#00e07a]/10 text-[#00e07a] border-[#00e07a]/20' : 'bg-muted text-muted-foreground border-border'
+                        }`}>{j.status || 'Open'}</span>
+                      </div>
+                      
+                      <div className="flex flex-wrap items-center gap-4 text-xs text-muted-foreground font-sans mt-2">
+                        <span className="flex items-center gap-1.5"><Briefcase size={14} className="text-muted-foreground/70"/> {j.department || 'N/A'}</span>
+                        <span className="flex items-center gap-1.5"><MapPin size={14} className="text-muted-foreground/70"/> {j.location || 'Remote'}</span>
+                        <span className="flex items-center gap-1.5"><Clock size={14} className="text-muted-foreground/70"/> {j.days_open}d open</span>
+                        {j.hiring_manager && <span className="flex items-center gap-1.5"><User size={14} className="text-muted-foreground/70"/> {j.hiring_manager}</span>}
                       </div>
                     </div>
-                    <ChevronRight size={20} className="text-muted-foreground group-hover:text-[#00e07a] group-hover:translate-x-1 transition-all" />
+
+                    {/* Right: Pipeline Health Breakdown */}
+                    <div className="flex items-center gap-2 lg:gap-4 w-full lg:w-auto mt-2 lg:mt-0 pt-4 lg:pt-0 border-t lg:border-t-0 border-border/50">
+                      
+                      <div className="flex items-center bg-card/50 rounded-lg border border-border/50 divide-x divide-border/50 overflow-hidden font-sans shadow-sm">
+                        <div className="flex flex-col items-center px-4 py-1.5 hover:bg-background/50 transition-colors">
+                          <span className="text-foreground font-bold text-[15px]">{j.health?.applied || 0}</span>
+                          <span className="text-[9px] uppercase text-muted-foreground font-bold tracking-wider">Applied</span>
+                        </div>
+                        <div className="flex flex-col items-center px-4 py-1.5 hover:bg-background/50 transition-colors">
+                          <span className="text-amber-400 font-bold text-[15px]">{j.health?.review || 0}</span>
+                          <span className="text-[9px] uppercase text-amber-400/70 font-bold tracking-wider">Review</span>
+                        </div>
+                        <div className="flex flex-col items-center px-4 py-1.5 hover:bg-background/50 transition-colors">
+                          <span className="text-purple-400 font-bold text-[15px]">{j.health?.interview || 0}</span>
+                          <span className="text-[9px] uppercase text-purple-400/70 font-bold tracking-wider">Interview</span>
+                        </div>
+                        <div className="flex flex-col items-center px-4 py-1.5 hover:bg-[#00e07a]/5 transition-colors">
+                          <span className="text-[#00e07a] font-bold text-[15px]">{j.health?.offer || 0}</span>
+                          <span className="text-[9px] uppercase text-[#00e07a]/70 font-bold tracking-wider">Offer</span>
+                        </div>
+                      </div>
+                      
+                      <div className="h-10 w-10 ml-2 rounded-full bg-primary/10 flex items-center justify-center group-hover:bg-primary transition-colors shrink-0">
+                        <ChevronRight size={20} className="text-primary group-hover:text-primary-foreground transition-colors" />
+                      </div>
+                    </div>
                   </button>
                 ))
               )}
