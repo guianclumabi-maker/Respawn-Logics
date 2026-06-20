@@ -125,14 +125,14 @@ const API = `${API_BASE}/api/index.php?route=candidates`;
 function Skeleton({ className = "" }: { className?: string }) {
   return (
     <div
-      className={`animate-pulse rounded-lg bg-white/[0.04] ${className}`}
+      className={`animate-pulse rounded-lg bg-secondary ${className}`}
     />
   );
 }
 
 function CardSkeleton() {
   return (
-    <div className="bg-[#0f1422] border border-white/[0.06] rounded-xl p-5 space-y-3">
+    <div className="bg-background border border-border rounded-xl p-5 space-y-3">
       <div className="flex items-center justify-between">
         <Skeleton className="w-10 h-10 rounded-full" />
         <Skeleton className="w-16 h-4" />
@@ -179,11 +179,11 @@ function MetricCard({
         </div>
         <ChevronRight
           size={14}
-          className="text-gray-600 group-hover:text-gray-400 transition-colors"
+          className="text-muted-foreground group-hover:text-muted-foreground transition-colors"
         />
       </div>
-      <div className="text-2xl font-bold text-white mb-1 font-mono tracking-tight">{value}</div>
-      <div className="text-[10px] font-mono text-gray-400 uppercase tracking-wider">{`// ${label}`}</div>
+      <div className="text-2xl font-bold text-foreground mb-1 font-mono tracking-tight">{value}</div>
+      <div className="text-[10px] font-mono text-muted-foreground uppercase tracking-wider">{`// ${label}`}</div>
     </button>
   );
 }
@@ -250,9 +250,9 @@ function AlertItem({
         {iconMap[alert.type] || <AlertTriangle size={16} />}
       </div>
       <div className="flex-1 min-w-0">
-        <p className="text-sm text-white/90 leading-snug">{alert.message}</p>
+        <p className="text-sm text-foreground/90 leading-snug">{alert.message}</p>
         {alert.job_title && (
-          <p className="text-xs text-gray-500 mt-0.5 font-mono">{`[ JOB: ${alert.job_title} ]`}</p>
+          <p className="text-xs text-muted-foreground mt-0.5 font-mono">{`[ JOB: ${alert.job_title} ]`}</p>
         )}
       </div>
       <span
@@ -315,11 +315,11 @@ function JobHealthCard({
   ];
 
   return (
-    <div className="bg-[#0f1422] border border-white/[0.07] rounded-xl p-5 flex flex-col justify-between transition-all hover:border-[#9b6dff]/40 hover:bg-[#141929] hover:shadow-[0_0_15px_rgba(155,109,255,0.1)]">
+    <div className="bg-background border border-border rounded-xl p-5 flex flex-col justify-between transition-all hover:border-[#9b6dff]/40 hover:bg-[#141929] hover:shadow-[0_0_15px_rgba(155,109,255,0.1)]">
       {/* Header */}
       <div className="mb-4">
         <div className="flex items-start justify-between mb-2">
-          <h4 className="text-sm font-semibold text-white leading-tight font-['Space_Grotesk']">
+          <h4 className="text-sm font-semibold text-foreground leading-tight font-['Space_Grotesk']">
             {job.title}
           </h4>
           <span
@@ -336,7 +336,7 @@ function JobHealthCard({
           )}
           {job.priority && (
             <span
-              className={`text-[10px] font-mono px-2 py-0.5 rounded border ${priorityConfig[job.priority] || "bg-white/5 text-gray-400 border-white/10"}`}
+              className={`text-[10px] font-mono px-2 py-0.5 rounded border ${priorityConfig[job.priority] || "bg-white/5 text-muted-foreground border-white/10"}`}
             >
               {`PRIORITY: ${job.priority}`}
             </span>
@@ -346,11 +346,11 @@ function JobHealthCard({
 
       {/* Mini Pipeline */}
       <div className="space-y-2 mb-4">
-        <div className="flex justify-between text-[9px] text-gray-500 font-mono">
+        <div className="flex justify-between text-[9px] text-muted-foreground font-mono">
           <span>PIPELINE CAPACITY</span>
           <span>{job.health.total} CANDIDATES</span>
         </div>
-        <div className="h-1.5 w-full bg-white/[0.04] rounded-full overflow-hidden flex">
+        <div className="h-1.5 w-full bg-secondary rounded-full overflow-hidden flex">
           {pipelineSteps.map((step) => {
             const pct = job.health.total > 0 ? (step.count / job.health.total) * 100 : 0;
             if (pct === 0) return null;
@@ -368,7 +368,7 @@ function JobHealthCard({
             );
           })}
         </div>
-        <div className="grid grid-cols-4 gap-1 text-[8px] text-gray-400 font-mono text-center">
+        <div className="grid grid-cols-4 gap-1 text-[8px] text-muted-foreground font-mono text-center">
           {pipelineSteps.map((step) => (
             <div key={step.label} className="truncate" style={{ color: step.color }}>
               {step.count} {step.label}
@@ -378,19 +378,19 @@ function JobHealthCard({
       </div>
 
       {/* Metrics */}
-      <div className="flex items-center justify-between text-[10px] text-gray-400 mb-4 font-mono">
+      <div className="flex items-center justify-between text-[10px] text-muted-foreground mb-4 font-mono">
         <div className="flex items-center gap-1">
           <Timer size={11} className="text-amber-400" />
           <span>OPEN: {job.days_open}D</span>
         </div>
         <div className="flex items-center gap-1">
-          <Zap size={11} className="text-[#00e07a]" />
+          <Zap size={11} className="text-primary" />
           <span>VELOCITY: +{job.health.velocity}/WK</span>
         </div>
       </div>
 
       {/* Actions */}
-      <div className="flex items-center gap-2 pt-3 border-t border-white/[0.04] font-mono">
+      <div className="flex items-center gap-2 pt-3 border-t border-border font-mono">
         <button
           onClick={() => onViewChange({ view: "Jobs", jobId: job.id })}
           className="flex items-center gap-1 text-[10px] font-semibold text-purple-400 hover:text-purple-300 transition-colors cursor-pointer bg-transparent border-0 px-0"
@@ -407,7 +407,7 @@ function JobHealthCard({
           [ + CANDIDATE ]
         </button>
         <span className="text-gray-700">·</span>
-        <button className="flex items-center gap-1 text-[10px] font-semibold text-gray-500 hover:text-gray-400 transition-colors cursor-pointer bg-transparent border-0 px-0">
+        <button className="flex items-center gap-1 text-[10px] font-semibold text-muted-foreground hover:text-muted-foreground transition-colors cursor-pointer bg-transparent border-0 px-0">
           [ PAUSE ]
         </button>
       </div>
@@ -431,7 +431,7 @@ function getActivityIcon(action: string) {
     return <ArrowRight size={14} className="text-cyan-400" />;
   if (lower.includes("note") || lower.includes("comment"))
     return <ClipboardList size={14} className="text-amber-400" />;
-  return <Activity size={14} className="text-gray-400" />;
+  return <Activity size={14} className="text-muted-foreground" />;
 }
 
 // ── Main Component ─────────────────────────────────────────────────────────────
@@ -554,7 +554,7 @@ export function ATSDashboard({ onViewChange }: Props) {
                 <CardSkeleton key={i} />
               ))}
             </div>
-            <div className="bg-[#0f1422] border border-white/[0.06] rounded-xl p-6 space-y-4">
+            <div className="bg-background border border-border rounded-xl p-6 space-y-4">
               <Skeleton className="w-40 h-5" />
               <Skeleton className="w-full h-12" />
               <Skeleton className="w-full h-12" />
@@ -563,7 +563,7 @@ export function ATSDashboard({ onViewChange }: Props) {
               {[0, 1, 2, 3].map((i) => (
                 <div
                   key={i}
-                  className="bg-[#0f1422] border border-white/[0.06] rounded-xl p-5 space-y-3"
+                  className="bg-background border border-border rounded-xl p-5 space-y-3"
                 >
                   <Skeleton className="w-32 h-4" />
                   <Skeleton className="w-full h-3" />
@@ -576,10 +576,10 @@ export function ATSDashboard({ onViewChange }: Props) {
           /* ── Error State ──────────────────────────────────────────────── */
           <div className="flex flex-col items-center justify-center py-24 text-center">
             <AlertTriangle size={40} className="text-[#f5a623] mb-4" />
-            <p className="text-gray-900 dark:text-white font-medium mb-1" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
+            <p className="text-gray-900 dark:text-foreground font-medium mb-1" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
               Unable to load dashboard
             </p>
-            <p className="text-sm text-gray-600 dark:text-gray-500 font-mono">{error}</p>
+            <p className="text-sm text-muted-foreground dark:text-muted-foreground font-mono">{error}</p>
             <button
               onClick={() => window.location.reload()}
               className="mt-4 px-4 py-2 rounded-lg text-xs font-mono font-semibold bg-purple-500/10 text-purple-600 dark:text-purple-400 border border-purple-500/20 hover:bg-purple-500/20 cursor-pointer transition-all"
@@ -627,14 +627,14 @@ export function ATSDashboard({ onViewChange }: Props) {
 
             {/* ── Action Center ────────────────────── */}
             <div
-              className="bg-[#0f1422] border border-white/[0.07] rounded-xl p-6 mb-8 relative overflow-hidden"
+              className="bg-background border border-border rounded-xl p-6 mb-8 relative overflow-hidden"
               style={{ animation: "fadeSlideUp 0.5s ease-out 200ms both" }}
             >
               <div className="flex items-center gap-2 mb-5 justify-between">
                 <div className="flex items-center gap-2">
                   <AlertTriangle size={18} className="text-[#f5a623]" />
                   <h2
-                    className="text-base font-bold text-white font-['Space_Grotesk']"
+                    className="text-base font-bold text-foreground font-['Space_Grotesk']"
                   >
                     SYSTEM ALERTS // ACTION REQUIRED
                   </h2>
@@ -657,13 +657,13 @@ export function ATSDashboard({ onViewChange }: Props) {
                   ))}
                 </div>
               ) : (
-                <div className="flex items-center gap-3 p-4 rounded-lg bg-[#00e07a]/5 border border-[#00e07a]/15 font-mono">
-                  <CheckCircle2 size={20} className="text-[#00e07a]" />
+                <div className="flex items-center gap-3 p-4 rounded-lg bg-primary border border-[#00e07a]/15 font-mono">
+                  <CheckCircle2 size={20} className="text-primary" />
                   <div>
-                    <p className="text-sm font-medium text-[#00e07a]">
+                    <p className="text-sm font-medium text-primary">
                       All caught up!
                     </p>
-                    <p className="text-xs text-gray-500">
+                    <p className="text-xs text-muted-foreground">
                       No pending actions.
                     </p>
                   </div>
@@ -680,14 +680,14 @@ export function ATSDashboard({ onViewChange }: Props) {
                 <div className="flex items-center gap-2">
                   <Briefcase size={18} className="text-[#9b6dff]" />
                   <h2
-                    className="text-base font-bold text-white font-['Space_Grotesk']"
+                    className="text-base font-bold text-foreground font-['Space_Grotesk']"
                   >
                     JOB PIPELINES // ACTIVE STATUS
                   </h2>
                 </div>
                 <button
                   onClick={() => onViewChange({ view: "Jobs" })}
-                  className="text-xs font-mono font-semibold text-[#9b6dff] hover:text-white cursor-pointer bg-transparent border-0 transition-colors"
+                  className="text-xs font-mono font-semibold text-[#9b6dff] hover:text-foreground cursor-pointer bg-transparent border-0 transition-colors"
                 >
                   [ ALL ACTIVE JOBS ]
                 </button>
@@ -704,20 +704,20 @@ export function ATSDashboard({ onViewChange }: Props) {
                   ))}
                 </div>
               ) : (
-                <div className="bg-[#0f1422] border border-white/[0.06] rounded-xl p-10 text-center">
+                <div className="bg-background border border-border rounded-xl p-10 text-center">
                   <Briefcase
                     size={32}
-                    className="text-gray-600 mx-auto mb-3"
+                    className="text-muted-foreground mx-auto mb-3"
                   />
-                  <p className="text-sm text-gray-400 mb-1 font-mono">
+                  <p className="text-sm text-muted-foreground mb-1 font-mono">
                     No active jobs
                   </p>
-                  <p className="text-xs text-gray-500 font-mono">
+                  <p className="text-xs text-muted-foreground font-mono">
                     Create your first job posting.
                   </p>
                   <button
                     onClick={() => onViewChange({ view: "Jobs" })}
-                    className="mt-4 px-4 py-2 rounded-lg text-xs font-mono font-semibold bg-gradient-to-r from-[#9b6dff] to-[#00e07a] text-black cursor-pointer border-0 hover:opacity-90 transition-opacity"
+                    className="mt-4 px-4 py-2 rounded-lg text-xs font-mono font-semibold bg-gradient-to-r from-[#9b6dff] to-[#00e07a] text-primary-foreground cursor-pointer border-0 hover:opacity-90 transition-opacity"
                   >
                     [ CREATE JOB ]
                   </button>
@@ -731,11 +731,11 @@ export function ATSDashboard({ onViewChange }: Props) {
               style={{ animation: "fadeSlideUp 0.5s ease-out 400ms both" }}
             >
               {/* Left: Recent Activity Feed (60%) */}
-              <div className="lg:col-span-3 bg-[#0f1422] border border-white/[0.07] rounded-xl p-6">
+              <div className="lg:col-span-3 bg-background border border-border rounded-xl p-6">
                 <div className="flex items-center gap-2 mb-5">
                   <Activity size={18} className="text-[#9b6dff]" />
                   <h2
-                    className="text-base font-bold text-white font-['Space_Grotesk']"
+                    className="text-base font-bold text-foreground font-['Space_Grotesk']"
                   >
                     SYSTEM LOGS // RECENT ACTIVITY
                   </h2>
@@ -746,13 +746,13 @@ export function ATSDashboard({ onViewChange }: Props) {
                     {data.activities.map((act, idx) => (
                       <div
                         key={act.id || idx}
-                        className="flex items-start gap-3 p-3 rounded-lg hover:bg-white/[0.02] transition-colors group"
+                        className="flex items-start gap-3 p-3 rounded-lg hover:bg-muted transition-colors group"
                       >
-                        <div className="flex-shrink-0 w-8 h-8 rounded-lg bg-white/[0.03] border border-white/[0.06] flex items-center justify-center mt-0.5">
+                        <div className="flex-shrink-0 w-8 h-8 rounded-lg bg-white/[0.03] border border-border flex items-center justify-center mt-0.5">
                           {getActivityIcon(act.action)}
                         </div>
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm text-white/90 leading-snug">
+                          <p className="text-sm text-foreground/90 leading-snug">
                             {act.description}
                           </p>
                           <div className="flex items-center gap-2 mt-1">
@@ -762,9 +762,9 @@ export function ATSDashboard({ onViewChange }: Props) {
                               </span>
                             )}
                             {act.candidate_name && act.time_ago && (
-                              <span className="text-gray-600">·</span>
+                              <span className="text-muted-foreground">·</span>
                             )}
-                            <span className="text-[11px] font-mono text-gray-500">
+                            <span className="text-[11px] font-mono text-muted-foreground">
                               {act.time_ago}
                             </span>
                           </div>
@@ -776,9 +776,9 @@ export function ATSDashboard({ onViewChange }: Props) {
                   <div className="py-10 text-center font-mono">
                     <Activity
                       size={28}
-                      className="text-gray-600 mx-auto mb-2"
+                      className="text-muted-foreground mx-auto mb-2"
                     />
-                    <p className="text-sm text-gray-500">
+                    <p className="text-sm text-muted-foreground">
                       No recent activity
                     </p>
                   </div>
@@ -786,11 +786,11 @@ export function ATSDashboard({ onViewChange }: Props) {
               </div>
 
               {/* Right: Upcoming Interviews (40%) */}
-              <div className="lg:col-span-2 bg-[#0f1422] border border-white/[0.07] rounded-xl p-6">
+              <div className="lg:col-span-2 bg-background border border-border rounded-xl p-6">
                 <div className="flex items-center gap-2 mb-5">
                   <Calendar size={18} className="text-[#4f8ef7]" />
                   <h2
-                    className="text-base font-bold text-white font-['Space_Grotesk']"
+                    className="text-base font-bold text-foreground font-['Space_Grotesk']"
                   >
                     UPCOMING SESSIONS // CANDIDATE INTERVIEWS
                   </h2>
@@ -807,20 +807,20 @@ export function ATSDashboard({ onViewChange }: Props) {
                             candidateId: interview.candidate_id,
                           })
                         }
-                        className="w-full text-left p-3.5 rounded-lg bg-white/[0.01] border border-white/[0.04] hover:border-blue-500/20 hover:bg-blue-500/5 transition-all cursor-pointer group"
+                        className="w-full text-left p-3.5 rounded-lg bg-white/[0.01] border border-border hover:border-blue-500/20 hover:bg-blue-500/5 transition-all cursor-pointer group"
                       >
                         <div className="flex items-start justify-between mb-1.5">
-                          <span className="text-sm font-medium text-white group-hover:text-blue-300 transition-colors">
+                          <span className="text-sm font-medium text-foreground group-hover:text-blue-300 transition-colors">
                             {interview.candidate_name}
                           </span>
                           <span className="text-[10px] font-mono font-medium px-2 py-0.5 rounded bg-blue-500/10 text-blue-400 border border-blue-500/20 flex-shrink-0 ml-2">
                             {`[ ${interview.status} ]`}
                           </span>
                         </div>
-                        <p className="text-xs text-gray-400 mb-1.5 font-mono">
+                        <p className="text-xs text-muted-foreground mb-1.5 font-mono">
                           {interview.job_title}
                         </p>
-                        <div className="flex items-center gap-2 text-[10px] text-gray-500 font-mono">
+                        <div className="flex items-center gap-2 text-[10px] text-muted-foreground font-mono">
                           <Clock size={11} />
                           <span>
                             {interview.formatted_date} at{" "}
@@ -840,9 +840,9 @@ export function ATSDashboard({ onViewChange }: Props) {
                   <div className="py-10 text-center font-mono">
                     <Calendar
                       size={28}
-                      className="text-gray-600 mx-auto mb-2"
+                      className="text-muted-foreground mx-auto mb-2"
                     />
-                    <p className="text-sm text-gray-500">
+                    <p className="text-sm text-muted-foreground">
                       No upcoming interviews
                     </p>
                   </div>

@@ -171,17 +171,17 @@ function AddNoteModal({
   const [content, setContent] = useState("");
   const [noteType, setNoteType] = useState("Comment");
 
-  const inputCls = "w-full px-3 py-2.5 rounded-xl border text-xs font-mono outline-none bg-[#161922] border-white/10 text-white focus:border-[#00e07a] focus:shadow-[0_0_10px_rgba(0,224,122,0.15)] transition-all";
-  const labelCls = "text-[10px] uppercase font-mono font-bold text-gray-500 block mb-1";
+  const inputCls = "w-full px-3 py-2.5 rounded-xl border text-xs font-mono outline-none bg-card border-white/10 text-foreground focus:border-[#00e07a] focus:shadow-[0_0_10px_rgba(0,224,122,0.15)] transition-all";
+  const labelCls = "text-[10px] uppercase font-mono font-bold text-muted-foreground block mb-1";
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm" onClick={onClose}>
-      <div className="bg-[#0f1422] border border-white/10 rounded-2xl shadow-2xl w-full max-w-md p-6 text-white" onClick={e => e.stopPropagation()}>
+      <div className="bg-background border border-white/10 rounded-2xl shadow-2xl w-full max-w-md p-6 text-foreground" onClick={e => e.stopPropagation()}>
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-sm font-bold font-['Space_Grotesk'] tracking-wide">// ADD COLLABORATION NOTE_</h3>
           <button
             onClick={onClose}
-            className="p-1 rounded bg-white/[0.04] text-gray-400 hover:text-white cursor-pointer border-0"
+            className="p-1 rounded bg-secondary text-muted-foreground hover:text-foreground cursor-pointer border-0"
           >
             <X size={16} />
           </button>
@@ -213,7 +213,7 @@ function AddNoteModal({
         <div className="flex gap-2 mt-5 font-mono">
           <button
             onClick={onClose}
-            className="flex-1 px-4 py-2 rounded-xl border text-xs font-bold bg-transparent hover:bg-white/5 cursor-pointer text-gray-400 border-white/10"
+            className="flex-1 px-4 py-2 rounded-xl border text-xs font-bold bg-transparent hover:bg-white/5 cursor-pointer text-muted-foreground border-white/10"
           >
             [ CANCEL ]
           </button>
@@ -223,7 +223,7 @@ function AddNoteModal({
               onSubmit(content.trim(), noteType);
               onClose();
             }}
-            className="flex-1 px-4 py-2 rounded-xl text-xs font-bold bg-[#00e07a] text-black hover:opacity-90 disabled:opacity-40 cursor-pointer border-0"
+            className="flex-1 px-4 py-2 rounded-xl text-xs font-bold bg-primary text-primary-foreground hover:opacity-90 disabled:opacity-40 cursor-pointer border-0"
           >
             [ ADD NOTE ]
           </button>
@@ -260,20 +260,20 @@ function AddToPoolModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm" onClick={onClose}>
-      <div className="bg-[#0f1422] border border-white/10 rounded-2xl shadow-2xl w-full max-w-md p-6 text-white font-mono" onClick={e => e.stopPropagation()}>
+      <div className="bg-background border border-white/10 rounded-2xl shadow-2xl w-full max-w-md p-6 text-foreground font-mono" onClick={e => e.stopPropagation()}>
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-sm font-bold font-['Space_Grotesk'] tracking-wide text-white">// ADD TO TALENT POOL_</h3>
+          <h3 className="text-sm font-bold font-['Space_Grotesk'] tracking-wide text-foreground">// ADD TO TALENT POOL_</h3>
           <button
             onClick={onClose}
-            className="p-1 rounded bg-white/[0.04] text-gray-400 hover:text-white cursor-pointer border-0"
+            className="p-1 rounded bg-secondary text-muted-foreground hover:text-foreground cursor-pointer border-0"
           >
             <X size={16} />
           </button>
         </div>
         {loading ? (
-          <div className="py-8 text-center text-xs text-gray-500">Loading pools...</div>
+          <div className="py-8 text-center text-xs text-muted-foreground">Loading pools...</div>
         ) : pools.length === 0 ? (
-          <div className="py-8 text-center text-xs text-gray-500">
+          <div className="py-8 text-center text-xs text-muted-foreground">
             No available talent pools found.
           </div>
         ) : (
@@ -301,7 +301,7 @@ function AddToPoolModal({
         <div className="flex gap-2 mt-5">
           <button
             onClick={onClose}
-            className="flex-1 px-4 py-2 rounded-xl border text-xs font-bold bg-transparent hover:bg-white/5 cursor-pointer text-gray-400 border-white/10"
+            className="flex-1 px-4 py-2 rounded-xl border text-xs font-bold bg-transparent hover:bg-white/5 cursor-pointer text-muted-foreground border-white/10"
           >
             [ CANCEL ]
           </button>
@@ -313,7 +313,7 @@ function AddToPoolModal({
                 onClose();
               }
             }}
-            className="flex-1 px-4 py-2 rounded-xl text-xs font-bold bg-[#00e07a] text-black hover:opacity-90 disabled:opacity-40 cursor-pointer border-0"
+            className="flex-1 px-4 py-2 rounded-xl text-xs font-bold bg-primary text-primary-foreground hover:opacity-90 disabled:opacity-40 cursor-pointer border-0"
           >
             [ ADD TO POOL ]
           </button>
@@ -346,13 +346,13 @@ function InlineNoteForm({
         onChange={(e) => setContent(e.target.value)}
         placeholder="Write a new note log..."
         rows={3}
-        className="w-full px-3 py-2.5 rounded-xl border text-xs outline-none bg-[#161922]/50 border-white/[0.08] text-white resize-none placeholder-gray-600 focus:border-[#00e07a] transition-all"
+        className="w-full px-3 py-2.5 rounded-xl border text-xs outline-none bg-card border-border text-foreground resize-none placeholder-gray-600 focus:border-[#00e07a] transition-all"
       />
       <div className="flex items-center justify-between">
         <select
           value={noteType}
           onChange={(e) => setNoteType(e.target.value)}
-          className="px-2.5 py-1.5 rounded-lg border text-[10px] outline-none bg-[#161922] border-white/[0.08] text-gray-300 cursor-pointer"
+          className="px-2.5 py-1.5 rounded-lg border text-[10px] outline-none bg-card border-border text-gray-300 cursor-pointer"
         >
           <option value="Comment">Comment</option>
           <option value="Feedback">Feedback</option>
@@ -361,7 +361,7 @@ function InlineNoteForm({
         <button
           disabled={!content.trim()}
           onClick={handleSubmit}
-          className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-[10px] font-bold bg-[#00e07a] text-black disabled:opacity-40 cursor-pointer hover:bg-[#00c9b1] border-0"
+          className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-[10px] font-bold bg-primary text-primary-foreground disabled:opacity-40 cursor-pointer hover:opacity-90 border-0"
         >
           <Send size={10} />
           [ POST NOTE ]
@@ -378,8 +378,8 @@ function ProfileSkeleton() {
     "animate-pulse bg-gradient-to-r from-white/[0.03] via-white/[0.06] to-white/[0.03] rounded-lg";
 
   return (
-    <div className="flex-1 flex flex-col overflow-y-auto px-8 py-6 text-white font-sans relative scrollbar-thin" >
-      <div className="absolute top-[-100px] left-[-100px] w-[500px] h-[500px] rounded-full bg-[#00e07a] blur-[120px] opacity-10 pointer-events-none z-0" />
+    <div className="flex-1 flex flex-col overflow-y-auto px-8 py-6 text-foreground font-sans relative scrollbar-thin" >
+      <div className="absolute top-[-100px] left-[-100px] w-[500px] h-[500px] rounded-full bg-primary blur-[120px] opacity-10 pointer-events-none z-0" />
       <div className="relative z-10 space-y-6">
         <div className="flex items-center gap-4">
           <div className={`w-8 h-8 rounded-lg ${shimmer}`} />
@@ -483,10 +483,10 @@ export function CandidateProfile({ onViewChange, candidateId }: Props) {
           <div className="w-16 h-16 rounded bg-red-500/10 border border-red-500/20 flex items-center justify-center mx-auto text-red-400 font-bold">
             [ ! ]
           </div>
-          <p className="text-sm text-gray-500 uppercase font-bold tracking-wider">{error || "CANDIDATE DATA UNAVAILABLE"}</p>
+          <p className="text-sm text-muted-foreground uppercase font-bold tracking-wider">{error || "CANDIDATE DATA UNAVAILABLE"}</p>
           <button
             onClick={() => onViewChange({ view: "Candidates" })}
-            className="px-5 py-2.5 rounded bg-white/[0.02] border border-white/[0.08] text-gray-400 text-xs font-bold hover:text-white transition-all cursor-pointer"
+            className="px-5 py-2.5 rounded bg-muted border border-border text-muted-foreground text-xs font-bold hover:text-foreground transition-all cursor-pointer"
           >
             [ ← RETURN TO DIRECTORY ]
           </button>
@@ -507,7 +507,7 @@ export function CandidateProfile({ onViewChange, candidateId }: Props) {
 
   return (
     <div
-      className="flex-1 flex flex-col overflow-y-auto px-8 py-6 text-white font-sans relative scrollbar-thin"
+      className="flex-1 flex flex-col overflow-y-auto px-8 py-6 text-foreground font-sans relative scrollbar-thin"
       
     >
       <style>{`
@@ -520,7 +520,7 @@ export function CandidateProfile({ onViewChange, candidateId }: Props) {
         }
       `}</style>
       {/* Background glows */}
-      <div className="absolute top-[-100px] left-[-100px] w-[500px] h-[500px] rounded-full bg-[#00e07a] blur-[120px] opacity-[0.06] pointer-events-none z-0" />
+      <div className="absolute top-[-100px] left-[-100px] w-[500px] h-[500px] rounded-full bg-primary blur-[120px] opacity-[0.06] pointer-events-none z-0" />
       <div className="absolute bottom-[-150px] right-[-100px] w-[600px] h-[600px] rounded-full bg-[#9b6dff] blur-[140px] opacity-[0.05] pointer-events-none z-0" />
 
       {/* Modals */}
@@ -536,11 +536,11 @@ export function CandidateProfile({ onViewChange, candidateId }: Props) {
       )}
 
       {/* ── Header Section ──────────────────────────────────────────────── */}
-      <div className="relative z-10 border-b border-white/[0.04] pb-6 mb-6">
+      <div className="relative z-10 border-b border-border pb-6 mb-6">
         {/* Back button */}
         <button
           onClick={() => onViewChange({ view: "Candidates" })}
-          className="flex items-center gap-1.5 text-xs text-gray-400 hover:text-white mb-4 cursor-pointer transition-colors bg-transparent border-0 font-mono"
+          className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground mb-4 cursor-pointer transition-colors bg-transparent border-0 font-mono"
         >
           <ArrowLeft size={14} />
           [ BACK TO DIRECTORY ]
@@ -549,16 +549,16 @@ export function CandidateProfile({ onViewChange, candidateId }: Props) {
         {/* Name + Badges */}
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
           <div className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded bg-[#0f1422] border border-white/[0.08] flex items-center justify-center font-mono text-base font-bold text-[#9b6dff] flex-shrink-0">
+            <div className="w-12 h-12 rounded bg-background border border-border flex items-center justify-center font-mono text-base font-bold text-[#9b6dff] flex-shrink-0">
               {`[ ${initials} ]`}
             </div>
             <div>
               <div className="flex items-center gap-3 flex-wrap">
                 <h1
-                  className="text-2xl font-bold tracking-tight text-white font-['Space_Grotesk'] flex items-center gap-1.5"
+                  className="text-2xl font-bold tracking-tight text-foreground font-['Space_Grotesk'] flex items-center gap-1.5"
                 >
                   {c.name}
-                  <span className="inline-block w-2.5 h-5 bg-[#00e07a] blink"></span>
+                  <span className="inline-block w-2.5 h-5 bg-primary blink"></span>
                 </h1>
                 <span
                   className="text-[9px] font-mono font-bold uppercase px-2 py-0.5 rounded border"
@@ -592,17 +592,17 @@ export function CandidateProfile({ onViewChange, candidateId }: Props) {
               )}
 
               {/* Recruiter / Hiring Manager */}
-              <div className="flex items-center gap-4 mt-2 text-[10px] text-gray-500 font-mono">
+              <div className="flex items-center gap-4 mt-2 text-[10px] text-muted-foreground font-mono">
                 {c.assigned_recruiter && (
                   <span className="flex items-center gap-1.5">
-                    <UserCheck size={12} className="text-[#00e07a]" />
-                    RECRUITER: <span className="text-white font-semibold">{c.assigned_recruiter}</span>
+                    <UserCheck size={12} className="text-primary" />
+                    RECRUITER: <span className="text-foreground font-semibold">{c.assigned_recruiter}</span>
                   </span>
                 )}
                 {c.assigned_hiring_manager && (
                   <span className="flex items-center gap-1.5">
                     <User size={12} className="text-[#9b6dff]" />
-                    HM: <span className="text-white font-semibold">{c.assigned_hiring_manager}</span>
+                    HM: <span className="text-foreground font-semibold">{c.assigned_hiring_manager}</span>
                   </span>
                 )}
               </div>
@@ -618,7 +618,7 @@ export function CandidateProfile({ onViewChange, candidateId }: Props) {
               <button
                 key={btn.label}
                 onClick={btn.action}
-                className="px-3 py-2 rounded-xl border bg-white/[0.02] border-white/[0.06] hover:border-[#00e07a]/40 text-[10px] font-bold text-gray-400 hover:text-white cursor-pointer transition-all"
+                className="px-3 py-2 rounded-xl border bg-muted border-border hover:border-[#00e07a]/40 text-[10px] font-bold text-muted-foreground hover:text-foreground cursor-pointer transition-all"
               >
                 {`[ ${btn.label} ]`}
               </button>
@@ -633,11 +633,11 @@ export function CandidateProfile({ onViewChange, candidateId }: Props) {
         <div className="col-span-5 lg:col-span-3 space-y-5">
           {/* AI Summary Card */}
           <div
-            className="p-5 rounded-xl border bg-[#0f1422]/60 border-white/[0.06] backdrop-blur-md relative overflow-hidden"
+            className="p-5 rounded-xl border bg-background/60 border-border backdrop-blur-md relative overflow-hidden"
           >
             <div className="flex items-center gap-2 mb-3">
-              <Brain size={14} className="text-[#00e07a]" />
-              <h3 className="text-xs font-bold tracking-wide text-white font-['Space_Grotesk'] uppercase">
+              <Brain size={14} className="text-primary" />
+              <h3 className="text-xs font-bold tracking-wide text-foreground font-['Space_Grotesk'] uppercase">
                 [ AI SYNAPSE PROFILE ANALYSIS ]
               </h3>
             </div>
@@ -648,9 +648,9 @@ export function CandidateProfile({ onViewChange, candidateId }: Props) {
 
           {/* Skills & Experience */}
           <div
-            className="p-5 rounded-xl border bg-[#0f1422] border-white/[0.06] font-mono"
+            className="p-5 rounded-xl border bg-background border-border font-mono"
           >
-            <h3 className="text-xs font-bold tracking-wide text-gray-400 uppercase mb-3 border-b border-white/[0.04] pb-2">
+            <h3 className="text-xs font-bold tracking-wide text-muted-foreground uppercase mb-3 border-b border-border pb-2">
               // SKILLS & STATS SHEET
             </h3>
             {skills.length > 0 && (
@@ -665,18 +665,18 @@ export function CandidateProfile({ onViewChange, candidateId }: Props) {
                 ))}
               </div>
             )}
-            <div className="grid grid-cols-3 gap-4 border-t border-white/[0.04] pt-3">
+            <div className="grid grid-cols-3 gap-4 border-t border-border pt-3">
               <div>
-                <span className="text-[10px] text-gray-500 block">EXPERIENCE</span>
-                <span className="text-xs text-white font-bold">{c.experience_years} Years</span>
+                <span className="text-[10px] text-muted-foreground block">EXPERIENCE</span>
+                <span className="text-xs text-foreground font-bold">{c.experience_years} Years</span>
               </div>
               <div>
-                <span className="text-[10px] text-gray-500 block">LOCATION</span>
-                <span className="text-xs text-white font-bold truncate block">{c.location || "Unknown"}</span>
+                <span className="text-[10px] text-muted-foreground block">LOCATION</span>
+                <span className="text-xs text-foreground font-bold truncate block">{c.location || "Unknown"}</span>
               </div>
               <div>
-                <span className="text-[10px] text-gray-500 block">EXPECTATION</span>
-                <span className="text-xs text-[#00e07a] font-bold">
+                <span className="text-[10px] text-muted-foreground block">EXPECTATION</span>
+                <span className="text-xs text-primary font-bold">
                   {c.salary_expectation
                     ? `$${c.salary_expectation.toLocaleString()}`
                     : "—"}
@@ -687,13 +687,13 @@ export function CandidateProfile({ onViewChange, candidateId }: Props) {
 
           {/* Application History */}
           <div
-            className="p-5 rounded-xl border bg-[#0f1422] border-white/[0.06]"
+            className="p-5 rounded-xl border bg-background border-border"
           >
-            <h3 className="text-xs font-bold tracking-wide text-gray-400 font-['Space_Grotesk'] uppercase mb-3 border-b border-white/[0.04] pb-2">
+            <h3 className="text-xs font-bold tracking-wide text-muted-foreground font-['Space_Grotesk'] uppercase mb-3 border-b border-border pb-2">
               // APPLICATION TIMELINE
             </h3>
             {c.applications.length === 0 ? (
-              <p className="text-xs text-gray-600 py-4 text-center font-mono">No active job applications.</p>
+              <p className="text-xs text-muted-foreground py-4 text-center font-mono">No active job applications.</p>
             ) : (
               <div className="space-y-2 font-mono">
                 {c.applications.map((app) => {
@@ -704,17 +704,17 @@ export function CandidateProfile({ onViewChange, candidateId }: Props) {
                       onClick={() =>
                         onViewChange({ view: "Pipeline", jobId: app.id })
                       }
-                      className="w-full flex items-center justify-between p-3 rounded-lg border bg-white/[0.01] border-white/[0.04] hover:border-[#00e07a]/40 hover:bg-[#00e07a]/5 transition-all cursor-pointer text-left"
+                      className="w-full flex items-center justify-between p-3 rounded-lg border bg-white/[0.01] border-border hover:border-[#00e07a]/40 hover:bg-primary transition-all cursor-pointer text-left"
                     >
                       <div className="flex items-center gap-3 min-w-0">
-                        <div className="w-8 h-8 rounded border border-white/[0.06] flex items-center justify-center flex-shrink-0 text-gray-500">
+                        <div className="w-8 h-8 rounded border border-border flex items-center justify-center flex-shrink-0 text-muted-foreground">
                           <Briefcase size={13} />
                         </div>
                         <div className="min-w-0">
-                          <div className="text-xs font-bold text-white truncate">
+                          <div className="text-xs font-bold text-foreground truncate">
                             {app.job_title}
                           </div>
-                          <div className="text-[9px] text-gray-500 mt-0.5">
+                          <div className="text-[9px] text-muted-foreground mt-0.5">
                             {app.department} • Applied {app.formatted_applied}
                           </div>
                         </div>
@@ -736,7 +736,7 @@ export function CandidateProfile({ onViewChange, candidateId }: Props) {
                         >
                           {`${app.days_in_stage}d`}
                         </span>
-                        <ChevronRight size={14} className="text-gray-600" />
+                        <ChevronRight size={14} className="text-muted-foreground" />
                       </div>
                     </button>
                   );
@@ -747,18 +747,18 @@ export function CandidateProfile({ onViewChange, candidateId }: Props) {
 
           {/* Interview Timeline */}
           <div
-            className="p-5 rounded-xl border bg-[#0f1422] border-white/[0.06]"
+            className="p-5 rounded-xl border bg-background border-border"
           >
-            <h3 className="text-xs font-bold tracking-wide text-gray-400 font-['Space_Grotesk'] uppercase mb-3 border-b border-white/[0.04] pb-2">
+            <h3 className="text-xs font-bold tracking-wide text-muted-foreground font-['Space_Grotesk'] uppercase mb-3 border-b border-border pb-2">
               // INTERVIEW SESSIONS
             </h3>
             {c.interviews.length === 0 ? (
-              <p className="text-xs text-gray-600 py-4 text-center font-mono">No interview sessions scheduled.</p>
+              <p className="text-xs text-muted-foreground py-4 text-center font-mono">No interview sessions scheduled.</p>
             ) : (
               <div className="relative pl-6 font-mono">
                 {/* Vertical timeline line */}
                 <div
-                  className="absolute left-2 top-2 bottom-2 w-px bg-white/[0.08]"
+                  className="absolute left-2 top-2 bottom-2 w-px bg-accent"
                 />
                 <div className="space-y-4">
                   {c.interviews.map((iv) => {
@@ -781,12 +781,12 @@ export function CandidateProfile({ onViewChange, candidateId }: Props) {
                           }}
                         />
                         <div
-                          className="p-3.5 rounded-xl border bg-white/[0.01] border-white/[0.04]"
+                          className="p-3.5 rounded-xl border bg-white/[0.01] border-border"
                         >
                           <div className="flex items-start justify-between">
                             <div>
                               <div className="flex items-center gap-2">
-                                <span className="text-xs font-bold text-white">
+                                <span className="text-xs font-bold text-foreground">
                                   {iv.interview_type}
                                 </span>
                                 <span
@@ -800,11 +800,11 @@ export function CandidateProfile({ onViewChange, candidateId }: Props) {
                                   {`[ ${iv.status.toUpperCase()} ]`}
                                 </span>
                               </div>
-                              <div className="text-[9px] text-gray-500 mt-1 font-semibold">
+                              <div className="text-[9px] text-muted-foreground mt-1 font-semibold">
                                 {iv.job_title}
                               </div>
                             </div>
-                            <div className="text-right text-[10px] text-gray-400">
+                            <div className="text-right text-[10px] text-muted-foreground">
                               <div className="flex items-center gap-1">
                                 <Calendar size={10} />
                                 {iv.formatted_date}
@@ -815,8 +815,8 @@ export function CandidateProfile({ onViewChange, candidateId }: Props) {
                               </div>
                             </div>
                           </div>
-                          <div className="flex items-center justify-between mt-3 pt-2.5 border-t border-white/[0.04]">
-                            <span className="flex items-center gap-1.5 text-[9px] text-gray-500">
+                          <div className="flex items-center justify-between mt-3 pt-2.5 border-t border-border">
+                            <span className="flex items-center gap-1.5 text-[9px] text-muted-foreground">
                               <UserCheck size={11} className="text-pink-500" />
                               {iv.interviewer_name}
                             </span>
@@ -840,25 +840,25 @@ export function CandidateProfile({ onViewChange, candidateId }: Props) {
 
           {/* Activity Log */}
           <div
-            className="p-5 rounded-xl border bg-[#0f1422] border-white/[0.06] font-mono"
+            className="p-5 rounded-xl border bg-background border-border font-mono"
           >
-            <h3 className="text-xs font-bold tracking-wide text-gray-400 uppercase mb-3 border-b border-white/[0.04] pb-2">
+            <h3 className="text-xs font-bold tracking-wide text-muted-foreground uppercase mb-3 border-b border-border pb-2">
               // ACTIVITY LOGS
             </h3>
             {c.activity_log.length === 0 ? (
-              <p className="text-xs text-gray-600 py-4 text-center">No system logs recorded.</p>
+              <p className="text-xs text-muted-foreground py-4 text-center">No system logs recorded.</p>
             ) : (
               <div className="space-y-1">
                 {c.activity_log.map((act, i) => (
                   <div
                     key={i}
-                    className="flex items-center justify-between px-3 py-2 rounded hover:bg-white/[0.02] transition-colors"
+                    className="flex items-center justify-between px-3 py-2 rounded hover:bg-muted transition-colors"
                   >
                     <div className="flex items-center gap-2">
                       <Activity size={12} className="text-[#9b6dff] flex-shrink-0" />
                       <span className="text-xs text-gray-300">{act.description}</span>
                     </div>
-                    <span className="text-[10px] text-gray-600 flex-shrink-0 ml-3">
+                    <span className="text-[10px] text-muted-foreground flex-shrink-0 ml-3">
                       {act.time_ago}
                     </span>
                   </div>
@@ -872,9 +872,9 @@ export function CandidateProfile({ onViewChange, candidateId }: Props) {
         <div className="col-span-5 lg:col-span-2 space-y-5 font-mono">
           {/* Quick Actions */}
           <div
-            className="p-5 rounded-xl border bg-[#0f1422] border-white/[0.06]"
+            className="p-5 rounded-xl border bg-background border-border"
           >
-            <h3 className="text-xs font-bold tracking-wide text-gray-400 uppercase mb-3 border-b border-white/[0.04] pb-2">
+            <h3 className="text-xs font-bold tracking-wide text-muted-foreground uppercase mb-3 border-b border-border pb-2">
               // CONSOLE CONTROLS
             </h3>
             <div className="space-y-2">
@@ -885,7 +885,7 @@ export function CandidateProfile({ onViewChange, candidateId }: Props) {
                 <button
                   key={btn.label}
                   onClick={btn.action}
-                  className="w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl border border-white/[0.06] bg-white/[0.02] text-xs font-bold text-gray-400 hover:text-white hover:border-[#00e07a]/40 hover:bg-[#00e07a]/5 transition-all cursor-pointer text-center"
+                  className="w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl border border-border bg-muted text-xs font-bold text-muted-foreground hover:text-foreground hover:border-[#00e07a]/40 hover:bg-primary transition-all cursor-pointer text-center"
                 >
                   {`[ ${btn.label} ]`}
                 </button>
@@ -895,21 +895,21 @@ export function CandidateProfile({ onViewChange, candidateId }: Props) {
 
           {/* Talent Pool Memberships */}
           <div
-            className="p-5 rounded-xl border bg-[#0f1422] border-white/[0.06]"
+            className="p-5 rounded-xl border bg-background border-border"
           >
-            <div className="flex items-center justify-between mb-3 border-b border-white/[0.04] pb-2">
-              <h3 className="text-xs font-bold tracking-wide text-gray-400 uppercase">
+            <div className="flex items-center justify-between mb-3 border-b border-border pb-2">
+              <h3 className="text-xs font-bold tracking-wide text-muted-foreground uppercase">
                 // TALENT POOLS
               </h3>
               <button
                 onClick={() => setShowPoolModal(true)}
-                className="flex items-center gap-1 text-[10px] font-bold text-[#00e07a] hover:text-[#00c9b1] cursor-pointer bg-transparent border-0"
+                className="flex items-center gap-1 text-[10px] font-bold text-primary hover:text-[#00c9b1] cursor-pointer bg-transparent border-0"
               >
                 [ + ADD ]
               </button>
             </div>
             {c.pools.length === 0 ? (
-              <p className="text-xs text-gray-600 py-3 text-center">Not enrolled in any talent pools.</p>
+              <p className="text-xs text-muted-foreground py-3 text-center">Not enrolled in any talent pools.</p>
             ) : (
               <div className="space-y-1.5">
                 {c.pools.map((pool) => (
@@ -918,15 +918,15 @@ export function CandidateProfile({ onViewChange, candidateId }: Props) {
                     onClick={() =>
                       onViewChange({ view: "Pool Detail", poolId: pool.id })
                     }
-                    className="w-full flex items-center gap-2 px-3 py-2 rounded border border-white/[0.04] bg-white/[0.01] hover:border-white/10 hover:bg-white/[0.03] transition-all cursor-pointer group text-left"
+                    className="w-full flex items-center gap-2 px-3 py-2 rounded border border-border bg-white/[0.01] hover:border-white/10 hover:bg-accent hover:text-accent-foreground transition-all cursor-pointer group text-left"
                   >
                     <Database size={13} className="text-[#9b6dff] flex-shrink-0" />
-                    <span className="text-xs text-gray-300 group-hover:text-white transition-colors truncate">
+                    <span className="text-xs text-gray-300 group-hover:text-foreground transition-colors truncate">
                       {pool.name}
                     </span>
                     <ChevronRight
                       size={12}
-                      className="text-gray-500 group-hover:text-white ml-auto"
+                      className="text-muted-foreground group-hover:text-foreground ml-auto"
                     />
                   </button>
                 ))}
@@ -936,23 +936,23 @@ export function CandidateProfile({ onViewChange, candidateId }: Props) {
 
           {/* Collaboration Panel - Notes */}
           <div
-            className="p-5 rounded-xl border bg-[#0f1422] border-white/[0.06]"
+            className="p-5 rounded-xl border bg-background border-border"
           >
-            <h3 className="text-xs font-bold tracking-wide text-gray-400 uppercase mb-3 border-b border-white/[0.04] pb-2">
+            <h3 className="text-xs font-bold tracking-wide text-muted-foreground uppercase mb-3 border-b border-border pb-2">
               // COLLABORATION NOTES
             </h3>
             {c.notes.length === 0 ? (
-              <p className="text-xs text-gray-600 py-3 text-center">No discussion logs recorded.</p>
+              <p className="text-xs text-muted-foreground py-3 text-center">No discussion logs recorded.</p>
             ) : (
               <div className="space-y-2 max-h-64 overflow-y-auto scrollbar-thin pr-1 mb-4">
                 {c.notes.map((note) => (
                   <div
                     key={note.id}
-                    className="p-3 rounded border border-white/[0.04] bg-white/[0.01]"
+                    className="p-3 rounded border border-border bg-white/[0.01]"
                   >
                     <div className="flex items-center justify-between mb-1.5">
                       <div className="flex items-center gap-1.5 flex-wrap">
-                        <span className="text-[10px] font-bold text-white">
+                        <span className="text-[10px] font-bold text-foreground">
                           {note.author_name}
                         </span>
                         <span
@@ -965,11 +965,11 @@ export function CandidateProfile({ onViewChange, candidateId }: Props) {
                           {`[ ${note.note_type.toUpperCase()} ]`}
                         </span>
                       </div>
-                      <span className="text-[9px] text-gray-600">
+                      <span className="text-[9px] text-muted-foreground">
                         {note.created_at}
                       </span>
                     </div>
-                    <p className="text-[11px] text-gray-400 leading-relaxed">
+                    <p className="text-[11px] text-muted-foreground leading-relaxed">
                       {note.content}
                     </p>
                   </div>
@@ -982,22 +982,22 @@ export function CandidateProfile({ onViewChange, candidateId }: Props) {
 
           {/* Contact Info */}
           <div
-            className="p-5 rounded-xl border bg-[#0f1422] border-white/[0.06]"
+            className="p-5 rounded-xl border bg-background border-border"
           >
-            <h3 className="text-xs font-bold tracking-wide text-gray-400 uppercase mb-3 border-b border-white/[0.04] pb-2">
+            <h3 className="text-xs font-bold tracking-wide text-muted-foreground uppercase mb-3 border-b border-border pb-2">
               // CONTACT REGISTRY
             </h3>
             <div className="space-y-3 font-sans">
               {c.email && (
                 <div className="flex items-center gap-2.5">
-                  <div className="w-7 h-7 rounded bg-[#0b0f1a] border border-white/[0.06] flex items-center justify-center">
-                    <Mail size={13} className="text-[#00e07a]" />
+                  <div className="w-7 h-7 rounded bg-[#0b0f1a] border border-border flex items-center justify-center">
+                    <Mail size={13} className="text-primary" />
                   </div>
                   <div className="min-w-0 flex-1">
-                    <div className="text-[9px] font-mono text-gray-500 uppercase tracking-wider">EMAIL</div>
+                    <div className="text-[9px] font-mono text-muted-foreground uppercase tracking-wider">EMAIL</div>
                     <a
                       href={`mailto:${c.email}`}
-                      className="text-xs text-white hover:text-[#00e07a] transition-colors truncate block"
+                      className="text-xs text-foreground hover:text-primary transition-colors truncate block"
                     >
                       {c.email}
                     </a>
@@ -1006,14 +1006,14 @@ export function CandidateProfile({ onViewChange, candidateId }: Props) {
               )}
               {c.phone && (
                 <div className="flex items-center gap-2.5">
-                  <div className="w-7 h-7 rounded bg-[#0b0f1a] border border-white/[0.06] flex items-center justify-center">
-                    <Phone size={13} className="text-[#00e07a]" />
+                  <div className="w-7 h-7 rounded bg-[#0b0f1a] border border-border flex items-center justify-center">
+                    <Phone size={13} className="text-primary" />
                   </div>
                   <div className="min-w-0 flex-1">
-                    <div className="text-[9px] font-mono text-gray-500 uppercase tracking-wider">PHONE</div>
+                    <div className="text-[9px] font-mono text-muted-foreground uppercase tracking-wider">PHONE</div>
                     <a
                       href={`tel:${c.phone}`}
-                      className="text-xs text-white hover:text-[#00e07a] transition-colors truncate block"
+                      className="text-xs text-foreground hover:text-primary transition-colors truncate block"
                     >
                       {c.phone}
                     </a>
@@ -1022,12 +1022,12 @@ export function CandidateProfile({ onViewChange, candidateId }: Props) {
               )}
               {c.location && (
                 <div className="flex items-center gap-2.5">
-                  <div className="w-7 h-7 rounded bg-[#0b0f1a] border border-white/[0.06] flex items-center justify-center">
-                    <MapPin size={13} className="text-[#00e07a]" />
+                  <div className="w-7 h-7 rounded bg-[#0b0f1a] border border-border flex items-center justify-center">
+                    <MapPin size={13} className="text-primary" />
                   </div>
                   <div className="min-w-0 flex-1">
-                    <div className="text-[9px] font-mono text-gray-500 uppercase tracking-wider">LOCATION</div>
-                    <span className="text-xs text-white truncate block">{c.location}</span>
+                    <div className="text-[9px] font-mono text-muted-foreground uppercase tracking-wider">LOCATION</div>
+                    <span className="text-xs text-foreground truncate block">{c.location}</span>
                   </div>
                 </div>
               )}

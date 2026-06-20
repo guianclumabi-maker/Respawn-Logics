@@ -129,20 +129,20 @@ function LoadingSkeleton() {
           key={i}
           className="p-5 rounded-2xl border animate-pulse"
           style={{
-            borderColor: "rgba(255,255,255,0.06)",
+            borderColor: "var(--border)",
             backgroundColor: "rgba(22,25,34,0.2)",
           }}
         >
           <div className="flex justify-between mb-4">
-            <div className="h-4 w-16 rounded bg-white/[0.06]" />
-            <div className="h-4 w-12 rounded bg-white/[0.06]" />
+            <div className="h-4 w-16 rounded bg-accent" />
+            <div className="h-4 w-12 rounded bg-accent" />
           </div>
-          <div className="h-5 w-40 rounded bg-white/[0.06] mb-2" />
-          <div className="h-3 w-28 rounded bg-white/[0.04] mb-6" />
-          <div className="h-3 w-full rounded bg-white/[0.04] mb-3" />
+          <div className="h-5 w-40 rounded bg-accent mb-2" />
+          <div className="h-3 w-28 rounded bg-secondary mb-6" />
+          <div className="h-3 w-full rounded bg-secondary mb-3" />
           <div className="flex gap-3 mt-4">
-            <div className="h-8 flex-1 rounded-lg bg-white/[0.04]" />
-            <div className="h-8 flex-1 rounded-lg bg-white/[0.04]" />
+            <div className="h-8 flex-1 rounded-lg bg-secondary" />
+            <div className="h-8 flex-1 rounded-lg bg-secondary" />
           </div>
         </div>
       ))}
@@ -167,7 +167,7 @@ function HealthBadge({ status }: { status: string }) {
 
 function PriorityBadge({ priority }: { priority: string }) {
   const styles: Record<string, string> = {
-    Normal: "bg-white/[0.05] text-gray-400 border-white/[0.08]",
+    Normal: "bg-white/[0.05] text-muted-foreground border-border",
     Urgent: "bg-amber-500/10 text-amber-400 border-amber-500/20",
     Critical: "bg-red-500/10 text-red-400 border-red-500/20",
   };
@@ -182,10 +182,10 @@ function PriorityBadge({ priority }: { priority: string }) {
 
 function StatusBadge({ status }: { status: string }) {
   const styles: Record<string, string> = {
-    Open: "border-[#00e07a]/20 bg-[#00e07a]/10 text-[#00e07a]",
+    Open: "border-[#00e07a]/20 bg-primary text-primary",
     Paused: "border-amber-500/20 bg-amber-500/10 text-amber-400",
     Closed: "border-red-500/20 bg-red-500/10 text-red-400",
-    Draft: "border-white/[0.1] bg-white/[0.05] text-gray-400",
+    Draft: "border-border bg-white/[0.05] text-muted-foreground",
   };
   return (
     <span
@@ -206,11 +206,11 @@ function PipelineMiniStats({ health }: { health: PipelineHealth }) {
 
   return (
     <div className="space-y-2 font-mono mt-3">
-      <div className="flex justify-between text-[9px] text-gray-500">
+      <div className="flex justify-between text-[9px] text-muted-foreground">
         <span>PIPELINE CANDIDATE CAPACITY</span>
         <span>{health.total} CANDIDATES</span>
       </div>
-      <div className="h-1.5 w-full bg-white/[0.04] rounded-full overflow-hidden flex">
+      <div className="h-1.5 w-full bg-secondary rounded-full overflow-hidden flex">
         {stages.map((s) => {
           const pct = health.total > 0 ? (s.count / health.total) * 100 : 0;
           if (pct === 0) return null;
@@ -228,7 +228,7 @@ function PipelineMiniStats({ health }: { health: PipelineHealth }) {
           );
         })}
       </div>
-      <div className="grid grid-cols-4 gap-1 text-[8px] text-gray-400 text-center">
+      <div className="grid grid-cols-4 gap-1 text-[8px] text-muted-foreground text-center">
         {stages.map((s) => (
           <div key={s.label} style={{ color: s.color }}>
             {s.count} {s.label}
@@ -275,7 +275,7 @@ function FilterDropdown({
             onClick={() => setOpen(false)}
           />
           <div
-            className="absolute right-0 top-full mt-1 z-50 min-w-[140px] rounded-lg border py-1 shadow-xl bg-[#0f1422] border-white/[0.08]"
+            className="absolute right-0 top-full mt-1 z-50 min-w-[140px] rounded-lg border py-1 shadow-xl bg-background border-border"
           >
             {options.map((opt) => (
               <button
@@ -284,7 +284,7 @@ function FilterDropdown({
                   onChange(opt === "All" ? "" : opt);
                   setOpen(false);
                 }}
-                className="w-full text-left px-3 py-1.5 text-xs cursor-pointer hover:bg-[#141929] hover:text-[#00e07a] transition-colors border-0 bg-transparent"
+                className="w-full text-left px-3 py-1.5 text-xs cursor-pointer hover:bg-[#141929] hover:text-primary transition-colors border-0 bg-transparent"
                 style={{
                   color:
                     (opt === "All" && !value) || opt === value
@@ -461,29 +461,29 @@ export function JobsPage({ onViewChange }: Props) {
   // ── Render ──
   return (
     <div
-      className="flex-1 flex flex-col overflow-y-auto px-8 py-6 text-white font-sans relative scrollbar-thin"
+      className="flex-1 flex flex-col overflow-y-auto px-8 py-6 text-foreground font-sans relative scrollbar-thin"
       
     >
       {/* Background glows */}
-      <div className="absolute top-[-100px] left-[-100px] w-[500px] h-[500px] rounded-full bg-[#00e07a] blur-[120px] opacity-[0.07] pointer-events-none z-0" />
+      <div className="absolute top-[-100px] left-[-100px] w-[500px] h-[500px] rounded-full bg-primary blur-[120px] opacity-[0.07] pointer-events-none z-0" />
       <div className="absolute bottom-[-150px] right-[-100px] w-[600px] h-[600px] rounded-full bg-[#9b6dff] blur-[140px] opacity-[0.05] pointer-events-none z-0" />
 
       {/* Header */}
-      <div className="relative z-10 flex items-center justify-between mb-8 border-b border-white/[0.04] pb-6">
+      <div className="relative z-10 flex items-center justify-between mb-8 border-b border-border pb-6">
         <div>
           <h1
-            className="text-2xl font-bold tracking-tight text-white font-['Space_Grotesk'] flex items-center gap-2"
+            className="text-2xl font-bold tracking-tight text-foreground font-['Space_Grotesk'] flex items-center gap-2"
           >
             JOBS BOARD // ACTIVE JOBS
-            <span className="inline-block w-2.5 h-5 bg-[#00e07a] blink"></span>
+            <span className="inline-block w-2.5 h-5 bg-primary blink"></span>
           </h1>
-          <p className="text-xs font-mono text-gray-500 mt-1 uppercase tracking-wider">
+          <p className="text-xs font-mono text-muted-foreground mt-1 uppercase tracking-wider">
             Operator Interface. Select an active job to view candidate progression logs.
           </p>
         </div>
         <button
           onClick={() => setShowCreateModal(true)}
-          className="flex items-center gap-1.5 bg-[#00e07a] hover:bg-[#00c9b1] rounded-lg px-4 py-2.5 text-black font-mono font-bold text-sm transition-all cursor-pointer border-0 shadow-lg shadow-green-500/15"
+          className="flex items-center gap-1.5 bg-primary hover:opacity-90 rounded-lg px-4 py-2.5 text-primary-foreground font-mono font-bold text-sm transition-all cursor-pointer border-0 shadow-lg shadow-green-500/15"
         >
           <Plus size={16} />
           [ CREATE JOB ]
@@ -495,14 +495,14 @@ export function JobsPage({ onViewChange }: Props) {
         {/* Search */}
         <div
           className="flex-1 flex items-center gap-2 px-3 py-2 rounded-lg border bg-white/[0.03] transition-all focus-within:border-[#00e07a]/40"
-          style={{ borderColor: "rgba(255,255,255,0.06)" }}
+          style={{ borderColor: "var(--border)" }}
         >
-          <Search size={14} className="text-gray-500" />
+          <Search size={14} className="text-muted-foreground" />
           <input
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
             placeholder="Search active jobs by title, department, or location..."
-            className="flex-1 bg-transparent outline-none text-xs text-white placeholder-gray-600 font-mono"
+            className="flex-1 bg-transparent outline-none text-xs text-foreground placeholder-gray-600 font-mono"
           />
         </div>
 
@@ -549,19 +549,19 @@ export function JobsPage({ onViewChange }: Props) {
         /* Empty State */
         <div className="relative z-10 flex-1 flex flex-col items-center justify-center py-20 font-mono">
           <div
-            className="w-20 h-20 rounded-2xl flex items-center justify-center mb-5 bg-[#00e07a]/5 border border-[#00e07a]/10"
+            className="w-20 h-20 rounded-2xl flex items-center justify-center mb-5 bg-primary border border-[#00e07a]/10"
           >
-            <Briefcase size={36} className="text-[#00e07a]" />
+            <Briefcase size={36} className="text-primary" />
           </div>
-          <h3 className="text-lg font-bold text-white mb-1 font-['Space_Grotesk']">
+          <h3 className="text-lg font-bold text-foreground mb-1 font-['Space_Grotesk']">
             CREATE YOUR FIRST JOB
           </h3>
-          <p className="text-sm text-gray-500 mb-6">
+          <p className="text-sm text-muted-foreground mb-6">
             Create a job posting to view recruitment metrics.
           </p>
           <button
             onClick={() => setShowCreateModal(true)}
-            className="flex items-center gap-1.5 bg-[#00e07a] hover:bg-[#00c9b1] text-black font-bold rounded-lg px-5 py-2.5 text-sm transition-all cursor-pointer border-0"
+            className="flex items-center gap-1.5 bg-primary hover:opacity-90 text-primary-foreground font-bold rounded-lg px-5 py-2.5 text-sm transition-all cursor-pointer border-0"
           >
             <Plus size={16} />
             [ CREATE JOB ]
@@ -639,7 +639,7 @@ function JobCard({
 }) {
   return (
     <div
-      className="bg-[#0f1422] border border-white/[0.07] rounded-xl p-5 hover:border-[#9b6dff]/40 hover:bg-[#141929] hover:shadow-[0_0_15px_rgba(155,109,255,0.1)] transition-all flex flex-col justify-between group"
+      className="bg-background border border-border rounded-xl p-5 hover:border-[#9b6dff]/40 hover:bg-[#141929] hover:shadow-[0_0_15px_rgba(155,109,255,0.1)] transition-all flex flex-col justify-between group"
     >
       {/* Top badges */}
       <div>
@@ -658,25 +658,25 @@ function JobCard({
         {/* Title */}
         <h3
           onClick={onViewPipeline}
-          className="text-lg font-bold text-white cursor-pointer hover:text-[#00e07a] transition-colors truncate mb-1 font-['Space_Grotesk']"
+          className="text-lg font-bold text-foreground cursor-pointer hover:text-primary transition-colors truncate mb-1 font-['Space_Grotesk']"
         >
           {job.title}
         </h3>
 
         {/* Location + type */}
-        <div className="flex items-center gap-2 text-xs text-gray-400 mb-3 font-mono">
-          <MapPin size={11} className="text-[#00e07a]" />
+        <div className="flex items-center gap-2 text-xs text-muted-foreground mb-3 font-mono">
+          <MapPin size={11} className="text-primary" />
           <span>{`LOCATION: ${job.location || "Remote"}`}</span>
           {job.employment_type && (
             <>
-              <span className="text-gray-600">·</span>
+              <span className="text-muted-foreground">·</span>
               <span>{`TYPE: ${job.employment_type}`}</span>
             </>
           )}
         </div>
 
         {/* Ownership */}
-        <div className="flex flex-col gap-0.5 mb-3 font-mono text-[10px] text-gray-500">
+        <div className="flex flex-col gap-0.5 mb-3 font-mono text-[10px] text-muted-foreground">
           {job.assigned_recruiter && (
             <span>
               {`RECRUITER: ${job.assigned_recruiter}`}
@@ -694,15 +694,15 @@ function JobCard({
       </div>
 
       {/* Bottom row: metrics + health */}
-      <div className="border-t border-white/[0.04] pt-3 mt-4">
+      <div className="border-t border-border pt-3 mt-4">
         <div className="flex items-center justify-between mb-3">
-          <div className="flex items-center gap-3 text-[9px] text-gray-500 font-mono">
+          <div className="flex items-center gap-3 text-[9px] text-muted-foreground font-mono">
             <span className="flex items-center gap-1">
               <Clock size={10} className="text-amber-400" />
               {job.days_open}d open
             </span>
             <span className="flex items-center gap-1">
-              <Zap size={10} className="text-[#00e07a]" />
+              <Zap size={10} className="text-primary" />
               +{job.health.velocity}/wk
             </span>
             <span className="flex items-center gap-1">
@@ -717,30 +717,30 @@ function JobCard({
         <div className="flex gap-2 font-mono">
           <button
             onClick={onViewPipeline}
-            className="flex-1 flex items-center justify-center gap-1 px-2 py-1.5 rounded-lg text-[9px] font-bold bg-white/[0.02] hover:bg-white/[0.06] border border-white/[0.05] text-gray-400 hover:text-white transition-all cursor-pointer"
+            className="flex-1 flex items-center justify-center gap-1 px-2 py-1.5 rounded-lg text-[9px] font-bold bg-muted hover:bg-accent border border-border text-muted-foreground hover:text-foreground transition-all cursor-pointer"
           >
             [ PIPELINE ]
           </button>
           <button
             onClick={onAddCandidate}
-            className="flex-1 flex items-center justify-center gap-1 px-2 py-1.5 rounded-lg text-[9px] font-bold bg-[#00e07a]/10 hover:bg-[#00e07a]/20 border border-[#00e07a]/25 text-[#00e07a] hover:text-white transition-all cursor-pointer"
+            className="flex-1 flex items-center justify-center gap-1 px-2 py-1.5 rounded-lg text-[9px] font-bold bg-primary hover:bg-primary border border-[#00e07a]/25 text-primary hover:text-foreground transition-all cursor-pointer"
           >
             [ + CANDIDATE ]
           </button>
           <button
             onClick={onDuplicate}
-            className="flex items-center justify-center px-2 py-1.5 rounded-lg text-[9px] font-bold bg-white/[0.02] hover:bg-white/[0.06] border border-white/[0.05] text-gray-400 hover:text-white transition-all cursor-pointer"
+            className="flex items-center justify-center px-2 py-1.5 rounded-lg text-[9px] font-bold bg-muted hover:bg-accent border border-border text-muted-foreground hover:text-foreground transition-all cursor-pointer"
             title="Duplicate Job"
           >
             <Copy size={10} />
           </button>
           <button
             onClick={onTogglePause}
-            className="flex items-center justify-center px-2 py-1.5 rounded-lg text-[9px] font-bold bg-white/[0.02] hover:bg-white/[0.06] border border-white/[0.05] text-gray-400 hover:text-white transition-all cursor-pointer"
+            className="flex items-center justify-center px-2 py-1.5 rounded-lg text-[9px] font-bold bg-muted hover:bg-accent border border-border text-muted-foreground hover:text-foreground transition-all cursor-pointer"
             title={job.status === "Paused" ? "Resume Job" : "Pause Job"}
           >
             {job.status === "Paused" ? (
-              <Play size={10} className="text-[#00e07a]" />
+              <Play size={10} className="text-primary" />
             ) : (
               <Pause size={10} className="text-amber-500" />
             )}
@@ -772,26 +772,26 @@ function CreateJobModal({
     setForm({ ...form, [field]: value });
 
   const inputClass =
-    "w-full px-3 py-2 rounded-lg bg-white/[0.02] border border-white/[0.06] text-xs font-mono text-white placeholder-gray-600 outline-none focus:border-[#00e07a] focus:shadow-[0_0_10px_rgba(0,224,122,0.15)] transition-all";
-  const labelClass = "block text-xs font-mono font-medium text-gray-400 mb-1.5 uppercase tracking-wider";
+    "w-full px-3 py-2 rounded-lg bg-muted border border-border text-xs font-mono text-foreground placeholder-gray-600 outline-none focus:border-[#00e07a] focus:shadow-[0_0_10px_rgba(0,224,122,0.15)] transition-all";
+  const labelClass = "block text-xs font-mono font-medium text-muted-foreground mb-1.5 uppercase tracking-wider";
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
       <div
-        className="relative bg-[#0f1422] border border-white/[0.07] rounded-2xl p-6 w-full max-w-xl max-h-[90vh] overflow-y-auto scrollbar-thin"
+        className="relative bg-background border border-border rounded-2xl p-6 w-full max-w-xl max-h-[90vh] overflow-y-auto scrollbar-thin"
         style={{ boxShadow: "0 0 30px rgba(155, 109, 255, 0.15)" }}
       >
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h2 className="text-lg font-bold text-white font-['Space_Grotesk']">CREATE NEW JOB</h2>
-            <p className="text-xs text-gray-500 mt-0.5 font-mono">
+            <h2 className="text-lg font-bold text-foreground font-['Space_Grotesk']">CREATE NEW JOB</h2>
+            <p className="text-xs text-muted-foreground mt-0.5 font-mono">
               Specify features and constraints for the recruitment campaign
             </p>
           </div>
           <button
             onClick={onClose}
-            className="w-8 h-8 rounded-lg bg-white/[0.04] hover:bg-white/[0.08] flex items-center justify-center text-gray-400 hover:text-white transition-all cursor-pointer border-0"
+            className="w-8 h-8 rounded-lg bg-secondary hover:bg-accent flex items-center justify-center text-muted-foreground hover:text-foreground transition-all cursor-pointer border-0"
           >
             <X size={16} />
           </button>
@@ -929,7 +929,7 @@ function CreateJobModal({
 
           {/* External Link */}
           <div>
-            <label className={labelClass}>External Job Link (e.g. JobStreet/Indeed) <span className="text-gray-500 lowercase normal-case">- Optional</span></label>
+            <label className={labelClass}>External Job Link (e.g. JobStreet/Indeed) <span className="text-muted-foreground lowercase normal-case">- Optional</span></label>
             <input
               value={form.external_link}
               onChange={(e) => update("external_link", e.target.value)}
@@ -944,13 +944,13 @@ function CreateJobModal({
               <label className={`${labelClass} mb-0`}>Requirements</label>
               <button
                 onClick={() => update("requirements", [...form.requirements, { text: "", type: "Mandatory" }])}
-                className="flex items-center gap-1 text-[10px] font-semibold text-[#00e07a] hover:text-[#00c9b1] bg-transparent border-0 cursor-pointer"
+                className="flex items-center gap-1 text-[10px] font-semibold text-primary hover:text-[#00c9b1] bg-transparent border-0 cursor-pointer"
               >
                 <Plus size={12} /> ADD REQ
               </button>
             </div>
             {form.requirements.length === 0 && (
-              <div className="text-xs text-gray-500 font-mono italic mb-2 py-2 text-center border border-dashed border-white/[0.06] rounded-lg">No requirements added.</div>
+              <div className="text-xs text-muted-foreground font-mono italic mb-2 py-2 text-center border border-dashed border-border rounded-lg">No requirements added.</div>
             )}
             <div className="space-y-2">
               {form.requirements.map((req, index) => (
@@ -986,7 +986,7 @@ function CreateJobModal({
                       newReqs.splice(index, 1);
                       update("requirements", newReqs);
                     }}
-                    className="p-2 text-gray-500 hover:text-red-400 bg-transparent border-0 cursor-pointer transition-colors"
+                    className="p-2 text-muted-foreground hover:text-red-400 bg-transparent border-0 cursor-pointer transition-colors"
                   >
                     <X size={14} />
                   </button>
@@ -997,17 +997,17 @@ function CreateJobModal({
         </div>
 
         {/* Submit */}
-        <div className="flex justify-end gap-3 mt-6 pt-4 border-t border-white/[0.06] font-mono">
+        <div className="flex justify-end gap-3 mt-6 pt-4 border-t border-border font-mono">
           <button
             onClick={onClose}
-            className="px-4 py-2 rounded-lg text-xs font-semibold text-gray-400 hover:text-white bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.06] transition-all cursor-pointer"
+            className="px-4 py-2 rounded-lg text-xs font-semibold text-muted-foreground hover:text-foreground bg-secondary hover:bg-accent border border-border transition-all cursor-pointer"
           >
             [ CANCEL ]
           </button>
           <button
             onClick={onSubmit}
             disabled={submitting || !form.title.trim()}
-            className="flex items-center gap-2 px-5 py-2 rounded-lg text-xs font-semibold bg-[#00e07a] hover:bg-[#00c9b1] text-black transition-all cursor-pointer border-0 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex items-center gap-2 px-5 py-2 rounded-lg text-xs font-semibold bg-primary hover:opacity-90 text-primary-foreground transition-all cursor-pointer border-0 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {submitting && (
               <Loader2 size={14} className="animate-spin" />
@@ -1041,8 +1041,8 @@ function AddCandidateModal({
     setForm({ ...form, [field]: value });
 
   const inputClass =
-    "w-full px-3 py-2 rounded-lg bg-white/[0.02] border border-white/[0.06] text-xs font-mono text-white placeholder-gray-600 outline-none focus:border-[#00e07a] focus:shadow-[0_0_10px_rgba(0,224,122,0.15)] transition-all";
-  const labelClass = "block text-[10px] font-mono font-bold text-gray-400 mb-1.5 uppercase tracking-wider";
+    "w-full px-3 py-2 rounded-lg bg-muted border border-border text-xs font-mono text-foreground placeholder-gray-600 outline-none focus:border-[#00e07a] focus:shadow-[0_0_10px_rgba(0,224,122,0.15)] transition-all";
+  const labelClass = "block text-[10px] font-mono font-bold text-muted-foreground mb-1.5 uppercase tracking-wider";
 
   const fieldInput = (label: string, key: keyof CandidateForm, placeholder: string, required = false) => (
     <div>
@@ -1055,19 +1055,19 @@ function AddCandidateModal({
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
       <div
-        className="relative bg-[#0f1422] border border-white/[0.07] rounded-2xl p-6 w-full max-w-md max-h-[90vh] overflow-y-auto scrollbar-thin"
+        className="relative bg-background border border-border rounded-2xl p-6 w-full max-w-md max-h-[90vh] overflow-y-auto scrollbar-thin"
         style={{ boxShadow: "0 0 30px rgba(155, 109, 255, 0.15)" }}
       >
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h2 className="text-lg font-bold text-white font-['Space_Grotesk']">ADD CANDIDATE</h2>
-            <p className="text-xs text-gray-500 mt-0.5 font-mono">
+            <h2 className="text-lg font-bold text-foreground font-['Space_Grotesk']">ADD CANDIDATE</h2>
+            <p className="text-xs text-muted-foreground mt-0.5 font-mono">
               Add candidate to job #{jobId}
             </p>
           </div>
           <button
             onClick={onClose}
-            className="w-8 h-8 rounded-lg bg-white/[0.04] hover:bg-white/[0.08] flex items-center justify-center text-gray-400 hover:text-white transition-all cursor-pointer border-0"
+            className="w-8 h-8 rounded-lg bg-secondary hover:bg-accent flex items-center justify-center text-muted-foreground hover:text-foreground transition-all cursor-pointer border-0"
           >
             <X size={16} />
           </button>
@@ -1088,7 +1088,7 @@ function AddCandidateModal({
               <select
                 value={form.source}
                 onChange={e => update("source", e.target.value)}
-                className="w-full px-3 py-2 rounded-lg bg-white/[0.02] border border-white/[0.06] text-xs font-mono text-white outline-none focus:border-[#00e07a]"
+                className="w-full px-3 py-2 rounded-lg bg-muted border border-border text-xs font-mono text-foreground outline-none focus:border-[#00e07a]"
               >
                 <option value="Direct">Direct</option>
                 <option value="LinkedIn">LinkedIn</option>
@@ -1102,17 +1102,17 @@ function AddCandidateModal({
         </div>
 
         {/* Submit */}
-        <div className="flex justify-end gap-3 mt-6 pt-4 border-t border-white/[0.06] font-mono">
+        <div className="flex justify-end gap-3 mt-6 pt-4 border-t border-border font-mono">
           <button
             onClick={onClose}
-            className="px-4 py-2 rounded-lg text-xs font-semibold text-gray-400 hover:text-white bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.06] transition-all cursor-pointer"
+            className="px-4 py-2 rounded-lg text-xs font-semibold text-muted-foreground hover:text-foreground bg-secondary hover:bg-accent border border-border transition-all cursor-pointer"
           >
             [ CANCEL ]
           </button>
           <button
             onClick={onSubmit}
             disabled={submitting || !form.name.trim()}
-            className="flex items-center gap-2 px-5 py-2 rounded-lg text-xs font-semibold bg-[#00e07a] hover:bg-[#00c9b1] text-black transition-all cursor-pointer border-0 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex items-center gap-2 px-5 py-2 rounded-lg text-xs font-semibold bg-primary hover:opacity-90 text-primary-foreground transition-all cursor-pointer border-0 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {submitting && (
               <Loader2 size={14} className="animate-spin" />

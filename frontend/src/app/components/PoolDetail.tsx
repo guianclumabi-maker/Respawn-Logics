@@ -46,10 +46,10 @@ export function PoolDetail({ onViewChange, poolId }: { onViewChange: (v: ViewSta
     );
   }
 
-  if (!pool) return <div className="text-white p-8 font-mono bg-[#0b0f1a]">[ ERROR: TALENT POOL RECORD OFFLINE ]</div>;
+  if (!pool) return <div className="text-foreground p-8 font-mono bg-[#0b0f1a]">[ ERROR: TALENT POOL RECORD OFFLINE ]</div>;
 
   return (
-    <div className="flex-1 flex flex-col h-full bg-[#0b0f1a] text-white p-8 relative overflow-hidden font-sans">
+    <div className="flex-1 flex flex-col h-full bg-[#0b0f1a] text-foreground p-8 relative overflow-hidden font-sans">
       <style>{`
         .blink {
           animation: blink-anim 1.1s step-start infinite;
@@ -63,34 +63,34 @@ export function PoolDetail({ onViewChange, poolId }: { onViewChange: (v: ViewSta
 
       <button
         onClick={() => onViewChange({ view: "Talent Pools" })}
-        className="flex items-center gap-1.5 text-xs text-gray-400 hover:text-white mb-6 w-fit transition-colors relative z-10 bg-transparent border-0 font-mono"
+        className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground mb-6 w-fit transition-colors relative z-10 bg-transparent border-0 font-mono"
       >
         <ArrowLeft size={14} />
         [ BACK TO POOLS ]
       </button>
 
-      <div className="mb-8 relative z-10 border-b border-white/[0.04] pb-6 font-mono">
-        <h1 className="text-2xl font-bold font-['Space_Grotesk'] tracking-tight text-white flex items-center gap-1.5 mb-2">
+      <div className="mb-8 relative z-10 border-b border-border pb-6 font-mono">
+        <h1 className="text-2xl font-bold font-['Space_Grotesk'] tracking-tight text-foreground flex items-center gap-1.5 mb-2">
           {`TALENT POOL // ${pool.name.toUpperCase()}`}
-          <span className="inline-block w-2.5 h-5 bg-[#00e07a] blink"></span>
+          <span className="inline-block w-2.5 h-5 bg-primary blink"></span>
         </h1>
-        <p className="text-xs text-gray-500 max-w-2xl font-sans">{pool.description || "No description provided."}</p>
-        <div className="flex items-center gap-2 mt-4 text-[9px] font-bold text-[#00e07a] bg-[#00e07a]/10 border border-[#00e07a]/20 px-3 py-1 rounded w-fit">
+        <p className="text-xs text-muted-foreground max-w-2xl font-sans">{pool.description || "No description provided."}</p>
+        <div className="flex items-center gap-2 mt-4 text-[9px] font-bold text-primary bg-primary border border-[#00e07a]/20 px-3 py-1 rounded w-fit">
           <Users size={12} />
           {`[ MEMBERS: ${pool.members.length} ]`}
         </div>
       </div>
 
-      <div className="flex-1 border border-white/[0.06] bg-[#0f1422]/40 rounded-2xl overflow-hidden relative z-10 flex flex-col font-mono">
+      <div className="flex-1 border border-border bg-background/40 rounded-2xl overflow-hidden relative z-10 flex flex-col font-mono">
         {pool.members.length === 0 ? (
-          <div className="flex-1 flex flex-col items-center justify-center text-gray-500 p-8 text-center py-20">
-            <Users size={36} className="mb-4 opacity-30 text-[#00e07a]" />
+          <div className="flex-1 flex flex-col items-center justify-center text-muted-foreground p-8 text-center py-20">
+            <Users size={36} className="mb-4 opacity-30 text-primary" />
             <p className="text-xs uppercase font-bold tracking-wider">POOL DIRECTORY EMPTY</p>
           </div>
         ) : (
           <div className="flex-1 overflow-y-auto scrollbar-thin">
             <table className="w-full text-left border-collapse">
-              <thead className="sticky top-0 bg-[#121625] z-10 text-[9px] uppercase font-bold text-gray-500 tracking-wider border-b border-white/[0.06] shadow-md shadow-black/10">
+              <thead className="sticky top-0 bg-[#121625] z-10 text-[9px] uppercase font-bold text-muted-foreground tracking-wider border-b border-border shadow-md shadow-black/10">
                 <tr>
                   <th className="px-6 py-4">// CANDIDATE</th>
                   <th className="px-6 py-4">// DETAILS</th>
@@ -102,28 +102,28 @@ export function PoolDetail({ onViewChange, poolId }: { onViewChange: (v: ViewSta
                 {pool.members.map((m) => (
                   <tr
                     key={m.id}
-                    className="hover:bg-white/[0.02] transition-colors cursor-pointer group"
+                    className="hover:bg-muted transition-colors cursor-pointer group"
                     onClick={() => onViewChange({ view: "Candidate Profile", candidateId: m.id })}
                   >
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded bg-white/[0.02] border border-white/[0.08] flex items-center justify-center text-xs font-bold text-[#9b6dff]">
+                        <div className="w-10 h-10 rounded bg-muted border border-border flex items-center justify-center text-xs font-bold text-[#9b6dff]">
                           {`[ ${m.name.substring(0, 2).toUpperCase()} ]`}
                         </div>
                         <div>
-                          <div className="font-semibold text-white group-hover:text-[#00e07a] transition-colors">{m.name}</div>
-                          <div className="text-[10px] text-gray-500 flex items-center gap-1 mt-0.5"><Mail size={10} /> {m.email || "No email"}</div>
+                          <div className="font-semibold text-foreground group-hover:text-primary transition-colors">{m.name}</div>
+                          <div className="text-[10px] text-muted-foreground flex items-center gap-1 mt-0.5"><Mail size={10} /> {m.email || "No email"}</div>
                         </div>
                       </div>
                     </td>
                     <td className="px-6 py-4">
-                      <div className="space-y-1 text-[11px] text-gray-400">
+                      <div className="space-y-1 text-[11px] text-muted-foreground">
                         <div className="flex items-center gap-1.5">
-                          <MapPin size={11} className="text-[#00e07a]" />
+                          <MapPin size={11} className="text-primary" />
                           {m.location || "Unknown"}
                         </div>
                         <div className="flex items-center gap-1.5">
-                          <Star size={11} className="text-[#00e07a]" />
+                          <Star size={11} className="text-primary" />
                           {m.experience_years} years exp
                         </div>
                       </div>
@@ -135,9 +135,9 @@ export function PoolDetail({ onViewChange, poolId }: { onViewChange: (v: ViewSta
                         ))}
                       </div>
                     </td>
-                    <td className="px-6 py-4 text-[11px] text-gray-400">
+                    <td className="px-6 py-4 text-[11px] text-muted-foreground">
                       <div>{m.added_at.split(' ')[0]}</div>
-                      <div className="text-[10px] text-gray-600 mt-0.5">by {m.added_by || "System"}</div>
+                      <div className="text-[10px] text-muted-foreground mt-0.5">by {m.added_by || "System"}</div>
                     </td>
                   </tr>
                 ))}

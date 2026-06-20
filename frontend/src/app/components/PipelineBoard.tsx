@@ -69,7 +69,7 @@ function StarRating({ value, onChange }: { value: number; onChange?: (r: number)
 }
 
 function AiScoreBadge({ score }: { score: number | null }) {
-  if (score === null || score === undefined) return <span className="text-[10px] text-gray-600 font-mono">—</span>;
+  if (score === null || score === undefined) return <span className="text-[10px] text-muted-foreground font-mono">—</span>;
   const color = score > 70 ? "#00e07a" : score >= 40 ? "#f5a623" : "#ff4d6a";
   return (
     <div className="flex items-center gap-1.5 font-mono">
@@ -87,18 +87,18 @@ function SlaDays({ days }: { days: number }) {
 function SourceIcon({ source }: { source: string }) {
   if (source?.toLowerCase().includes("linkedin")) return <Linkedin size={11} className="text-blue-400" />;
   if (source?.toLowerCase().includes("careers") || source?.toLowerCase().includes("site")) return <Globe size={11} className="text-cyan-400" />;
-  if (source?.toLowerCase().includes("referral")) return <UserPlus size={11} className="text-[#00e07a]" />;
+  if (source?.toLowerCase().includes("referral")) return <UserPlus size={11} className="text-primary" />;
   if (source?.toLowerCase().includes("indeed")) return <Briefcase size={11} className="text-amber-400" />;
-  return <Globe size={11} className="text-gray-500" />;
+  return <Globe size={11} className="text-muted-foreground" />;
 }
 
 function LoadingSkeleton() {
   return (
     <div className="space-y-4 p-8 animate-pulse">
-      <div className="h-8 bg-white/[0.04] rounded-xl w-64" />
+      <div className="h-8 bg-secondary rounded-xl w-64" />
       <div className="h-5 bg-white/[0.03] rounded-lg w-44" />
       <div className="flex gap-3 mt-6">{[...Array(7)].map((_, i) => <div key={i} className="h-16 w-20 bg-white/[0.03] rounded-xl" />)}</div>
-      <div className="h-[400px] bg-white/[0.02] rounded-2xl mt-4 border border-white/[0.02]" />
+      <div className="h-[400px] bg-muted rounded-2xl mt-4 border border-border" />
     </div>
   );
 }
@@ -126,18 +126,18 @@ function AddCandidateModal({ jobId, onClose, onSuccess }: { jobId: number; onClo
 
   const field = (label: string, key: string, placeholder: string, required = false) => (
     <div>
-      <label className="text-[10px] uppercase font-mono font-bold text-gray-500 block mb-1">{label}{required && " *"}</label>
+      <label className="text-[10px] uppercase font-mono font-bold text-muted-foreground block mb-1">{label}{required && " *"}</label>
       <input value={(form as Record<string, string>)[key]} onChange={e => set(key, e.target.value)} placeholder={placeholder}
-        className="w-full px-3 py-2 rounded-xl border text-xs font-mono outline-none bg-[#161922] border-white/10 text-white placeholder-gray-600 focus:border-[#00e07a]" />
+        className="w-full px-3 py-2 rounded-xl border text-xs font-mono outline-none bg-card border-white/10 text-foreground placeholder-gray-600 focus:border-[#00e07a]" />
     </div>
   );
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm">
-      <div className="bg-[#0f1422] border border-white/10 rounded-2xl shadow-2xl w-full max-w-md p-6 text-white max-h-[90vh] overflow-y-auto scrollbar-thin">
+      <div className="bg-background border border-white/10 rounded-2xl shadow-2xl w-full max-w-md p-6 text-foreground max-h-[90vh] overflow-y-auto scrollbar-thin">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-sm font-bold font-['Space_Grotesk'] tracking-wide">ADD NEW CANDIDATE</h3>
-          <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-white/5 text-gray-400 hover:text-white cursor-pointer border-0 bg-transparent"><X size={16} /></button>
+          <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-white/5 text-muted-foreground hover:text-foreground cursor-pointer border-0 bg-transparent"><X size={16} /></button>
         </div>
         <div className="space-y-3">
           {field("Name", "name", "Full name...", true)}
@@ -152,18 +152,18 @@ function AddCandidateModal({ jobId, onClose, onSuccess }: { jobId: number; onClo
             {field("Salary Expectation", "salary_expectation", "80000")}
           </div>
           <div>
-            <label className="text-[10px] uppercase font-mono font-bold text-gray-500 block mb-1">Source</label>
+            <label className="text-[10px] uppercase font-mono font-bold text-muted-foreground block mb-1">Source</label>
             <select value={form.source} onChange={e => set("source", e.target.value)}
-              className="w-full px-3 py-2 rounded-xl border text-xs font-mono outline-none bg-[#161922] border-white/10 text-white focus:border-[#00e07a]">
+              className="w-full px-3 py-2 rounded-xl border text-xs font-mono outline-none bg-card border-white/10 text-foreground focus:border-[#00e07a]">
               {SOURCES.map(s => <option key={s} value={s}>{s}</option>)}
             </select>
           </div>
           {field("Tags", "tags", "Senior, Remote (comma-separated)")}
         </div>
         <div className="flex gap-2 mt-5 font-mono">
-          <button onClick={onClose} className="flex-1 px-4 py-2 rounded-xl border text-xs font-bold bg-transparent hover:bg-white/5 cursor-pointer text-gray-400 border-white/10">[ CANCEL ]</button>
+          <button onClick={onClose} className="flex-1 px-4 py-2 rounded-xl border text-xs font-bold bg-transparent hover:bg-white/5 cursor-pointer text-muted-foreground border-white/10">[ CANCEL ]</button>
           <button disabled={!form.name.trim() || saving} onClick={submit}
-            className="flex-1 px-4 py-2 rounded-xl text-xs font-bold bg-[#00e07a] hover:bg-[#00c9b1] text-black hover:opacity-90 disabled:opacity-40 cursor-pointer border-0">
+            className="flex-1 px-4 py-2 rounded-xl text-xs font-bold bg-primary hover:opacity-90 text-primary-foreground hover:opacity-90 disabled:opacity-40 cursor-pointer border-0">
             {saving ? "[ SAVING... ]" : "[ ADD CANDIDATE ]"}
           </button>
         </div>
@@ -177,18 +177,18 @@ function KanbanCard({ app, onClick }: { app: Application; onClick: () => void })
   return (
     <div draggable onDragStart={e => { e.dataTransfer.setData("application/json", JSON.stringify({ id: app.id })); e.dataTransfer.effectAllowed = "move"; }}
       onClick={onClick}
-      className="bg-[#0f1422] border border-white/[0.07] rounded-xl p-3.5 cursor-grab hover:border-[#9b6dff]/40 hover:bg-[#141929] hover:shadow-[0_0_12px_rgba(155,109,255,0.08)] transition-all group">
+      className="bg-background border border-border rounded-xl p-3.5 cursor-grab hover:border-[#9b6dff]/40 hover:bg-[#141929] hover:shadow-[0_0_12px_rgba(155,109,255,0.08)] transition-all group">
       <div className="flex items-start justify-between mb-1.5">
-        <span className="text-xs font-bold text-white group-hover:text-[#00e07a] transition-colors truncate flex-1">{app.name}</span>
+        <span className="text-xs font-bold text-foreground group-hover:text-primary transition-colors truncate flex-1">{app.name}</span>
         <div className="flex items-center gap-1 ml-1.5"><SourceIcon source={app.source || app.candidate_source || ""} /></div>
       </div>
       <div className="flex items-center justify-between mb-2">
         <AiScoreBadge score={app.ai_match_score} />
         <SlaDays days={app.days_in_stage} />
       </div>
-      <div className="flex items-center justify-between mt-2 pt-2 border-t border-white/[0.04]">
+      <div className="flex items-center justify-between mt-2 pt-2 border-t border-border">
         <StarRating value={app.rating} />
-        <span className="text-[8px] font-mono text-gray-500">{app.formatted_applied}</span>
+        <span className="text-[8px] font-mono text-muted-foreground">{app.formatted_applied}</span>
       </div>
       {app.tags?.length > 0 && (
         <div className="flex gap-1 flex-wrap mt-2">
@@ -217,13 +217,13 @@ function KanbanColumn({ stage, apps, onDrop, onCardClick }: {
   const label = displayStages[stage] || stage;
 
   return (
-    <div className={`bg-[#0f1422]/60 border border-white/[0.04] rounded-xl min-h-[450px] p-3 flex flex-col gap-2.5 flex-1 min-w-[220px] transition-all ${over ? "border-[#9b6dff] bg-[#9b6dff]/[0.02] shadow-[0_0_15px_rgba(155,109,255,0.08)]" : ""}`}
+    <div className={`bg-background/60 border border-border rounded-xl min-h-[450px] p-3 flex flex-col gap-2.5 flex-1 min-w-[220px] transition-all ${over ? "border-[#9b6dff] bg-[#9b6dff]/[0.02] shadow-[0_0_15px_rgba(155,109,255,0.08)]" : ""}`}
       onDragOver={e => { e.preventDefault(); e.dataTransfer.dropEffect = "move"; setOver(true); }}
       onDragLeave={() => setOver(false)}
       onDrop={e => { e.preventDefault(); setOver(false); try { const d = JSON.parse(e.dataTransfer.getData("application/json")); onDrop(d.id, stage); } catch {} }}>
-      <div className="flex items-center justify-between px-1 py-1 border-b border-white/[0.04] pb-2 font-mono">
-        <span className="text-[10px] font-bold text-gray-400 tracking-wider">{`// ${label}`}</span>
-        <span className="text-[9px] font-bold px-2 py-0.5 rounded bg-white/[0.04] text-[#9b6dff]">{apps.length}</span>
+      <div className="flex items-center justify-between px-1 py-1 border-b border-border pb-2 font-mono">
+        <span className="text-[10px] font-bold text-muted-foreground tracking-wider">{`// ${label}`}</span>
+        <span className="text-[9px] font-bold px-2 py-0.5 rounded bg-secondary text-[#9b6dff]">{apps.length}</span>
       </div>
       <div className="flex flex-col gap-2.5 overflow-y-auto max-h-[60vh] pr-0.5 scrollbar-thin mt-2.5">
         {apps.map(a => <KanbanCard key={a.id} app={a} onClick={() => onCardClick(a.candidate_id)} />)}
@@ -238,8 +238,8 @@ function BulkBar({ count, onAdvance, onReject, onDelete }: {
 }) {
   const [showStages, setShowStages] = useState(false);
   return (
-    <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 flex items-center gap-4 px-5 py-3 rounded-2xl border border-[#00e07a]/20 bg-[#0f1422]/95 backdrop-blur-xl shadow-2xl shadow-green-500/10 font-mono text-xs">
-      <span className="text-gray-400"><span className="font-bold text-[#00e07a]">{count}</span> CANDIDATES SELECTED</span>
+    <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 flex items-center gap-4 px-5 py-3 rounded-2xl border border-[#00e07a]/20 bg-background/95 backdrop-blur-xl shadow-2xl shadow-green-500/10 font-mono text-xs">
+      <span className="text-muted-foreground"><span className="font-bold text-primary">{count}</span> CANDIDATES SELECTED</span>
       <div className="w-px h-5 bg-white/10" />
       <div className="relative">
         <button onClick={() => setShowStages(s => !s)} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-bold bg-[#9b6dff]/10 border border-[#9b6dff]/20 text-[#9b6dff] hover:bg-[#9b6dff]/20 cursor-pointer border-0">
@@ -297,13 +297,13 @@ function StageFilterBar({ health, active, onSelect }: { health: HealthData; acti
                 borderColor: isActive ? "#00e07a" : "rgba(255,255,255,0.06)",
                 borderWidth: isActive ? 2 : 1,
               }}>
-              <span className="text-lg font-bold leading-none mb-1 text-white">{s.count}</span>
+              <span className="text-lg font-bold leading-none mb-1 text-foreground">{s.count}</span>
               <span className="text-[9px] font-bold tracking-wide text-center leading-tight" style={{ color: isActive ? "#00e07a" : "#8b95a8" }}>{displayLabel}</span>
             </button>
             {convPct !== null && s.key !== "Hired" && (
-              <div className="flex flex-col items-center text-gray-600 flex-shrink-0 font-mono">
-                <ArrowRight size={10} className="text-[#00e07a]/40" />
-                <span className="text-[8px] font-bold text-gray-500">{`${convPct}%`}</span>
+              <div className="flex flex-col items-center text-muted-foreground flex-shrink-0 font-mono">
+                <ArrowRight size={10} className="text-primary/40" />
+                <span className="text-[8px] font-bold text-muted-foreground">{`${convPct}%`}</span>
               </div>
             )}
           </div>
@@ -380,8 +380,8 @@ export function PipelineBoard({ onViewChange, jobId }: Props) {
   };
 
   const SortIcon = ({ col }: { col: SortKey }) => {
-    if (sortKey !== col) return <ChevronDown size={11} className="text-gray-600" />;
-    return sortDir === "asc" ? <ChevronUp size={11} className="text-[#00e07a]" /> : <ChevronDown size={11} className="text-[#00e07a]" />;
+    if (sortKey !== col) return <ChevronDown size={11} className="text-muted-foreground" />;
+    return sortDir === "asc" ? <ChevronUp size={11} className="text-primary" /> : <ChevronDown size={11} className="text-primary" />;
   };
 
   // ── Bulk selection ──
@@ -466,15 +466,15 @@ export function PipelineBoard({ onViewChange, jobId }: Props) {
 
   // Job selector if no specific job
   if (!job && jobs.length > 0) return (
-    <div className="flex-1 flex flex-col items-center justify-center text-white font-mono" >
+    <div className="flex-1 flex flex-col items-center justify-center text-foreground font-mono" >
       <Briefcase size={40} className="text-[#9b6dff] mb-4" />
       <h2 className="text-base font-bold mb-4">SELECT ACTIVE JOB PIPELINE</h2>
       <div className="space-y-2.5 w-80">
         {jobs.map(j => (
           <button key={j.id} onClick={() => setSelectedJobId(j.id)}
-            className="w-full flex items-center justify-between px-4 py-3 rounded-xl border border-white/[0.06] bg-white/[0.02] text-left hover:border-[#00e07a]/40 hover:bg-[#00e07a]/[0.02] transition-all cursor-pointer">
-            <div><span className="text-sm font-semibold text-white">{j.title}</span><span className="text-[10px] text-gray-500 block">{`DEPARTMENT: ${j.department}`}</span></div>
-            <ChevronRight size={14} className="text-gray-500" />
+            className="w-full flex items-center justify-between px-4 py-3 rounded-xl border border-border bg-muted text-left hover:border-[#00e07a]/40 hover:bg-primary/[0.02] transition-all cursor-pointer">
+            <div><span className="text-sm font-semibold text-foreground">{j.title}</span><span className="text-[10px] text-muted-foreground block">{`DEPARTMENT: ${j.department}`}</span></div>
+            <ChevronRight size={14} className="text-muted-foreground" />
           </button>
         ))}
       </div>
@@ -482,7 +482,7 @@ export function PipelineBoard({ onViewChange, jobId }: Props) {
   );
 
   if (!job) return (
-    <div className="flex-1 flex items-center justify-center text-gray-500 text-sm font-mono" >
+    <div className="flex-1 flex items-center justify-center text-muted-foreground text-sm font-mono" >
       Job pipeline offline. Create a job first.
     </div>
   );
@@ -490,7 +490,7 @@ export function PipelineBoard({ onViewChange, jobId }: Props) {
   const h = job.health;
 
   return (
-    <div className="flex-1 flex flex-col overflow-hidden text-white font-sans relative" >
+    <div className="flex-1 flex flex-col overflow-hidden text-foreground font-sans relative" >
       <style>{`
         .blink {
           animation: blink-anim 1.1s step-start infinite;
@@ -501,7 +501,7 @@ export function PipelineBoard({ onViewChange, jobId }: Props) {
         }
       `}</style>
       {/* Glow */}
-      <div className="absolute top-[-100px] left-[-100px] w-[500px] h-[500px] rounded-full bg-[#00e07a] blur-[120px] opacity-[0.07] pointer-events-none z-0" />
+      <div className="absolute top-[-100px] left-[-100px] w-[500px] h-[500px] rounded-full bg-primary blur-[120px] opacity-[0.07] pointer-events-none z-0" />
       <div className="absolute bottom-[-150px] right-[-100px] w-[600px] h-[600px] rounded-full bg-[#9b6dff] blur-[140px] opacity-[0.05] pointer-events-none z-0" />
 
       {/* Modals */}
@@ -509,7 +509,7 @@ export function PipelineBoard({ onViewChange, jobId }: Props) {
 
       {/* Toast */}
       {toast && (
-        <div className="fixed bottom-6 right-6 z-50 flex items-center gap-2 px-4 py-3 rounded-xl shadow-2xl text-xs font-mono font-bold border border-[#00e07a]/20 bg-[#0f1422] text-[#00e07a]">
+        <div className="fixed bottom-6 right-6 z-50 flex items-center gap-2 px-4 py-3 rounded-xl shadow-2xl text-xs font-mono font-bold border border-[#00e07a]/20 bg-background text-primary">
           <Check size={14} />{toast}
         </div>
       )}
@@ -518,43 +518,43 @@ export function PipelineBoard({ onViewChange, jobId }: Props) {
       {selected.size > 0 && <BulkBar count={selected.size} onAdvance={bulkAdvance} onReject={bulkReject} onDelete={bulkDelete} />}
 
       {/* Header area */}
-      <div className="px-8 pt-5 relative z-10 border-b border-white/[0.04] pb-4">
+      <div className="px-8 pt-5 relative z-10 border-b border-border pb-4">
         {/* Breadcrumb */}
-        <div className="flex items-center gap-1.5 text-[9px] uppercase font-bold tracking-wider text-gray-500 mb-3 font-mono">
-          <span className="hover:text-white cursor-pointer transition-colors" onClick={() => onViewChange({ view: "Jobs" })}>JOBS</span>
+        <div className="flex items-center gap-1.5 text-[9px] uppercase font-bold tracking-wider text-muted-foreground mb-3 font-mono">
+          <span className="hover:text-foreground cursor-pointer transition-colors" onClick={() => onViewChange({ view: "Jobs" })}>JOBS</span>
           <span>/</span>
-          <span className="hover:text-white cursor-pointer transition-colors truncate max-w-[150px]">{job.title}</span>
+          <span className="hover:text-foreground cursor-pointer transition-colors truncate max-w-[150px]">{job.title}</span>
           <span>/</span>
-          <span className="text-[#00e07a]">PIPELINE</span>
+          <span className="text-primary">PIPELINE</span>
         </div>
 
         {/* Title row */}
         <div className="flex items-start justify-between mb-4">
           <div>
             <div className="flex items-center gap-3 flex-wrap">
-              <h1 className="text-2xl font-bold tracking-tight text-white font-['Space_Grotesk'] flex items-center gap-1.5">
+              <h1 className="text-2xl font-bold tracking-tight text-foreground font-['Space_Grotesk'] flex items-center gap-1.5">
                 {job.title}
-                <span className="inline-block w-2 h-4 bg-[#00e07a] blink"></span>
+                <span className="inline-block w-2 h-4 bg-primary blink"></span>
               </h1>
               <span className="text-[9px] font-mono font-bold px-2 py-0.5 rounded-full tracking-wider border border-[#9b6dff]/20 bg-[#9b6dff]/10 text-[#9b6dff]">{`DEPARTMENT: ${job.department}`}</span>
-              <span className={`text-[9px] font-mono font-bold px-2 py-0.5 rounded-full tracking-wider border ${job.status === "Open" ? "border-[#00e07a]/20 bg-[#00e07a]/10 text-[#00e07a]" : "border-rose-500/20 bg-rose-500/10 text-rose-400"}`}>{`[ STATUS: ${job.status} ]`}</span>
+              <span className={`text-[9px] font-mono font-bold px-2 py-0.5 rounded-full tracking-wider border ${job.status === "Open" ? "border-[#00e07a]/20 bg-primary text-primary" : "border-rose-500/20 bg-rose-500/10 text-rose-400"}`}>{`[ STATUS: ${job.status} ]`}</span>
               {healthBadge(h)}
             </div>
           </div>
           <div className="flex items-center gap-2 font-mono flex-shrink-0">
             {/* View toggle */}
-            <div className="flex items-center rounded-xl border border-white/[0.06] overflow-hidden bg-white/[0.01]">
+            <div className="flex items-center rounded-xl border border-border overflow-hidden bg-white/[0.01]">
               <button onClick={() => setViewMode("table")}
-                className={`flex items-center gap-1.5 px-3 py-2 text-[10px] font-bold transition-all cursor-pointer border-0 ${viewMode === "table" ? "bg-[#00e07a]/12 border-r border-[#00e07a]/20 text-[#00e07a]" : "text-gray-500 hover:text-gray-300 border-r border-white/[0.06] bg-transparent"}`}>
+                className={`flex items-center gap-1.5 px-3 py-2 text-[10px] font-bold transition-all cursor-pointer border-0 ${viewMode === "table" ? "bg-primary border-r border-[#00e07a]/20 text-primary" : "text-muted-foreground hover:text-gray-300 border-r border-border bg-transparent"}`}>
                 <LayoutList size={14} /> [ HUD TABLE ]
               </button>
               <button onClick={() => setViewMode("kanban")}
-                className={`flex items-center gap-1.5 px-3 py-2 text-[10px] font-bold transition-all cursor-pointer border-0 ${viewMode === "kanban" ? "bg-[#00e07a]/12 text-[#00e07a]" : "text-gray-500 hover:text-gray-300 bg-transparent"}`}>
+                className={`flex items-center gap-1.5 px-3 py-2 text-[10px] font-bold transition-all cursor-pointer border-0 ${viewMode === "kanban" ? "bg-primary text-primary" : "text-muted-foreground hover:text-gray-300 bg-transparent"}`}>
                 <Columns3 size={14} /> [ HUD KANBAN ]
               </button>
             </div>
             <button onClick={() => setShowAdd(true)}
-              className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-xs font-bold bg-[#00e07a] hover:bg-[#00c9b1] text-black hover:opacity-90 cursor-pointer shadow-lg shadow-green-500/10 border-0">
+              className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-xs font-bold bg-primary hover:opacity-90 text-primary-foreground hover:opacity-90 cursor-pointer shadow-lg shadow-green-500/10 border-0">
               <Plus size={14} /> [ ADD CANDIDATE ]
             </button>
           </div>
@@ -565,13 +565,13 @@ export function PipelineBoard({ onViewChange, jobId }: Props) {
 
         {/* Search */}
         <div className="flex items-center gap-2 mt-4 mb-2 font-mono">
-          <div className="flex-1 flex items-center gap-2 px-3 py-2 rounded-xl border bg-[#161922]/30 backdrop-blur-md transition-all focus-within:border-[#00e07a]/40"
-            style={{ borderColor: "rgba(255,255,255,0.08)" }}>
-            <Search size={14} className="text-gray-600" />
+          <div className="flex-1 flex items-center gap-2 px-3 py-2 rounded-xl border bg-card backdrop-blur-md transition-all focus-within:border-[#00e07a]/40"
+            style={{ borderColor: "var(--border)" }}>
+            <Search size={14} className="text-muted-foreground" />
             <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search candidate records..."
-              className="flex-1 bg-transparent outline-none text-xs text-white placeholder-gray-600" />
+              className="flex-1 bg-transparent outline-none text-xs text-foreground placeholder-gray-600" />
           </div>
-          <span className="text-[10px] text-gray-500 flex-shrink-0"><span className="font-bold text-white">{filtered.length}</span> CANDIDATES FOUND</span>
+          <span className="text-[10px] text-muted-foreground flex-shrink-0"><span className="font-bold text-foreground">{filtered.length}</span> CANDIDATES FOUND</span>
         </div>
       </div>
 
@@ -582,24 +582,24 @@ export function PipelineBoard({ onViewChange, jobId }: Props) {
             <div className="w-16 h-16 rounded-2xl bg-[#9b6dff]/10 border border-[#9b6dff]/20 flex items-center justify-center mb-4">
               <UserPlus size={28} className="text-[#9b6dff]" />
             </div>
-            <h3 className="text-sm font-bold text-white mb-1 font-['Space_Grotesk']">NO CANDIDATES ADDED</h3>
-            <p className="text-xs text-gray-500 max-w-xs mb-4">Add candidate profiles to begin evaluation.</p>
-            <button onClick={() => setShowAdd(true)} className="px-4 py-2.5 rounded-xl text-xs font-bold bg-[#00e07a] hover:bg-[#00c9b1] text-black cursor-pointer border-0">
+            <h3 className="text-sm font-bold text-foreground mb-1 font-['Space_Grotesk']">NO CANDIDATES ADDED</h3>
+            <p className="text-xs text-muted-foreground max-w-xs mb-4">Add candidate profiles to begin evaluation.</p>
+            <button onClick={() => setShowAdd(true)} className="px-4 py-2.5 rounded-xl text-xs font-bold bg-primary hover:opacity-90 text-primary-foreground cursor-pointer border-0">
               <Plus size={12} className="inline mr-1" />[ ADD CANDIDATE ]
             </button>
           </div>
         ) : viewMode === "table" ? (
           /* ─── Table View ─── */
-          <div className="rounded-2xl border overflow-hidden bg-[#161922]/20 backdrop-blur-md shadow-2xl" style={{ borderColor: "rgba(255,255,255,0.08)" }}>
+          <div className="rounded-2xl border overflow-hidden bg-card backdrop-blur-md shadow-2xl" style={{ borderColor: "var(--border)" }}>
             <table className="w-full">
               <thead>
                 <tr className="text-[9px] font-mono font-bold uppercase tracking-wider border-b"
-                  style={{ backgroundColor: "rgba(17,19,28,0.5)", color: "#8b95a8", borderColor: "rgba(255,255,255,0.08)" }}>
+                  style={{ backgroundColor: "var(--card)", color: "#8b95a8", borderColor: "var(--border)" }}>
                   <th className="w-10 px-4 py-3 text-center">
                     <input type="checkbox" checked={allChecked} onChange={toggleAll} className="rounded accent-[#00e07a]" />
                   </th>
                   {([["name", "// NAME"], ["stage", "// STAGE"], ["source", "// SOURCE"], ["ai_match_score", "// AI MATCH"], ["days_in_stage", "// TIME IN STAGE"], ["formatted_applied", "// SUMMONED"], ["rating", "// RATING"]] as [SortKey, string][]).map(([key, label]) => (
-                    <th key={key} className="px-4 py-3 text-left cursor-pointer hover:text-[#00e07a] transition-colors" onClick={() => toggleSort(key)}>
+                    <th key={key} className="px-4 py-3 text-left cursor-pointer hover:text-primary transition-colors" onClick={() => toggleSort(key)}>
                       <div className="flex items-center gap-1">{label} <SortIcon col={key} /></div>
                     </th>
                   ))}
@@ -608,10 +608,10 @@ export function PipelineBoard({ onViewChange, jobId }: Props) {
               </thead>
               <tbody>
                 {sorted.length === 0 ? (
-                  <tr><td colSpan={9} className="px-4 py-12 text-center text-xs text-gray-600 font-mono">No candidates match the target filters.</td></tr>
+                  <tr><td colSpan={9} className="px-4 py-12 text-center text-xs text-muted-foreground font-mono">No candidates match the target filters.</td></tr>
                 ) : sorted.map(a => (
-                  <tr key={a.id} className="border-b transition-colors hover:bg-white/[0.02]"
-                    style={{ borderColor: "rgba(255,255,255,0.04)", backgroundColor: selected.has(a.id) ? "rgba(0,224,122,0.04)" : undefined }}>
+                  <tr key={a.id} className="border-b transition-colors hover:bg-muted"
+                    style={{ borderColor: "var(--border)", backgroundColor: selected.has(a.id) ? "rgba(0,224,122,0.04)" : undefined }}>
                     <td className="px-4 py-3 text-center">
                       <input type="checkbox" checked={selected.has(a.id)} onChange={() => toggleOne(a.id)} className="rounded accent-[#00e07a]" />
                     </td>
@@ -622,28 +622,28 @@ export function PipelineBoard({ onViewChange, jobId }: Props) {
                     <td className="px-4 py-3">
                       <select value={a.stage} onChange={e => updateStage(a.id, e.target.value)}
                         className="text-[9px] font-mono font-bold rounded px-2.5 py-1 bg-[#9b6dff]/10 border border-[#9b6dff]/20 text-[#9b6dff] outline-none cursor-pointer">
-                        {STAGES.map(s => <option key={s} value={s} className="bg-[#13141f] text-white">{s}</option>)}
+                        {STAGES.map(s => <option key={s} value={s} className="bg-card text-foreground">{s}</option>)}
                       </select>
                     </td>
                     <td className="px-4 py-3">
-                      <div className="flex items-center gap-1.5 text-xs text-gray-400 font-mono">
+                      <div className="flex items-center gap-1.5 text-xs text-muted-foreground font-mono">
                         <SourceIcon source={a.source || a.candidate_source || ""} />
                         <span>{a.source || a.candidate_source || "—"}</span>
                       </div>
                     </td>
                     <td className="px-4 py-3"><AiScoreBadge score={a.ai_match_score} /></td>
                     <td className="px-4 py-3"><SlaDays days={a.days_in_stage} /></td>
-                    <td className="px-4 py-3 text-xs text-gray-400 font-mono">{a.formatted_applied}</td>
+                    <td className="px-4 py-3 text-xs text-muted-foreground font-mono">{a.formatted_applied}</td>
                     <td className="px-4 py-3"><StarRating value={a.rating} onChange={r => updateRating(a.id, r)} /></td>
                     <td className="px-4 py-3 font-mono">
                       <button onClick={() => onViewChange({ view: "Candidate Profile", candidateId: a.candidate_id })}
-                        className="text-[9px] text-gray-400 hover:text-white px-2.5 py-1 rounded bg-white/[0.02] border border-white/[0.06] hover:bg-white/[0.06] cursor-pointer transition-colors">[ VIEW ]</button>
+                        className="text-[9px] text-muted-foreground hover:text-foreground px-2.5 py-1 rounded bg-muted border border-border hover:bg-accent cursor-pointer transition-colors">[ VIEW ]</button>
                     </td>
                   </tr>
                 ))}
               </tbody>
             </table>
-            <div className="px-4 py-3 border-t border-white/[0.04] text-[10px] text-gray-600 font-mono">
+            <div className="px-4 py-3 border-t border-border text-[10px] text-muted-foreground font-mono">
               COMPILING {sorted.length} OF {apps.length} CANDIDATES
             </div>
           </div>

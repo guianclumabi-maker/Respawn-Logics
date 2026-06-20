@@ -53,10 +53,10 @@ export function InsightsPage({ onViewChange }: InsightsPageProps) {
     return (
       <div className="flex-1 flex flex-col items-center justify-center py-24 text-center">
         <Target size={40} className="text-[#f5a623] mb-4" />
-        <p className="text-gray-900 dark:text-white font-medium mb-1" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
+        <p className="text-gray-900 dark:text-foreground font-medium mb-1" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
           Unable to load analytics
         </p>
-        <p className="text-sm text-gray-600 dark:text-gray-500 font-mono">{error || "No data available"}</p>
+        <p className="text-sm text-muted-foreground dark:text-muted-foreground font-mono">{error || "No data available"}</p>
         <button
           onClick={() => window.location.reload()}
           className="mt-4 px-4 py-2 rounded-lg text-xs font-mono font-semibold bg-purple-500/10 text-purple-600 dark:text-purple-400 border border-purple-500/20 hover:bg-purple-500/20 cursor-pointer transition-all"
@@ -140,7 +140,7 @@ export function InsightsPage({ onViewChange }: InsightsPageProps) {
   const maxDeptApps = Math.max(...deptVelocity.map((d: any) => (d.total || 0)), 1);
 
   return (
-    <div className="flex-1 flex flex-col overflow-y-auto px-8 py-6 text-white font-sans relative scrollbar-thin" >
+    <div className="flex-1 flex flex-col overflow-y-auto px-8 py-6 text-foreground font-sans relative scrollbar-thin" >
       <style>{`
         .blink {
           animation: blink-anim 1.1s step-start infinite;
@@ -151,46 +151,46 @@ export function InsightsPage({ onViewChange }: InsightsPageProps) {
         }
       `}</style>
       {/* Background glows */}
-      <div className="absolute top-[-100px] left-[-100px] w-[500px] h-[500px] rounded-full bg-[#00e07a] blur-[120px] opacity-[0.06] pointer-events-none z-0" />
+      <div className="absolute top-[-100px] left-[-100px] w-[500px] h-[500px] rounded-full bg-primary blur-[120px] opacity-[0.06] pointer-events-none z-0" />
       <div className="absolute bottom-[-150px] right-[-100px] w-[600px] h-[600px] rounded-full bg-[#9b6dff] blur-[140px] opacity-[0.05] pointer-events-none z-0" />
 
       {/* Header */}
-      <div className="relative z-10 flex items-center justify-between mb-8 border-b border-white/[0.04] pb-6">
+      <div className="relative z-10 flex items-center justify-between mb-8 border-b border-border pb-6">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-white font-['Space_Grotesk'] flex items-center gap-1.5">
+          <h1 className="text-2xl font-bold tracking-tight text-foreground font-['Space_Grotesk'] flex items-center gap-1.5">
             RECRUITMENT ANALYTICS // METRICS DASHBOARD
-            <span className="inline-block w-2.5 h-5 bg-[#00e07a] blink"></span>
+            <span className="inline-block w-2.5 h-5 bg-primary blink"></span>
           </h1>
-          <p className="text-xs font-mono text-gray-500 mt-1 uppercase tracking-wider">acquisition conversions, pipeline calibration, and department recruitment velocity.</p>
+          <p className="text-xs font-mono text-muted-foreground mt-1 uppercase tracking-wider">acquisition conversions, pipeline calibration, and department recruitment velocity.</p>
         </div>
       </div>
 
       {/* Top Headline stats */}
       <div className="relative z-10 grid grid-cols-1 md:grid-cols-3 gap-5 mb-8 font-mono">
-        <div className="p-5 rounded-xl border border-white/[0.06] bg-[#0f1422] flex gap-4 items-start">
-          <div className="p-2.5 rounded bg-[#00e07a]/10 text-[#00e07a] border border-[#00e07a]/20"><Clock size={16} /></div>
+        <div className="p-5 rounded-xl border border-border bg-background flex gap-4 items-start">
+          <div className="p-2.5 rounded bg-primary text-primary border border-[#00e07a]/20"><Clock size={16} /></div>
           <div>
-            <h4 className="text-[10px] text-gray-500 uppercase">AVG TIME TO HIRE</h4>
-            <p className="text-xl font-bold text-white mt-1">{data.headline?.avg_time_to_hire} DAYS</p>
-            <p className="text-[9px] text-gray-500 mt-1 uppercase">Applied to hire cycle</p>
+            <h4 className="text-[10px] text-muted-foreground uppercase">AVG TIME TO HIRE</h4>
+            <p className="text-xl font-bold text-foreground mt-1">{data.headline?.avg_time_to_hire} DAYS</p>
+            <p className="text-[9px] text-muted-foreground mt-1 uppercase">Applied to hire cycle</p>
           </div>
         </div>
 
-        <div className="p-5 rounded-xl border border-white/[0.06] bg-[#0f1422] flex gap-4 items-start">
-          <div className="p-2.5 rounded bg-[#00e07a]/10 text-[#00e07a] border border-[#00e07a]/20"><Target size={16} /></div>
+        <div className="p-5 rounded-xl border border-border bg-background flex gap-4 items-start">
+          <div className="p-2.5 rounded bg-primary text-primary border border-[#00e07a]/20"><Target size={16} /></div>
           <div>
-            <h4 className="text-[10px] text-gray-500 uppercase">OFFER ACCEPTANCE</h4>
-            <p className="text-xl font-bold text-white mt-1">{data.headline?.offer_acceptance_rate}%</p>
-            <p className="text-[9px] text-gray-500 mt-1 uppercase">Ratio of offers accepted</p>
+            <h4 className="text-[10px] text-muted-foreground uppercase">OFFER ACCEPTANCE</h4>
+            <p className="text-xl font-bold text-foreground mt-1">{data.headline?.offer_acceptance_rate}%</p>
+            <p className="text-[9px] text-muted-foreground mt-1 uppercase">Ratio of offers accepted</p>
           </div>
         </div>
 
-        <div className="p-5 rounded-xl border border-white/[0.06] bg-[#0f1422] flex gap-4 items-start">
-          <div className="p-2.5 rounded bg-[#00e07a]/10 text-[#00e07a] border border-[#00e07a]/20"><Users size={16} /></div>
+        <div className="p-5 rounded-xl border border-border bg-background flex gap-4 items-start">
+          <div className="p-2.5 rounded bg-primary text-primary border border-[#00e07a]/20"><Users size={16} /></div>
           <div>
-            <h4 className="text-[10px] text-gray-500 uppercase">TOTAL CANDIDATES</h4>
-            <p className="text-xl font-bold text-white mt-1">{data.headline?.total_candidates}</p>
-            <p className="text-[9px] text-gray-500 mt-1 uppercase">Central talent database</p>
+            <h4 className="text-[10px] text-muted-foreground uppercase">TOTAL CANDIDATES</h4>
+            <p className="text-xl font-bold text-foreground mt-1">{data.headline?.total_candidates}</p>
+            <p className="text-[9px] text-muted-foreground mt-1 uppercase">Central talent database</p>
           </div>
         </div>
       </div>
@@ -199,20 +199,20 @@ export function InsightsPage({ onViewChange }: InsightsPageProps) {
       <div className="relative z-10 grid lg:grid-cols-2 gap-6 mb-8 font-mono">
         
         {/* Application Volume Trend Chart */}
-        <div className="p-6 rounded-xl border bg-[#0f1422]/60 border-white/[0.06] flex flex-col justify-between">
+        <div className="p-6 rounded-xl border bg-background/60 border-border flex flex-col justify-between">
           <div>
             <div className="flex justify-between items-start mb-6">
               <div>
-                <h3 className="text-xs font-bold text-white uppercase tracking-wider">// APPLICATION VOLUME TREND</h3>
-                <p className="text-[9px] text-gray-500 mt-0.5">Monthly breakdown of received resumes (Last 6 Months).</p>
+                <h3 className="text-xs font-bold text-foreground uppercase tracking-wider">// APPLICATION VOLUME TREND</h3>
+                <p className="text-[9px] text-muted-foreground mt-0.5">Monthly breakdown of received resumes (Last 6 Months).</p>
               </div>
-              <span className="text-[9px] font-bold text-[#00e07a] flex items-center gap-1 bg-[#00e07a]/10 px-2 py-0.5 rounded border border-[#00e07a]/20">
+              <span className="text-[9px] font-bold text-primary flex items-center gap-1 bg-primary px-2 py-0.5 rounded border border-[#00e07a]/20">
                 <TrendingUp size={10} /> LIVE
               </span>
             </div>
 
             {/* Custom SVG Line Chart */}
-            <div className="w-full h-44 relative bg-black/10 border border-white/[0.03] rounded-xl p-4 overflow-hidden">
+            <div className="w-full h-44 relative bg-black/10 border border-border rounded-xl p-4 overflow-hidden">
               <svg viewBox="0 0 600 160" className="w-full h-full">
                 <line x1="30" y1="30" x2="570" y2="30" stroke="rgba(255,255,255,0.03)" strokeWidth="1" />
                 <line x1="30" y1="80" x2="570" y2="80" stroke="rgba(255,255,255,0.03)" strokeWidth="1" />
@@ -251,25 +251,25 @@ export function InsightsPage({ onViewChange }: InsightsPageProps) {
             </div>
           </div>
           
-          <div className="border-t border-white/[0.04] pt-4 mt-6 flex justify-between items-center text-[9px] text-gray-500">
+          <div className="border-t border-border pt-4 mt-6 flex justify-between items-center text-[9px] text-muted-foreground">
             <span>Peak Month: **{peakMonthLabel}** with {peakApps} new applications</span>
             <span>Report updated live</span>
           </div>
         </div>
 
         {/* Pipeline Stage Density Bar Chart */}
-        <div className="p-6 rounded-xl border bg-[#0f1422]/60 border-white/[0.06] flex flex-col justify-between">
+        <div className="p-6 rounded-xl border bg-background/60 border-border flex flex-col justify-between">
           <div>
-            <h3 className="text-xs font-bold text-white uppercase tracking-wider mb-1">// PIPELINE STAGE CALIBRATION</h3>
-            <p className="text-[9px] text-gray-500 mb-6">Distribution of active candidates across recruiting milestones.</p>
+            <h3 className="text-xs font-bold text-foreground uppercase tracking-wider mb-1">// PIPELINE STAGE CALIBRATION</h3>
+            <p className="text-[9px] text-muted-foreground mb-6">Distribution of active candidates across recruiting milestones.</p>
             
             <div className="space-y-3">
               {stageCalibration.map((s) => {
                 const pct = Math.max(Math.round((s.count / maxStageCount) * 100), 2);
                 return (
                   <div key={s.stage} className="flex items-center gap-4">
-                    <span className="text-[9px] font-bold text-gray-400 w-24 shrink-0 truncate">{`[ ${s.label} ]`}</span>
-                    <div className="flex-1 h-3 bg-white/[0.02] border border-white/[0.04] rounded overflow-hidden relative">
+                    <span className="text-[9px] font-bold text-muted-foreground w-24 shrink-0 truncate">{`[ ${s.label} ]`}</span>
+                    <div className="flex-1 h-3 bg-muted border border-border rounded overflow-hidden relative">
                       <div 
                         className="h-full transition-all duration-500"
                         style={{ 
@@ -279,14 +279,14 @@ export function InsightsPage({ onViewChange }: InsightsPageProps) {
                         }}
                       />
                     </div>
-                    <span className="text-[10px] font-bold text-white w-12 text-right">{s.count} Apps</span>
+                    <span className="text-[10px] font-bold text-foreground w-12 text-right">{s.count} Apps</span>
                   </div>
                 );
               })}
             </div>
           </div>
 
-          <div className="border-t border-white/[0.04] pt-4 mt-5 text-[9px] text-gray-500 leading-relaxed">
+          <div className="border-t border-border pt-4 mt-5 text-[9px] text-muted-foreground leading-relaxed">
             Active pipeline density tracks total unconverted applications.
           </div>
         </div>
@@ -295,12 +295,12 @@ export function InsightsPage({ onViewChange }: InsightsPageProps) {
       {/* Grid Row 2 */}
       <div className="relative z-10 grid lg:grid-cols-2 gap-6 font-mono">
         {/* Applications by Department (adapted from headcount by dept) */}
-        <div className="p-6 rounded-xl border bg-[#0f1422]/60 border-white/[0.06]">
-          <h3 className="text-xs font-bold text-white uppercase tracking-wider mb-1">// APPLICATIONS BY DEPARTMENT</h3>
-          <p className="text-[9px] text-gray-500 mb-6">Volume distribution across organizational department sectors.</p>
+        <div className="p-6 rounded-xl border bg-background/60 border-border">
+          <h3 className="text-xs font-bold text-foreground uppercase tracking-wider mb-1">// APPLICATIONS BY DEPARTMENT</h3>
+          <p className="text-[9px] text-muted-foreground mb-6">Volume distribution across organizational department sectors.</p>
           
           {deptVelocity.length === 0 ? (
-            <div className="text-xs text-gray-600 italic py-10 text-center">No department data available.</div>
+            <div className="text-xs text-muted-foreground italic py-10 text-center">No department data available.</div>
           ) : (
             <div className="space-y-4">
               {deptVelocity.slice(0, 5).map((d: any, idx: number) => {
@@ -310,17 +310,17 @@ export function InsightsPage({ onViewChange }: InsightsPageProps) {
                 return (
                   <div key={d.department}>
                     <div className="flex justify-between items-center text-[10px] mb-1 font-semibold">
-                      <span className="text-white uppercase">{d.department}</span>
-                      <span className="text-gray-500">{total} Applicants</span>
+                      <span className="text-foreground uppercase">{d.department}</span>
+                      <span className="text-muted-foreground">{total} Applicants</span>
                     </div>
                     <div className="flex items-center gap-3">
-                      <div className="flex-1 h-2 bg-white/[0.02] border border-white/[0.04] rounded overflow-hidden">
+                      <div className="flex-1 h-2 bg-muted border border-border rounded overflow-hidden">
                         <div 
                           className="h-full transition-all duration-500"
                           style={{ width: `${pct}%`, backgroundColor: color }}
                         />
                       </div>
-                      <span className="text-[9px] font-bold text-gray-400 w-16 text-right">
+                      <span className="text-[9px] font-bold text-muted-foreground w-16 text-right">
                         {d.avg_time_to_hire ? `[ ${Math.round(d.avg_time_to_hire)}d cycle ]` : "[ N/A ]"}
                       </span>
                     </div>
@@ -332,29 +332,29 @@ export function InsightsPage({ onViewChange }: InsightsPageProps) {
         </div>
 
         {/* Source Channels performance breakdown */}
-        <div className="p-6 rounded-xl border bg-[#0f1422]/60 border-white/[0.06] flex flex-col justify-between">
+        <div className="p-6 rounded-xl border bg-background/60 border-border flex flex-col justify-between">
           <div>
-            <h3 className="text-xs font-bold text-white uppercase tracking-wider mb-1">// CANDIDATE ACQUISITION SOURCES</h3>
-            <p className="text-[9px] text-gray-500 mb-5">Primary channels generating applications and hired conversions.</p>
+            <h3 className="text-xs font-bold text-foreground uppercase tracking-wider mb-1">// CANDIDATE ACQUISITION SOURCES</h3>
+            <p className="text-[9px] text-muted-foreground mb-5">Primary channels generating applications and hired conversions.</p>
             
             {channels.length === 0 ? (
-              <div className="text-xs text-gray-500 italic mt-8 text-center">No source records logged.</div>
+              <div className="text-xs text-muted-foreground italic mt-8 text-center">No source records logged.</div>
             ) : (
               <div className="space-y-4">
                 {channels.map((c: any, idx: number) => (
                   <div key={idx}>
                     <div className="flex justify-between items-center text-[10px] mb-1.5 font-semibold">
-                      <span className="text-white uppercase">{c.source}</span>
-                      <span className="text-gray-500">{c.percentage}%</span>
+                      <span className="text-foreground uppercase">{c.source}</span>
+                      <span className="text-muted-foreground">{c.percentage}%</span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <div className="flex-1 h-2 bg-white/[0.02] border border-white/[0.04] rounded-full overflow-hidden">
+                      <div className="flex-1 h-2 bg-muted border border-border rounded-full overflow-hidden">
                         <div 
                           className="h-full rounded-full transition-all duration-500"
                           style={{ width: `${c.percentage}%`, backgroundColor: c.color }}
                         />
                       </div>
-                      <span className="text-[9px] font-bold text-gray-500 uppercase leading-none min-w-20 text-right">
+                      <span className="text-[9px] font-bold text-muted-foreground uppercase leading-none min-w-20 text-right">
                         {c.applications} Apps
                       </span>
                     </div>
@@ -364,7 +364,7 @@ export function InsightsPage({ onViewChange }: InsightsPageProps) {
             )}
           </div>
 
-          <div className="border-t border-white/[0.04] pt-4 mt-5 text-[9px] text-gray-500 leading-relaxed">
+          <div className="border-t border-border pt-4 mt-5 text-[9px] text-muted-foreground leading-relaxed">
             ?? {data.headline?.top_source ? `${data.headline.top_source.toUpperCase()} is currently your top performing channel.` : 'Tracking live source registry.'}
           </div>
         </div>

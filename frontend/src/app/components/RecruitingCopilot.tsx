@@ -41,7 +41,7 @@ export function RecruitingCopilot({ onViewChange }: { onViewChange: (v: ViewStat
   };
 
   return (
-    <div className="flex-1 flex flex-col h-full bg-[#0b0f1a] text-white p-8 relative overflow-hidden font-sans">
+    <div className="flex-1 flex flex-col h-full bg-[#0b0f1a] text-foreground p-8 relative overflow-hidden font-sans">
       <style>{`
         .blink {
           animation: blink-anim 1.1s step-start infinite;
@@ -53,21 +53,21 @@ export function RecruitingCopilot({ onViewChange }: { onViewChange: (v: ViewStat
       `}</style>
       <div className="absolute top-[-100px] left-[50%] -translate-x-1/2 w-[800px] h-[400px] rounded-[100%] bg-gradient-to-b from-[#00e07a]/10 to-transparent blur-[80px] pointer-events-none" />
 
-      <div className="flex items-center gap-4 mb-10 relative z-10 border-b border-white/[0.04] pb-6">
-        <div className="w-12 h-12 rounded bg-[#0f1422] border border-white/[0.08] flex items-center justify-center font-mono text-base font-bold text-[#00e07a] flex-shrink-0">
+      <div className="flex items-center gap-4 mb-10 relative z-10 border-b border-border pb-6">
+        <div className="w-12 h-12 rounded bg-background border border-border flex items-center justify-center font-mono text-base font-bold text-primary flex-shrink-0">
           <Bot size={24} />
         </div>
         <div>
-          <h1 className="text-2xl font-bold font-['Space_Grotesk'] tracking-tight text-white flex items-center gap-1.5">
+          <h1 className="text-2xl font-bold font-['Space_Grotesk'] tracking-tight text-foreground flex items-center gap-1.5">
             RECRUITING COPILOT // TERMINAL PILOT v2.0
-            <span className="inline-block w-2.5 h-5 bg-[#00e07a] blink"></span>
+            <span className="inline-block w-2.5 h-5 bg-primary blink"></span>
           </h1>
-          <p className="text-xs font-mono text-gray-500 mt-1 uppercase tracking-wider">your autonomous assistant for proactive candidate pipeline calibration.</p>
+          <p className="text-xs font-mono text-muted-foreground mt-1 uppercase tracking-wider">your autonomous assistant for proactive candidate pipeline calibration.</p>
         </div>
       </div>
 
       <div className="flex-1 max-w-4xl w-full mx-auto relative z-10 space-y-6 font-mono">
-        <div className="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-4 border-b border-white/[0.04] pb-2">
+        <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-4 border-b border-border pb-2">
           {`// RECOMMENDED ACTION ITEMS (${actions.length})`}
         </div>
 
@@ -76,10 +76,10 @@ export function RecruitingCopilot({ onViewChange }: { onViewChange: (v: ViewStat
             <div className="animate-spin w-8 h-8 border-2 border-[#00e07a] border-t-transparent rounded-full" />
           </div>
         ) : actions.length === 0 ? (
-          <div className="bg-[#0f1422] border border-white/5 rounded-2xl p-12 text-center flex flex-col items-center py-20">
-            <CheckCircle size={36} className="text-[#00e07a] opacity-60 mb-4" />
-            <h3 className="text-sm font-bold text-white uppercase tracking-wider mb-2">STATUS: DIAGNOSTICS CLEAR</h3>
-            <p className="text-xs text-gray-500 max-w-md mx-auto leading-relaxed">
+          <div className="bg-background border border-white/5 rounded-2xl p-12 text-center flex flex-col items-center py-20">
+            <CheckCircle size={36} className="text-primary opacity-60 mb-4" />
+            <h3 className="text-sm font-bold text-foreground uppercase tracking-wider mb-2">STATUS: DIAGNOSTICS CLEAR</h3>
+            <p className="text-xs text-muted-foreground max-w-md mx-auto leading-relaxed">
               Recruiting Copilot hasn't detected any stalled candidates or active bottlenecks in your pipeline.
             </p>
           </div>
@@ -88,7 +88,7 @@ export function RecruitingCopilot({ onViewChange }: { onViewChange: (v: ViewStat
             {actions.map((act, i) => (
               <div
                 key={i}
-                className="group flex items-center p-4 rounded-xl border bg-[#0f1422] hover:bg-[#0f1422]/80 transition-all cursor-pointer relative overflow-hidden"
+                className="group flex items-center p-4 rounded-xl border bg-background hover:bg-background/80 transition-all cursor-pointer relative overflow-hidden"
                 style={{
                   borderColor: act.priority === 'high' ? 'rgba(248, 113, 113, 0.2)' : 'rgba(255, 255, 255, 0.06)',
                 }}
@@ -108,14 +108,14 @@ export function RecruitingCopilot({ onViewChange }: { onViewChange: (v: ViewStat
                   <div className="text-[9px] font-bold uppercase tracking-wider mb-1" style={{ color: act.priority === 'high' ? '#f87171' : '#9b6dff' }}>
                     {`[ ${act.type.replace('_', ' ').toUpperCase()} ]`}
                   </div>
-                  <h3 className="text-sm font-bold text-white group-hover:text-[#00e07a] transition-colors truncate">
+                  <h3 className="text-sm font-bold text-foreground group-hover:text-primary transition-colors truncate">
                     {act.message}
                   </h3>
                 </div>
 
-                <button className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-[10px] font-bold bg-white/[0.02] border border-white/[0.06] hover:border-white/20 hover:bg-white/[0.06] transition-colors whitespace-nowrap text-white shrink-0">
+                <button className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-[10px] font-bold bg-muted border border-border hover:border-white/20 hover:bg-accent transition-colors whitespace-nowrap text-foreground shrink-0">
                   {`[ ${act.action.toUpperCase()} ]`}
-                  <ChevronRight size={12} className="text-gray-500 group-hover:text-white" />
+                  <ChevronRight size={12} className="text-muted-foreground group-hover:text-foreground" />
                 </button>
               </div>
             ))}
