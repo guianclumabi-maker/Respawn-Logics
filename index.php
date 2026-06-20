@@ -1311,7 +1311,7 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
 
         <div class="why-grid">
             <div class="why-card">
-                <i data-lucide="gamepad-2"></i>
+                <i data-lucide="layers"></i>
                 <h3>One Platform</h3>
                 <p>Manage employee data, payroll, performance, and employee support from a unified system without messy integrations.</p>
             </div>
