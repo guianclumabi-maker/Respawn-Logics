@@ -19,6 +19,7 @@ import {
   Layers,
   Clock,
   Gamepad2,
+  Banknote,
 } from "lucide-react";
 
 // ── Types ──────────────────────────────────────────────────
@@ -95,11 +96,15 @@ const getSections = (hasPermission: (p: string) => boolean): NavSection[] => [
       { label: "Recruiting Copilot", view: "Recruiting Copilot", icon: <Bot size={19} />, badgeKey: "copilotAlerts" },
     ],
   }] : []),
-  // Administration Section
-  ...(hasPermission("users.manage") || hasPermission("shifts.manage") ? [{
+  ...(hasPermission("users.manage") || hasPermission("shifts.manage") || hasPermission("payroll.manage") ? [{
     title: "Administration",
     items: [
-      { label: "Employee Directory", view: "HR Directory", icon: <Users size={19} /> },
+      ...(hasPermission("users.manage") || hasPermission("shifts.manage") ? [
+        { label: "Employee Directory", view: "HR Directory", icon: <Users size={19} /> }
+      ] : []),
+      ...(hasPermission("payroll.manage") ? [
+        { label: "Payroll Engine", view: "Payroll Engine", icon: <Banknote size={19} /> }
+      ] : []),
     ],
   }] : []),
 ];

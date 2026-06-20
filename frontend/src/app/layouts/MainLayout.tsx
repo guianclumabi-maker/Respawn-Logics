@@ -21,6 +21,7 @@ export default function MainLayout() {
     if (path.includes("/approvals")) return { view: "Timesheet Approvals" };
     if (path.includes("/hr-directory")) return { view: "HR Directory" };
     if (path.includes("/leaves")) return { view: "Leaves" };
+    if (path.includes("/payroll")) return { view: "Payroll Engine" };
     return { view: "Dashboard" };
   };
 
@@ -50,6 +51,7 @@ export default function MainLayout() {
       case "Timesheet Approvals": navigate("/attendance/approvals"); break;
       case "HR Directory": navigate("/hr-directory"); break;
       case "Leaves": navigate("/leaves"); break;
+      case "Payroll Engine": navigate("/payroll"); break;
       default: navigate("/"); break; // fallback
     }
   };
