@@ -20,6 +20,7 @@ try {
         `priority` varchar(50) DEFAULT 'Normal',
         `hiring_manager` varchar(150) DEFAULT NULL,
         `assigned_recruiter` varchar(150) DEFAULT NULL,
+        `external_link` varchar(255) DEFAULT NULL,
         `approval_status` varchar(50) DEFAULT 'Approved',
         `approved_by` varchar(150) DEFAULT NULL,
         `approved_at` datetime DEFAULT NULL,
@@ -28,6 +29,13 @@ try {
         PRIMARY KEY (`id`)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;");
     echo "- Created jobs table.\n";
+
+    // Add external_link column to jobs if not present (migration fallback)
+    try {
+        $pdo->exec("ALTER TABLE `jobs` ADD COLUMN `external_link` VARCHAR(255) DEFAULT NULL AFTER `assigned_recruiter`");
+    } catch (PDOException $e) {
+        // Safe to ignore if column already exists
+    }
 
     $pdo->exec("CREATE TABLE IF NOT EXISTS `candidate_profiles` (
         `id` int(11) NOT NULL AUTO_INCREMENT,

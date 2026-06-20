@@ -383,6 +383,11 @@ export function JobsPage({ onViewChange }: Props) {
           setShowCreateModal(false);
           setJobForm(emptyJobForm);
           fetchJobs();
+          if (data.job_id) {
+            onViewChange({ view: "Pipeline", jobId: data.job_id });
+          } else {
+            onViewChange({ view: "Pipeline" });
+          }
         }
         setSubmitting(false);
       })

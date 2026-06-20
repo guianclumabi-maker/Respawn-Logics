@@ -727,6 +727,12 @@ class CandidatesController
         $stmt->execute([$this->tenantId, $title, trim($input['department'] ?? ''), trim($input['location'] ?? ''), $input['employment_type'] ?? 'Full-Time', !empty($input['salary_min']) ? (float)$input['salary_min'] : null, !empty($input['salary_max']) ? (float)$input['salary_max'] : null, trim($input['description'] ?? ''), is_array($input['requirements'] ?? '') ? json_encode($input['requirements']) : trim($input['requirements'] ?? ''), $input['status'] ?? 'Open', $input['priority'] ?? 'Normal', trim($input['hiring_manager'] ?? ''), trim($input['assigned_recruiter'] ?? ''), trim($input['external_link'] ?? '')]);
         $jobId = (int)$this->pdo->lastInsertId();
         $this->logActivity('job_created', "Job '$title' was created", null, $jobId);
+        
+        $externalLink = trim($input['external_link'] ?? '');
+        if (!empty($externalLink)) {
+            $this->logActivity('job_published', "Job '$title' was published to external board: $externalLink", null, $jobId);
+        }
+        
         echo json_encode(['success' => true, 'job_id' => $jobId]);
         exit;
     }

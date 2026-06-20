@@ -330,6 +330,13 @@ export function PipelineBoard({ onViewChange, jobId }: Props) {
 
   const showToast = (msg: string) => { setToast(msg); setTimeout(() => setToast(""), 3500); };
 
+  // Sync jobId prop to state when it changes (e.g. on redirection from Job creation)
+  useEffect(() => {
+    if (jobId !== undefined) {
+      setSelectedJobId(jobId);
+    }
+  }, [jobId]);
+
   // Fetch job list if no jobId
   useEffect(() => {
     if (!jobId) {
