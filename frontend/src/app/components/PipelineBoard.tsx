@@ -291,19 +291,19 @@ function StageFilterBar({ health, active, onSelect }: { health: HealthData; acti
         return (
           <div key={s.key} className="flex items-center gap-1.5 flex-shrink-0">
             <button onClick={() => onSelect(s.key)}
-              className="flex flex-col items-center px-4 py-2.5 rounded-xl border transition-all cursor-pointer min-w-[80px]"
+              className="flex flex-col items-center px-6 py-4 rounded-2xl border transition-all cursor-pointer min-w-[100px]"
               style={{
-                backgroundColor: isActive ? "rgba(0, 224, 122, 0.12)" : "rgba(15, 20, 34, 0.5)",
+                backgroundColor: isActive ? "rgba(0, 224, 122, 0.15)" : "rgba(15, 20, 34, 0.5)",
                 borderColor: isActive ? "#00e07a" : "rgba(255,255,255,0.06)",
                 borderWidth: isActive ? 2 : 1,
               }}>
-              <span className="text-lg font-bold leading-none mb-1 text-foreground">{s.count}</span>
-              <span className="text-[9px] font-bold tracking-wide text-center leading-tight" style={{ color: isActive ? "#00e07a" : "#8b95a8" }}>{displayLabel}</span>
+              <span className="text-2xl font-bold leading-none mb-2 text-foreground">{s.count}</span>
+              <span className="text-[11px] font-bold tracking-wide text-center leading-tight" style={{ color: isActive ? "#00e07a" : "#8b95a8" }}>{displayLabel}</span>
             </button>
             {convPct !== null && s.key !== "Hired" && (
-              <div className="flex flex-col items-center text-muted-foreground flex-shrink-0 font-mono">
-                <ArrowRight size={10} className="text-primary/40" />
-                <span className="text-[8px] font-bold text-muted-foreground">{`${convPct}%`}</span>
+              <div className="flex flex-col items-center text-muted-foreground flex-shrink-0 font-mono px-2">
+                <ArrowRight size={16} className="text-primary/40" />
+                <span className="text-[10px] font-bold text-muted-foreground mt-0.5">{`${convPct}%`}</span>
               </div>
             )}
           </div>
@@ -655,7 +655,7 @@ export function PipelineBoard({ onViewChange, jobId }: Props) {
                 <span className="inline-block w-2 h-4 bg-primary blink"></span>
               </h1>
               <span className="text-[9px] font-mono font-bold px-2 py-0.5 rounded-full tracking-wider border border-[#9b6dff]/20 bg-[#9b6dff]/10 text-[#9b6dff]">{`DEPARTMENT: ${job.department}`}</span>
-              <span className={`text-[9px] font-mono font-bold px-2 py-0.5 rounded-full tracking-wider border ${job.status === "Open" ? "border-[#00e07a]/20 bg-primary text-primary" : "border-rose-500/20 bg-rose-500/10 text-rose-400"}`}>{`[ STATUS: ${job.status} ]`}</span>
+              <span className={`text-[9px] font-mono font-bold px-2 py-0.5 rounded-full tracking-wider border ${job.status === "Open" ? "border-[#00e07a]/30 bg-[#00e07a]/10 text-primary" : "border-rose-500/20 bg-rose-500/10 text-rose-400"}`}>{`[ STATUS: ${job.status} ]`}</span>
               {healthBadge(h)}
             </div>
           </div>
@@ -663,11 +663,11 @@ export function PipelineBoard({ onViewChange, jobId }: Props) {
             {/* View toggle */}
             <div className="flex items-center rounded-xl border border-border overflow-hidden bg-white/[0.01]">
               <button onClick={() => setViewMode("table")}
-                className={`flex items-center gap-1.5 px-3 py-2 text-[10px] font-bold transition-all cursor-pointer border-0 ${viewMode === "table" ? "bg-primary border-r border-[#00e07a]/20 text-primary" : "text-muted-foreground hover:text-gray-300 border-r border-border bg-transparent"}`}>
+                className={`flex items-center gap-1.5 px-3 py-2 text-[10px] font-bold transition-all cursor-pointer border-0 ${viewMode === "table" ? "bg-[#00e07a]/10 border-r border-[#00e07a]/20 text-primary" : "text-muted-foreground hover:text-gray-300 border-r border-border bg-transparent"}`}>
                 <LayoutList size={14} /> [ HUD TABLE ]
               </button>
               <button onClick={() => setViewMode("kanban")}
-                className={`flex items-center gap-1.5 px-3 py-2 text-[10px] font-bold transition-all cursor-pointer border-0 ${viewMode === "kanban" ? "bg-primary text-primary" : "text-muted-foreground hover:text-gray-300 bg-transparent"}`}>
+                className={`flex items-center gap-1.5 px-3 py-2 text-[10px] font-bold transition-all cursor-pointer border-0 ${viewMode === "kanban" ? "bg-[#00e07a]/10 text-primary" : "text-muted-foreground hover:text-gray-300 bg-transparent"}`}>
                 <Columns3 size={14} /> [ HUD KANBAN ]
               </button>
             </div>
