@@ -267,6 +267,10 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
         .mod-tag.red { color: var(--red); background: rgba(255, 77, 106, 0.1); border: 1px solid rgba(255, 77, 106, 0.2); }
         .mod-tag.purple { color: var(--purple); background: rgba(155, 109, 255, 0.1); border: 1px solid rgba(155, 109, 255, 0.2); }
         .mod-tag.amber { color: var(--amber); background: rgba(245, 166, 35, 0.1); border: 1px solid rgba(245, 166, 35, 0.2); }
+        
+        .mod-tag.portal-admin { color: #fff; background: rgba(255, 77, 106, 0.15); border: 1px solid var(--red); font-size: 0.65rem; }
+        .mod-tag.portal-employee { color: #fff; background: rgba(0, 201, 177, 0.15); border: 1px solid var(--teal); font-size: 0.65rem; }
+        .mod-tag.portal-both { color: #fff; background: rgba(155, 109, 255, 0.15); border: 1px solid var(--purple); font-size: 0.65rem; }
 
         .card-title {
             font-size: 1.6rem;
@@ -459,6 +463,9 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
             <a href="#dashboard" class="sidebar-item">Client Dashboard</a>
             <a href="#elr" class="sidebar-item">Employee Relations</a>
             <a href="#payroll" class="sidebar-item">Payroll Engine</a>
+            <a href="#ats" class="sidebar-item">Applicant Tracking (ATS)</a>
+            <a href="#performance" class="sidebar-item">Performance Mgt</a>
+            <a href="#esm" class="sidebar-item">Platform Support (ESM)</a>
         </div>
     </div>
 
@@ -473,6 +480,7 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
                         <div class="mod-meta">
                             <span class="mod-badge">MODULE 01</span>
                             <span class="mod-tag green">SPAWN POINT</span>
+                            <span class="mod-tag portal-admin">ADMIN VERSION</span>
                         </div>
                         <h2 class="card-title">Universal Onboarding Engine</h2>
                     </div>
@@ -532,6 +540,7 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
                         <div class="mod-meta">
                             <span class="mod-badge">MODULE 02</span>
                             <span class="mod-tag blue">PARTY ROSTER</span>
+                            <span class="mod-tag portal-both">BOTH / ADMIN HEAVY</span>
                         </div>
                         <h2 class="card-title">Core HR & Roster Directory</h2>
                     </div>
@@ -591,6 +600,7 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
                         <div class="mod-meta">
                             <span class="mod-badge">MODULE 00</span>
                             <span class="mod-tag teal">CONTROL CORE</span>
+                            <span class="mod-tag portal-employee">EMPLOYEE FACING PORTAL</span>
                         </div>
                         <h2 class="card-title">Interactive Client Dashboard</h2>
                     </div>
@@ -650,6 +660,7 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
                         <div class="mod-meta">
                             <span class="mod-badge">MODULE 11</span>
                             <span class="mod-tag red">TRIBUNAL</span>
+                            <span class="mod-tag portal-admin">ADMIN VERSION</span>
                         </div>
                         <h2 class="card-title">Employee Relations Console (ELR)</h2>
                     </div>
@@ -710,6 +721,7 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
                         <div class="mod-meta">
                             <span class="mod-badge">MODULE 04</span>
                             <span class="mod-tag amber">GOLD RECOVERY</span>
+                            <span class="mod-tag portal-admin">ADMIN VERSION</span>
                         </div>
                         <h2 class="card-title">Payroll Engine & Calculations</h2>
                     </div>
@@ -755,6 +767,117 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
                         </div>
                         <div class="window-body">
                             <img src="assets/images/payroll.png" alt="Payroll System Interface" class="window-screenshot">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 6. ATS -->
+        <section id="ats" class="module-section">
+            <div class="dive-card">
+                <div class="card-header">
+                    <div>
+                        <div class="mod-meta">
+                            <span class="mod-badge">MODULE 06</span>
+                            <span class="mod-tag purple">RECRUITMENT</span>
+                            <span class="mod-tag portal-admin">ADMIN VERSION</span>
+                        </div>
+                        <h2 class="card-title">Applicant Tracking System (ATS)</h2>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <p class="mod-summary">
+                        End-to-end recruitment pipeline. Manage job postings, track candidates through custom hiring stages, evaluate with scorecards, and collaborate directly with hiring managers.
+                    </p>
+                    <div class="feature-grid">
+                        <div class="feature-item">
+                            <i class="fa-solid fa-circle-check"></i>
+                            <div>
+                                <div class="feature-title">Kanban Pipeline</div>
+                                <div class="feature-desc">Drag and drop candidates across stages visually.</div>
+                            </div>
+                        </div>
+                        <div class="feature-item">
+                            <i class="fa-solid fa-circle-check"></i>
+                            <div>
+                                <div class="feature-title">Structured Scorecards</div>
+                                <div class="feature-desc">Ensure objective hiring with customizable interview rubrics.</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 7. PERFORMANCE -->
+        <section id="performance" class="module-section">
+            <div class="dive-card">
+                <div class="card-header">
+                    <div>
+                        <div class="mod-meta">
+                            <span class="mod-badge">MODULE 07</span>
+                            <span class="mod-tag blue">LEVEL UP</span>
+                            <span class="mod-tag portal-both">BOTH (MGR & EMPLOYEES)</span>
+                        </div>
+                        <h2 class="card-title">Performance Management</h2>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <p class="mod-summary">
+                        Conduct periodic 360-degree performance reviews, track OKRs (Objectives and Key Results), and align employee goals with company-wide strategic initiatives.
+                    </p>
+                    <div class="feature-grid">
+                        <div class="feature-item">
+                            <i class="fa-solid fa-circle-check"></i>
+                            <div>
+                                <div class="feature-title">Custom Review Cycles</div>
+                                <div class="feature-desc">Set up annual, bi-annual, or quarterly review periods automatically.</div>
+                            </div>
+                        </div>
+                        <div class="feature-item">
+                            <i class="fa-solid fa-circle-check"></i>
+                            <div>
+                                <div class="feature-title">Goal Tracking</div>
+                                <div class="feature-desc">Employees set their KPIs, managers approve and score them.</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 8. ESM -->
+        <section id="esm" class="module-section">
+            <div class="dive-card">
+                <div class="card-header">
+                    <div>
+                        <div class="mod-meta">
+                            <span class="mod-badge">MODULE 10</span>
+                            <span class="mod-tag teal">SUPPORT DECK</span>
+                            <span class="mod-tag portal-employee">EMPLOYEE FACING PORTAL</span>
+                        </div>
+                        <h2 class="card-title">Platform Support (ESM)</h2>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <p class="mod-summary">
+                        An internal IT and HR helpdesk for employees to submit tickets, request equipment, and report system issues. Includes an SLA-driven ticketing system for support agents.
+                    </p>
+                    <div class="feature-grid">
+                        <div class="feature-item">
+                            <i class="fa-solid fa-circle-check"></i>
+                            <div>
+                                <div class="feature-title">Self-Service Portal</div>
+                                <div class="feature-desc">Employees can file tickets easily from their dashboard.</div>
+                            </div>
+                        </div>
+                        <div class="feature-item">
+                            <i class="fa-solid fa-circle-check"></i>
+                            <div>
+                                <div class="feature-title">SLA Timers</div>
+                                <div class="feature-desc">Priority-based countdowns to ensure prompt resolution by agents.</div>
+                            </div>
                         </div>
                     </div>
                 </div>
