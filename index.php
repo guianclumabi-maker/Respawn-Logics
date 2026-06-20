@@ -96,27 +96,23 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
         }
 
         .logo-mark {
-            width: 32px;
-            height: 32px;
+            width: 40px;
+            height: 40px;
             background: linear-gradient(135deg, var(--green), #00b8ff);
-            border-radius: 7px;
+            border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
             color: #000;
-            font-size: 0.875rem;
+            box-shadow: 0 8px 20px rgba(0, 224, 122, 0.25);
+            flex-shrink: 0;
         }
 
         .version-pill {
             font-family: var(--mono);
-            font-size: 0.625rem;
+            font-size: 0.5625rem;
             font-weight: 700;
-            letter-spacing: 0.1em;
             color: var(--green);
-            background: rgba(0,224,122,0.07);
-            border: 1px solid rgba(0,224,122,0.18);
-            padding: 2px 7px;
-            border-radius: 3px;
         }
 
         .nav-links {
