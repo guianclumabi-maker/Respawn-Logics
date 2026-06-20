@@ -5,6 +5,8 @@ import { PipelineBoard } from "./components/PipelineBoard";
 import { JobsPage } from "./components/JobsPage";
 import { CandidatesList } from "./components/CandidatesList";
 
+import { HRDirectory } from "./pages/HRDirectory";
+
 // Placeholder for unmigrated modules
 function Placeholder() {
   return <div className="p-8 text-white w-full">This module is being migrated...</div>;
@@ -30,7 +32,7 @@ export const router = createBrowserRouter([
       },
       {
         path: "hr-directory",
-        element: <Placeholder />,
+        element: <HRDirectory />,
       },
       {
         path: "payroll",

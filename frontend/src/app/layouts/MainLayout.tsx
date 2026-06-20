@@ -19,6 +19,7 @@ export default function MainLayout() {
     if (path.includes("/ats")) return { view: "Dashboard" };
     if (path.includes("/attendance")) return { view: "Attendance" };
     if (path.includes("/approvals")) return { view: "Timesheet Approvals" };
+    if (path.includes("/hr-directory")) return { view: "HR Directory" };
     return { view: "Dashboard" };
   };
 
@@ -46,6 +47,7 @@ export default function MainLayout() {
       case "Approvals": navigate("/ats/approvals"); break;
       case "Attendance": navigate("/attendance"); break;
       case "Timesheet Approvals": navigate("/attendance/approvals"); break;
+      case "HR Directory": navigate("/hr-directory"); break;
       default: navigate("/"); break; // fallback
     }
   };

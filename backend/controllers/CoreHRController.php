@@ -23,6 +23,9 @@ class CoreHRController
                 case 'master_record':
                     $this->masterRecord();
                     break;
+                case 'directory':
+                    $this->directory();
+                    break;
                 case 'update_master_record':
                     $this->updateMasterRecord($input);
                     break;
@@ -48,6 +51,20 @@ class CoreHRController
     {
         $stmt = $this->pdo->prepare("INSERT INTO `employment_history` (`tenant_id`, `user_id`, `change_type`, `job_title`, `department`, `manager_id`, `base_salary`, `effective_date`, `notes`, `recorded_by`) VALUES (?, ?, ?, ?, ?, ?, ?, CURDATE(), ?, ?)");
         $stmt->execute([$this->tenantId, $userId, $changeType, $jobTitle, $dept, $managerId, $salary, $notes, $recordedBy]);
+    }
+
+    private function directory()
+    {
+        if (!hasPermission('employees.view')) {
+            echo json_encode(['success' => false, 'error' => 'Permission denied']);
+            return;
+        }
+
+        $stmt = $this->pdo->prepare("SELECT id, full_name, email, employment_status, department, job_title, created_at FROM users WHERE tenant_id = ? ORDER BY created_at DESC");
+        $stmt->execute([$this->tenantId]);
+        $employees = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        echo json_encode(['success' => true, 'data' => $employees]);
     }
 
     private function masterRecord()

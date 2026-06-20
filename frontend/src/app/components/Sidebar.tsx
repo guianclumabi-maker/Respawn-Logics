@@ -92,7 +92,13 @@ const getSections = (hasPermission: (p: string) => boolean): NavSection[] => [
       { label: "Recruiting Copilot", view: "Recruiting Copilot", icon: <Bot size={19} />, badgeKey: "copilotAlerts" },
     ],
   }] : []),
-  // We'll hide the Admin sections from ATS since we moved them to Core Platform
+  // Administration Section
+  ...(hasPermission("users.manage") || hasPermission("shifts.manage") ? [{
+    title: "Administration",
+    items: [
+      { label: "Employee Directory", view: "HR Directory", icon: <Users size={19} /> },
+    ],
+  }] : []),
 ];
 
 // ── Badge component ────────────────────────────────────────
