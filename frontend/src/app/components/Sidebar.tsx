@@ -63,9 +63,12 @@ type NavSection = {
 // Config is now a function so we can pass useAuth checks
 const getSections = (hasPermission: (p: string) => boolean): NavSection[] => [
   {
-    title: "",
+    title: "Workspace",
     items: [
       { label: "Dashboard", view: "Dashboard", icon: <LayoutDashboard size={19} />, badgeKey: "actions" },
+      ...(hasPermission("leave.view") || hasPermission("leave.request") ? [
+        { label: "Leave Requests", view: "Leaves", icon: <Calendar size={19} /> }
+      ] : []),
     ],
   },
   ...(hasPermission("ats.edit_job") || hasPermission("ats.create_job") ? [{

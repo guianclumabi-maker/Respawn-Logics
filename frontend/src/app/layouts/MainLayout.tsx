@@ -20,6 +20,7 @@ export default function MainLayout() {
     if (path.includes("/attendance")) return { view: "Attendance" };
     if (path.includes("/approvals")) return { view: "Timesheet Approvals" };
     if (path.includes("/hr-directory")) return { view: "HR Directory" };
+    if (path.includes("/leaves")) return { view: "Leaves" };
     return { view: "Dashboard" };
   };
 
@@ -48,6 +49,7 @@ export default function MainLayout() {
       case "Attendance": navigate("/attendance"); break;
       case "Timesheet Approvals": navigate("/attendance/approvals"); break;
       case "HR Directory": navigate("/hr-directory"); break;
+      case "Leaves": navigate("/leaves"); break;
       default: navigate("/"); break; // fallback
     }
   };

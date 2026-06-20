@@ -89,6 +89,7 @@ $controllers = [
     'analytics' => 'AnalyticsController',
     'attendance' => 'AttendanceController',
     'benefits' => 'BenefitsController',
+    'leaves' => 'LeavesController',
     'candidates' => 'CandidatesController',
     'elr' => 'ELRController',
     'employee_relations' => 'EmployeeRelationsController',

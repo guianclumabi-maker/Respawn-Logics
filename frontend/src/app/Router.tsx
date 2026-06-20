@@ -6,6 +6,7 @@ import { JobsPage } from "./components/JobsPage";
 import { CandidatesList } from "./components/CandidatesList";
 
 import { HRDirectory } from "./pages/HRDirectory";
+import { LeavesDashboard } from "./pages/LeavesDashboard";
 
 // Placeholder for unmigrated modules
 function Placeholder() {
@@ -40,7 +41,7 @@ export const router = createBrowserRouter([
       },
       {
         path: "leaves",
-        element: <Placeholder />,
+        element: <LeavesDashboard />,
       },
       {
         path: "esm",
