@@ -56,6 +56,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                 'id' => $user['id'],
                 'name' => $user['full_name'],
                 'profile_image' => $user['profile_image'] ?? null,
+                'job_title' => $user['job_title'] ?? null,
                 'roles' => $roles,
                 'permissions' => $_SESSION['permissions'] ?? []
             ]
