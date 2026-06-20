@@ -175,7 +175,7 @@ function AddCandidateModal({ jobId, onClose, onSuccess }: { jobId: number; onClo
 // ─── Kanban Card ──────────────────────────────────────────────────────────────
 function KanbanCard({ app, onClick }: { app: Application; onClick: () => void }) {
   return (
-    <div draggable onDragStart={e => { e.dataTransfer.setData("application/json", JSON.stringify({ id: app.id })); e.dataTransfer.effectAllowed = "move"; }}
+    <div draggable onDragStart={e => { e.dataTransfer.setData("text/plain", app.id.toString()); e.dataTransfer.effectAllowed = "move"; }}
       onClick={onClick}
       className="bg-card border border-border rounded-xl p-3.5 cursor-grab hover:border-[#9b6dff]/40 hover:bg-purple-500/5 dark:hover:bg-[#141929] hover:shadow-[0_0_12px_rgba(155,109,255,0.08)] transition-all group">
       <div className="flex items-start justify-between mb-1.5">
@@ -220,7 +220,7 @@ function KanbanColumn({ stage, apps, onDrop, onCardClick }: {
     <div className={`bg-background/60 border border-border rounded-xl min-h-[450px] p-3 flex flex-col gap-2.5 flex-1 min-w-[220px] transition-all ${over ? "border-[#9b6dff] bg-[#9b6dff]/[0.02] shadow-[0_0_15px_rgba(155,109,255,0.08)]" : ""}`}
       onDragOver={e => { e.preventDefault(); e.dataTransfer.dropEffect = "move"; setOver(true); }}
       onDragLeave={() => setOver(false)}
-      onDrop={e => { e.preventDefault(); setOver(false); try { const d = JSON.parse(e.dataTransfer.getData("application/json")); onDrop(d.id, stage); } catch {} }}>
+      onDrop={e => { e.preventDefault(); setOver(false); try { const idStr = e.dataTransfer.getData("text/plain"); if (idStr) onDrop(parseInt(idStr, 10), stage); } catch (err) { console.error("Drop error", err); } }}>
       <div className="flex items-center justify-between px-1 py-1 border-b border-border pb-2 font-mono">
         <span className="text-[10px] font-bold text-muted-foreground tracking-wider">{`// ${label}`}</span>
         <span className="text-[9px] font-bold px-2 py-0.5 rounded bg-secondary text-[#9b6dff]">{apps.length}</span>
@@ -357,7 +357,7 @@ export function PipelineBoard({ onViewChange, jobId }: Props) {
     if (!id) return;
     setLoading(true);
     try {
-      const res = await fetch(`${API}&action=job&id=${id}`);
+      const res = await fetch(`${API}&action=job&id=${id}&t=${Date.now()}`);
       const data = await res.json();
       if (data.success) setJob(data.job);
     } catch (e) { console.error(e); }
