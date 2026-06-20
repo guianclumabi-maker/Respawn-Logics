@@ -124,10 +124,9 @@ export function Sidebar({ activeView, onViewChange, badges = {} }: SidebarProps)
   return (
     <aside
       style={{
-        width: collapsed ? 72 : 260,
-        fontFamily: "'Space Grotesk', sans-serif",
+        width: collapsed ? 72 : 280,
       }}
-      className="h-full bg-white dark:bg-[#0b0f1a] flex flex-col flex-shrink-0 border-r border-gray-200 dark:border-border transition-all duration-300 overflow-hidden select-none"
+      className="h-full bg-white dark:bg-[#0f172a] flex flex-col flex-shrink-0 border-r border-gray-200 dark:border-border transition-all duration-300 overflow-hidden select-none"
     >
       {/* ── Brand header ──────────────────────────────── */}
       <div className="flex items-center justify-between h-[70px] px-5 border-b border-gray-200 dark:border-border flex-shrink-0">
@@ -141,8 +140,13 @@ export function Sidebar({ activeView, onViewChange, badges = {} }: SidebarProps)
             </div>
             <div className="flex items-baseline gap-1.5">
               <span
-                className="font-bold text-slate-800 dark:text-foreground whitespace-nowrap tracking-[-0.5px] text-[15px]"
-                style={{ fontFamily: "'JetBrains Mono', monospace" }}
+                className="text-foreground tracking-tight"
+                style={{
+                  fontFamily: "'JetBrains Mono', monospace",
+                  fontSize: "15px",
+                  fontWeight: 700,
+                  letterSpacing: "-0.5px",
+                }}
               >
                 ATS Controller
               </span>
@@ -179,7 +183,8 @@ export function Sidebar({ activeView, onViewChange, badges = {} }: SidebarProps)
             {/* Section title */}
             {section.title && !collapsed && (
               <p
-                className="pl-3 text-[10px] font-bold text-muted-foreground dark:text-[#5e6a82] tracking-[1.5px] uppercase mb-2"
+                className="pl-[12px] text-[0.75rem] font-bold text-muted-foreground dark:text-muted-foreground tracking-[1px] uppercase mb-1.5"
+                style={{ fontFamily: "'Space Grotesk', sans-serif" }}
               >
                 {section.title}
               </p>
@@ -198,7 +203,7 @@ export function Sidebar({ activeView, onViewChange, badges = {} }: SidebarProps)
                     key={item.view}
                     onClick={() => onViewChange({ view: item.view })}
                     title={collapsed ? item.label : undefined}
-                    className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-lg border transition-all text-left group cursor-pointer ${
+                    className={`w-full flex items-center gap-3 px-[20px] py-[14px] rounded-[12px] border transition-all text-left group cursor-pointer ${
                       active
                         ? "bg-primary/10 border-primary/20 shadow-[0_0_12px_rgba(0,224,122,0.08)]"
                         : "hover:bg-gray-100 dark:hover:bg-accent hover:text-accent-foreground border-transparent"
@@ -215,8 +220,8 @@ export function Sidebar({ activeView, onViewChange, badges = {} }: SidebarProps)
                     {!collapsed && (
                       <>
                         <span
-                          className={`text-[0.85rem] font-medium flex-1 truncate ${
-                            active ? "text-primary" : "text-slate-600 dark:text-[#8b95a8] group-hover:text-slate-800 dark:group-hover:text-foreground"
+                          className={`text-[0.9rem] flex-1 truncate ${
+                            active ? "text-primary font-semibold" : "text-slate-600 dark:text-muted-foreground font-medium group-hover:text-slate-800 dark:group-hover:text-foreground"
                           }`}
                         >
                           {item.label}
