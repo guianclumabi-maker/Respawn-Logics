@@ -861,7 +861,7 @@ function App() {
       <aside className="sidebar glass">
         <div className="sidebar-brand" style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '16px' }}>
           <div style={{ width: '40px', height: '40px', flexShrink: 0, background: 'linear-gradient(135deg, #00e07a, #00b8ff)', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 8px 20px rgba(0,224,122,0.25)' }}>
-            <Gamepad2 size={20} color="#000" strokeWidth={2.2} />
+            <i className="fa-solid fa-gamepad" style={{ color: '#000', fontSize: '22px' }}></i>
           </div>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px' }}>
             <span className="brand-text" style={{ fontFamily: "'JetBrains Mono', monospace", fontWeight: 700, color: 'var(--text-primary)', fontSize: '15px', letterSpacing: '-0.5px', whiteSpace: 'nowrap' }}>Respawn Logics</span>
