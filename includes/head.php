@@ -35,9 +35,9 @@ if ($userTheme === 'system') $userTheme = 'light'; // Fallback to light if syste
     </script>
     
     <!-- Core Application CSS -->
-    <link rel="stylesheet" href="<?= url('/assets/css/styles.css?v=2.2') ?>">
-    <link rel="stylesheet" href="<?= url('/assets/css/dashboard.css?v=2.2') ?>">
-    <link rel="stylesheet" href="<?= url('/assets/css/app-nav.css?v=2.2') ?>">
+    <link rel="stylesheet" href="<?= url('/assets/css/styles.css?v=2.3') ?>">
+    <link rel="stylesheet" href="<?= url('/assets/css/dashboard.css?v=2.3') ?>">
+    <link rel="stylesheet" href="<?= url('/assets/css/app-nav.css?v=2.3') ?>">
 
     <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="<?= url('/assets/favicon.svg') ?>">

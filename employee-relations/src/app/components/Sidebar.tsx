@@ -119,7 +119,10 @@ export function Sidebar({ activeView, onViewChange }: SidebarProps) {
         {!collapsed && (
           <div className="flex items-center gap-3">
             {/* Gamepad logo icon */}
-            <div className="w-10 h-10 rounded-[10px] bg-gradient-to-br from-[#00e07a] to-[#00b8ff] flex items-center justify-center flex-shrink-0 shadow-lg shadow-[#00e07a]/20">
+            <div
+              className="w-10 h-10 bg-gradient-to-br from-[#00e07a] to-[#00b8ff] flex items-center justify-center flex-shrink-0"
+              style={{ borderRadius: '10px', boxShadow: '0 8px 20px rgba(0,224,122,0.25)' }}
+            >
               <Gamepad2 size={20} color="#000" strokeWidth={2.2} />
             </div>
             <div className="flex items-baseline gap-1.5">
