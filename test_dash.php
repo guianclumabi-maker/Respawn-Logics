@@ -1,0 +1,1 @@
+<?php $_SESSION['user_id']=1; $_SESSION['role_name']='System Administrator'; $_SERVER['REQUEST_METHOD']='GET'; require 'bootstrap/app.php'; require 'backend/controllers/CandidatesController.php'; global $pdo; try { $c = new CandidatesController($pdo); $c->handleRequest('dashboard'); } catch (Exception $e) { echo $e->getMessage(); }

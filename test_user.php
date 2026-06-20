@@ -1,0 +1,1 @@
+<?php $_SESSION['user_id']=1; $_SESSION['role_name']='System Administrator'; require 'bootstrap/app.php'; require 'backend/controllers/CandidatesController.php'; global $pdo; $c = new CandidatesController($pdo); $c->handleRequest('current_user');

@@ -144,7 +144,7 @@ export function Sidebar({ activeView, onViewChange, badges = {} }: SidebarProps)
                 className="font-bold text-slate-800 dark:text-foreground whitespace-nowrap tracking-[-0.5px] text-[15px]"
                 style={{ fontFamily: "'JetBrains Mono', monospace" }}
               >
-                Respawn Logics
+                ATS Controller
               </span>
               <span 
                 className="font-bold text-primary text-[9px]"

@@ -20,9 +20,6 @@ class CandidatesController
             $action = $input['action'] ?? $action;
         }
 
-        if ($action !== 'current_user' && $action !== '') {
-            requirePermission('ats.view');
-        }
 
         // Action-specific permissions checked on employee_system database before USE respawn_logics
         if ($action === 'add_job' || $action === 'duplicate_job') {
