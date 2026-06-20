@@ -55,12 +55,18 @@ type Job = {
   assigned_recruiter: string;
   description: string;
   requirements: string;
+  external_link: string | null;
   salary_min: number | null;
   salary_max: number | null;
   days_open: number;
   days_since_activity: number;
   formatted_date: string;
   health: PipelineHealth;
+};
+
+type Requirement = {
+  text: string;
+  type: "Mandatory" | "Optional";
 };
 
 type JobForm = {
@@ -71,7 +77,8 @@ type JobForm = {
   salary_min: string;
   salary_max: string;
   description: string;
-  requirements: string;
+  requirements: Requirement[];
+  external_link: string;
   priority: string;
   hiring_manager: string;
   assigned_recruiter: string;
@@ -95,7 +102,8 @@ const emptyJobForm: JobForm = {
   salary_min: "",
   salary_max: "",
   description: "",
-  requirements: "",
+  requirements: [],
+  external_link: "",
   priority: "Normal",
   hiring_manager: "",
   assigned_recruiter: "",
@@ -919,16 +927,72 @@ function CreateJobModal({
             />
           </div>
 
+          {/* External Link */}
+          <div>
+            <label className={labelClass}>External Job Link (e.g. JobStreet/Indeed) <span className="text-gray-500 lowercase normal-case">- Optional</span></label>
+            <input
+              value={form.external_link}
+              onChange={(e) => update("external_link", e.target.value)}
+              placeholder="https://..."
+              className={inputClass}
+            />
+          </div>
+
           {/* Requirements */}
           <div>
-            <label className={labelClass}>Requirements</label>
-            <textarea
-              value={form.requirements}
-              onChange={(e) => update("requirements", e.target.value)}
-              placeholder="Key requirements..."
-              rows={3}
-              className={`${inputClass} resize-none`}
-            />
+            <div className="flex items-center justify-between mb-2">
+              <label className={`${labelClass} mb-0`}>Requirements</label>
+              <button
+                onClick={() => update("requirements", [...form.requirements, { text: "", type: "Mandatory" }])}
+                className="flex items-center gap-1 text-[10px] font-semibold text-[#00e07a] hover:text-[#00c9b1] bg-transparent border-0 cursor-pointer"
+              >
+                <Plus size={12} /> ADD REQ
+              </button>
+            </div>
+            {form.requirements.length === 0 && (
+              <div className="text-xs text-gray-500 font-mono italic mb-2 py-2 text-center border border-dashed border-white/[0.06] rounded-lg">No requirements added.</div>
+            )}
+            <div className="space-y-2">
+              {form.requirements.map((req, index) => (
+                <div key={index} className="flex items-start gap-2">
+                  <div className="pt-2">
+                    <div className="w-3 h-3 rounded border border-gray-500 bg-transparent flex-shrink-0" />
+                  </div>
+                  <input
+                    value={req.text}
+                    onChange={(e) => {
+                      const newReqs = [...form.requirements];
+                      newReqs[index].text = e.target.value;
+                      update("requirements", newReqs);
+                    }}
+                    placeholder="Requirement description..."
+                    className={inputClass}
+                  />
+                  <select
+                    value={req.type}
+                    onChange={(e) => {
+                      const newReqs = [...form.requirements];
+                      newReqs[index].type = e.target.value as "Mandatory" | "Optional";
+                      update("requirements", newReqs);
+                    }}
+                    className={`${inputClass} w-32`}
+                  >
+                    <option value="Mandatory">Mandatory</option>
+                    <option value="Optional">Optional</option>
+                  </select>
+                  <button
+                    onClick={() => {
+                      const newReqs = [...form.requirements];
+                      newReqs.splice(index, 1);
+                      update("requirements", newReqs);
+                    }}
+                    className="p-2 text-gray-500 hover:text-red-400 bg-transparent border-0 cursor-pointer transition-colors"
+                  >
+                    <X size={14} />
+                  </button>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
 

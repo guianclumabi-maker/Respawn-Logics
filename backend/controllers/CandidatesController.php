@@ -726,8 +726,8 @@ class CandidatesController
     private function addJob($input) {
         $title = trim($input['title'] ?? '');
         if (empty($title)) { http_response_code(400); echo json_encode(['success' => false, 'error' => 'Job title is required']); exit; }
-        $stmt = $this->pdo->prepare("INSERT INTO `jobs` (`tenant_id`, `title`, `department`, `location`, `employment_type`, `salary_min`, `salary_max`, `description`, `requirements`, `status`, `priority`, `hiring_manager`, `assigned_recruiter`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-        $stmt->execute([$this->tenantId, $title, trim($input['department'] ?? ''), trim($input['location'] ?? ''), $input['employment_type'] ?? 'Full-Time', !empty($input['salary_min']) ? (float)$input['salary_min'] : null, !empty($input['salary_max']) ? (float)$input['salary_max'] : null, trim($input['description'] ?? ''), trim($input['requirements'] ?? ''), $input['status'] ?? 'Open', $input['priority'] ?? 'Normal', trim($input['hiring_manager'] ?? ''), trim($input['assigned_recruiter'] ?? '')]);
+        $stmt = $this->pdo->prepare("INSERT INTO `jobs` (`tenant_id`, `title`, `department`, `location`, `employment_type`, `salary_min`, `salary_max`, `description`, `requirements`, `status`, `priority`, `hiring_manager`, `assigned_recruiter`, `external_link`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+        $stmt->execute([$this->tenantId, $title, trim($input['department'] ?? ''), trim($input['location'] ?? ''), $input['employment_type'] ?? 'Full-Time', !empty($input['salary_min']) ? (float)$input['salary_min'] : null, !empty($input['salary_max']) ? (float)$input['salary_max'] : null, trim($input['description'] ?? ''), is_array($input['requirements'] ?? '') ? json_encode($input['requirements']) : trim($input['requirements'] ?? ''), $input['status'] ?? 'Open', $input['priority'] ?? 'Normal', trim($input['hiring_manager'] ?? ''), trim($input['assigned_recruiter'] ?? ''), trim($input['external_link'] ?? '')]);
         $jobId = (int)$this->pdo->lastInsertId();
         $this->logActivity('job_created', "Job '$title' was created", null, $jobId);
         echo json_encode(['success' => true, 'job_id' => $jobId]);
@@ -738,8 +738,11 @@ class CandidatesController
         $id = (int)($input['id'] ?? 0);
         if (!$id) { http_response_code(400); echo json_encode(['success' => false, 'error' => 'Job ID required']); exit; }
         $fields = []; $params = [];
-        foreach (['title', 'department', 'location', 'employment_type', 'description', 'requirements', 'status', 'priority', 'hiring_manager', 'assigned_recruiter'] as $f) {
-            if (isset($input[$f])) { $fields[] = "`$f` = ?"; $params[] = $input[$f]; }
+        foreach (['title', 'department', 'location', 'employment_type', 'description', 'requirements', 'status', 'priority', 'hiring_manager', 'assigned_recruiter', 'external_link'] as $f) {
+            if (isset($input[$f])) { 
+                $fields[] = "`$f` = ?"; 
+                $params[] = ($f === 'requirements' && is_array($input[$f])) ? json_encode($input[$f]) : $input[$f]; 
+            }
         }
         if (isset($input['salary_min'])) { $fields[] = "`salary_min` = ?"; $params[] = (float)$input['salary_min']; }
         if (isset($input['salary_max'])) { $fields[] = "`salary_max` = ?"; $params[] = (float)$input['salary_max']; }
@@ -757,8 +760,8 @@ class CandidatesController
         $id = (int)($input['id'] ?? 0);
         $orig = $this->pdo->prepare("SELECT * FROM `jobs` WHERE `id` = ? AND `tenant_id` = ?"); $orig->execute([$id, $this->tenantId]); $job = $orig->fetch();
         if (!$job) { echo json_encode(['success' => false, 'error' => 'Job not found']); exit; }
-        $stmt = $this->pdo->prepare("INSERT INTO `jobs` (`tenant_id`, `title`, `department`, `location`, `employment_type`, `salary_min`, `salary_max`, `description`, `requirements`, `status`, `priority`, `hiring_manager`, `assigned_recruiter`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'Draft', ?, ?, ?)");
-        $stmt->execute([$this->tenantId, $job['title'] . ' (Copy)', $job['department'], $job['location'], $job['employment_type'], $job['salary_min'], $job['salary_max'], $job['description'], $job['requirements'], $job['priority'], $job['hiring_manager'], $job['assigned_recruiter']]);
+        $stmt = $this->pdo->prepare("INSERT INTO `jobs` (`tenant_id`, `title`, `department`, `location`, `employment_type`, `salary_min`, `salary_max`, `description`, `requirements`, `status`, `priority`, `hiring_manager`, `assigned_recruiter`, `external_link`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'Draft', ?, ?, ?, ?)");
+        $stmt->execute([$this->tenantId, $job['title'] . ' (Copy)', $job['department'], $job['location'], $job['employment_type'], $job['salary_min'], $job['salary_max'], $job['description'], $job['requirements'], $job['priority'], $job['hiring_manager'], $job['assigned_recruiter'], $job['external_link']]);
         $newId = (int)$this->pdo->lastInsertId();
         $this->logActivity('job_duplicated', "Job duplicated from #{$id}", null, $newId);
         echo json_encode(['success' => true, 'job_id' => $newId]);
