@@ -25,9 +25,16 @@ if ($user) {
 <div class="app-sidebar">
     <div class="sidebar-brand">
         <div class="brand-logo-gamepad">
-            <i data-lucide="gamepad-2"></i>
+            <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="6" x2="10" y1="12" y2="12"/><line x1="8" x2="8" y1="10" y2="14"/>
+                <line x1="15" x2="15.01" y1="13" y2="13"/><line x1="18" x2="18.01" y1="11" y2="11"/>
+                <rect width="20" height="12" x="2" y="6" rx="2"/>
+            </svg>
         </div>
-        <span class="brand-text">Respawn Logics <span style="font-size: 0.65em; color: var(--accent-green); vertical-align: super; font-weight: 800;">v.2</span></span>
+        <div style="display:flex; align-items:center; gap:6px;">
+            <span class="brand-text">Respawn Logics</span>
+            <span style="font-family:'JetBrains Mono',monospace; font-size:9px; font-weight:700; color:#00e07a; background:rgba(0,224,122,0.1); padding:2px 5px; border:1px solid rgba(0,224,122,0.25); border-radius:4px; line-height:1; flex-shrink:0;">v2.0</span>
+        </div>
     </div>
     
     <div class="sidebar-menu">
