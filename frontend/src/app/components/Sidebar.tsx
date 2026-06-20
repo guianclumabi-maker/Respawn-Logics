@@ -283,7 +283,7 @@ export function Sidebar({ activeView, onViewChange, badges = {} }: SidebarProps)
                 {user ? user.name : "Admin User"}
               </div>
               <div className="text-[0.75rem] font-mono text-gray-500 uppercase tracking-wider truncate">
-                {user && user.roles.length > 0 ? user.roles.join(', ') : "Employee"}
+                {user?.job_title || (user && user.roles.length > 0 ? user.roles.join(', ') : "Employee")}
               </div>
             </div>
           </div>

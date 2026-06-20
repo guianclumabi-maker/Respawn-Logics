@@ -4,6 +4,7 @@ interface AuthUser {
   id: number;
   name: string;
   profile_image?: string;
+  job_title?: string;
   roles: string[];
   permissions: string[];
 }

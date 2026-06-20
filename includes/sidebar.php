@@ -17,9 +17,13 @@ if ($user) {
 // Generate role and department string description
 $role_desc = 'Staff';
 if ($user) {
-    $role_desc = ucfirst($user['role'] ?? 'employee');
+    if (!empty($user['job_title'])) {
+        $role_desc = $user['job_title'];
+    } else {
+        $role_desc = ucfirst($user['role'] ?? 'employee');
+    }
     if (!empty($user['department'])) {
-        $role_desc .= ' (' . $user['department'] . ')';
+        $role_desc .= ' • ' . $user['department'];
     }
 }
 ?>
