@@ -466,6 +466,7 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
             <a href="#ats" class="sidebar-item">Applicant Tracking (ATS)</a>
             <a href="#performance" class="sidebar-item">Performance Mgt</a>
             <a href="#esm" class="sidebar-item">Platform Support (ESM)</a>
+            <a href="#ai" class="sidebar-item">Respawn AI Engine</a>
         </div>
     </div>
 
@@ -877,6 +878,43 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
                             <div>
                                 <div class="feature-title">SLA Timers</div>
                                 <div class="feature-desc">Priority-based countdowns to ensure prompt resolution by agents.</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 9. AI COMPANION -->
+        <section id="ai" class="module-section">
+            <div class="dive-card">
+                <div class="card-header">
+                    <div>
+                        <div class="mod-meta">
+                            <span class="mod-badge">MODULE 12</span>
+                            <span class="mod-tag amber">AI CORE</span>
+                            <span class="mod-tag portal-both">BOTH (MGR & EMPLOYEES)</span>
+                        </div>
+                        <h2 class="card-title">Respawn AI Generation Engine</h2>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <p class="mod-summary">
+                        The embedded artificial intelligence companion. Assists employees with platform questions, drafts HR policies, generates performance review summaries, and automates repetitive workflows instantly.
+                    </p>
+                    <div class="feature-grid">
+                        <div class="feature-item">
+                            <i class="fa-solid fa-circle-check"></i>
+                            <div>
+                                <div class="feature-title">Context-Aware AI</div>
+                                <div class="feature-desc">Understands your role and permissions when answering queries.</div>
+                            </div>
+                        </div>
+                        <div class="feature-item">
+                            <i class="fa-solid fa-circle-check"></i>
+                            <div>
+                                <div class="feature-title">Smart Content Generation</div>
+                                <div class="feature-desc">Instantly drafts job descriptions, review rubrics, and incident reports.</div>
                             </div>
                         </div>
                     </div>
