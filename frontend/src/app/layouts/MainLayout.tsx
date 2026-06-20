@@ -22,6 +22,7 @@ export default function MainLayout() {
     if (path.includes("/hr-directory")) return { view: "HR Directory" };
     if (path.includes("/leaves")) return { view: "Leaves" };
     if (path.includes("/payroll")) return { view: "Payroll Engine" };
+    if (path.includes("/service-desk")) return { view: "IT / HR Service Desk" };
     return { view: "Dashboard" };
   };
 
@@ -52,6 +53,7 @@ export default function MainLayout() {
       case "HR Directory": navigate("/hr-directory"); break;
       case "Leaves": navigate("/leaves"); break;
       case "Payroll Engine": navigate("/payroll"); break;
+      case "IT / HR Service Desk": navigate("/service-desk"); break;
       default: navigate("/"); break; // fallback
     }
   };

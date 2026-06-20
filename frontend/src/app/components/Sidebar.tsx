@@ -20,6 +20,7 @@ import {
   Clock,
   Gamepad2,
   Banknote,
+  Headphones,
 } from "lucide-react";
 
 // ── Types ──────────────────────────────────────────────────
@@ -70,6 +71,7 @@ const getSections = (hasPermission: (p: string) => boolean): NavSection[] => [
       ...(hasPermission("leave.view") || hasPermission("leave.request") ? [
         { label: "Leave Requests", view: "Leaves", icon: <Calendar size={19} /> }
       ] : []),
+      { label: "IT / HR Service Desk", view: "IT / HR Service Desk", icon: <Headphones size={19} /> },
     ],
   },
   ...(hasPermission("ats.edit_job") || hasPermission("ats.create_job") ? [{

@@ -8,6 +8,7 @@ import { CandidatesList } from "./components/CandidatesList";
 import { HRDirectory } from "./pages/HRDirectory";
 import { LeavesDashboard } from "./pages/LeavesDashboard";
 import { PayrollManager } from "./pages/PayrollManager";
+import { ServiceDesk } from "./pages/ServiceDesk";
 
 // Placeholder for unmigrated modules
 function Placeholder() {
@@ -39,6 +40,10 @@ export const router = createBrowserRouter([
       {
         path: "payroll",
         element: <PayrollManager />,
+      },
+      {
+        path: "service-desk",
+        element: <ServiceDesk />,
       },
       {
         path: "leaves",
