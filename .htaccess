@@ -1,5 +1,19 @@
 AddType text/css .css
 
+# ── Security: Block debug, test, scratch, backup & log files ─────────────────
+# These files must never be publicly accessible in production (OWASP A05).
+<FilesMatch "^(debug_|scratch_|test_|scratch\.|scan_results|error\.log)">
+    Require all denied
+</FilesMatch>
+<FilesMatch "\.(bak|log|txt|sql|sh|ps1|bat)$">
+    Require all denied
+</FilesMatch>
+# Block entire directories that should never be web-accessible
+<DirectoryMatch "^.*(screenshot-temp|scratch|archive|node_modules|\.git)">
+    Require all denied
+</DirectoryMatch>
+
+# ── Cache Control for HTML ────────────────────────────────────────────────────
 <FilesMatch "\.(html|htm)$">
     <IfModule mod_headers.c>
         Header set Cache-Control "max-age=0, no-cache, no-store, must-revalidate"
@@ -8,6 +22,19 @@ AddType text/css .css
     </IfModule>
 </FilesMatch>
 
+# ── Security Headers ──────────────────────────────────────────────────────────
+<IfModule mod_headers.c>
+    # Prevent MIME-type sniffing (OWASP)
+    Header always set X-Content-Type-Options "nosniff"
+    # Prevent clickjacking
+    Header always set X-Frame-Options "SAMEORIGIN"
+    # Enable XSS filter in older browsers
+    Header always set X-XSS-Protection "1; mode=block"
+    # Only send referrer to same origin
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>
+
+# ── URL Routing ───────────────────────────────────────────────────────────────
 <IfModule mod_rewrite.c>
     RewriteEngine On
     # Silently route legacy API calls to the new Front Controller

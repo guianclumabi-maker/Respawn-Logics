@@ -94,6 +94,8 @@ if (!function_exists('loadPermissions')) {
 }
 
 require_once __DIR__ . '/../helpers/permissions.php';
+// Load CSRF helpers (csrf_token, csrf_field, csrf_verify)
+require_once __DIR__ . '/../helpers/csrf.php';
 
 if (!function_exists('isLoggedIn')) {
     function isLoggedIn() {

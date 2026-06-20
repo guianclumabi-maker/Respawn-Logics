@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/bootstrap/app.php';
+require_once __DIR__ . '/services/TotpService.php';
 
 // If already logged in normally, redirect to dashboard
 if (isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESSION['must_change_password'] !== true)) {
@@ -29,49 +30,168 @@ if ($activationToken) {
     }
 }
 
+// ── Helper: DB-based IP rate limiting ────────────────────────────────────────
+// Stores attempts server-side in MySQL — cannot be bypassed by clearing cookies.
+// OWASP A07: Identification and Authentication Failures.
+function checkLoginRateLimit(PDO $pdo, string $ip): ?string
+{
+    $maxAttempts = 5;
+    $lockSeconds = 900; // 15-minute lockout after 5 failures
+
+    $stmt = $pdo->prepare(
+        "SELECT attempt_count, locked_until FROM login_rate_limits WHERE ip_address = ?"
+    );
+    $stmt->execute([$ip]);
+    $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if ($row) {
+        // Check if currently locked
+        if ($row['locked_until'] && new DateTime() < new DateTime($row['locked_until'])) {
+            $remaining = (new DateTime($row['locked_until']))->diff(new DateTime())->i;
+            return "Too many failed attempts. Try again in {$remaining} minute(s).";
+        }
+    }
+    return null; // Not locked
+}
+
+function recordFailedAttempt(PDO $pdo, string $ip): void
+{
+    $maxAttempts = 5;
+    $lockSeconds = 900;
+
+    // INSERT new row or increment existing — atomic upsert
+    $pdo->prepare(
+        "INSERT INTO login_rate_limits (ip_address, attempt_count, last_attempt_at)
+         VALUES (?, 1, NOW())
+         ON DUPLICATE KEY UPDATE
+           attempt_count    = attempt_count + 1,
+           last_attempt_at  = NOW(),
+           locked_until     = IF(attempt_count + 1 >= ?, DATE_ADD(NOW(), INTERVAL ? SECOND), NULL)"
+    )->execute([$ip, $maxAttempts, $lockSeconds]);
+}
+
+function clearRateLimit(PDO $pdo, string $ip): void
+{
+    // Reset on successful login so legitimate users aren't permanently throttled
+    $pdo->prepare(
+        "UPDATE login_rate_limits SET attempt_count = 0, locked_until = NULL WHERE ip_address = ?"
+    )->execute([$ip]);
+}
+
 // 1. Process standard login submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'login') {
-    $email = trim($_POST['email']);
-    $password = $_POST['password'];
-    
-    // Rate Limiting
-    if (!isset($_SESSION['login_attempts'])) $_SESSION['login_attempts'] = 0;
-    if (!isset($_SESSION['last_login_attempt'])) $_SESSION['last_login_attempt'] = time();
-    
-    if ($_SESSION['login_attempts'] >= 5 && (time() - $_SESSION['last_login_attempt']) < 60) {
-        $error = 'Too many failed login attempts. Please wait 60 seconds.';
-    } else {
-        if (time() - $_SESSION['last_login_attempt'] >= 60) {
-            $_SESSION['login_attempts'] = 0;
-        }
-        $_SESSION['last_login_attempt'] = time();
 
-        if (empty($email) || empty($password)) {
-            $error = 'Please fill in all fields.';
-        } else {
-            try {
-                $stmt = $pdo->prepare("SELECT * FROM `users` WHERE `email` = ?");
-                $stmt->execute([$email]);
-                $user = $stmt->fetch();
-                
-                if ($user && !empty($user['password_hash']) && password_verify($password, $user['password_hash'])) {
-                    session_regenerate_id(true); // Prevent Session Fixation
-                    $_SESSION['login_attempts'] = 0; // Reset on success
-                    $_SESSION['user_id'] = $user['id'];
-                    $_SESSION['user_email'] = $user['email'];
-                    $_SESSION['user_name'] = $user['full_name'];
-                    $_SESSION['tenant_id'] = $user['tenant_id'];
-                    $_SESSION['theme_preference'] = $user['theme_preference'] ?? 'light';
-                    
-                    header('Location: ' . url('/pages/dashboard.php'));
+    // ── CSRF Validation ───────────────────────────────────────────────────────
+    $submittedCsrf = $_POST['csrf_token'] ?? '';
+    $sessionCsrf   = $_SESSION['csrf_token'] ?? '';
+    if (!$submittedCsrf || !$sessionCsrf || !hash_equals($sessionCsrf, $submittedCsrf)) {
+        $error = 'Security error. Please refresh and try again.';
+    } else {
+
+    $email    = trim($_POST['email']);
+    $password = $_POST['password'];
+    $clientIp = $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0';
+
+    // ── DB-based Rate Limiting ────────────────────────────────────────────────
+    $rateLimitError = null;
+    try {
+        $rateLimitError = checkLoginRateLimit($pdo, $clientIp);
+    } catch (PDOException $e) {
+        // Table may not exist yet on first deploy — gracefully fall through
+        error_log('[RateLimit] Table missing: ' . $e->getMessage());
+    }
+
+    if ($rateLimitError) {
+        $error = $rateLimitError;
+    } elseif (empty($email) || empty($password)) {
+        $error = 'Please fill in all fields.';
+    } else {
+        try {
+            $stmt = $pdo->prepare("SELECT * FROM `users` WHERE `email` = ?");
+            $stmt->execute([$email]);
+            $user = $stmt->fetch();
+
+            if ($user && !empty($user['password_hash']) && password_verify($password, $user['password_hash'])) {
+                // ── 2FA Check (if user has enrolled) ─────────────────────────
+                if (!empty($user['totp_enabled'])) {
+                    // Store verified credentials temporarily in session;
+                    // actual login session is NOT established yet.
+                    // session_regenerate_id prevents session fixation at this step.
+                    session_regenerate_id(true);
+                    $_SESSION['2fa_pending_user_id']    = $user['id'];
+                    $_SESSION['2fa_pending_user_email'] = $user['email'];
+                    header('Location: ' . url('/login.php?step=2fa'));
                     exit;
-                } else {
-                    $_SESSION['login_attempts']++;
-                    $error = 'Invalid email or password.';
                 }
-            } catch (PDOException $e) {
-                $error = 'Database error: ' . $e->getMessage();
+
+                // ── Normal Login (no 2FA) ─────────────────────────────────────
+                session_regenerate_id(true); // Prevent Session Fixation (OWASP A07)
+                try { clearRateLimit($pdo, $clientIp); } catch (PDOException $e) {}
+                $_SESSION['user_id']           = $user['id'];
+                $_SESSION['user_email']        = $user['email'];
+                $_SESSION['user_name']         = $user['full_name'];
+                $_SESSION['tenant_id']         = $user['tenant_id'];
+                $_SESSION['theme_preference']  = $user['theme_preference'] ?? 'light';
+
+                header('Location: ' . url('/pages/dashboard.php'));
+                exit;
+            } else {
+                // Record failed attempt in DB
+                try { recordFailedAttempt($pdo, $clientIp); } catch (PDOException $e) {}
+                $error = 'Invalid email or password.';
             }
+        } catch (PDOException $e) {
+            $error = 'Database error: ' . $e->getMessage();
+        }
+    }
+    } // end CSRF check
+}
+
+// 1b. Process 2FA code verification step
+$show2faStep = isset($_GET['step']) && $_GET['step'] === '2fa';
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'verify_2fa') {
+    $pendingUserId    = $_SESSION['2fa_pending_user_id']    ?? null;
+    $pendingUserEmail = $_SESSION['2fa_pending_user_email'] ?? null;
+    $totpCode         = trim($_POST['totp_code'] ?? '');
+    $clientIp         = $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0';
+
+    if (!$pendingUserId) {
+        $error = 'Session expired. Please log in again.';
+        header('Location: ' . url('/login.php'));
+        exit;
+    }
+
+    // ── CSRF Validation for 2FA step ────────────────────────────────────────
+    $submittedCsrf = $_POST['csrf_token'] ?? '';
+    $sessionCsrf   = $_SESSION['csrf_token'] ?? '';
+    if (!$submittedCsrf || !$sessionCsrf || !hash_equals($sessionCsrf, $submittedCsrf)) {
+        $error = 'Security error. Please refresh and try again.';
+    } else {
+        try {
+            // Fetch user + TOTP secret
+            $stmt = $pdo->prepare("SELECT u.*, t.secret FROM `users` u JOIN `totp_secrets` t ON t.user_id = u.id WHERE u.id = ?");
+            $stmt->execute([$pendingUserId]);
+            $user = $stmt->fetch();
+
+            if ($user && TotpService::verify($user['secret'], $totpCode)) {
+                // 2FA passed — establish full login session
+                session_regenerate_id(true);
+                try { clearRateLimit($pdo, $clientIp); } catch (PDOException $e) {}
+                unset($_SESSION['2fa_pending_user_id'], $_SESSION['2fa_pending_user_email']);
+                $_SESSION['user_id']          = $user['id'];
+                $_SESSION['user_email']       = $user['email'];
+                $_SESSION['user_name']        = $user['full_name'];
+                $_SESSION['tenant_id']        = $user['tenant_id'];
+                $_SESSION['theme_preference'] = $user['theme_preference'] ?? 'light';
+                header('Location: ' . url('/pages/dashboard.php'));
+                exit;
+            } else {
+                $error = 'Invalid authentication code. Please try again.';
+                $show2faStep = true;
+            }
+        } catch (PDOException $e) {
+            $error = 'Database error during 2FA verification.';
+            $show2faStep = true;
         }
     }
 }
@@ -198,7 +318,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                     </div>
                 <?php endif; ?>
 
+                <?php if ($show2faStep): ?>
+                <!-- ── 2FA Verification Step ────────────────────────────── -->
+                <div style="text-align:center; margin-bottom: 20px;">
+                    <i class="fa-solid fa-shield-halved" style="font-size:36px; color:#00e07a; margin-bottom:12px; display:block; filter: drop-shadow(0 0 10px rgba(0,224,122,0.4));"></i>
+                    <p style="font-family:'JetBrains Mono',monospace; font-size:12px; color:#8b95a8;">Enter the 6-digit code from your authenticator app.</p>
+                </div>
+                <form action="login.php?step=2fa" method="POST" class="onboarding-form">
+                    <?= csrf_field() ?>
+                    <input type="hidden" name="action" value="verify_2fa">
+                    <div class="form-group" style="margin-bottom: 20px;">
+                        <label for="totp-code" style="font-family:'JetBrains Mono',monospace; font-size:11px; text-transform:uppercase; letter-spacing:0.1em; color:#5e6a82; display:block; margin-bottom:8px;">// Authenticator_Code</label>
+                        <input type="text" id="totp-code" name="totp_code" maxlength="6" pattern="[0-9]{6}" inputmode="numeric" autocomplete="one-time-code" required placeholder="000000" autofocus style="width:100%; background:#0b0f1a; border:1px solid rgba(255,255,255,0.1); color:#00e07a; font-family:'JetBrains Mono',monospace; font-size:24px; letter-spacing:0.5em; text-align:center; border-radius:4px; padding:16px; outline:none; transition:border-color 0.2s;">
+                    </div>
+                    <button type="submit" class="w-full" style="background:#00e07a; color:#000; font-family:'JetBrains Mono',monospace; font-weight:700; letter-spacing:0.05em; border-radius:4px; box-shadow:0 0 20px rgba(0,224,122,0.4); border:none; padding:14px; text-transform:uppercase; cursor:pointer; transition:all 0.2s; display:flex; align-items:center; justify-content:center; gap:8px;">[ VERIFY_ ] <i class="fa-solid fa-shield-check"></i></button>
+                    <div style="text-align:center; margin-top:12px;"><a href="login.php" style="color:#5e6a82; font-family:'JetBrains Mono',monospace; font-size:11px;">← Back to Login</a></div>
+                </form>
+                <?php else: ?>
                 <form action="login.php" method="POST" class="onboarding-form">
+                    <?= csrf_field() ?>
                     <input type="hidden" name="action" value="login">
                     
                     <div class="form-group" style="margin-bottom: 20px;">
@@ -229,6 +367,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                     
 
                 </form>
+                <?php endif; ?>
             </div>
         </div>
     </div>
@@ -357,6 +496,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                 </div>
                 
                 <form id="ticket-form" class="onboarding-form">
+                    <input type="hidden" name="csrf_token" id="ticket-csrf" value="<?= htmlspecialchars(csrf_token()) ?>">
                     <div class="form-group">
                         <label for="ticket-email">Your Account Email</label>
                         <div class="input-wrapper">
@@ -519,29 +659,45 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
             }
         });
 
-        // Handle Support Ticket form submit (AJAX simulation)
+        // Handle Support Ticket form submit — real fetch() to submit_ticket.php
         if (ticketForm) {
-            ticketForm.addEventListener('submit', (e) => {
+            ticketForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
-                
-                // Set loading status on submit button
+
                 const oldContent = ticketSubmitBtn.innerHTML;
                 ticketSubmitBtn.disabled = true;
                 ticketSubmitBtn.innerHTML = '<span>Submitting...</span><i class="fa-solid fa-spinner fa-spin"></i>';
-                
-                setTimeout(() => {
-                    // Generate random ticket identifier
-                    const mockId = '#TKT-' + Math.floor(10000 + Math.random() * 90000);
-                    if (ticketIdVal) ticketIdVal.textContent = mockId;
-                    
-                    // Show confirmation view
-                    ticketFormContainer.classList.add('hidden');
-                    ticketSuccessContainer.classList.remove('hidden');
-                    
-                    // Re-enable button & restore label
+
+                const formData = new FormData();
+                formData.append('email',      document.getElementById('ticket-email').value);
+                formData.append('subject',    document.getElementById('ticket-subject').value);
+                formData.append('message',    document.getElementById('ticket-description').value);
+                // Include CSRF token from the hidden field
+                formData.append('csrf_token', document.getElementById('ticket-csrf').value);
+
+                try {
+                    const res  = await fetch('<?= url('/submit_ticket.php') ?>', {
+                        method: 'POST',
+                        body: formData,
+                        credentials: 'same-origin' // send session cookie for CSRF check
+                    });
+                    const json = await res.json();
+
+                    if (json.success) {
+                        // Show real ticket reference from server
+                        if (ticketIdVal) ticketIdVal.textContent = json.ticket_ref;
+                        ticketFormContainer.classList.add('hidden');
+                        ticketSuccessContainer.classList.remove('hidden');
+                    } else {
+                        alert('Error: ' + (json.error || 'Could not submit ticket. Please try again.'));
+                        ticketSubmitBtn.disabled = false;
+                        ticketSubmitBtn.innerHTML = oldContent;
+                    }
+                } catch (err) {
+                    alert('Network error. Please check your connection and try again.');
                     ticketSubmitBtn.disabled = false;
                     ticketSubmitBtn.innerHTML = oldContent;
-                }, 1000);
+                }
             });
         }
     </script>
