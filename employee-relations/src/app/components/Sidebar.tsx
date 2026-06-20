@@ -113,10 +113,10 @@ export function Sidebar({ activeView, onViewChange }: SidebarProps) {
       style={{
         width: collapsed ? 72 : 280,
       }}
-      className="h-full bg-white dark:bg-[#0b0f1a] border-r border-gray-200 dark:border-white/[0.06] flex flex-col flex-shrink-0 transition-all duration-300 overflow-hidden font-sans select-none"
+      className="h-full bg-white dark:bg-[#0b0f1a] flex flex-col flex-shrink-0 border-r border-gray-200 dark:border-border transition-all duration-300 overflow-hidden font-sans select-none"
     >
       {/* Brand Logo Header */}
-      <div className="flex items-center justify-between h-[70px] px-6 border-b border-gray-200 dark:border-white/[0.04] flex-shrink-0">
+      <div className="flex items-center justify-between h-[70px] px-6 border-b border-gray-200 dark:border-border flex-shrink-0">
         {!collapsed && (
           <div className="flex items-center gap-3">
             {/* Gamepad logo icon */}
@@ -128,13 +128,13 @@ export function Sidebar({ activeView, onViewChange }: SidebarProps) {
             </div>
             <div className="flex items-baseline gap-1.5">
               <span
-                className="font-bold text-slate-800 dark:text-white text-[15px] tracking-[-0.5px] whitespace-nowrap"
+                className="font-bold text-slate-800 dark:text-foreground text-[15px] tracking-[-0.5px] whitespace-nowrap"
                 style={{ fontFamily: "'JetBrains Mono', monospace" }}
               >
                 Employee Relations
               </span>
               <span
-                className="font-bold text-[#00e07a] text-[9px]"
+                className="font-bold text-primary text-[9px]"
                 style={{ fontFamily: "'JetBrains Mono', monospace" }}
               >
                 v2.0
@@ -146,7 +146,7 @@ export function Sidebar({ activeView, onViewChange }: SidebarProps) {
         {/* Toggle icon */}
         <button
           onClick={() => setCollapsed((c) => !c)}
-          className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-white/5 transition-colors text-gray-500 dark:text-gray-400 hover:text-slate-800 dark:hover:text-white cursor-pointer ml-auto"
+          className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-accent transition-colors text-muted-foreground hover:text-slate-800 dark:hover:text-foreground cursor-pointer ml-auto"
         >
           {collapsed ? <Menu size={16} /> : <Layers size={16} />}
         </button>
@@ -180,15 +180,15 @@ export function Sidebar({ activeView, onViewChange }: SidebarProps) {
                     }}
                     className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all text-left group cursor-pointer ${
                       isActive
-                        ? "bg-[#00e07a]/10 border border-[#00e07a]/20 shadow-[0_0_12px_rgba(0,224,122,0.08)]"
-                        : "hover:bg-gray-100 dark:hover:bg-white/[0.03] border border-transparent"
+                        ? "bg-primary/10 border border-primary/20 shadow-[0_0_12px_rgba(0,224,122,0.08)]"
+                        : "hover:bg-gray-100 dark:hover:bg-accent border border-transparent"
                     }`}
                   >
                     <span
                       className={`transition-colors ${
                         isActive
-                          ? "text-[#00e07a]"
-                          : "text-slate-500 dark:text-[#9ca3af] group-hover:text-slate-800 dark:group-hover:text-white"
+                          ? "text-primary"
+                          : "text-muted-foreground group-hover:text-slate-800 dark:group-hover:text-foreground"
                       }`}
                     >
                       {item.icon}
@@ -197,13 +197,13 @@ export function Sidebar({ activeView, onViewChange }: SidebarProps) {
                       <>
                         <span className={`text-[0.9rem] font-medium flex-1 transition-colors ${
                           isActive
-                            ? "text-[#00e07a]"
-                            : "text-slate-600 dark:text-[#9ca3af] group-hover:text-slate-800 dark:group-hover:text-white"
+                            ? "text-primary"
+                            : "text-muted-foreground group-hover:text-slate-800 dark:group-hover:text-foreground"
                         }`}>
                           {item.label}
                         </span>
                         {item.hasChevron && (
-                          <span className={isActive ? "text-[#00e07a]" : "text-gray-600 group-hover:text-slate-800 dark:group-hover:text-white"}>
+                          <span className={isActive ? "text-primary" : "text-muted-foreground group-hover:text-slate-800 dark:group-hover:text-foreground"}>
                             {hasChildren && isExpanded ? (
                               <ChevronDown size={14} />
                             ) : (

@@ -200,7 +200,7 @@ export function Sidebar({ activeView, onViewChange, badges = {} }: SidebarProps)
                     title={collapsed ? item.label : undefined}
                     className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-lg border transition-all text-left group cursor-pointer ${
                       active
-                        ? "bg-primary border-[#00e07a]/20 shadow-[0_0_12px_rgba(0,224,122,0.08)]"
+                        ? "bg-primary/10 border-primary/20 shadow-[0_0_12px_rgba(0,224,122,0.08)]"
                         : "hover:bg-gray-100 dark:hover:bg-accent hover:text-accent-foreground border-transparent"
                     }`}
                   >
