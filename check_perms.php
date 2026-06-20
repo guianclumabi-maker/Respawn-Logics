@@ -1,1 +1,0 @@
-<?php require_once __DIR__ . '/bootstrap/app.php'; global $pdo; $stmt = $pdo->query("SELECT permission_key FROM permissions"); var_dump($stmt->fetchAll(PDO::FETCH_COLUMN)); ?>
