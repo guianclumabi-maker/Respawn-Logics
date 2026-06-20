@@ -20,7 +20,8 @@ if ($user) {
     if (!empty($user['job_title'])) {
         $role_desc = $user['job_title'];
     } else {
-        $role_desc = ucfirst($user['role'] ?? 'employee');
+        $r = $user['role'] ?? 'employee';
+        $role_desc = (strtolower($r) === 'super_admin' || strtolower($r) === 'super admin') ? 'System Administrator' : ucfirst($r);
     }
     if (!empty($user['department'])) {
         $role_desc .= ' • ' . $user['department'];
