@@ -487,8 +487,8 @@ export function PipelineBoard({ onViewChange, jobId }: Props) {
     const totalOffers = jobs.reduce((sum, j) => sum + (j.health?.offer || 0), 0);
     
     return (
-      <div className="flex-1 flex flex-col items-center justify-start text-foreground font-mono p-6 overflow-y-auto custom-scrollbar" >
-        <div className="w-full max-w-4xl space-y-8 mt-4">
+      <div className="flex-1 flex flex-col items-center justify-start text-foreground font-mono p-6 md:p-10 overflow-y-auto custom-scrollbar" >
+        <div className="w-full space-y-8 mt-2 max-w-[1600px]">
           
           <div className="text-center">
             <div className="w-16 h-16 rounded-full bg-[#00e07a]/10 flex items-center justify-center mx-auto mb-4">
@@ -537,8 +537,7 @@ export function PipelineBoard({ onViewChange, jobId }: Props) {
                 className="w-full bg-background border border-border rounded-lg pl-12 pr-4 py-3 text-sm text-foreground placeholder-muted-foreground focus:outline-none focus:border-[#00e07a]/40 transition-colors shadow-inner"
               />
             </div>
-
-            <div className="space-y-3 w-full max-h-[50vh] overflow-y-auto pr-2 custom-scrollbar">
+            <div className="space-y-4 w-full">
               {filteredJobs.length === 0 ? (
                 <div className="text-center py-10 text-sm text-muted-foreground font-sans">No jobs match your filter.</div>
               ) : (
