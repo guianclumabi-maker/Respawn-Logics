@@ -40,8 +40,11 @@ class CoreHRController
                     $this->customFieldsDef($input);
                     break;
                 case 'upload_document':
-                    if (!hasPermission('settings.manage')) { http_response_code(403); echo json_encode(['success'=>false, 'error'=>'Denied']); return; }
+                    if (!hasPermission('settings.manage') && !hasPermission('employees.manage')) { http_response_code(403); echo json_encode(['success'=>false, 'error'=>'Denied']); return; }
                     $this->uploadDocument();
+                    break;
+                case 'download_document':
+                    $this->downloadDocument();
                     break;
                 case 'save_tenant_modules':
                     if (!hasPermission('settings.manage')) { http_response_code(403); echo json_encode(['success'=>false, 'error'=>'Denied']); return; }
@@ -123,6 +126,10 @@ class CoreHRController
         $docStmt = $this->pdo->prepare("SELECT `id`, `document_type`, `file_name`, `uploaded_by`, `uploaded_at` FROM `employee_documents` WHERE `user_id` = ? AND `tenant_id` = ? ORDER BY `uploaded_at` DESC");
         $docStmt->execute([$userId, $this->tenantId]);
         $documents = $docStmt->fetchAll();
+
+        foreach ($documents as &$doc) {
+            $doc['download_url'] = '../api/index.php?route=core_hr&action=download_document&id=' . $doc['id'];
+        }
 
         echo json_encode([
             'success' => true,
@@ -238,7 +245,7 @@ class CoreHRController
 
     private function uploadDocument()
     {
-        if (!hasPermission('settings.manage')) {
+        if (!hasPermission('settings.manage') && !hasPermission('employees.manage')) {
             http_response_code(403);
             echo json_encode(['success' => false, 'error' => 'Denied']);
             return;
@@ -248,33 +255,107 @@ class CoreHRController
         $docType = $_POST['document_type'] ?? 'General';
         
         if (isset($_FILES['document']) && $_FILES['document']['error'] === UPLOAD_ERR_OK) {
-            $uploadDir = __DIR__ . '/../../uploads/tenant_' . $this->tenantId . '/documents/';
-            if (!is_dir($uploadDir)) {
-                mkdir($uploadDir, 0777, true);
+            $file = $_FILES['document'];
+
+            // 5MB limit
+            if ($file['size'] > 5 * 1024 * 1024) {
+                echo json_encode(['success' => false, 'error' => 'File exceeds 5MB limit']);
+                return;
+            }
+
+            // MIME Check
+            $finfo = finfo_open(FILEINFO_MIME_TYPE);
+            $mime = finfo_file($finfo, $file['tmp_name']);
+            finfo_close($finfo);
+
+            $allowedMimes = [
+                'application/pdf' => 'pdf',
+                'application/msword' => 'doc',
+                'application/vnd.openxmlformats-officedocument.wordprocessingml.document' => 'docx',
+                'image/jpeg' => 'jpg',
+                'image/png' => 'png'
+            ];
+
+            if (!array_key_exists($mime, $allowedMimes)) {
+                echo json_encode(['success' => false, 'error' => 'Invalid file type']);
+                return;
+            }
+
+            $ext = $allowedMimes[$mime];
+            
+            // Storage Base
+            $storageBase = getenv('FILE_STORAGE_PATH') ?: __DIR__ . '/../../storage';
+            $storageDir = $storageBase . '/tenant_' . $this->tenantId . '/documents';
+            
+            if (!is_dir($storageDir)) {
+                mkdir($storageDir, 0755, true);
             }
             
-            $fileInfo = pathinfo($_FILES['document']['name']);
-            $ext = strtolower($fileInfo['extension']);
-            $allowed = ['pdf', 'doc', 'docx', 'jpg', 'png'];
+            $secureFilename = bin2hex(random_bytes(16)) . '.' . $ext;
+            $destPath = $storageDir . '/' . $secureFilename;
             
-            if (in_array($ext, $allowed)) {
-                $filename = 'doc_' . $userId . '_' . time() . '.' . $ext;
-                $destPath = $uploadDir . $filename;
+            if (move_uploaded_file($file['tmp_name'], $destPath)) {
+                $relativePath = 'tenant_' . $this->tenantId . '/documents/' . $secureFilename;
+                $originalName = basename($file['name']);
+
+                $stmt = $this->pdo->prepare("INSERT INTO `employee_documents` (`tenant_id`, `user_id`, `document_type`, `file_name`, `file_path`, `uploaded_by`) VALUES (?, ?, ?, ?, ?, ?)");
+                $stmt->execute([$this->tenantId, $userId, $docType, $originalName, $relativePath, $this->currentUser['full_name']]);
                 
-                if (move_uploaded_file($_FILES['document']['tmp_name'], $destPath)) {
-                    $stmt = $this->pdo->prepare("INSERT INTO `employee_documents` (`tenant_id`, `user_id`, `document_type`, `file_name`, `file_path`, `uploaded_by`) VALUES (?, ?, ?, ?, ?, ?)");
-                    $stmt->execute([$this->tenantId, $userId, $docType, $fileInfo['basename'], 'uploads/tenant_'.$this->tenantId.'/documents/'.$filename, $this->currentUser['full_name']]);
-                    
-                    echo json_encode(['success' => true]);
-                } else {
-                    echo json_encode(['success' => false, 'error' => 'Failed to save file']);
-                }
+                echo json_encode(['success' => true]);
             } else {
-                echo json_encode(['success' => false, 'error' => 'Invalid file extension']);
+                echo json_encode(['success' => false, 'error' => 'Failed to save file']);
             }
         } else {
             echo json_encode(['success' => false, 'error' => 'No file uploaded']);
         }
+    }
+
+    private function downloadDocument()
+    {
+        $id = intval($_GET['id'] ?? 0);
+        if (!$id) {
+            http_response_code(400);
+            echo "Missing ID";
+            return;
+        }
+
+        $stmt = $this->pdo->prepare("SELECT * FROM `employee_documents` WHERE `id` = ? AND `tenant_id` = ?");
+        $stmt->execute([$id, $this->tenantId]);
+        $doc = $stmt->fetch();
+
+        if (!$doc) {
+            http_response_code(404);
+            echo "Document not found";
+            return;
+        }
+
+        // Access check: User must be HR or the owner
+        $isHR = hasPermission('employees.manage') || hasPermission('settings.manage');
+        if (!$isHR && $this->currentUser['id'] !== $doc['user_id']) {
+            http_response_code(403);
+            echo "Access denied";
+            return;
+        }
+
+        $storageBase = getenv('FILE_STORAGE_PATH') ?: __DIR__ . '/../../storage';
+        $dbPath = preg_replace('/^uploads\//', '', $doc['file_path']);
+        $fullPath = rtrim($storageBase, '/') . '/' . ltrim($dbPath, '/');
+
+        if (!file_exists($fullPath)) {
+            http_response_code(404);
+            echo "File missing from storage";
+            return;
+        }
+
+        $finfo = finfo_open(FILEINFO_MIME_TYPE);
+        $mime = finfo_file($finfo, $fullPath);
+        finfo_close($finfo);
+
+        header('Content-Type: ' . $mime);
+        header('Content-Disposition: attachment; filename="' . basename($doc['file_name']) . '"');
+        header('Content-Length: ' . filesize($fullPath));
+        readfile($fullPath);
+        exit;
     }
 
     private function saveTenantModules($input)

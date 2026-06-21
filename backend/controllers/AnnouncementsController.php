@@ -31,9 +31,12 @@ class AnnouncementsController
                 case 'fetch_posts':
                     $this->fetchPosts();
                     break;
+                case 'download_attachment':
+                    $this->downloadAttachment();
+                    break;
                 case 'create_post':
                     if (!hasPermission('announcements.manage')) { http_response_code(403); echo json_encode(['success'=>false, 'error'=>'Denied']); return; }
-                $this->createPost();
+                    $this->createPost();
                     break;
                 default:
                     echo json_encode(['success' => false, 'error' => 'Unknown action']);
@@ -55,7 +58,13 @@ class AnnouncementsController
             LIMIT 50
         ");
         $stmt->execute([$this->tenantId]);
-        $posts = $stmt->fetchAll();
+        $posts = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        foreach ($posts as &$post) {
+            if (!empty($post['image_path'])) {
+                $post['image_url'] = '../api/index.php?route=announcements&action=download_attachment&id=' . $post['id'];
+            }
+        }
 
         echo json_encode(['success' => true, 'data' => $posts]);
     }
@@ -78,22 +87,30 @@ class AnnouncementsController
 
         // Handle Image Upload
         if (!empty($_FILES['image']['name'])) {
-            $uploadDir = __DIR__ . '/../../uploads/';
-            if (!is_dir($uploadDir)) {
-                mkdir($uploadDir, 0777, true);
+            $file = $_FILES['image'];
+            if ($file['size'] > 5 * 1024 * 1024) {
+                echo json_encode(['success' => false, 'error' => 'File exceeds 5MB limit']); return;
             }
-
-            $fileName = uniqid('post_') . '_' . basename($_FILES['image']['name']);
-            $targetPath = $uploadDir . $fileName;
 
             // Verify real MIME type for security
             $finfo = finfo_open(FILEINFO_MIME_TYPE);
-            $mimeType = finfo_file($finfo, $_FILES['image']['tmp_name']);
-            $allowedMimes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+            $mimeType = finfo_file($finfo, $file['tmp_name']);
+            finfo_close($finfo);
+
+            $allowedMimes = ['image/jpeg' => 'jpg', 'image/png' => 'png', 'image/gif' => 'gif', 'image/webp' => 'webp'];
             
-            if (in_array($mimeType, $allowedMimes)) {
-                if (move_uploaded_file($_FILES['image']['tmp_name'], $targetPath)) {
-                    $imagePath = $fileName;
+            if (array_key_exists($mimeType, $allowedMimes)) {
+                $storageBase = getenv('FILE_STORAGE_PATH') ?: __DIR__ . '/../../storage';
+                $storageDir = rtrim($storageBase, '/') . '/tenant_' . $this->tenantId . '/announcements';
+                if (!is_dir($storageDir)) {
+                    mkdir($storageDir, 0755, true);
+                }
+
+                $fileName = bin2hex(random_bytes(16)) . '.' . $allowedMimes[$mimeType];
+                $targetPath = $storageDir . '/' . $fileName;
+
+                if (move_uploaded_file($file['tmp_name'], $targetPath)) {
+                    $imagePath = 'tenant_' . $this->tenantId . '/announcements/' . $fileName;
                 } else {
                     echo json_encode(['success' => false, 'error' => 'Failed to upload image']);
                     return;
@@ -138,5 +155,42 @@ class AnnouncementsController
             $this->pdo->rollBack();
             echo json_encode(['success' => false, 'error' => 'Database error']);
         }
+    }
+
+    private function downloadAttachment() {
+        $id = (int)($_GET['id'] ?? 0);
+        if (!$id) { http_response_code(400); echo "Missing ID"; return; }
+
+        $stmt = $this->pdo->prepare("SELECT image_path FROM company_posts WHERE id = ? AND tenant_id = ?");
+        $stmt->execute([$id, $this->tenantId]);
+        $post = $stmt->fetch();
+
+        if (!$post || empty($post['image_path'])) {
+            http_response_code(404); echo "Attachment not found"; return;
+        }
+
+        $path = $post['image_path'];
+        $storageBase = getenv('FILE_STORAGE_PATH') ?: __DIR__ . '/../../storage';
+
+        if (strpos($path, '/') === false) {
+            // Legacy file
+            $fullPath = __DIR__ . '/../../uploads/' . ltrim($path, '/');
+        } else {
+            $fullPath = rtrim($storageBase, '/') . '/' . ltrim($path, '/');
+        }
+
+        if (!file_exists($fullPath)) {
+            http_response_code(404); echo "File not found"; return;
+        }
+
+        $finfo = finfo_open(FILEINFO_MIME_TYPE);
+        $mime = finfo_file($finfo, $fullPath);
+        finfo_close($finfo);
+
+        header('Content-Type: ' . $mime);
+        header('Content-Disposition: inline; filename="' . basename($fullPath) . '"');
+        header('Content-Length: ' . filesize($fullPath));
+        readfile($fullPath);
+        exit;
     }
 }

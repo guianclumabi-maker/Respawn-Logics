@@ -107,8 +107,23 @@ class ESMController
                 case 'add_comment':
                     $this->addComment($input);
                     break;
-
+                case 'download_attachment':
+                    $this->downloadAttachment();
+                    break;
                 case 'agent_queue':
+                    if (!$this->isAgent()) { echo json_encode(['success' => false, 'error' => 'Denied']); return; }
+                    $stmt = $this->pdo->prepare("
+                        SELECT st.*, tt.name as type_name, tm.name as team_name, u.full_name as employee_name
+                        FROM `service_tickets` st
+                        JOIN `service_ticket_types` tt ON st.ticket_type_id = tt.id
+                        JOIN `users` u ON st.employee_id = u.id
+                        WHERE st.tenant_id = ?
+                        ORDER BY st.id DESC
+                    ");
+                    $stmt->execute([$this->tenantId]);
+                    echo json_encode(['success' => true, 'data' => $stmt->fetchAll()]);
+                    break;
+                case 'update_ticket':
                     if (!$this->isAgent()) { echo json_encode(['success' => false, 'error' => 'Denied']); return; }
                     $stmt = $this->pdo->prepare("
                         SELECT st.*, tt.name as type_name, tm.name as team_name, u.full_name as employee_name
@@ -224,6 +239,9 @@ class ESMController
             if ($c['comment_type'] === 'Internal' && !$this->isAgent()) {
                 continue; 
             }
+            if ($c['attachment_url']) {
+                $c['attachment_url'] = '../api/index.php?route=esm&action=download_attachment&id=' . $c['id'];
+            }
             $comments[] = $c;
         }
 
@@ -247,12 +265,34 @@ class ESMController
 
         $attachmentUrl = null;
         if (isset($_FILES['attachment']) && $_FILES['attachment']['error'] === UPLOAD_ERR_OK) {
-            $uploadDir = __DIR__ . '/../../uploads/tickets/';
-            if (!is_dir($uploadDir)) mkdir($uploadDir, 0777, true);
-            $filename = time() . '_' . preg_replace('/[^a-zA-Z0-9.\-_]/', '', basename($_FILES['attachment']['name']));
-            $dest = $uploadDir . $filename;
-            if (move_uploaded_file($_FILES['attachment']['tmp_name'], $dest)) {
-                $attachmentUrl = '/uploads/tickets/' . $filename;
+            $file = $_FILES['attachment'];
+            if ($file['size'] > 5 * 1024 * 1024) {
+                echo json_encode(['success' => false, 'error' => 'File exceeds 5MB limit']); return;
+            }
+            $finfo = finfo_open(FILEINFO_MIME_TYPE);
+            $mime = finfo_file($finfo, $file['tmp_name']);
+            finfo_close($finfo);
+
+            $allowedMimes = [
+                'application/pdf' => 'pdf',
+                'image/jpeg' => 'jpg',
+                'image/png' => 'png',
+                'application/msword' => 'doc',
+                'application/vnd.openxmlformats-officedocument.wordprocessingml.document' => 'docx'
+            ];
+            if (!array_key_exists($mime, $allowedMimes)) {
+                echo json_encode(['success' => false, 'error' => 'Invalid file type']); return;
+            }
+
+            $storageBase = getenv('FILE_STORAGE_PATH') ?: __DIR__ . '/../../storage';
+            $storageDir = $storageBase . '/tenant_' . $this->tenantId . '/tickets';
+            if (!is_dir($storageDir)) mkdir($storageDir, 0755, true);
+
+            $filename = bin2hex(random_bytes(16)) . '.' . $allowedMimes[$mime];
+            $dest = $storageDir . '/' . $filename;
+
+            if (move_uploaded_file($file['tmp_name'], $dest)) {
+                $attachmentUrl = 'tenant_' . $this->tenantId . '/tickets/' . $filename;
             }
         }
 
@@ -295,5 +335,49 @@ class ESMController
         }
 
         echo json_encode(['success' => true]);
+    }
+
+    private function downloadAttachment()
+    {
+        $id = intval($_GET['id'] ?? 0);
+        if (!$id) { http_response_code(400); echo "Missing ID"; return; }
+
+        $stmt = $this->pdo->prepare("
+            SELECT tc.attachment_url, st.employee_id, st.is_confidential 
+            FROM `ticket_comments` tc
+            JOIN `service_tickets` st ON tc.ticket_id = st.id
+            WHERE tc.id = ? AND st.tenant_id = ?
+        ");
+        $stmt->execute([$id, $this->tenantId]);
+        $comment = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if (!$comment || empty($comment['attachment_url'])) {
+            http_response_code(404); echo "Attachment not found"; return;
+        }
+
+        if (!$this->isAgent() && $comment['is_confidential'] == 1 && $comment['employee_id'] !== $this->currentUser['id']) {
+            http_response_code(403); echo "Denied - Confidential Case"; return;
+        }
+        if ($comment['employee_id'] !== $this->currentUser['id'] && !$this->isAgent()) {
+            http_response_code(403); echo "Access denied"; return;
+        }
+
+        $storageBase = getenv('FILE_STORAGE_PATH') ?: __DIR__ . '/../../storage';
+        $dbPath = preg_replace('/^\/?uploads\/tickets\//', '', $comment['attachment_url']);
+        $fullPath = rtrim($storageBase, '/') . '/' . ltrim($dbPath, '/');
+
+        if (!file_exists($fullPath)) {
+            http_response_code(404); echo "File missing from storage"; return;
+        }
+
+        $finfo = finfo_open(FILEINFO_MIME_TYPE);
+        $mime = finfo_file($finfo, $fullPath);
+        finfo_close($finfo);
+
+        header('Content-Type: ' . $mime);
+        header('Content-Disposition: inline; filename="attachment_' . $id . '"');
+        header('Content-Length: ' . filesize($fullPath));
+        readfile($fullPath);
+        exit;
     }
 }

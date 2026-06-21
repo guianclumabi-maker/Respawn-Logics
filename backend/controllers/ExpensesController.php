@@ -49,6 +49,10 @@ class ExpensesController
                     $this->getMyClaims();
                     break;
 
+                case 'download_receipt':
+                    $this->downloadReceipt();
+                    break;
+
                 case 'submit_claim':
                     $this->submitClaim($input);
                     break;
@@ -92,7 +96,13 @@ class ExpensesController
             ORDER BY ec.id DESC
         ");
         $stmt->execute([$this->currentUser['id'], $this->tenantId]);
-        echo json_encode(['success' => true, 'data' => $stmt->fetchAll()]);
+        $claims = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        foreach ($claims as &$c) {
+            if ($c['receipt_path']) {
+                $c['receipt_url'] = '../api/index.php?route=expenses&action=download_receipt&id=' . $c['id'];
+            }
+        }
+        echo json_encode(['success' => true, 'data' => $claims]);
     }
 
     private function submitClaim($input)
@@ -109,16 +119,42 @@ class ExpensesController
 
         // File Upload Handling
         $receiptPath = null;
-        if (isset($_FILES['receipt']) && $_FILES['receipt']['error'] == 0) {
-            $uploadDir = __DIR__ . '/../../uploads/receipts/';
-            if (!is_dir($uploadDir)) mkdir($uploadDir, 0777, true);
+        if (isset($_FILES['receipt']) && $_FILES['receipt']['error'] == UPLOAD_ERR_OK) {
+            $file = $_FILES['receipt'];
+
+            if ($file['size'] > 5 * 1024 * 1024) {
+                echo json_encode(['success' => false, 'error' => 'File exceeds 5MB limit']);
+                return;
+            }
+
+            $finfo = finfo_open(FILEINFO_MIME_TYPE);
+            $mime = finfo_file($finfo, $file['tmp_name']);
+            finfo_close($finfo);
+
+            $allowedMimes = [
+                'application/pdf' => 'pdf',
+                'image/jpeg' => 'jpg',
+                'image/png' => 'png'
+            ];
+
+            if (!array_key_exists($mime, $allowedMimes)) {
+                echo json_encode(['success' => false, 'error' => 'Invalid file type. Only PDF, JPG, PNG allowed.']);
+                return;
+            }
+
+            $ext = $allowedMimes[$mime];
+
+            $storageBase = getenv('FILE_STORAGE_PATH') ?: __DIR__ . '/../../storage';
+            $storageDir = $storageBase . '/tenant_' . $this->tenantId . '/receipts';
+            if (!is_dir($storageDir)) {
+                mkdir($storageDir, 0755, true);
+            }
             
-            $ext = pathinfo($_FILES['receipt']['name'], PATHINFO_EXTENSION);
-            $fileName = 'receipt_' . uniqid() . '.' . $ext;
-            $dest = $uploadDir . $fileName;
+            $fileName = bin2hex(random_bytes(16)) . '.' . $ext;
+            $dest = $storageDir . '/' . $fileName;
             
-            if (move_uploaded_file($_FILES['receipt']['tmp_name'], $dest)) {
-                $receiptPath = '/uploads/receipts/' . $fileName;
+            if (move_uploaded_file($file['tmp_name'], $dest)) {
+                $receiptPath = 'tenant_' . $this->tenantId . '/receipts/' . $fileName;
             }
         }
 
@@ -140,7 +176,13 @@ class ExpensesController
             ORDER BY ec.id ASC
         ");
         $stmt->execute([$this->currentUser['id'], $this->tenantId]);
-        echo json_encode(['success' => true, 'data' => $stmt->fetchAll()]);
+        $claims = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        foreach ($claims as &$c) {
+            if ($c['receipt_path']) {
+                $c['receipt_url'] = '../api/index.php?route=expenses&action=download_receipt&id=' . $c['id'];
+            }
+        }
+        echo json_encode(['success' => true, 'data' => $claims]);
     }
 
     private function getFinancePending()
@@ -156,7 +198,13 @@ class ExpensesController
             ORDER BY ec.id ASC
         ");
         $stmt->execute([$this->tenantId]);
-        echo json_encode(['success' => true, 'data' => $stmt->fetchAll()]);
+        $claims = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        foreach ($claims as &$c) {
+            if ($c['receipt_path']) {
+                $c['receipt_url'] = '../api/index.php?route=expenses&action=download_receipt&id=' . $c['id'];
+            }
+        }
+        echo json_encode(['success' => true, 'data' => $claims]);
     }
 
     private function approveClaim($input)
@@ -205,5 +253,58 @@ class ExpensesController
         $astmt->execute([$claimId, $this->currentUser['id'], $auditAction, $comments]);
 
         echo json_encode(['success' => true]);
+    }
+
+    private function downloadReceipt()
+    {
+        $id = intval($_GET['id'] ?? 0);
+        if (!$id) { http_response_code(400); echo "Missing ID"; return; }
+
+        $stmt = $this->pdo->prepare("SELECT `employee_id`, `receipt_path` FROM `expense_claims` WHERE `id` = ? AND `tenant_id` = ?");
+        $stmt->execute([$id, $this->tenantId]);
+        $claim = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if (!$claim || empty($claim['receipt_path'])) {
+            http_response_code(404);
+            echo "Receipt not found";
+            return;
+        }
+
+        // Access check: User must be Finance, the Manager of the employee, or the owner
+        $isOwner = ($this->currentUser['id'] === $claim['employee_id']);
+        $isFinance = $this->isFinanceOrHR();
+        $isManagerOf = false;
+
+        if (!$isOwner && !$isFinance) {
+            $mgrStmt = $this->pdo->prepare("SELECT COUNT(*) FROM `users` WHERE `id` = ? AND `manager_id` = ? AND `tenant_id` = ?");
+            $mgrStmt->execute([$claim['employee_id'], $this->currentUser['id'], $this->tenantId]);
+            $isManagerOf = ($mgrStmt->fetchColumn() > 0);
+        }
+
+        if (!$isOwner && !$isFinance && !$isManagerOf) {
+            http_response_code(403);
+            echo "Access denied";
+            return;
+        }
+
+        $storageBase = getenv('FILE_STORAGE_PATH') ?: __DIR__ . '/../../storage';
+        $dbPath = preg_replace('/^\/?uploads\/receipts\//', '', $claim['receipt_path']);
+        $fullPath = rtrim($storageBase, '/') . '/' . ltrim($dbPath, '/');
+
+        if (!file_exists($fullPath)) {
+            http_response_code(404);
+            echo "File missing from storage";
+            return;
+        }
+
+        $finfo = finfo_open(FILEINFO_MIME_TYPE);
+        $mime = finfo_file($finfo, $fullPath);
+        finfo_close($finfo);
+
+        header('Content-Type: ' . $mime);
+        header('Content-Disposition: inline; filename="receipt_' . $id . '"');
+        header('Content-Length: ' . filesize($fullPath));
+        readfile($fullPath);
+        exit;
     }
 }

@@ -53,6 +53,9 @@ class ESMSupportController
                 case 'ticket_details':
                     $this->getDetails();
                     break;
+                case 'download_attachment':
+                    $this->downloadAttachment();
+                    break;
                 case 'add_comment':
                     $this->addComment($input);
                     break;
@@ -238,6 +241,20 @@ class ESMSupportController
             }));
         }
 
+        foreach ($comments as &$c) {
+            if (!empty($c['attachments'])) {
+                $atts = json_decode($c['attachments'], true);
+                if (is_array($atts)) {
+                    foreach ($atts as &$a) {
+                        if (isset($a['url'])) {
+                            $a['url'] = '../api/index.php?route=esm_support&action=download_attachment&ticket_id=' . $id . '&path=' . urlencode($a['url']);
+                        }
+                    }
+                    $c['attachments'] = json_encode($atts);
+                }
+            }
+        }
+
         echo json_encode(['success' => true, 'data' => ['ticket' => $ticket, 'comments' => $comments]]);
     }
 
@@ -399,14 +416,74 @@ class ESMSupportController
     private function uploadAttachment() {
         if (!isset($_FILES['attachment'])) { http_response_code(400); echo json_encode(['success' => false, 'error' => 'No file uploaded']); return; }
         $file = $_FILES['attachment'];
-        $ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
-        $uploadDir = __DIR__ . '/../../uploads/esm_tickets/';
-        if (!is_dir($uploadDir)) { mkdir($uploadDir, 0755, true); }
-        $filename = uniqid('esm_') . '.' . $ext;
-        if (move_uploaded_file($file['tmp_name'], $uploadDir . $filename)) {
-            echo json_encode(['success' => true, 'url' => '/uploads/esm_tickets/' . $filename, 'name' => basename($file['name'])]);
+
+        if ($file['size'] > 5 * 1024 * 1024) {
+            echo json_encode(['success' => false, 'error' => 'File exceeds 5MB limit']); return;
+        }
+
+        $finfo = finfo_open(FILEINFO_MIME_TYPE);
+        $mime = finfo_file($finfo, $file['tmp_name']);
+        finfo_close($finfo);
+
+        $allowedMimes = [
+            'application/pdf' => 'pdf',
+            'image/jpeg' => 'jpg',
+            'image/png' => 'png',
+            'application/msword' => 'doc',
+            'application/vnd.openxmlformats-officedocument.wordprocessingml.document' => 'docx'
+        ];
+        if (!array_key_exists($mime, $allowedMimes)) {
+            echo json_encode(['success' => false, 'error' => 'Invalid file type']); return;
+        }
+
+        $storageBase = getenv('FILE_STORAGE_PATH') ?: __DIR__ . '/../../storage';
+        $storageDir = rtrim($storageBase, '/') . '/tenant_' . $this->tenantId . '/esm_tickets';
+        if (!is_dir($storageDir)) { mkdir($storageDir, 0755, true); }
+        
+        $filename = bin2hex(random_bytes(16)) . '.' . $allowedMimes[$mime];
+        
+        if (move_uploaded_file($file['tmp_name'], $storageDir . '/' . $filename)) {
+            $url = 'tenant_' . $this->tenantId . '/esm_tickets/' . $filename;
+            echo json_encode(['success' => true, 'url' => $url, 'name' => basename($file['name'])]);
         } else {
             http_response_code(500); echo json_encode(['success' => false, 'error' => 'Failed to move uploaded file']);
         }
+    }
+
+    private function downloadAttachment() {
+        $ticketId = (int)($_GET['ticket_id'] ?? 0);
+        $path = $_GET['path'] ?? '';
+        if (!$ticketId || !$path || strpos($path, '..') !== false) {
+            http_response_code(400); echo "Invalid request"; return;
+        }
+
+        if ($this->isESMAgent()) {
+            $stmt = $this->pdo->prepare("SELECT id FROM `esm_tickets` WHERE id = ? AND tenant_id = ?");
+            $stmt->execute([$ticketId, $this->tenantId]);
+        } else {
+            $stmt = $this->pdo->prepare("SELECT id FROM `esm_tickets` WHERE id = ? AND tenant_id = ? AND created_by = ?");
+            $stmt->execute([$ticketId, $this->tenantId, $this->currentUser['id']]);
+        }
+        if (!$stmt->fetch()) {
+            http_response_code(403); echo "Access denied to ticket"; return;
+        }
+
+        $storageBase = getenv('FILE_STORAGE_PATH') ?: __DIR__ . '/../../storage';
+        $dbPath = preg_replace('/^\/?uploads\//', '', $path);
+        $fullPath = rtrim($storageBase, '/') . '/' . ltrim($dbPath, '/');
+
+        if (!file_exists($fullPath)) {
+            http_response_code(404); echo "File not found"; return;
+        }
+
+        $finfo = finfo_open(FILEINFO_MIME_TYPE);
+        $mime = finfo_file($finfo, $fullPath);
+        finfo_close($finfo);
+
+        header('Content-Type: ' . $mime);
+        header('Content-Disposition: inline; filename="' . basename($fullPath) . '"');
+        header('Content-Length: ' . filesize($fullPath));
+        readfile($fullPath);
+        exit;
     }
 }

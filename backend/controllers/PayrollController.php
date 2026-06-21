@@ -148,7 +148,7 @@ class PayrollController
                         $emps = $empStmt->fetchAll();
 
                         foreach ($emps as $e) {
-                            $pdfPath = "uploads/tenant_{$this->tenantId}/payslips/run_{$runId}_emp_{$e['employee_id']}.pdf";
+                            $pdfPath = "tenant_{$this->tenantId}/payslips/run_{$runId}_emp_{$e['employee_id']}.pdf";
                             
                             try {
                                 $psStmt = $this->pdo->prepare("INSERT INTO `payroll_payslips` (`tenant_id`, `payroll_run_id`, `employee_id`, `pdf_path`) VALUES (?, ?, ?, ?)");
@@ -171,7 +171,11 @@ class PayrollController
                         ORDER BY pr.pay_date DESC
                     ");
                     $stmt->execute([$this->currentUser['id'], $this->tenantId]);
-                    echo json_encode(['success' => true, 'data' => $stmt->fetchAll()]);
+                    $payslips = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                    foreach ($payslips as &$ps) {
+                        $ps['download_url'] = '../api/index.php?route=payroll&action=download_payslip&id=' . $ps['id'];
+                    }
+                    echo json_encode(['success' => true, 'data' => $payslips]);
                     break;
 
                 case 'dashboard_kpis':
@@ -340,7 +344,11 @@ class PayrollController
                         ORDER BY pp.id DESC
                     ");
                     $stmt->execute([$this->tenantId]);
-                    echo json_encode(['success' => true, 'data' => $stmt->fetchAll(PDO::FETCH_ASSOC)]);
+                    $payslips = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                    foreach ($payslips as &$ps) {
+                        $ps['download_url'] = '../api/index.php?route=payroll&action=download_payslip&id=' . $ps['id'];
+                    }
+                    echo json_encode(['success' => true, 'data' => $payslips]);
                     break;
 
                 case 'payslip_details':
@@ -381,5 +389,43 @@ class PayrollController
         } catch (\Exception $e) {
             echo json_encode(['success' => false, 'error' => 'Database error']);
         }
+    }
+
+    private function downloadPayslip() {
+        $id = intval($_GET['id'] ?? 0);
+        if (!$id) { http_response_code(400); echo "Missing ID"; return; }
+
+        $stmt = $this->pdo->prepare("SELECT `employee_id`, `pdf_path` FROM `payroll_payslips` WHERE `id` = ? AND `tenant_id` = ?");
+        $stmt->execute([$id, $this->tenantId]);
+        $ps = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if (!$ps) { http_response_code(404); echo "Payslip not found"; return; }
+
+        $isPayrollManager = $this->canManagePayroll();
+        if (!$isPayrollManager && $this->currentUser['id'] !== $ps['employee_id']) {
+            http_response_code(403);
+            echo "Access denied";
+            return;
+        }
+
+        $storageBase = getenv('FILE_STORAGE_PATH') ?: __DIR__ . '/../../storage';
+        $dbPath = preg_replace('/^uploads\//', '', $ps['pdf_path']);
+        $fullPath = rtrim($storageBase, '/') . '/' . ltrim($dbPath, '/');
+
+        if (!file_exists($fullPath)) {
+            http_response_code(404);
+            echo "Payslip PDF not generated yet.";
+            return;
+        }
+
+        $finfo = finfo_open(FILEINFO_MIME_TYPE);
+        $mime = finfo_file($finfo, $fullPath);
+        finfo_close($finfo);
+
+        header('Content-Type: ' . $mime);
+        header('Content-Disposition: attachment; filename="Payslip_' . $id . '.pdf"');
+        header('Content-Length: ' . filesize($fullPath));
+        readfile($fullPath);
+        exit;
     }
 }
