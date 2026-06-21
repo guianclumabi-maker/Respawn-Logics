@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/../utils/Storage.php';
 
 class ExpensesController
 {
@@ -144,8 +145,8 @@ class ExpensesController
 
             $ext = $allowedMimes[$mime];
 
-            $storageBase = getenv('FILE_STORAGE_PATH') ?: __DIR__ . '/../../storage';
-            $storageDir = $storageBase . '/tenant_' . $this->tenantId . '/receipts';
+            $storageBase = \App\Utils\Storage::resolveStorageBase(false, true);
+            $storageDir = rtrim($storageBase, '/') . '/tenant_' . $this->tenantId . '/receipts';
             if (!is_dir($storageDir)) {
                 mkdir($storageDir, 0755, true);
             }
@@ -287,7 +288,7 @@ class ExpensesController
             return;
         }
 
-        $storageBase = getenv('FILE_STORAGE_PATH') ?: __DIR__ . '/../../storage';
+        $storageBase = \App\Utils\Storage::resolveStorageBase(false, false);
         $dbPath = preg_replace('/^\/?uploads\/receipts\//', '', $claim['receipt_path']);
         $fullPath = rtrim($storageBase, '/') . '/' . ltrim($dbPath, '/');
 

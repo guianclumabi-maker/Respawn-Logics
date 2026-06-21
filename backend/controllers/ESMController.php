@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/../utils/Storage.php';
 
 class ESMController
 {
@@ -284,8 +285,8 @@ class ESMController
                 echo json_encode(['success' => false, 'error' => 'Invalid file type']); return;
             }
 
-            $storageBase = getenv('FILE_STORAGE_PATH') ?: __DIR__ . '/../../storage';
-            $storageDir = $storageBase . '/tenant_' . $this->tenantId . '/tickets';
+            $storageBase = \App\Utils\Storage::resolveStorageBase(false, true);
+            $storageDir = rtrim($storageBase, '/') . '/tenant_' . $this->tenantId . '/tickets';
             if (!is_dir($storageDir)) mkdir($storageDir, 0755, true);
 
             $filename = bin2hex(random_bytes(16)) . '.' . $allowedMimes[$mime];
@@ -362,7 +363,7 @@ class ESMController
             http_response_code(403); echo "Access denied"; return;
         }
 
-        $storageBase = getenv('FILE_STORAGE_PATH') ?: __DIR__ . '/../../storage';
+        $storageBase = \App\Utils\Storage::resolveStorageBase(false, false);
         $dbPath = preg_replace('/^\/?uploads\/tickets\//', '', $comment['attachment_url']);
         $fullPath = rtrim($storageBase, '/') . '/' . ltrim($dbPath, '/');
 

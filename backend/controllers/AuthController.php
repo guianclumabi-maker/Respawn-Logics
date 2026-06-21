@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/../utils/Storage.php';
 
 class AuthController
 {
@@ -67,6 +68,11 @@ class AuthController
         }
 
         if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+            if ($action === 'download_avatar') {
+                $this->downloadAvatar();
+                return;
+            }
+
             if ($action === 'me') {
                 if (isLoggedIn()) {
                     echo json_encode([
@@ -90,5 +96,36 @@ class AuthController
 
         http_response_code(400);
         echo json_encode(['success' => false, 'error' => 'Invalid auth action']);
+    }
+
+    private function downloadAvatar() {
+        if (!isLoggedIn()) { http_response_code(401); echo "Unauthorized"; return; }
+        $file = $_GET['file'] ?? '';
+        // Only allow basic filenames, no traversal
+        if (!$file || !preg_match('/^[a-zA-Z0-9.\-_]+$/', $file)) {
+            http_response_code(400); echo "Invalid file"; return;
+        }
+
+        $storageBase = \App\Utils\Storage::resolveStorageBase(false, false);
+        
+        // Legacy check: did we migrate it yet? If not, it might still be in uploads/
+        $legacyPath = __DIR__ . '/../../uploads/' . $file;
+        $securePath = rtrim($storageBase, '/') . '/avatars/' . $file;
+
+        $fullPath = file_exists($securePath) ? $securePath : $legacyPath;
+
+        if (!file_exists($fullPath)) {
+            // Serve a default placeholder or 404
+            http_response_code(404); echo "Avatar not found"; return;
+        }
+
+        $finfo = finfo_open(FILEINFO_MIME_TYPE);
+        $mime = finfo_file($finfo, $fullPath);
+        finfo_close($finfo);
+
+        header('Content-Type: ' . $mime);
+        header('Content-Length: ' . filesize($fullPath));
+        readfile($fullPath);
+        exit;
     }
 }

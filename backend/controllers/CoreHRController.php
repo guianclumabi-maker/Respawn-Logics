@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/../utils/Storage.php';
 
 class CoreHRController
 {
@@ -284,8 +285,8 @@ class CoreHRController
             $ext = $allowedMimes[$mime];
             
             // Storage Base
-            $storageBase = getenv('FILE_STORAGE_PATH') ?: __DIR__ . '/../../storage';
-            $storageDir = $storageBase . '/tenant_' . $this->tenantId . '/documents';
+            $storageBase = \App\Utils\Storage::resolveStorageBase(false, true);
+            $storageDir = rtrim($storageBase, '/') . '/tenant_' . $this->tenantId . '/documents';
             
             if (!is_dir($storageDir)) {
                 mkdir($storageDir, 0755, true);
@@ -337,7 +338,7 @@ class CoreHRController
             return;
         }
 
-        $storageBase = getenv('FILE_STORAGE_PATH') ?: __DIR__ . '/../../storage';
+        $storageBase = \App\Utils\Storage::resolveStorageBase(false, false);
         $dbPath = preg_replace('/^uploads\//', '', $doc['file_path']);
         $fullPath = rtrim($storageBase, '/') . '/' . ltrim($dbPath, '/');
 

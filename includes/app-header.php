@@ -176,7 +176,7 @@ if ($user) {
 
         <div class="header-profile-pill" id="profilePillTrigger">
             <?php if (!empty($profile_image)): ?>
-                <img class="header-profile-avatar" src="<?= url('/uploads/' . htmlspecialchars($profile_image)) ?>" alt="Avatar">
+                <img class="header-profile-avatar" src="<?= url('/api/index.php?route=auth&action=download_avatar&file=' . htmlspecialchars($profile_image)) ?>" alt="Avatar">
             <?php else: ?>
                 <div class="header-profile-avatar"><?= $initials ?></div>
             <?php endif; ?>

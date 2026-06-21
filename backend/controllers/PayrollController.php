@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/../utils/Storage.php';
 
 class PayrollController
 {
@@ -408,7 +409,7 @@ class PayrollController
             return;
         }
 
-        $storageBase = getenv('FILE_STORAGE_PATH') ?: __DIR__ . '/../../storage';
+        $storageBase = \App\Utils\Storage::resolveStorageBase(false, false);
         $dbPath = preg_replace('/^uploads\//', '', $ps['pdf_path']);
         $fullPath = rtrim($storageBase, '/') . '/' . ltrim($dbPath, '/');
 

@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/../utils/Storage.php';
 
 class AnnouncementsController
 {
@@ -100,7 +101,7 @@ class AnnouncementsController
             $allowedMimes = ['image/jpeg' => 'jpg', 'image/png' => 'png', 'image/gif' => 'gif', 'image/webp' => 'webp'];
             
             if (array_key_exists($mimeType, $allowedMimes)) {
-                $storageBase = getenv('FILE_STORAGE_PATH') ?: __DIR__ . '/../../storage';
+                $storageBase = \App\Utils\Storage::resolveStorageBase(false, true);
                 $storageDir = rtrim($storageBase, '/') . '/tenant_' . $this->tenantId . '/announcements';
                 if (!is_dir($storageDir)) {
                     mkdir($storageDir, 0755, true);
@@ -170,7 +171,7 @@ class AnnouncementsController
         }
 
         $path = $post['image_path'];
-        $storageBase = getenv('FILE_STORAGE_PATH') ?: __DIR__ . '/../../storage';
+        $storageBase = \App\Utils\Storage::resolveStorageBase(false, false);
 
         if (strpos($path, '/') === false) {
             // Legacy file

@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/../utils/Storage.php';
 
 class ESMSupportController
 {
@@ -436,7 +437,7 @@ class ESMSupportController
             echo json_encode(['success' => false, 'error' => 'Invalid file type']); return;
         }
 
-        $storageBase = getenv('FILE_STORAGE_PATH') ?: __DIR__ . '/../../storage';
+        $storageBase = \App\Utils\Storage::resolveStorageBase(false, true);
         $storageDir = rtrim($storageBase, '/') . '/tenant_' . $this->tenantId . '/esm_tickets';
         if (!is_dir($storageDir)) { mkdir($storageDir, 0755, true); }
         
@@ -468,7 +469,7 @@ class ESMSupportController
             http_response_code(403); echo "Access denied to ticket"; return;
         }
 
-        $storageBase = getenv('FILE_STORAGE_PATH') ?: __DIR__ . '/../../storage';
+        $storageBase = \App\Utils\Storage::resolveStorageBase(false, false);
         $dbPath = preg_replace('/^\/?uploads\//', '', $path);
         $fullPath = rtrim($storageBase, '/') . '/' . ltrim($dbPath, '/');
 

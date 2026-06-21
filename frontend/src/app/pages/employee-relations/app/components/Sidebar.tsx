@@ -294,7 +294,7 @@ export function Sidebar({ activeView, onViewChange }: SidebarProps) {
             {/* User Initials Avatar */}
             <div className="w-10 h-10 rounded-full bg-gray-200 dark:bg-[#a855f7]/20 border border-gray-300 dark:border-[#a855f7]/30 flex items-center justify-center flex-shrink-0 overflow-hidden">
               {sessionUser?.profile_image ? (
-                <img src={`${window.location.hostname === 'localhost' ? '/respawn-logics' : ''}/uploads/${sessionUser.profile_image}`} alt="Profile" className="w-full h-full object-cover" />
+                <img src={`${window.location.hostname === 'localhost' ? '/respawn-logics' : ''}/api/index.php?route=auth&action=download_avatar&file=${sessionUser.profile_image}`} alt="Profile" className="w-full h-full object-cover" />
               ) : (
                 <span className="text-slate-600 dark:text-[#00e07a] font-bold text-[0.95rem]">
                   {sessionUser ? sessionUser.initials : "GC"}
@@ -323,7 +323,7 @@ export function Sidebar({ activeView, onViewChange }: SidebarProps) {
             title={sessionUser ? sessionUser.full_name : "Jane Doe"}
           >
             {sessionUser?.profile_image ? (
-              <img src={`${window.location.hostname === 'localhost' ? '/respawn-logics' : ''}/uploads/${sessionUser.profile_image}`} alt="Profile" className="w-full h-full object-cover" />
+              <img src={`${window.location.hostname === 'localhost' ? '/respawn-logics' : ''}/api/index.php?route=auth&action=download_avatar&file=${sessionUser.profile_image}`} alt="Profile" className="w-full h-full object-cover" />
             ) : (
               <span className="text-[#c084fc] font-bold text-[0.85rem]">
                 {sessionUser ? sessionUser.initials : "JD"}

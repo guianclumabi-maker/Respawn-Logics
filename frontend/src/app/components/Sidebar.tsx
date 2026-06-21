@@ -326,7 +326,7 @@ export function Sidebar({ activeView, onViewChange, badges = {} }: SidebarProps)
           >
             {user?.profile_image ? (
               <div className="w-10 h-10 rounded-full overflow-hidden flex-shrink-0 border border-gray-200 dark:border-[#00e07a]/20">
-                <img src={`${import.meta.env.VITE_API_BASE_URL}/uploads/${user.profile_image}`} alt="Profile" className="w-full h-full object-cover" />
+                <img src={`${import.meta.env.VITE_API_BASE_URL}/api/index.php?route=auth&action=download_avatar&file=${user.profile_image}`} alt="Profile" className="w-full h-full object-cover" />
               </div>
             ) : (
               <div className="w-10 h-10 rounded-full flex-shrink-0 bg-gray-100 dark:bg-background border border-gray-200 dark:border-[#00e07a]/20 flex items-center justify-center">
@@ -356,7 +356,7 @@ export function Sidebar({ activeView, onViewChange, badges = {} }: SidebarProps)
             title={user ? user.name : "Admin User"}
           >
             {user?.profile_image ? (
-              <img src={`${import.meta.env.VITE_API_BASE_URL}/uploads/${user.profile_image}`} alt="Profile" className="w-full h-full object-cover" />
+              <img src={`${import.meta.env.VITE_API_BASE_URL}/api/index.php?route=auth&action=download_avatar&file=${user.profile_image}`} alt="Profile" className="w-full h-full object-cover" />
             ) : (
               <span className="text-slate-600 dark:text-primary font-bold text-[0.95rem]">
                 {userInitials}

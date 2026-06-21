@@ -333,7 +333,7 @@ if ($user) {
             <a href="<?= url('/pages/profile.php') ?>" class="user-footer-card" title="Profile & Settings">
                 <div class="user-footer-avatar-box">
                     <?php if (!empty($user['profile_image'])): ?>
-                        <img src="<?= url('/uploads/' . htmlspecialchars($user['profile_image'])) ?>" alt="Avatar">
+                        <img src="<?= url('/api/index.php?route=auth&action=download_avatar&file=' . htmlspecialchars($user['profile_image'])) ?>" alt="Avatar">
                     <?php else: ?>
                         <span class="user-footer-avatar-initials"><?= $initials ?></span>
                     <?php endif; ?>

@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/../utils/Storage.php';
 
 class CandidatesController
 {
@@ -1148,8 +1149,8 @@ class CandidatesController
         $originalName = basename($file['name']);
         
         // Define storage base configurable via env var for persistent storage (e.g. /data mounted on Railway), fallback to local storage
-        $storageBase = getenv('RESUME_STORAGE_PATH') ?: __DIR__ . '/../../storage';
-        $storageDir = $storageBase . '/tenant_' . $this->tenantId . '/resumes';
+        $storageBase = \App\Utils\Storage::resolveStorageBase(true, true);
+        $storageDir = rtrim($storageBase, '/') . '/tenant_' . $this->tenantId . '/resumes';
 
         if (!is_dir($storageDir)) {
             mkdir($storageDir, 0755, true);
@@ -1207,11 +1208,11 @@ class CandidatesController
             exit;
         }
 
-        $storageBase = getenv('RESUME_STORAGE_PATH') ?: __DIR__ . '/../../storage';
+        $storageBase = \App\Utils\Storage::resolveStorageBase(true, false);
 
         // Strip off any old 'storage/' prefix from earlier uploads to handle migration gracefully
         $dbPath = preg_replace('/^storage\//', '', $candidate['resume_file_path']);
-        $fullPath = $storageBase . '/' . $dbPath;
+        $fullPath = rtrim($storageBase, '/') . '/' . ltrim($dbPath, '/');
 
         if (!file_exists($fullPath)) {
             http_response_code(404);
