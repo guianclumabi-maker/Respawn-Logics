@@ -144,17 +144,64 @@ class PayrollController
                     }
 
                     if ($status === 'Processed') {
-                        $empStmt = $this->pdo->prepare("SELECT employee_id FROM payroll_run_employees WHERE payroll_run_id = ?");
+                        require_once __DIR__ . '/../utils/Storage.php';
+                        require_once __DIR__ . '/../utils/PayslipGenerator.php';
+                        
+                        // Fetch Run details for period and pay date
+                        $runStmt = $this->pdo->prepare("SELECT payroll_period_start, payroll_period_end, pay_date FROM payroll_runs WHERE id = ?");
+                        $runStmt->execute([$runId]);
+                        $runDetails = $runStmt->fetch();
+                        $periodStr = $runDetails['payroll_period_start'] . ' to ' . $runDetails['payroll_period_end'];
+                        $payDateStr = $runDetails['pay_date'];
+
+                        $empStmt = $this->pdo->prepare("
+                            SELECT pre.employee_id, u.full_name, u.employee_number 
+                            FROM payroll_run_employees pre 
+                            JOIN users u ON pre.employee_id = u.id 
+                            WHERE pre.payroll_run_id = ?
+                        ");
                         $empStmt->execute([$runId]);
                         $emps = $empStmt->fetchAll();
 
                         foreach ($emps as $e) {
-                            $pdfPath = "tenant_{$this->tenantId}/payslips/run_{$runId}_emp_{$e['employee_id']}.pdf";
+                            $empId = $e['employee_id'];
+                            
+                            // Fetch earnings
+                            $earnStmt = $this->pdo->prepare("SELECT earning_type as description, amount FROM payroll_earnings WHERE payroll_run_id = ? AND employee_id = ?");
+                            $earnStmt->execute([$runId, $empId]);
+                            $earnings = $earnStmt->fetchAll(PDO::FETCH_ASSOC);
+                            
+                            // Fetch deductions
+                            $dedStmt = $this->pdo->prepare("SELECT deduction_type as description, amount FROM payroll_deductions WHERE payroll_run_id = ? AND employee_id = ?");
+                            $dedStmt->execute([$runId, $empId]);
+                            $deductions = $dedStmt->fetchAll(PDO::FETCH_ASSOC);
+                            
+                            $netPayStmt = $this->pdo->prepare("SELECT net_pay FROM payroll_run_employees WHERE payroll_run_id = ? AND employee_id = ?");
+                            $netPayStmt->execute([$runId, $empId]);
+                            $netPayRow = $netPayStmt->fetch();
+                            $netPay = $netPayRow ? floatval($netPayRow['net_pay']) : 0;
+
+                            $pdfPath = "tenant_{$this->tenantId}/payslips/run_{$runId}_emp_{$empId}.pdf";
+                            $fullPath = Storage::resolveStorageBase() . '/' . $pdfPath;
+                            
+                            $pdfData = [
+                                'employeeName' => $e['full_name'],
+                                'employeeId'   => $e['employee_number'] ?: 'EMP-' . $empId,
+                                'period'       => $periodStr,
+                                'payDate'      => $payDateStr,
+                                'earnings'     => $earnings,
+                                'deductions'   => $deductions,
+                                'netPay'       => $netPay
+                            ];
                             
                             try {
+                                PayslipGenerator::generate($pdfData, $fullPath);
+                                
                                 $psStmt = $this->pdo->prepare("INSERT INTO `payroll_payslips` (`tenant_id`, `payroll_run_id`, `employee_id`, `pdf_path`) VALUES (?, ?, ?, ?)");
-                                $psStmt->execute([$this->tenantId, $runId, $e['employee_id'], $pdfPath]);
-                            } catch(Exception $ex) { /* ignore duplicate */ }
+                                $psStmt->execute([$this->tenantId, $runId, $empId, $pdfPath]);
+                            } catch(Exception $ex) { 
+                                error_log("Payslip generation failed: " . $ex->getMessage());
+                            }
                         }
                     }
 
