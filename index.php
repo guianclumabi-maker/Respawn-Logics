@@ -1254,6 +1254,93 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
     </div>
 </section>
 
+<!-- SECTION 1: JOURNEY -->
+<section class="story-section" id="journey">
+    <div class="story-container">
+        <h2>The Complete Player Journey</h2>
+        <p class="sub">Forget the messy spreadsheets and clunky onboarding forms. We treat your employees like players logging into a AAA MMO. From their very first tutorial (onboarding) to their end-game progression (performance reviews), everything is tracked, rewarded, and managed in one seamless ecosystem.</p>
+        
+        <div class="journey-flow">
+            <div class="journey-node"><i data-lucide="crosshair"></i> Recruit</div> <i data-lucide="chevron-right" class="journey-arrow"></i>
+            <div class="journey-node"><i data-lucide="handshake"></i> Hire</div> <i data-lucide="chevron-right" class="journey-arrow"></i>
+            <div class="journey-node"><i data-lucide="zap"></i> Onboard</div> <i data-lucide="chevron-right" class="journey-arrow"></i>
+            <div class="journey-node"><i data-lucide="briefcase"></i> Work</div> <i data-lucide="chevron-right" class="journey-arrow"></i>
+            <div class="journey-node"><i data-lucide="coins"></i> Pay</div> <i data-lucide="chevron-right" class="journey-arrow"></i>
+            <div class="journey-node"><i data-lucide="star"></i> Develop</div> <i data-lucide="chevron-right" class="journey-arrow"></i>
+            <div class="journey-node"><i data-lucide="shield-alert"></i> Support</div> <i data-lucide="chevron-right" class="journey-arrow"></i>
+            <div class="journey-node" style="background: rgba(155,109,255,0.1); border-color: var(--purple); color: var(--purple);"><i data-lucide="corner-right-up"></i> Grow</div>
+        </div>
+    </div>
+</section>
+
+<!-- SECTION 2: PROBLEMS ELIMINATED -->
+<section class="story-section" id="problems">
+    <div class="story-container">
+        <h2>Defeat the Final Boss of HR: Disconnected Tools</h2>
+        <p class="sub">Are you still tracking PTO in an Excel sheet, approving payroll via email chains, and storing performance reviews in a dusty Google Drive? That's the equivalent of playing on dial-up. It's time to wipe the board clean.</p>
+        
+        <div class="problems-grid">
+            <div class="problem-card"><i data-lucide="skull"></i> Spreadsheets</div>
+            <div class="problem-card"><i data-lucide="hourglass"></i> Manual Tracking</div>
+            <div class="problem-card"><i data-lucide="mail-x"></i> Email Approvals</div>
+            <div class="problem-card"><i data-lucide="alert-triangle"></i> Payroll Rework</div>
+            <div class="problem-card"><i data-lucide="ghost"></i> Scattered Documents</div>
+            <div class="problem-card"><i data-lucide="unplug"></i> Disconnected Records</div>
+        </div>
+
+        <div class="solution-block">
+            Respawn Logic brings your people data, workflows, and processes into one place.
+        </div>
+    </div>
+</section>
+
+<!-- SECTION 3: PLATFORM OVERVIEW (4 PILLARS) -->
+<section class="story-section" id="overview">
+    <div class="story-container">
+        <h2>The Core Engine. No Bloatware.</h2>
+        <p class="sub">We stripped out the corporate fluff and built exactly what you need to run a high-performance guild (your company). A unified platform built on four core pillars, running at 60 FPS.</p>
+
+        <div class="pillars-grid">
+            <div class="pillar-card">
+                <h3><i data-lucide="users"></i> Workforce</h3>
+                <ul>
+                    <li>Attendance</li>
+                    <li>Leave Management</li>
+                    <li>Scheduling</li>
+                    <li>Organization Structure</li>
+                </ul>
+            </div>
+            <div class="pillar-card">
+                <h3><i data-lucide="coins"></i> Pay & Benefits</h3>
+                <ul>
+                    <li>Enterprise Payroll</li>
+                    <li>Government Contributions</li>
+                    <li>Benefits Administration</li>
+                    <li>Expense Management</li>
+                </ul>
+            </div>
+            <div class="pillar-card">
+                <h3><i data-lucide="star"></i> Talent & Growth</h3>
+                <ul>
+                    <li>Recruitment / ATS</li>
+                    <li>Automated Onboarding</li>
+                    <li>Performance Reviews</li>
+                    <li>Succession Planning</li>
+                </ul>
+            </div>
+            <div class="pillar-card">
+                <h3><i data-lucide="headphones"></i> Employee Support</h3>
+                <ul>
+                    <li>Employee Relations</li>
+                    <li>Knowledge Base</li>
+                    <li>Case Management</li>
+                    <li>AI Companion</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</section>
+
 <!-- DEMOS WORKFLOW SECTION -->
 <section class="story-section" id="demos" style="background: var(--bg2); border-top: 1px solid var(--border3); border-bottom: 1px solid var(--border3); padding-top: 80px; padding-bottom: 80px;">
     <div class="story-container">
@@ -1426,93 +1513,6 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
                     }
                 })();
             </script>
-        </div>
-    </div>
-</section>
-
-<!-- SECTION 1: JOURNEY -->
-<section class="story-section" id="journey">
-    <div class="story-container">
-        <h2>The Complete Player Journey</h2>
-        <p class="sub">Forget the messy spreadsheets and clunky onboarding forms. We treat your employees like players logging into a AAA MMO. From their very first tutorial (onboarding) to their end-game progression (performance reviews), everything is tracked, rewarded, and managed in one seamless ecosystem.</p>
-        
-        <div class="journey-flow">
-            <div class="journey-node"><i data-lucide="crosshair"></i> Recruit</div> <i data-lucide="chevron-right" class="journey-arrow"></i>
-            <div class="journey-node"><i data-lucide="handshake"></i> Hire</div> <i data-lucide="chevron-right" class="journey-arrow"></i>
-            <div class="journey-node"><i data-lucide="zap"></i> Onboard</div> <i data-lucide="chevron-right" class="journey-arrow"></i>
-            <div class="journey-node"><i data-lucide="briefcase"></i> Work</div> <i data-lucide="chevron-right" class="journey-arrow"></i>
-            <div class="journey-node"><i data-lucide="coins"></i> Pay</div> <i data-lucide="chevron-right" class="journey-arrow"></i>
-            <div class="journey-node"><i data-lucide="star"></i> Develop</div> <i data-lucide="chevron-right" class="journey-arrow"></i>
-            <div class="journey-node"><i data-lucide="shield-alert"></i> Support</div> <i data-lucide="chevron-right" class="journey-arrow"></i>
-            <div class="journey-node" style="background: rgba(155,109,255,0.1); border-color: var(--purple); color: var(--purple);"><i data-lucide="corner-right-up"></i> Grow</div>
-        </div>
-    </div>
-</section>
-
-<!-- SECTION 2: PROBLEMS ELIMINATED -->
-<section class="story-section" id="problems">
-    <div class="story-container">
-        <h2>Defeat the Final Boss of HR: Disconnected Tools</h2>
-        <p class="sub">Are you still tracking PTO in an Excel sheet, approving payroll via email chains, and storing performance reviews in a dusty Google Drive? That's the equivalent of playing on dial-up. It's time to wipe the board clean.</p>
-        
-        <div class="problems-grid">
-            <div class="problem-card"><i data-lucide="skull"></i> Spreadsheets</div>
-            <div class="problem-card"><i data-lucide="hourglass"></i> Manual Tracking</div>
-            <div class="problem-card"><i data-lucide="mail-x"></i> Email Approvals</div>
-            <div class="problem-card"><i data-lucide="alert-triangle"></i> Payroll Rework</div>
-            <div class="problem-card"><i data-lucide="ghost"></i> Scattered Documents</div>
-            <div class="problem-card"><i data-lucide="unplug"></i> Disconnected Records</div>
-        </div>
-
-        <div class="solution-block">
-            Respawn Logic brings your people data, workflows, and processes into one place.
-        </div>
-    </div>
-</section>
-
-<!-- SECTION 3: PLATFORM OVERVIEW (4 PILLARS) -->
-<section class="story-section" id="overview">
-    <div class="story-container">
-        <h2>The Core Engine. No Bloatware.</h2>
-        <p class="sub">We stripped out the corporate fluff and built exactly what you need to run a high-performance guild (your company). A unified platform built on four core pillars, running at 60 FPS.</p>
-
-        <div class="pillars-grid">
-            <div class="pillar-card">
-                <h3><i data-lucide="users"></i> Workforce</h3>
-                <ul>
-                    <li>Attendance</li>
-                    <li>Leave Management</li>
-                    <li>Scheduling</li>
-                    <li>Organization Structure</li>
-                </ul>
-            </div>
-            <div class="pillar-card">
-                <h3><i data-lucide="coins"></i> Pay & Benefits</h3>
-                <ul>
-                    <li>Enterprise Payroll</li>
-                    <li>Government Contributions</li>
-                    <li>Benefits Administration</li>
-                    <li>Expense Management</li>
-                </ul>
-            </div>
-            <div class="pillar-card">
-                <h3><i data-lucide="star"></i> Talent & Growth</h3>
-                <ul>
-                    <li>Recruitment / ATS</li>
-                    <li>Automated Onboarding</li>
-                    <li>Performance Reviews</li>
-                    <li>Succession Planning</li>
-                </ul>
-            </div>
-            <div class="pillar-card">
-                <h3><i data-lucide="headphones"></i> Employee Support</h3>
-                <ul>
-                    <li>Employee Relations</li>
-                    <li>Knowledge Base</li>
-                    <li>Case Management</li>
-                    <li>AI Companion</li>
-                </ul>
-            </div>
         </div>
     </div>
 </section>
