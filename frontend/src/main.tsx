@@ -26,8 +26,12 @@ const API_BASE = import.meta.env.VITE_API_BASE_URL || "";
 window.fetch = async (...args) => {
   const response = await originalFetch(...args);
   if (response.status === 401) {
-    alert("Session expired. Please log in again.");
-    window.location.href = `${API_BASE}/login.php`;
+    const url = typeof args[0] === 'string' ? args[0] : (args[0] instanceof Request ? args[0].url : '');
+    // Ignore 401s for initial auth/csrf checks to prevent immediate lockout
+    if (!url.includes('action=current_user') && !url.includes('action=csrf') && !url.includes('get_csrf.php')) {
+      alert("Session expired. Please log in again.");
+      window.location.href = `${API_BASE}/login.php`;
+    }
   }
   return response;
 };
