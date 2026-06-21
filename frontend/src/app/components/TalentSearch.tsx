@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Search, MapPin, Star, Filter, Users, X, ChevronRight } from "lucide-react";
 import type { ViewState } from "./Sidebar";
 
-const API_BASE = import.meta.env.VITE_API_BASE_URL;
+const API_BASE = import.meta.env.VITE_API_BASE_URL || (window.location.origin + (window.location.hostname === "localhost" ? "/respawn-logics" : ""));
 const API = `${API_BASE}/api/index.php?route=candidates`;
 
 type SearchResult = {

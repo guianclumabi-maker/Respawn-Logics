@@ -30,7 +30,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const API_BASE = import.meta.env.VITE_API_BASE_URL;
+    const API_BASE = import.meta.env.VITE_API_BASE_URL || (window.location.origin + (window.location.hostname === "localhost" ? "/respawn-logics" : ""));
     fetch(`${API_BASE}/api.php?action=current_user`)
       .then((res) => res.json())
       .then((data) => {

@@ -8,7 +8,7 @@ export function TenantSettings() {
   const grantSupportAccess = async () => {
     setLoading(true);
     try {
-      const API_BASE = import.meta.env.VITE_API_BASE_URL || '';
+      const API_BASE = import.meta.env.VITE_API_BASE_URL || (window.location.origin + (window.location.hostname === 'localhost' ? '/respawn-logics' : ''));
       const csrfToken = (window as any).__CSRF_TOKEN__ || '';
       const res = await fetch(`${API_BASE}/api/index.php?route=iam&action=grant_support_access`, {
         method: 'POST',

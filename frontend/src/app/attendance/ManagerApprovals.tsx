@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { CheckCircle, AlertCircle, Clock } from "lucide-react";
 
-const API_BASE = import.meta.env.VITE_API_BASE_URL;
+const API_BASE = import.meta.env.VITE_API_BASE_URL || (window.location.origin + (window.location.hostname === "localhost" ? "/respawn-logics" : ""));
 const API = `${API_BASE}/api/index.php?route=attendance`;
 
 export function ManagerApprovals() {

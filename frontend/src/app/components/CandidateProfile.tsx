@@ -26,7 +26,7 @@ import {
 
 // ─── API ────────────────────────────────────────────────────────────────────────
 
-const API_BASE = import.meta.env.VITE_API_BASE_URL;
+const API_BASE = import.meta.env.VITE_API_BASE_URL || (window.location.origin + (window.location.hostname === "localhost" ? "/respawn-logics" : ""));
 const API = `${API_BASE}/api/index.php?route=candidates`;
 
 // ─── Types ──────────────────────────────────────────────────────────────────────

@@ -301,7 +301,7 @@ export function Sidebar({ activeView, onViewChange, badges = {} }: SidebarProps)
             <div className="mx-3 border-t border-gray-200 dark:border-border mb-3" />
           )}
           <button
-            onClick={() => { window.location.href = `${import.meta.env.VITE_API_BASE_URL}/pages/dashboard.php`; }}
+            onClick={() => { window.location.href = `${import.meta.env.VITE_API_BASE_URL || (window.location.origin + (window.location.hostname === "localhost" ? "/respawn-logics" : ""))}/pages/dashboard.php`; }}
             className="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-lg border border-transparent hover:bg-gray-100 dark:hover:bg-accent hover:text-accent-foreground text-slate-500 dark:text-[#8b95a8] hover:text-slate-800 dark:hover:text-foreground transition-all group cursor-pointer font-mono text-xs uppercase tracking-wider"
             title={collapsed ? "Return to Core HRIS" : undefined}
           >
@@ -328,12 +328,12 @@ export function Sidebar({ activeView, onViewChange, badges = {} }: SidebarProps)
       {!collapsed && (
         <div className="p-4 border-t border-gray-200 dark:border-border flex-shrink-0">
           <div
-            onClick={() => { window.location.href = `${import.meta.env.VITE_API_BASE_URL}/pages/profile.php`; }}
+            onClick={() => { window.location.href = `${import.meta.env.VITE_API_BASE_URL || (window.location.origin + (window.location.hostname === "localhost" ? "/respawn-logics" : ""))}/pages/profile.php`; }}
             className="flex items-center gap-3 p-2.5 border border-transparent rounded-lg cursor-pointer hover:bg-gray-100 dark:hover:bg-secondary transition-all"
           >
             {user?.profile_image ? (
               <div className="w-10 h-10 rounded-full overflow-hidden flex-shrink-0 border border-gray-200 dark:border-[#00e07a]/20">
-                <img src={`${import.meta.env.VITE_API_BASE_URL}/api/index.php?route=auth&action=download_avatar&file=${user.profile_image}`} alt="Profile" className="w-full h-full object-cover" />
+                <img src={`${import.meta.env.VITE_API_BASE_URL || (window.location.origin + (window.location.hostname === "localhost" ? "/respawn-logics" : ""))}/api/index.php?route=auth&action=download_avatar&file=${user.profile_image}`} alt="Profile" className="w-full h-full object-cover" />
               </div>
             ) : (
               <div className="w-10 h-10 rounded-full flex-shrink-0 bg-gray-100 dark:bg-background border border-gray-200 dark:border-[#00e07a]/20 flex items-center justify-center">
@@ -358,12 +358,12 @@ export function Sidebar({ activeView, onViewChange, badges = {} }: SidebarProps)
       {collapsed && (
         <div className="p-3 border-t border-gray-200 dark:border-border flex-shrink-0 flex justify-center">
           <div
-            onClick={() => { window.location.href = `${import.meta.env.VITE_API_BASE_URL}/pages/profile.php`; }}
+            onClick={() => { window.location.href = `${import.meta.env.VITE_API_BASE_URL || (window.location.origin + (window.location.hostname === "localhost" ? "/respawn-logics" : ""))}/pages/profile.php`; }}
             className="w-10 h-10 rounded-full flex-shrink-0 border border-gray-200 dark:border-[#00e07a]/20 bg-gray-100 dark:bg-background flex items-center justify-center cursor-pointer hover:bg-gray-200 dark:hover:bg-accent transition-all overflow-hidden font-mono text-xs"
             title={user ? user.name : "Admin User"}
           >
             {user?.profile_image ? (
-              <img src={`${import.meta.env.VITE_API_BASE_URL}/api/index.php?route=auth&action=download_avatar&file=${user.profile_image}`} alt="Profile" className="w-full h-full object-cover" />
+              <img src={`${import.meta.env.VITE_API_BASE_URL || (window.location.origin + (window.location.hostname === "localhost" ? "/respawn-logics" : ""))}/api/index.php?route=auth&action=download_avatar&file=${user.profile_image}`} alt="Profile" className="w-full h-full object-cover" />
             ) : (
               <span className="text-slate-600 dark:text-primary font-bold text-[0.95rem]">
                 {userInitials}
