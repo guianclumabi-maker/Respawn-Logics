@@ -3,6 +3,11 @@ require_once __DIR__ . '/../utils/Storage.php';
 
 class CandidatesController
 {
+    private const ALLOWED_STAGES = ['Applied', 'Review', 'Phone Screen', 'Interview', 'Offer', 'Hired', 'Rejected'];
+    private const ALLOWED_JOB_STATUS = ['Open', 'Draft', 'Closed', 'On Hold'];
+    private const ALLOWED_JOB_PRIORITY = ['Low', 'Normal', 'High', 'Urgent'];
+    private const ALLOWED_EMP_TYPE = ['Full-Time', 'Part-Time', 'Contract', 'Internship'];
+
     private $pdo;
     private $currentUser;
     private $tenantId;
@@ -745,10 +750,24 @@ class CandidatesController
 
     // --- POST METHODS ---
     private function addJob($input) {
-        $title = trim($input['title'] ?? '');
+        $title = mb_substr(trim($input['title'] ?? ''), 0, 255);
         if (empty($title)) { http_response_code(400); echo json_encode(['success' => false, 'error' => 'Job title is required']); exit; }
+        
+        $status = $input['status'] ?? 'Open';
+        if (!in_array($status, self::ALLOWED_JOB_STATUS, true)) { http_response_code(400); echo json_encode(['success' => false, 'error' => 'Invalid status']); exit; }
+
+        $priority = $input['priority'] ?? 'Normal';
+        if (!in_array($priority, self::ALLOWED_JOB_PRIORITY, true)) { http_response_code(400); echo json_encode(['success' => false, 'error' => 'Invalid priority']); exit; }
+
+        $empType = $input['employment_type'] ?? 'Full-Time';
+        if (!in_array($empType, self::ALLOWED_EMP_TYPE, true)) { http_response_code(400); echo json_encode(['success' => false, 'error' => 'Invalid employment type']); exit; }
+
+        $salaryMin = isset($input['salary_min']) && $input['salary_min'] !== '' ? (float)$input['salary_min'] : null;
+        $salaryMax = isset($input['salary_max']) && $input['salary_max'] !== '' ? (float)$input['salary_max'] : null;
+        if (($salaryMin !== null && $salaryMin < 0) || ($salaryMax !== null && $salaryMax < 0)) { http_response_code(400); echo json_encode(['success' => false, 'error' => 'Salary cannot be negative']); exit; }
+
         $stmt = $this->pdo->prepare("INSERT INTO `jobs` (`tenant_id`, `title`, `department`, `location`, `employment_type`, `salary_min`, `salary_max`, `description`, `requirements`, `status`, `priority`, `hiring_manager`, `assigned_recruiter`, `external_link`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-        $stmt->execute([$this->tenantId, $title, trim($input['department'] ?? ''), trim($input['location'] ?? ''), $input['employment_type'] ?? 'Full-Time', !empty($input['salary_min']) ? (float)$input['salary_min'] : null, !empty($input['salary_max']) ? (float)$input['salary_max'] : null, trim($input['description'] ?? ''), is_array($input['requirements'] ?? '') ? json_encode($input['requirements']) : trim($input['requirements'] ?? ''), $input['status'] ?? 'Open', $input['priority'] ?? 'Normal', trim($input['hiring_manager'] ?? ''), trim($input['assigned_recruiter'] ?? ''), trim($input['external_link'] ?? '')]);
+        $stmt->execute([$this->tenantId, $title, mb_substr(trim($input['department'] ?? ''), 0, 255), mb_substr(trim($input['location'] ?? ''), 0, 255), $empType, $salaryMin, $salaryMax, trim($input['description'] ?? ''), is_array($input['requirements'] ?? '') ? json_encode($input['requirements']) : trim($input['requirements'] ?? ''), $status, $priority, mb_substr(trim($input['hiring_manager'] ?? ''), 0, 150), mb_substr(trim($input['assigned_recruiter'] ?? ''), 0, 150), mb_substr(trim($input['external_link'] ?? ''), 0, 255)]);
         $jobId = (int)$this->pdo->lastInsertId();
         $this->logActivity('job_created', "Job '$title' was created", null, $jobId);
         
@@ -764,15 +783,26 @@ class CandidatesController
     private function updateJob($input) {
         $id = (int)($input['id'] ?? 0);
         if (!$id) { http_response_code(400); echo json_encode(['success' => false, 'error' => 'Job ID required']); exit; }
+        
+        if (isset($input['title'])) { $input['title'] = mb_substr(trim($input['title']), 0, 255); if (empty($input['title'])) { http_response_code(400); echo json_encode(['success' => false, 'error' => 'Job title is required']); exit; } }
+        if (isset($input['status']) && !in_array($input['status'], self::ALLOWED_JOB_STATUS, true)) { http_response_code(400); echo json_encode(['success' => false, 'error' => 'Invalid status']); exit; }
+        if (isset($input['priority']) && !in_array($input['priority'], self::ALLOWED_JOB_PRIORITY, true)) { http_response_code(400); echo json_encode(['success' => false, 'error' => 'Invalid priority']); exit; }
+        if (isset($input['employment_type']) && !in_array($input['employment_type'], self::ALLOWED_EMP_TYPE, true)) { http_response_code(400); echo json_encode(['success' => false, 'error' => 'Invalid employment type']); exit; }
+        if (isset($input['salary_min']) && $input['salary_min'] !== '' && (float)$input['salary_min'] < 0) { http_response_code(400); echo json_encode(['success' => false, 'error' => 'Salary cannot be negative']); exit; }
+        if (isset($input['salary_max']) && $input['salary_max'] !== '' && (float)$input['salary_max'] < 0) { http_response_code(400); echo json_encode(['success' => false, 'error' => 'Salary cannot be negative']); exit; }
+
         $fields = []; $params = [];
         foreach (['title', 'department', 'location', 'employment_type', 'description', 'requirements', 'status', 'priority', 'hiring_manager', 'assigned_recruiter', 'external_link'] as $f) {
             if (isset($input[$f])) { 
                 $fields[] = "`$f` = ?"; 
-                $params[] = ($f === 'requirements' && is_array($input[$f])) ? json_encode($input[$f]) : $input[$f]; 
+                $val = ($f === 'requirements' && is_array($input[$f])) ? json_encode($input[$f]) : $input[$f];
+                if (in_array($f, ['department', 'location', 'external_link'])) $val = mb_substr(trim((string)$val), 0, 255);
+                if (in_array($f, ['hiring_manager', 'assigned_recruiter'])) $val = mb_substr(trim((string)$val), 0, 150);
+                $params[] = $val;
             }
         }
-        if (isset($input['salary_min'])) { $fields[] = "`salary_min` = ?"; $params[] = (float)$input['salary_min']; }
-        if (isset($input['salary_max'])) { $fields[] = "`salary_max` = ?"; $params[] = (float)$input['salary_max']; }
+        if (isset($input['salary_min'])) { $fields[] = "`salary_min` = ?"; $params[] = $input['salary_min'] !== '' ? (float)$input['salary_min'] : null; }
+        if (isset($input['salary_max'])) { $fields[] = "`salary_max` = ?"; $params[] = $input['salary_max'] !== '' ? (float)$input['salary_max'] : null; }
         if (isset($input['status']) && $input['status'] === 'Closed') { $fields[] = "`closed_at` = NOW()"; }
         if (empty($fields)) { http_response_code(400); echo json_encode(['success' => false, 'error' => 'No fields to update']); exit; }
         $params[] = $id;
@@ -796,10 +826,20 @@ class CandidatesController
     }
 
     private function addCandidate($input) {
-        $name = trim($input['name'] ?? '');
+        $name = mb_substr(trim($input['name'] ?? ''), 0, 255);
         if (empty($name)) { http_response_code(400); echo json_encode(['success' => false, 'error' => 'Name is required']); exit; }
+        
+        $email = trim($input['email'] ?? '');
+        if ($email !== '' && !filter_var($email, FILTER_VALIDATE_EMAIL)) { http_response_code(400); echo json_encode(['success' => false, 'error' => 'Invalid email format']); exit; }
+
+        $expYears = isset($input['experience_years']) && $input['experience_years'] !== '' ? (int)$input['experience_years'] : 0;
+        if ($expYears < 0) { http_response_code(400); echo json_encode(['success' => false, 'error' => 'Experience years cannot be negative']); exit; }
+
+        $salaryExpectation = isset($input['salary_expectation']) && $input['salary_expectation'] !== '' ? (float)$input['salary_expectation'] : null;
+        if ($salaryExpectation !== null && $salaryExpectation < 0) { http_response_code(400); echo json_encode(['success' => false, 'error' => 'Salary expectation cannot be negative']); exit; }
+
         $stmt = $this->pdo->prepare("INSERT INTO `candidate_profiles` (`tenant_id`, `name`, `email`, `phone`, `location`, `skills`, `experience_years`, `resume_text`, `salary_expectation`, `source`, `tags`, `assigned_recruiter`, `assigned_hiring_manager`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-        $stmt->execute([$this->tenantId, $name, trim($input['email'] ?? ''), trim($input['phone'] ?? ''), trim($input['location'] ?? ''), is_array($input['skills'] ?? null) ? implode(', ', $input['skills']) : trim($input['skills'] ?? ''), (int)($input['experience_years'] ?? 0), trim($input['resume_text'] ?? ''), !empty($input['salary_expectation']) ? (float)$input['salary_expectation'] : null, $input['source'] ?? 'Direct', is_array($input['tags'] ?? null) ? implode(', ', $input['tags']) : trim($input['tags'] ?? ''), trim($input['assigned_recruiter'] ?? ''), trim($input['assigned_hiring_manager'] ?? '')]);
+        $stmt->execute([$this->tenantId, $name, mb_substr($email, 0, 255), mb_substr(trim($input['phone'] ?? ''), 0, 50), mb_substr(trim($input['location'] ?? ''), 0, 150), is_array($input['skills'] ?? null) ? implode(', ', $input['skills']) : trim($input['skills'] ?? ''), $expYears, trim($input['resume_text'] ?? ''), $salaryExpectation, mb_substr($input['source'] ?? 'Direct', 0, 100), is_array($input['tags'] ?? null) ? implode(', ', $input['tags']) : trim($input['tags'] ?? ''), mb_substr(trim($input['assigned_recruiter'] ?? ''), 0, 150), mb_substr(trim($input['assigned_hiring_manager'] ?? ''), 0, 150)]);
         $candidateId = (int)$this->pdo->lastInsertId();
         $this->logActivity('candidate_created', "Candidate '$name' was added", $candidateId);
         if (!empty($input['job_id'])) {
@@ -817,14 +857,27 @@ class CandidatesController
     private function updateCandidate($input) {
         $id = (int)($input['id'] ?? 0);
         if (!$id) { http_response_code(400); echo json_encode(['success' => false, 'error' => 'Candidate ID required']); exit; }
+        
+        if (isset($input['name'])) { $input['name'] = mb_substr(trim($input['name']), 0, 255); if (empty($input['name'])) { http_response_code(400); echo json_encode(['success' => false, 'error' => 'Name is required']); exit; } }
+        if (isset($input['email']) && trim($input['email']) !== '') { if (!filter_var(trim($input['email']), FILTER_VALIDATE_EMAIL)) { http_response_code(400); echo json_encode(['success' => false, 'error' => 'Invalid email format']); exit; } $input['email'] = mb_substr(trim($input['email']), 0, 255); }
+        if (isset($input['experience_years']) && $input['experience_years'] !== '' && (int)$input['experience_years'] < 0) { http_response_code(400); echo json_encode(['success' => false, 'error' => 'Experience years cannot be negative']); exit; }
+        if (isset($input['salary_expectation']) && $input['salary_expectation'] !== '' && (float)$input['salary_expectation'] < 0) { http_response_code(400); echo json_encode(['success' => false, 'error' => 'Salary expectation cannot be negative']); exit; }
+
         $fields = []; $params = [];
         foreach (['name', 'email', 'phone', 'location', 'source', 'assigned_recruiter', 'assigned_hiring_manager', 'status'] as $f) {
-            if (isset($input[$f])) { $fields[] = "`$f` = ?"; $params[] = $input[$f]; }
+            if (isset($input[$f])) { 
+                $fields[] = "`$f` = ?"; 
+                $val = $input[$f];
+                if (in_array($f, ['phone', 'status'])) $val = mb_substr(trim((string)$val), 0, 50);
+                if ($f === 'source') $val = mb_substr(trim((string)$val), 0, 100);
+                if (in_array($f, ['location', 'assigned_recruiter', 'assigned_hiring_manager'])) $val = mb_substr(trim((string)$val), 0, 150);
+                $params[] = $val; 
+            }
         }
         if (isset($input['skills'])) { $fields[] = "`skills` = ?"; $params[] = is_array($input['skills']) ? implode(', ', $input['skills']) : $input['skills']; }
         if (isset($input['tags'])) { $fields[] = "`tags` = ?"; $params[] = is_array($input['tags']) ? implode(', ', $input['tags']) : $input['tags']; }
-        if (isset($input['experience_years'])) { $fields[] = "`experience_years` = ?"; $params[] = (int)$input['experience_years']; }
-        if (isset($input['salary_expectation'])) { $fields[] = "`salary_expectation` = ?"; $params[] = (float)$input['salary_expectation']; }
+        if (isset($input['experience_years'])) { $fields[] = "`experience_years` = ?"; $params[] = $input['experience_years'] !== '' ? (int)$input['experience_years'] : 0; }
+        if (isset($input['salary_expectation'])) { $fields[] = "`salary_expectation` = ?"; $params[] = $input['salary_expectation'] !== '' ? (float)$input['salary_expectation'] : null; }
         if (isset($input['resume_text'])) { $fields[] = "`resume_text` = ?"; $params[] = $input['resume_text']; }
         if (isset($input['ai_summary'])) { $fields[] = "`ai_summary` = ?"; $params[] = $input['ai_summary']; }
         if (empty($fields)) { http_response_code(400); echo json_encode(['success' => false, 'error' => 'No fields to update']); exit; }
@@ -850,6 +903,7 @@ class CandidatesController
     private function updateStage($input) {
         $id = (int)($input['id'] ?? 0); $stage = trim($input['stage'] ?? '');
         if (!$id || empty($stage)) { http_response_code(400); echo json_encode(['success' => false, 'error' => 'Missing ID or stage']); exit; }
+        if (!in_array($stage, self::ALLOWED_STAGES, true)) { http_response_code(400); echo json_encode(['success' => false, 'error' => 'Invalid stage']); exit; }
         $oldStage = $this->pdo->prepare("SELECT `stage`, `candidate_id`, `job_id` FROM `candidate_applications` WHERE `id` = ? AND `tenant_id` = ?"); $oldStage->execute([$id, $this->tenantId]); $old = $oldStage->fetch();
         $updateFields = "`stage` = ?, `stage_entered_at` = NOW()";
         $updateParams = [$stage];
@@ -884,6 +938,7 @@ class CandidatesController
     private function bulkAdvance($input) {
         $ids = $input['ids'] ?? []; $stage = trim($input['stage'] ?? '');
         if (empty($ids) || empty($stage)) { http_response_code(400); echo json_encode(['success' => false, 'error' => 'Missing IDs or stage']); exit; }
+        if (!in_array($stage, self::ALLOWED_STAGES, true)) { http_response_code(400); echo json_encode(['success' => false, 'error' => 'Invalid stage']); exit; }
         $placeholders = implode(',', array_fill(0, count($ids), '?'));
         if ($stage === 'Hired') {
             $set = "`stage` = ?, `stage_entered_at` = NOW(), `hired_at` = NOW(), `rejected_at` = NULL, `rejection_reason` = NULL";
