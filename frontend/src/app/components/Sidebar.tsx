@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { GamifiedThemeToggle } from "./GamifiedThemeToggle";
 import {
@@ -114,7 +115,7 @@ const getSections = (hasPermission: (p: string) => boolean): NavSection[] => [
       { label: "Surveys", view: "Surveys", icon: <ClipboardList size={19} /> },
     ]
   },
-  ...(hasPermission("ats.edit_job") || hasPermission("ats.create_job") ? [{
+  ...(hasPermission("ats.view") || hasPermission("ats.edit") || hasPermission("ats.edit_job") || hasPermission("ats.create_job") ? [{
     title: "Hiring (ATS)",
     items: [
       { label: "ATS Dashboard", view: "ATS Dashboard", icon: <LayoutDashboard size={19} /> },
@@ -163,7 +164,13 @@ function Badge({ count }: { count: number }) {
 export function Sidebar({ activeView, onViewChange, badges = {} }: SidebarProps) {
   const [collapsed, setCollapsed] = useState(false);
   const { user, hasPermission } = useAuth();
-  const sections = getSections(hasPermission);
+  const location = useLocation();
+  const isAtsContext = location.pathname.startsWith("/ats");
+
+  let sections = getSections(hasPermission);
+  if (isAtsContext) {
+    sections = sections.filter((s) => s.title === "Hiring (ATS)");
+  }
 
 
 
