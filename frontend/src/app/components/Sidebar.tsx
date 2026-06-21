@@ -207,7 +207,7 @@ export function Sidebar({ activeView, onViewChange, badges = {} }: SidebarProps)
                   letterSpacing: "-0.5px",
                 }}
               >
-                ATS Controller
+                Respawn Logics
               </span>
               <span 
                 className="font-bold text-primary text-[9px]"
