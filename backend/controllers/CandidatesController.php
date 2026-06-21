@@ -1147,8 +1147,11 @@ class CandidatesController
         $ext = $allowedMimes[$mime];
         $originalName = basename($file['name']);
         
-        // Ensure storage directory exists
-        $storageDir = __DIR__ . '/../../storage/tenant_' . $this->tenantId . '/resumes';
+        // Define storage base: /tmp on Railway (outside docroot), or local storage/ directory (protected by .htaccess)
+        $isRailway = getenv('RAILWAY_ENVIRONMENT') || getenv('NIXPACKS') || getenv('RAILWAY_PROJECT_ID');
+        $storageBase = $isRailway ? '/tmp/respawn_storage' : __DIR__ . '/../../storage';
+        $storageDir = $storageBase . '/tenant_' . $this->tenantId . '/resumes';
+
         if (!is_dir($storageDir)) {
             mkdir($storageDir, 0755, true);
         }
@@ -1159,11 +1162,15 @@ class CandidatesController
 
         if (move_uploaded_file($file['tmp_name'], $destPath)) {
             // Delete old resume if exists
-            if (!empty($candidate['resume_file_path']) && file_exists(__DIR__ . '/../../' . $candidate['resume_file_path'])) {
-                unlink(__DIR__ . '/../../' . $candidate['resume_file_path']);
+            if (!empty($candidate['resume_file_path'])) {
+                $oldPath = $storageBase . '/' . $candidate['resume_file_path'];
+                if (file_exists($oldPath)) {
+                    unlink($oldPath);
+                }
             }
 
-            $relativePath = 'storage/tenant_' . $this->tenantId . '/resumes/' . $secureFilename;
+            // Store path relative to storage base so downloadResume can resolve it dynamically
+            $relativePath = 'tenant_' . $this->tenantId . '/resumes/' . $secureFilename;
             $now = date('Y-m-d H:i:s');
 
             $updateStmt = $this->pdo->prepare("UPDATE `candidate_profiles` SET `resume_file_path` = ?, `resume_filename` = ?, `resume_mime` = ?, `resume_uploaded_at` = ? WHERE `id` = ?");
@@ -1201,7 +1208,13 @@ class CandidatesController
             exit;
         }
 
-        $fullPath = __DIR__ . '/../../' . $candidate['resume_file_path'];
+        $isRailway = getenv('RAILWAY_ENVIRONMENT') || getenv('NIXPACKS') || getenv('RAILWAY_PROJECT_ID');
+        $storageBase = $isRailway ? '/tmp/respawn_storage' : __DIR__ . '/../../storage';
+
+        // Strip off any old 'storage/' prefix from earlier uploads to handle migration gracefully
+        $dbPath = preg_replace('/^storage\//', '', $candidate['resume_file_path']);
+        $fullPath = $storageBase . '/' . $dbPath;
+
         if (!file_exists($fullPath)) {
             http_response_code(404);
             echo "File missing from storage";
