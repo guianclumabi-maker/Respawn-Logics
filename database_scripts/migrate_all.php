@@ -31,7 +31,8 @@ $scripts = [
     'setup_platform_tickets.php',
     'migrate_notifications.php',
     'migrate_permissions_sync.php',
-    'migrate_must_change_password.php'
+    'migrate_must_change_password.php',
+    'migrate_candidate_privacy.php'
 ];
 
 foreach ($scripts as $script) {

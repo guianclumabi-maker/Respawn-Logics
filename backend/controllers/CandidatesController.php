@@ -66,7 +66,7 @@ class CandidatesController
             requirePermission('ats.edit');
         } elseif (
             $action === 'delete_candidate' || $action === 'delete_pool' || 
-            $action === 'delete' || $action === 'resolve_approval'
+            $action === 'delete' || $action === 'resolve_approval' || $action === 'erase_candidate'
         ) {
             requirePermission('ats.delete');
         } elseif ($action === 'upload_resume') {
@@ -108,6 +108,8 @@ class CandidatesController
                 case 'bulk_reject': $this->bulkReject($input); break;
                 case 'bulk_delete': $this->bulkDelete($input); break;
                 case 'delete_candidate': $this->deleteCandidate($input); break;
+                case 'export_candidate': $this->exportCandidate($input); break;
+                case 'erase_candidate': $this->eraseCandidate($input); break;
                 case 'add_interview': $this->addInterview($input); break;
                 case 'update_interview': $this->updateInterview($input); break;
                 case 'add_scorecard': $this->addScorecard($input); break;
@@ -842,8 +844,14 @@ class CandidatesController
         $salaryExpectation = isset($input['salary_expectation']) && $input['salary_expectation'] !== '' ? (float)$input['salary_expectation'] : null;
         if ($salaryExpectation !== null && $salaryExpectation < 0) { http_response_code(400); echo json_encode(['success' => false, 'error' => 'Salary expectation cannot be negative']); exit; }
 
-        $stmt = $this->pdo->prepare("INSERT INTO `candidate_profiles` (`tenant_id`, `name`, `email`, `phone`, `location`, `skills`, `experience_years`, `resume_text`, `salary_expectation`, `source`, `tags`, `assigned_recruiter`, `assigned_hiring_manager`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-        $stmt->execute([$this->tenantId, $name, mb_substr($email, 0, 255), mb_substr(trim($input['phone'] ?? ''), 0, 50), mb_substr(trim($input['location'] ?? ''), 0, 150), is_array($input['skills'] ?? null) ? implode(', ', $input['skills']) : trim($input['skills'] ?? ''), $expYears, trim($input['resume_text'] ?? ''), $salaryExpectation, mb_substr($input['source'] ?? 'Direct', 0, 100), is_array($input['tags'] ?? null) ? implode(', ', $input['tags']) : trim($input['tags'] ?? ''), mb_substr(trim($input['assigned_recruiter'] ?? ''), 0, 150), mb_substr(trim($input['assigned_hiring_manager'] ?? ''), 0, 150)]);
+        $consentGiven = isset($input['consent_given']) ? (int)$input['consent_given'] : 0;
+        $consentAt = !empty($input['consent_at']) ? $input['consent_at'] : null;
+        $consentSource = mb_substr(trim($input['consent_source'] ?? ''), 0, 100);
+        $retentionMonths = getenv('CANDIDATE_DATA_RETENTION_MONTHS') ?: 24;
+        $retentionUntil = date('Y-m-d', strtotime("+$retentionMonths months"));
+
+        $stmt = $this->pdo->prepare("INSERT INTO `candidate_profiles` (`tenant_id`, `name`, `email`, `phone`, `location`, `skills`, `experience_years`, `resume_text`, `salary_expectation`, `source`, `tags`, `assigned_recruiter`, `assigned_hiring_manager`, `consent_given`, `consent_at`, `consent_source`, `data_retention_until`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+        $stmt->execute([$this->tenantId, $name, mb_substr($email, 0, 255), mb_substr(trim($input['phone'] ?? ''), 0, 50), mb_substr(trim($input['location'] ?? ''), 0, 150), is_array($input['skills'] ?? null) ? implode(', ', $input['skills']) : trim($input['skills'] ?? ''), $expYears, trim($input['resume_text'] ?? ''), $salaryExpectation, mb_substr($input['source'] ?? 'Direct', 0, 100), is_array($input['tags'] ?? null) ? implode(', ', $input['tags']) : trim($input['tags'] ?? ''), mb_substr(trim($input['assigned_recruiter'] ?? ''), 0, 150), mb_substr(trim($input['assigned_hiring_manager'] ?? ''), 0, 150), $consentGiven, $consentAt, $consentSource, $retentionUntil]);
         $candidateId = (int)$this->pdo->lastInsertId();
         $this->logActivity('candidate_created', "Candidate '$name' was added", $candidateId);
         if (!empty($input['job_id'])) {
@@ -1024,6 +1032,66 @@ class CandidatesController
         if (!$id) { http_response_code(400); echo json_encode(['success' => false, 'error' => 'Missing candidate ID']); exit; }
         $this->logActivity('candidate_deleted', "Candidate deleted", $id);
         $this->pdo->prepare("DELETE FROM `candidate_profiles` WHERE `id` = ? AND `tenant_id` = ?")->execute([$id, $this->tenantId]);
+        echo json_encode(['success' => true]);
+        exit;
+    }
+
+    private function exportCandidate($input) {
+        $id = (int)($input['id'] ?? $_GET['id'] ?? 0);
+        if (!$id) { http_response_code(400); echo json_encode(['success' => false, 'error' => 'Missing candidate ID']); exit; }
+        
+        $profile = $this->pdo->prepare("SELECT * FROM `candidate_profiles` WHERE `id` = ? AND `tenant_id` = ?");
+        $profile->execute([$id, $this->tenantId]);
+        $data = $profile->fetch();
+        if (!$data) { http_response_code(404); echo json_encode(['success' => false, 'error' => 'Candidate not found']); exit; }
+
+        $applications = $this->pdo->prepare("SELECT * FROM `candidate_applications` WHERE `candidate_id` = ? AND `tenant_id` = ?");
+        $applications->execute([$id, $this->tenantId]);
+        $data['applications'] = $applications->fetchAll();
+
+        $interviews = $this->pdo->prepare("SELECT * FROM `interviews` WHERE `candidate_id` = ? AND `tenant_id` = ?");
+        $interviews->execute([$id, $this->tenantId]);
+        $data['interviews'] = $interviews->fetchAll();
+
+        $notes = $this->pdo->prepare("SELECT * FROM `candidate_notes` WHERE `candidate_id` = ? AND `tenant_id` = ?");
+        $notes->execute([$id, $this->tenantId]);
+        $data['notes'] = $notes->fetchAll();
+
+        $pools = $this->pdo->prepare("SELECT * FROM `talent_pool_members` WHERE `candidate_id` = ? AND `tenant_id` = ?");
+        $pools->execute([$id, $this->tenantId]);
+        $data['pool_memberships'] = $pools->fetchAll();
+
+        $activities = $this->pdo->prepare("SELECT * FROM `activity_logs` WHERE `candidate_id` = ? AND `tenant_id` = ?");
+        $activities->execute([$id, $this->tenantId]);
+        $data['activities'] = $activities->fetchAll();
+
+        header('Content-Type: application/json');
+        header('Content-Disposition: attachment; filename="candidate_export_' . $id . '.json"');
+        echo json_encode($data, JSON_PRETTY_PRINT);
+        exit;
+    }
+
+    private function eraseCandidate($input) {
+        $id = (int)($input['id'] ?? 0);
+        if (!$id) { http_response_code(400); echo json_encode(['success' => false, 'error' => 'Missing candidate ID']); exit; }
+
+        $profile = $this->pdo->prepare("SELECT `resume_filename` FROM `candidate_profiles` WHERE `id` = ? AND `tenant_id` = ?");
+        $profile->execute([$id, $this->tenantId]);
+        $data = $profile->fetch();
+
+        if (!$data) { http_response_code(404); echo json_encode(['success' => false, 'error' => 'Candidate not found']); exit; }
+
+        if (!empty($data['resume_filename'])) {
+            $path = \App\Utils\Storage::resolveStorageBase(true) . '/' . basename($data['resume_filename']);
+            if (file_exists($path)) {
+                @unlink($path);
+            }
+        }
+
+        $this->pdo->prepare("UPDATE `candidate_profiles` SET `name` = 'Anonymized', `email` = '', `phone` = '', `location` = '', `skills` = '', `resume_text` = '', `resume_filename` = NULL, `is_anonymized` = 1 WHERE `id` = ? AND `tenant_id` = ?")->execute([$id, $this->tenantId]);
+
+        $this->logActivity('candidate_erased', "Candidate anonymized for data privacy", $id);
+
         echo json_encode(['success' => true]);
         exit;
     }
