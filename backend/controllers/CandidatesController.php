@@ -37,6 +37,9 @@ class CandidatesController
             $action = $input['action'] ?? $action;
         }
 
+        if ($action !== 'current_user' && $action !== 'permissions') {
+            requirePermission('ats.view');
+        }
 
         // Action-specific permissions checked on employee_system database before USE respawn_logics
         if ($action === 'add_job' || $action === 'duplicate_job') {
@@ -118,7 +121,8 @@ class CandidatesController
                     break;
             }
         } catch (\Exception $e) {
-            echo json_encode(['success' => false, 'error' => $e->getMessage()]);
+            error_log('CandidatesController error: ' . $e->getMessage());
+            echo json_encode(['success' => false, 'error' => 'An error occurred. Please try again.']);
         }
     }
 
