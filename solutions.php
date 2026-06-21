@@ -1,6 +1,91 @@
 <?php
 require_once __DIR__ . '/bootstrap/app.php';
 
+$modules = [
+    'core-hr' => [
+        'title' => 'Core HR & People',
+        'tagline' => 'Your single source of truth for everything HR.',
+        'overview' => 'Centralized employee directory & profiles, documents, org chart, and multi-tenant capabilities, giving you total visibility into your workforce.',
+        'features' => [
+            'Centralized employee directory & profiles',
+            'Secure document storage',
+            'Dynamic org charts',
+            'Multi-tenant architecture'
+        ],
+        'benefits' => 'Built for HR leaders and operations teams who need an organized, accessible, and secure foundation for managing personnel data.'
+    ],
+    'ats' => [
+        'title' => 'ATS Pipeline',
+        'tagline' => 'Hire top talent faster and smarter.',
+        'overview' => 'Manage your entire recruiting pipeline by stage, from sourcing to hiring, with advanced match scoring and seamless one-click hire-to-employee onboarding.',
+        'features' => [
+            'Custom recruiting pipelines',
+            'AI-assisted match scoring',
+            'Résumé management and parsing',
+            'Interview scheduling & scorecards',
+            'Talent pools for future hiring',
+            'One-click hire-to-employee workflow'
+        ],
+        'benefits' => 'Designed for recruiters and hiring managers who want a streamlined process to evaluate, track, and close top candidates efficiently.'
+    ],
+    'payroll' => [
+        'title' => 'Enterprise Payroll',
+        'tagline' => 'Accurate, efficient, and compliant payroll processing.',
+        'overview' => 'Designed for PH statutory compliance, managing complex deductions and specialized payroll configurations per company with ease.',
+        'features' => [
+            'Designed for Philippine statutory deductions (SSS, PhilHealth, Pag-IBIG, BIR withholding)',
+            '13th-month pay calculations',
+            'De-minimis benefits handling',
+            'Per-company configuration capabilities',
+            'Detailed digital payslips'
+        ],
+        'benefits' => 'Ideal for payroll officers and finance teams needing a reliable system tailored to local requirements (pending final CPA validation).'
+    ],
+    'service-desk' => [
+        'title' => 'Service Desk',
+        'tagline' => 'Centralize HR and IT support requests.',
+        'overview' => 'Empower your employees with an intuitive portal for IT and HR ticketing, complete with SLA tracking, attachments, and dedicated agent queues.',
+        'features' => [
+            'Unified IT/HR ticketing system',
+            'Service Level Agreement (SLA) tracking',
+            'File attachments and documentation',
+            'Dedicated agent queues for rapid resolution'
+        ],
+        'benefits' => 'Perfect for support teams and administrators aiming to deliver prompt, organized internal services to all employees.'
+    ],
+    'employee-relations' => [
+        'title' => 'Employee Relations',
+        'tagline' => 'Handle cases with compliance and care.',
+        'overview' => 'A structured case management system for incidents and investigations, featuring integrated PH labor-law guidance to ensure fair resolutions.',
+        'features' => [
+            'Incident and investigation case management',
+            'Integrated PH labor-law guidance',
+            'Secure and confidential documentation',
+            'Resolution tracking'
+        ],
+        'benefits' => 'Essential for HR professionals handling sensitive workplace issues securely and compliantly.'
+    ],
+    'attendance' => [
+        'title' => 'Attendance & Leaves',
+        'tagline' => 'Simplify time tracking and time-off requests.',
+        'overview' => 'A comprehensive module to monitor attendance, track leave requests, manage approvals, and maintain accurate leave balances in real time.',
+        'features' => [
+            'Real-time time tracking',
+            'Automated leave requests and multi-level approvals',
+            'Up-to-date leave balances',
+            'Absence reporting and trends'
+        ],
+        'benefits' => 'Built for managers and employees to ensure clear, transparent, and hassle-free scheduling and time-off management.'
+    ]
+];
+
+$slug = $_GET['module'] ?? '';
+if (!isset($modules[$slug])) {
+    header("Location: index.php");
+    exit;
+}
+
+$module = $modules[$slug];
 $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESSION['must_change_password'] !== true);
 ?>
 <!DOCTYPE html>
@@ -1177,6 +1262,73 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
         .gaming-step i { color: var(--green); }
         .gaming-divider { color: var(--text-dim); }
     </style>
+<style>
+    .module-hero {
+        padding: 140px 48px 80px;
+        text-align: center;
+        background: linear-gradient(180deg, var(--bg) 0%, var(--bg2) 100%);
+    }
+    .module-hero h1 {
+        font-size: 3.5rem;
+        color: #fff;
+        margin-bottom: 20px;
+        letter-spacing: -0.03em;
+    }
+    .module-hero .tagline {
+        font-size: 1.5rem;
+        color: var(--green);
+        margin-bottom: 40px;
+    }
+    .module-content {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 0 48px 100px;
+    }
+    .module-section {
+        background: var(--bg3);
+        border: 1px solid var(--border2);
+        border-radius: 12px;
+        padding: 40px;
+        margin-bottom: 40px;
+    }
+    .module-section h2 {
+        color: #fff;
+        margin-bottom: 20px;
+        font-size: 1.75rem;
+    }
+    .module-section p {
+        font-size: 1.125rem;
+        color: var(--text-c);
+        margin-bottom: 20px;
+        line-height: 1.6;
+    }
+    .feature-list {
+        list-style: none;
+        padding: 0;
+    }
+    .feature-list li {
+        position: relative;
+        padding-left: 30px;
+        margin-bottom: 15px;
+        font-size: 1.1rem;
+        color: var(--text);
+    }
+    .feature-list li::before {
+        content: '\f00c';
+        font-family: 'Font Awesome 6 Free';
+        font-weight: 900;
+        position: absolute;
+        left: 0;
+        top: 2px;
+        color: var(--green);
+    }
+    .cta-buttons {
+        display: flex;
+        gap: 20px;
+        justify-content: center;
+        margin-top: 40px;
+    }
+</style>
 </head>
 <body>
     <div class="global-bg"></div>
@@ -1200,536 +1352,60 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
     </div>
 </nav>
 
-<!-- HERO -->
-<section class="hero" id="home">
-
-    <div class="hero-badge">
-        <div class="ping"></div>
-        BETA SERVERS ONLINE &nbsp;·&nbsp; RESPAWN-PH
-    </div>
-
-    <h1 class="hero-h1">
-        Your team deserves more<br>than a spreadsheet.<br>Time to <span class="accent">level up</span>
-    </h1>
-
-    <p class="hero-sub">
-        Respawn Logics is the enterprise HR platform built by people who actually played video games growing up. Payroll, hiring, performance, attendance — wired together and secured properly.
-    </p>
-
-    <div class="hero-actions">
-        <?php if ($loggedIn): ?>
-            <a href="<?= url('/pages/dashboard.php') ?>" class="btn-primary">
-                <i data-lucide="play"></i> Resume Session
-            </a>
-        <?php else: ?>
-            <a href="<?= url('/frontend/dist/index.html#/onboarding') ?>" class="btn-primary">
-                <i data-lucide="play"></i> Initialize Setup
-            </a>
-            <a href="<?= url('/login.php') ?>" class="btn-ghost">
-                <i data-lucide="save"></i> Continue Save File
-            </a>
-        <?php endif; ?>
-    </div>
-
-    <div class="hud">
-        <div class="hud-item">
-            <div class="hud-key">// MODULES</div>
-            <div class="hud-val">17</div>
-            <div class="hud-desc">Fully wired modules</div>
-        </div>
-        <div class="hud-item">
-            <div class="hud-key">// UPTIME</div>
-            <div class="hud-val">99.9%</div>
-            <div class="hud-desc">No unplanned outages</div>
-        </div>
-        <div class="hud-item">
-            <div class="hud-key">// BUILD</div>
-            <div class="hud-val amber">BETA</div>
-            <div class="hud-desc">Free for early partners</div>
-        </div>
-        <div class="hud-item">
-            <div class="hud-key">// STACK</div>
-            <div class="hud-val blue" style="font-size:1rem; padding-top:6px;">PHP · MySQL · React</div>
-            <div class="hud-desc">No black boxes</div>
-        </div>
-    </div>
-</section>
-
-<!-- SECTION 1: JOURNEY -->
-<section class="story-section" id="journey">
-    <div class="story-container">
-        <h2>The Complete Player Journey</h2>
-        <p class="sub">Forget the messy spreadsheets and clunky onboarding forms. We treat your employees like players logging into a AAA MMO. From their very first tutorial (onboarding) to their end-game progression (performance reviews), everything is tracked, rewarded, and managed in one seamless ecosystem.</p>
+<main>
+    <section class="module-hero">
+        <h1><?= htmlspecialchars($module['title']) ?></h1>
+        <div class="tagline"><?= htmlspecialchars($module['tagline']) ?></div>
         
-        <div class="journey-flow">
-            <div class="journey-node"><i data-lucide="crosshair"></i> Recruit</div> <i data-lucide="chevron-right" class="journey-arrow"></i>
-            <div class="journey-node"><i data-lucide="handshake"></i> Hire</div> <i data-lucide="chevron-right" class="journey-arrow"></i>
-            <div class="journey-node"><i data-lucide="zap"></i> Onboard</div> <i data-lucide="chevron-right" class="journey-arrow"></i>
-            <div class="journey-node"><i data-lucide="briefcase"></i> Work</div> <i data-lucide="chevron-right" class="journey-arrow"></i>
-            <div class="journey-node"><i data-lucide="coins"></i> Pay</div> <i data-lucide="chevron-right" class="journey-arrow"></i>
-            <div class="journey-node"><i data-lucide="star"></i> Develop</div> <i data-lucide="chevron-right" class="journey-arrow"></i>
-            <div class="journey-node"><i data-lucide="shield-alert"></i> Support</div> <i data-lucide="chevron-right" class="journey-arrow"></i>
-            <div class="journey-node" style="background: rgba(155,109,255,0.1); border-color: var(--purple); color: var(--purple);"><i data-lucide="corner-right-up"></i> Grow</div>
+        <div class="cta-buttons">
+            <a href="register.php" class="btn-primary" style="font-size: 1.1rem; padding: 15px 30px;">
+                <i data-lucide="building"></i> Create Workspace
+            </a>
+            <?php if (!$loggedIn): ?>
+                <a href="login.php" class="btn-ghost" style="font-size: 1.1rem; padding: 15px 30px;">
+                    Sign in
+                </a>
+            <?php else: ?>
+                <a href="pages/dashboard.php" class="btn-ghost" style="font-size: 1.1rem; padding: 15px 30px;">
+                    Go to Dashboard
+                </a>
+            <?php endif; ?>
         </div>
-    </div>
-</section>
+    </section>
 
-<!-- SECTION 2: PROBLEMS ELIMINATED -->
-<section class="story-section" id="problems">
-    <div class="story-container">
-        <h2>Defeat the Final Boss of HR: Disconnected Tools</h2>
-        <p class="sub">Are you still tracking PTO in an Excel sheet, approving payroll via email chains, and storing performance reviews in a dusty Google Drive? That's the equivalent of playing on dial-up. It's time to wipe the board clean.</p>
-        
-        <div class="problems-grid">
-            <div class="problem-card"><i data-lucide="skull"></i> Spreadsheets</div>
-            <div class="problem-card"><i data-lucide="hourglass"></i> Manual Tracking</div>
-            <div class="problem-card"><i data-lucide="mail-x"></i> Email Approvals</div>
-            <div class="problem-card"><i data-lucide="alert-triangle"></i> Payroll Rework</div>
-            <div class="problem-card"><i data-lucide="ghost"></i> Scattered Documents</div>
-            <div class="problem-card"><i data-lucide="unplug"></i> Disconnected Records</div>
+    <div class="module-content">
+        <div class="module-section">
+            <h2>Overview</h2>
+            <p><?= htmlspecialchars($module['overview']) ?></p>
         </div>
 
-        <div class="solution-block">
-            Respawn Logic brings your people data, workflows, and processes into one place.
-        </div>
-    </div>
-</section>
-
-<!-- SECTION 3: PLATFORM OVERVIEW (4 PILLARS) -->
-<section class="story-section" id="overview">
-    <div class="story-container">
-        <h2>The Core Engine. No Bloatware.</h2>
-        <p class="sub">We stripped out the corporate fluff and built exactly what you need to run a high-performance guild (your company). A unified platform built on four core pillars, running at 60 FPS.</p>
-
-        <div class="pillars-grid">
-            <div class="pillar-card">
-                <h3><i data-lucide="users"></i> Workforce</h3>
-                <ul>
-                    <li>Attendance</li>
-                    <li>Leave Management</li>
-                    <li>Scheduling</li>
-                    <li>Organization Structure</li>
-                </ul>
-            </div>
-            <div class="pillar-card">
-                <h3><i data-lucide="coins"></i> Pay & Benefits</h3>
-                <ul>
-                    <li>Enterprise Payroll</li>
-                    <li>Government Contributions</li>
-                    <li>Benefits Administration</li>
-                    <li>Expense Management</li>
-                </ul>
-            </div>
-            <div class="pillar-card">
-                <h3><i data-lucide="star"></i> Talent & Growth</h3>
-                <ul>
-                    <li>Recruitment / ATS</li>
-                    <li>Automated Onboarding</li>
-                    <li>Performance Reviews</li>
-                    <li>Succession Planning</li>
-                </ul>
-            </div>
-            <div class="pillar-card">
-                <h3><i data-lucide="headphones"></i> Employee Support</h3>
-                <ul>
-                    <li>Employee Relations</li>
-                    <li>Knowledge Base</li>
-                    <li>Case Management</li>
-                    <li>AI Companion</li>
-                </ul>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- DEMOS WORKFLOW SECTION -->
-<section class="story-section" id="demos" style="background: var(--bg2); border-top: 1px solid var(--border3); border-bottom: 1px solid var(--border3); padding-top: 80px; padding-bottom: 80px;">
-    <div class="story-container">
-        <h2 style="text-align: center; margin-bottom: 15px;">Experience the Workflow</h2>
-        <p class="sub" style="text-align: center; margin-bottom: 50px;">Drag-and-drop candidates through your custom recruitment pipeline. No training required.</p>
-        
-        <!-- Interactive Mockup of the ATS Board -->
-        <div style="background: var(--bg3); border: 1px solid var(--border2); border-radius: 16px; padding: 24px; box-shadow: 0 20px 40px rgba(0,0,0,0.4); max-width: 1000px; margin: 0 auto; overflow-x: auto;">
-            <!-- Header -->
-            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border3); padding-bottom: 16px; margin-bottom: 24px;">
-                <div style="display: flex; gap: 16px; align-items: center;">
-                    <div style="width: 40px; height: 40px; background: rgba(0,224,122,0.1); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: var(--green);">
-                        <i data-lucide="layout-dashboard"></i>
-                    </div>
-                    <div>
-                        <h3 style="margin: 0; font-size: 1.2rem; color: #fff;">ATS Pipeline</h3>
-                        <p style="margin: 0; font-size: 0.85rem; color: #8899b4;">Senior React Engineer</p>
-                    </div>
-                </div>
-                <div>
-                    <button style="background: var(--green); color: #000; border: none; padding: 8px 16px; border-radius: 6px; font-weight: 600; cursor: pointer;">+ Add Candidate</button>
-                </div>
-            </div>
-
-            <!-- Board -->
-            <div class="demo-board" style="display: flex; gap: 24px; min-width: 800px; padding-bottom: 10px;">
-                <!-- Column 1 -->
-                <div class="demo-column" style="flex: 1; min-width: 250px; background: var(--bg4); border-radius: 12px; padding: 16px; position: relative;">
-                    <div style="display: flex; justify-content: space-between; margin-bottom: 16px;">
-                        <span style="color: #8899b4; font-size: 0.85rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;">Sourced</span>
-                        <span class="col-count" style="background: rgba(255,255,255,0.1); padding: 2px 8px; border-radius: 10px; font-size: 0.75rem; color: #fff;">2</span>
-                    </div>
-                    <div class="drop-target-demo" style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.05); border-radius: 12px; pointer-events: none; opacity: 0; transition: opacity 0.3s; z-index: 10;">
-                        <div style="color: #fff; font-weight: 600; display: flex; align-items: center; gap: 8px;">
-                            <i data-lucide="download"></i> Drop Here
-                        </div>
-                    </div>
-                    <!-- Cards Container -->
-                    <div class="cards-container" style="min-height: 100px;">
-                        <!-- Card 1 -->
-                        <div class="demo-card" draggable="true" id="card-1" style="background: var(--bg2); border: 1px solid var(--border2); border-radius: 8px; padding: 16px; margin-bottom: 12px; cursor: grab; transition: transform 0.2s; box-shadow: 0 4px 10px rgba(0,0,0,0.2);" ondragstart="this.style.opacity='0.5'" ondragend="this.style.opacity='1'">
-                            <div style="font-weight: 600; color: #fff; margin-bottom: 4px;">Alex Mercer</div>
-                            <div style="font-size: 0.8rem; color: #8899b4; margin-bottom: 12px;">Google • 5 YOE</div>
-                            <div style="display: flex; gap: 6px;">
-                                <span style="background: rgba(0,224,122,0.1); color: var(--green); padding: 2px 6px; border-radius: 4px; font-size: 0.7rem;">React</span>
-                                <span style="background: rgba(79,142,247,0.1); color: var(--blue); padding: 2px 6px; border-radius: 4px; font-size: 0.7rem;">Node.js</span>
-                            </div>
-                        </div>
-                        <!-- Card 2 -->
-                        <div class="demo-card" draggable="true" id="card-2" style="background: var(--bg2); border: 1px solid var(--border2); border-radius: 8px; padding: 16px; margin-bottom: 12px; cursor: grab; transition: transform 0.2s; box-shadow: 0 4px 10px rgba(0,0,0,0.2);" ondragstart="this.style.opacity='0.5'" ondragend="this.style.opacity='1'">
-                            <div style="font-weight: 600; color: #fff; margin-bottom: 4px;">Sarah Chen</div>
-                            <div style="font-size: 0.8rem; color: #8899b4; margin-bottom: 12px;">Stripe • 3 YOE</div>
-                            <div style="display: flex; gap: 6px;">
-                                <span style="background: rgba(0,224,122,0.1); color: var(--green); padding: 2px 6px; border-radius: 4px; font-size: 0.7rem;">React</span>
-                                <span style="background: rgba(245,166,35,0.1); color: var(--amber); padding: 2px 6px; border-radius: 4px; font-size: 0.7rem;">TypeScript</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Column 2 -->
-                <div class="demo-column" style="flex: 1; min-width: 250px; background: var(--bg4); border-radius: 12px; padding: 16px; position: relative;">
-                    <div style="display: flex; justify-content: space-between; margin-bottom: 16px;">
-                        <span style="color: var(--blue); font-size: 0.85rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;">Interviewing</span>
-                        <span class="col-count" style="background: rgba(79,142,247,0.2); padding: 2px 8px; border-radius: 10px; font-size: 0.75rem; color: var(--blue);">1</span>
-                    </div>
-                    <div class="drop-target-demo" style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: rgba(79,142,247,0.05); border-radius: 12px; pointer-events: none; opacity: 0; transition: opacity 0.3s; z-index: 10;">
-                        <div style="color: var(--blue); font-weight: 600; display: flex; align-items: center; gap: 8px;">
-                            <i data-lucide="download"></i> Drop Here
-                        </div>
-                    </div>
-                    <!-- Cards Container -->
-                    <div class="cards-container" style="min-height: 100px;">
-                        <!-- Card 3 -->
-                        <div class="demo-card" draggable="true" id="card-3" style="background: var(--bg2); border: 1px solid var(--border2); border-radius: 8px; padding: 16px; margin-bottom: 12px; cursor: grab; box-shadow: 0 4px 10px rgba(0,0,0,0.2);" ondragstart="this.style.opacity='0.5'" ondragend="this.style.opacity='1'">
-                            <div style="font-weight: 600; color: #fff; margin-bottom: 4px;">David Kim</div>
-                            <div style="font-size: 0.8rem; color: #8899b4; margin-bottom: 12px;">Amazon • 7 YOE</div>
-                            <div style="display: flex; gap: 6px;">
-                                <span style="background: rgba(155,109,255,0.1); color: var(--purple); padding: 2px 6px; border-radius: 4px; font-size: 0.7rem;">System Design</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Column 3 -->
-                <div class="demo-column" style="flex: 1; min-width: 250px; background: var(--bg4); border-radius: 12px; padding: 16px; position: relative;">
-                    <div style="display: flex; justify-content: space-between; margin-bottom: 16px;">
-                        <span style="color: var(--green); font-size: 0.85rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;">Offer Extended</span>
-                        <span class="col-count" style="background: rgba(0,224,122,0.2); padding: 2px 8px; border-radius: 10px; font-size: 0.75rem; color: var(--green);">0</span>
-                    </div>
-                    <div class="drop-target-demo" style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: rgba(0,224,122,0.05); border-radius: 12px; pointer-events: none; opacity: 0; transition: opacity 0.3s; z-index: 10;">
-                        <div style="color: var(--green); font-weight: 600; display: flex; align-items: center; gap: 8px;">
-                            <i data-lucide="download"></i> Drop Here
-                        </div>
-                    </div>
-                    <!-- Cards Container -->
-                    <div class="cards-container" style="min-height: 100px; display: flex; flex-direction: column;">
-                        <div class="empty-state" style="height: 100px; display: flex; align-items: center; justify-content: center; color: #8899b4; font-size: 0.85rem; font-style: italic;">
-                            Empty Stage
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <script>
-                (function() {
-                    const cards = document.querySelectorAll('.demo-card');
-                    const columns = document.querySelectorAll('.demo-column');
-                    let draggedCard = null;
-
-                    cards.forEach(card => {
-                        card.addEventListener('dragstart', (e) => {
-                            draggedCard = card;
-                            e.dataTransfer.effectAllowed = 'move';
-                            // Required for Firefox
-                            if (e.dataTransfer) {
-                                e.dataTransfer.setData('text/plain', card.id);
-                            }
-                        });
-                        card.addEventListener('dragend', () => {
-                            draggedCard = null;
-                        });
-                    });
-
-                    columns.forEach(col => {
-                        col.addEventListener('dragover', (e) => {
-                            e.preventDefault(); // allow drop
-                            e.dataTransfer.dropEffect = 'move';
-                            const target = col.querySelector('.drop-target-demo');
-                            if(target) target.style.opacity = '1';
-                        });
-
-                        col.addEventListener('dragleave', (e) => {
-                            // Check if we are really leaving the column, not just hovering over a child
-                            if (!col.contains(e.relatedTarget)) {
-                                const target = col.querySelector('.drop-target-demo');
-                                if(target) target.style.opacity = '0';
-                            }
-                        });
-
-                        col.addEventListener('drop', (e) => {
-                            e.preventDefault();
-                            const target = col.querySelector('.drop-target-demo');
-                            if(target) target.style.opacity = '0';
-                            
-                            if (draggedCard) {
-                                const container = col.querySelector('.cards-container');
-                                const emptyState = container.querySelector('.empty-state');
-                                if(emptyState) emptyState.style.display = 'none';
-                                
-                                container.appendChild(draggedCard);
-                                updateCounts();
-                            }
-                        });
-                    });
-
-                    function updateCounts() {
-                        columns.forEach(col => {
-                            const countSpan = col.querySelector('.col-count');
-                            const cardsInCol = col.querySelectorAll('.demo-card').length;
-                            countSpan.textContent = cardsInCol;
-                            
-                            const emptyState = col.querySelector('.empty-state');
-                            if (emptyState && cardsInCol > 0) {
-                                emptyState.style.display = 'none';
-                            } else if (emptyState && cardsInCol === 0) {
-                                emptyState.style.display = 'flex';
-                            }
-                        });
-                    }
-                })();
-            </script>
-        </div>
-    </div>
-</section>
-
-<!-- SECTION 4: WHY TEAMS CHOOSE RESPAWN -->
-<section class="story-section" id="why">
-    <div class="story-container">
-        <h2>Built for real-world people operations</h2>
-        <p class="sub">Why organizations are leaving legacy tools behind.</p>
-
-        <div class="why-grid">
-            <div class="why-card">
-                <i data-lucide="layers"></i>
-                <h3>One Platform</h3>
-                <p>Manage employee data, payroll, performance, and employee support from a unified system without messy integrations.</p>
-            </div>
-            <div class="why-card">
-                <i data-lucide="cpu"></i>
-                <h3>Configurable Workflows</h3>
-                <p>Adapt processes to your organization's needs. Build approval chains, document requirements, and custom fields.</p>
-            </div>
-            <div class="why-card">
-                <i data-lucide="zap"></i>
-                <h3>Employee Self-Service</h3>
-                <p>Give employees access to the information and tools they need to request leave, check payslips, and log attendance.</p>
-            </div>
-            <div class="why-card">
-                <i data-lucide="book"></i>
-                <h3>Knowledge-Driven</h3>
-                <p>Policies, procedures, and guidance available when your teams need them. Integrated directly into the support flow.</p>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- SECTION 5: EMPLOYEE EXPERIENCE (COMPANION) -->
-<section class="story-section" id="experience">
-    <div class="story-container split-section">
-        <div>
-            <h2 style="font-size: clamp(1.8rem, 4vw, 2.5rem);">Help employees find answers faster.</h2>
-            <p style="font-size: 1.125rem; color: var(--text-mid); line-height: 1.6; margin-bottom: 30px;">
-                Employees can access leave balances, attendance records, payroll information, company policies, and more from a single, intelligent experience.
-            </p>
-            <ul style="list-style: none; color: var(--text); font-size: 1rem; display: flex; flex-direction: column; gap: 16px;">
-                <li><i data-lucide="check-circle-2" style="color: var(--green); margin-right: 12px; width: 18px; height: 18px; display: inline-block; vertical-align: middle;"></i> Instant policy lookups</li>
-                <li><i data-lucide="check-circle-2" style="color: var(--green); margin-right: 12px; width: 18px; height: 18px; display: inline-block; vertical-align: middle;"></i> Self-service document generation</li>
-                <li><i data-lucide="check-circle-2" style="color: var(--green); margin-right: 12px; width: 18px; height: 18px; display: inline-block; vertical-align: middle;"></i> 24/7 autonomous support</li>
+        <div class="module-section">
+            <h2>Key Features</h2>
+            <ul class="feature-list">
+                <?php foreach ($module['features'] as $feature): ?>
+                    <li><?= htmlspecialchars($feature) ?></li>
+                <?php endforeach; ?>
             </ul>
         </div>
-        <div class="split-image">
-            <div class="window-frame">
-                <div class="window-header">
-                    <div class="window-dots">
-                        <div class="window-dot close"></div>
-                        <div class="window-dot minimize"></div>
-                        <div class="window-dot maximize"></div>
-                    </div>
-                    <div class="window-url">http://localhost/respawn-logics/pages/dashboard.php</div>
-                </div>
-                <div class="window-body">
-                    <img src="assets/images/dashboard.png" alt="Employee Dashboard UI Screenshot" class="window-screenshot">
-                </div>
-            </div>
+
+        <div class="module-section">
+            <h2>Who It's For</h2>
+            <p><?= htmlspecialchars($module['benefits']) ?></p>
         </div>
     </div>
-</section>
-
-<!-- SECTION 6: GAMING CTA -->
-<section class="gaming-cta">
-    <div class="story-container">
-        <h2 style="font-size: 2.5rem; color: #fff; margin-bottom: 20px;">A Better Way to Manage People</h2>
-        <p style="color: var(--text-mid); font-size: 1.125rem; max-width: 600px; margin: 0 auto;">Equip your HR team with the ultimate loadout. No more juggling ten different tabs just to onboard a single employee or process payroll.</p>
-        
-        <div class="gaming-flow">
-            <div class="gaming-step"><i data-lucide="map-pin"></i> Spawn Point</div>
-            <i data-lucide="chevron-right" class="gaming-divider"></i>
-            <div class="gaming-step"><i data-lucide="users"></i> Build Your Team</div>
-            <i data-lucide="chevron-right" class="gaming-divider"></i>
-            <div class="gaming-step"><i data-lucide="trending-up"></i> Level Up Performance</div>
-            <i data-lucide="chevron-right" class="gaming-divider"></i>
-            <div class="gaming-step"><i data-lucide="shield-alert"></i> Support Your People</div>
-        </div>
-    </div>
-</section>
-
-<hr class="divider">
-
-<!-- STORY -->
-<div class="story-section" id="story">
-    <div class="story-container story-inner">
-        <div>
-            <div class="eyebrow">// THE LORE</div>
-            <h2 class="section-h" style="margin-bottom: 24px;">Built by someone who plays games and hates boring HR software.</h2>
-            <p style="font-size: 1rem; color: var(--text-mid); line-height: 1.8; margin-bottom: 20px; text-align: left;">
-                In every game, dying isn't the end. You <strong style="color:#fff">respawn</strong>. You come back smarter, better equipped, with another shot at the objective. That's the mindset we think every company should have toward its people — second chances, continuous growth, and the belief that your team can always level up.
-            </p>
-            <p style="font-size: 1rem; color: var(--text-mid); line-height: 1.8; margin-bottom: 20px; text-align: left;">
-                The <strong style="color:#fff">Logics</strong> half keeps us grounded. This isn't a game — people's livelihoods depend on accurate payroll, fair reviews, and secure personal data. We bring the energy of gaming culture with the discipline of enterprise software.
-            </p>
-            <p style="font-size: 1rem; color: var(--text); line-height: 1.8; font-weight: 500; text-align: left;">
-                Built in the Philippines <img src="https://flagcdn.com/ph.svg" width="20" alt="PH" style="vertical-align: middle; margin-left: 2px; margin-top: -3px; border-radius: 2px;">, for companies that take their people seriously — without taking themselves too seriously.
-            </p>
-        </div>
-
-        <div class="terminal">
-            <div class="term-bar">
-                <div class="t-dot r"></div>
-                <div class="t-dot y"></div>
-                <div class="t-dot g"></div>
-                <span class="term-file">respawn-logics ~ system.log</span>
-            </div>
-            <div class="term-body" style="text-align: left;">
-                <div class="t-row"><span class="t-p">▶</span><span class="t-c">./respawn <span style="color:var(--green)">--boot</span></span></div>
-                <div class="t-o t-cm"># Initializing core modules...</div>
-                <div class="t-o"><span style="color:var(--green)">✔</span> onboarding.engine &nbsp;&nbsp; <span class="t-v">READY</span></div>
-                <div class="t-o"><span style="color:var(--green)">✔</span> payroll.engine &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="t-v">READY</span></div>
-                <div class="t-o"><span style="color:var(--green)">✔</span> ats.pipeline &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="t-v">READY</span></div>
-                <div class="t-o"><span style="color:var(--green)">✔</span> ai.intelligence &nbsp;&nbsp;&nbsp;&nbsp; <span class="t-v">READY</span></div>
-                <div class="t-o"><span style="color:var(--green)">✔</span> rbac.security &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="t-v">READY</span></div>
-                <div class="t-o"><span style="color:var(--green)">✔</span> esm.helpdesk &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="t-v">READY</span></div>
-                <div class="t-gap"></div>
-                <div class="t-o t-cm"># 17 modules active.</div>
-                <div class="t-o t-cm"># Tenant isolation: ON</div>
-                <div class="t-o t-cm"># Audit trail: ARMED</div>
-                <div class="t-gap"></div>
-                <div class="t-row"><span class="t-p">▶</span><span class="t-c">status <span style="color:var(--green)">--all</span></span></div>
-                <div class="t-o"><span class="t-v">SYSTEM</span> All systems nominal.</div>
-                <div class="t-o"><span class="t-v">SERVER</span> Uptime: <span style="color:var(--green)">99.9%</span></div>
-                <div class="t-gap"></div>
-                <div class="t-row"><span class="t-p">▶</span><span class="t-cursor"></span></div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<section class="beta-wrap" id="beta">
-    <div style="display: grid; gap: 80px; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); align-items: stretch;">
-        
-        <!-- SOLO PLAN -->
-        <div class="beta-card" style="grid-template-columns: 1fr; gap: 24px; padding: 60px; position: relative;">
-            <div class="beta-label" style="background: rgba(0, 224, 122, 0.07); color: var(--green); border-color: rgba(0, 224, 122, 0.2);"><i data-lucide="user"></i> SOLO FOUNDER</div>
-            <h2 class="beta-h" style="font-size: 2rem;">Build your empire.</h2>
-            <p class="beta-p" style="max-width: 100%; margin-bottom: 24px;">Perfect for solo developers, indie hackers, and single-member startups who need an enterprise-grade HRIS to start right.</p>
-            
-            <div class="perks" style="grid-template-columns: 1fr; margin-bottom: 32px; gap: 12px;">
-                <div class="perk"><i data-lucide="check-circle"></i> 1 Sandbox Environment</div>
-                <div class="perk"><i data-lucide="check-circle"></i> 1 Administrator Seat</div>
-                <div class="perk"><i data-lucide="check-circle"></i> All Core Modules included</div>
-                <div class="perk"><i data-lucide="check-circle"></i> Community Support</div>
-            </div>
-            
-            <div class="price-panel" style="text-align: left; margin-top: auto;">
-                <div class="price-num">₱0</div>
-                <div class="price-tag">FOREVER FREE</div>
-                <?php if ($loggedIn): ?>
-                    <a href="<?= url('/pages/dashboard.php') ?>" class="btn-primary" style="width:100%; justify-content:center;">
-                        <i data-lucide="play"></i> Go to Dashboard
-                    </a>
-                <?php else: ?>
-                    <a href="<?= url('/register.php') ?>" class="btn-primary" style="width:100%; justify-content:center;">
-                        <i data-lucide="rocket"></i> Create Solo Workspace
-                    </a>
-                    <a href="<?= url('/login.php') ?>" class="btn-ghost" style="width:100%; justify-content:center; margin-top: 10px;">
-                        Sign In
-                    </a>
-                <?php endif; ?>
-            </div>
-        </div>
-
-        <!-- ENTERPRISE BETA PLAN -->
-        <div class="beta-card" style="grid-template-columns: 1fr; gap: 24px; padding: 60px; position: relative;">
-            <div class="beta-label"><i data-lucide="flask-conical"></i> PRIVATE BETA — LIMITED SLOTS</div>
-            <h2 class="beta-h" style="font-size: 2rem;">Join before we<br>go public.</h2>
-            <p class="beta-p" style="max-width: 100%; margin-bottom: 24px;">We're onboarding select enterprise partners. Every feature completely free while we battle-test the platform together.</p>
-            
-            <div class="perks" style="grid-template-columns: 1fr; margin-bottom: 32px; gap: 12px;">
-                <div class="perk"><i data-lucide="check-circle"></i> Unlimited employee seats</div>
-                <div class="perk"><i data-lucide="check-circle"></i> Batch structure onboarding</div>
-                <div class="perk"><i data-lucide="check-circle"></i> Direct line to the dev team</div>
-                <div class="perk"><i data-lucide="check-circle"></i> Priority onboarding support</div>
-            </div>
-            
-            <div class="price-panel" style="text-align: left; margin-top: auto;">
-                <div class="price-num">₱0</div>
-                <div class="price-tag">DURING BETA PERIOD</div>
-                <?php if ($loggedIn): ?>
-                    <a href="<?= url('/pages/dashboard.php') ?>" class="btn-primary" style="width:100%; justify-content:center;">
-                        <i data-lucide="play"></i> Go to Dashboard
-                    </a>
-                <?php else: ?>
-                    <a href="<?= url('/onboarding/') ?>" class="btn-primary" style="width:100%; justify-content:center;">
-                        <i data-lucide="building"></i> Claim Enterprise Slot
-                    </a>
-                    <a href="<?= url('/login.php') ?>" class="btn-ghost" style="width:100%; justify-content:center; margin-top: 10px;">
-                        Sign In
-                    </a>
-                <?php endif; ?>
-            </div>
-        </div>
-
-    </div>
-</section>
-
-<!-- FOOTER -->
+</main>
 <footer>
     <div class="footer-inner">
         <div class="footer-grid">
             <div class="footer-col">
                 <h4>Platform Modules</h4>
                 <ul>
-                    <li><a href="<?= url('/solutions.php?module=core-hr') ?>">Core HR & People</a></li>
-                    <li><a href="<?= url('/solutions.php?module=ats') ?>">ATS Pipeline</a></li>
-                    <li><a href="<?= url('/solutions.php?module=payroll') ?>">Enterprise Payroll</a></li>
-                    <li><a href="<?= url('/solutions.php?module=service-desk') ?>">Service Desk</a></li>
-                    <li><a href="<?= url('/solutions.php?module=employee-relations') ?>">Employee Relations</a></li>
-                    <li><a href="<?= url('/solutions.php?module=attendance') ?>">Attendance & Leaves</a></li>
+                    <li><a href="<?= url('/frontend/dist/index.html#/hr-directory') ?>">Core HR & People</a></li>
+                    <li><a href="<?= url('/frontend/dist/index.html#/ats') ?>">ATS Pipeline</a></li>
+                    <li><a href="<?= url('/frontend/dist/index.html#/payroll') ?>">Enterprise Payroll</a></li>
+                    <li><a href="<?= url('/frontend/dist/index.html#/service-desk') ?>">Service Desk</a></li>
+                    <li><a href="<?= url('/frontend/dist/index.html#/employee-relations') ?>">Employee Relations</a></li>
+                    <li><a href="<?= url('/frontend/dist/index.html#/attendance') ?>">Attendance & Leaves</a></li>
                 </ul>
             </div>
             <div class="footer-col">
