@@ -524,7 +524,7 @@ export function ATSDashboard({ onViewChange }: Props) {
             <h1
               className="text-2xl font-bold tracking-tight text-foreground font-['Space_Grotesk'] flex items-center gap-3"
             >
-              ATS CONTROLLER v2.0
+              RESPAWN LOGICS v2.0
               <span className="inline-block w-2.5 h-5 bg-emerald-500 blink"></span>
             </h1>
             <p className="text-xs font-mono text-muted-foreground mt-1 uppercase tracking-wider">
@@ -532,7 +532,7 @@ export function ATSDashboard({ onViewChange }: Props) {
             </p>
           </div>
           <div className="flex flex-wrap items-center gap-3 mt-4 md:mt-0 font-mono text-[10px]">
-            <span className="px-2.5 py-1 rounded bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 flex items-center gap-1.5 font-bold">
+            <span className="px-2.5 py-1 rounded bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-500/20 flex items-center gap-1.5 font-bold">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping" />
               STATUS: SECURE
             </span>

@@ -56,11 +56,15 @@ export function CandidatesList({ onViewChange }: { onViewChange: (v: ViewState) 
 
   const statusBadge = (status: string) => {
     const map: Record<string, string> = {
-      Active: "bg-emerald-500/10 border-emerald-500/20 text-emerald-400",
-      Archived: "bg-gray-500/10 border-gray-500/20 text-muted-foreground",
-      Blacklisted: "bg-red-500/10 border-red-500/20 text-red-400",
+      Active: "bg-emerald-500/10 border-emerald-500/20 text-emerald-700 dark:text-emerald-400",
+      Archived: "bg-gray-500/10 border-gray-500/20 text-slate-700 dark:text-muted-foreground",
+      Blacklisted: "bg-red-500/10 border-red-500/20 text-red-700 dark:text-red-400",
     };
     return map[status] || map.Active;
+  };
+
+  const getInitials = (name: string) => {
+    return name.split(" ").map(n => n[0]).join("").substring(0, 2).toUpperCase();
   };
 
   return (
@@ -155,7 +159,7 @@ export function CandidatesList({ onViewChange }: { onViewChange: (v: ViewState) 
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
                         <div className="w-10 h-10 rounded bg-muted border border-border flex items-center justify-center text-xs font-bold text-[#9b6dff]">
-                          {`[ ${c.name.substring(0, 2).toUpperCase()} ]`}
+                          {`[ ${getInitials(c.name)} ]`}
                         </div>
                         <div>
                           <div className="font-semibold text-foreground group-hover:text-primary transition-colors">
