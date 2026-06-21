@@ -1581,6 +1581,53 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
     </div>
 </section>
 
+<!-- SECTION 5.5: US VS THEM COMPARISON -->
+<section class="story-section" id="compare">
+    <div class="story-container">
+        <h2 style="text-align: center; font-size: clamp(2rem, 5vw, 3rem); margin-bottom: 10px;">The Legacy Way vs. The Respawn Way</h2>
+        <p class="sub" style="text-align: center; margin-bottom: 50px;">Why elite teams refuse to use legacy HR software.</p>
+
+        <div class="comparison-table-wrapper" style="overflow-x: auto; background: rgba(255,255,255,0.02); border: 1px solid var(--border2); border-radius: 12px; padding: 20px;">
+            <table style="width: 100%; border-collapse: collapse; min-width: 600px; text-align: left;">
+                <thead>
+                    <tr>
+                        <th style="padding: 20px; border-bottom: 1px solid var(--border2); color: var(--text-mid); font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.05em; width: 20%;">Focus Area</th>
+                        <th style="padding: 20px; border-bottom: 1px solid var(--border2); color: #ff4a4a; font-size: 1.1rem; width: 40%;"><i class="fa-solid fa-xmark"></i> Legacy HR Tech</th>
+                        <th style="padding: 20px; border-bottom: 1px solid var(--border2); color: var(--green); font-size: 1.2rem; width: 40%;"><i class="fa-solid fa-check-double"></i> Respawn Logics</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="padding: 20px; border-bottom: 1px solid var(--border2); color: #fff; font-weight: 600;">Architecture</td>
+                        <td style="padding: 20px; border-bottom: 1px solid var(--border2); color: var(--text-mid);">"Frankenstein" integrations. You buy an ATS, an HRIS, and a Payroll system from 3 different vendors and try to tape them together.</td>
+                        <td style="padding: 20px; border-bottom: 1px solid var(--border2); color: #fff; background: rgba(0,224,122,0.03);"><strong>A Unified Ecosystem.</strong> Candidate data flows natively from ATS directly into the Employee Directory and straight into Payroll. Zero double-entry.</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 20px; border-bottom: 1px solid var(--border2); color: #fff; font-weight: 600;">User Experience</td>
+                        <td style="padding: 20px; border-bottom: 1px solid var(--border2); color: var(--text-mid);">Clunky, slow interfaces that look like they were built in 2005. Employees dread using them.</td>
+                        <td style="padding: 20px; border-bottom: 1px solid var(--border2); color: #fff; background: rgba(0,224,122,0.03);"><strong>Consumer-Grade Design.</strong> Dark mode, glassmorphic UI, and keyboard shortcuts. It feels like a premium developer tool.</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 20px; border-bottom: 1px solid var(--border2); color: #fff; font-weight: 600;">PH Compliance</td>
+                        <td style="padding: 20px; border-bottom: 1px solid var(--border2); color: var(--text-mid);">Generic payroll engines or hardcoded rules that break entirely whenever BIR, SSS, or PhilHealth changes rates.</td>
+                        <td style="padding: 20px; border-bottom: 1px solid var(--border2); color: #fff; background: rgba(0,224,122,0.03);"><strong>Versioned Statutory Tables.</strong> Built specifically for the Philippines. Statutory changes are data updates, keeping historical runs 100% accurate.</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 20px; border-bottom: 1px solid var(--border2); color: #fff; font-weight: 600;">Data Security</td>
+                        <td style="padding: 20px; border-bottom: 1px solid var(--border2); color: var(--text-mid);">Weak access controls. Everything ends up exported to insecure Excel spreadsheets to make reporting work.</td>
+                        <td style="padding: 20px; border-bottom: 1px solid var(--border2); color: #fff; background: rgba(0,224,122,0.03);"><strong>Zero-Trust & Audit-Ready.</strong> AES-256 encryption, strict Need-to-Know RBAC, and cryptographically tamper-proof audit logs.</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 20px; border-bottom: none; color: #fff; font-weight: 600;">Pricing Model</td>
+                        <td style="padding: 20px; border-bottom: none; color: var(--text-mid);">Predatory "Pay-Per-Module" pricing. Want the ATS? That's extra. Need Service Desk? Another contract.</td>
+                        <td style="padding: 20px; border-bottom: none; color: #fff; background: rgba(0,224,122,0.03);"><strong>All-Inclusive Suite.</strong> You get the entire platform—Core HR, ATS, Payroll, ELR, Service Desk, and Attendance—out of the box.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+
 <!-- SECTION 6: GAMING CTA -->
 <section class="gaming-cta">
     <div class="story-container">
