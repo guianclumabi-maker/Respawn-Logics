@@ -4,7 +4,6 @@ recruitment/node_modules/
 employee-relations/node_modules/
 .env
 scratch/
-tests/
 *.log
 .DS_Store
 
