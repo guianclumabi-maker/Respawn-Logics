@@ -1221,7 +1221,7 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
                 <i data-lucide="play"></i> Resume Session
             </a>
         <?php else: ?>
-            <a href="<?= url('/frontend/dist/index.html') ?>" class="btn-primary">
+            <a href="<?= url('/frontend/dist/index.html#/onboarding') ?>" class="btn-primary">
                 <i data-lucide="play"></i> Initialize Setup
             </a>
             <a href="<?= url('/login.php') ?>" class="btn-ghost">
@@ -1723,12 +1723,12 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
             <div class="footer-col">
                 <h4>Platform Modules</h4>
                 <ul>
-                    <li><a href="<?= url('/frontend/dist/index.html') ?>">Core HR & People</a></li>
-                    <li><a href="<?= url('/frontend/dist/index.html') ?>">ATS Pipeline</a></li>
-                    <li><a href="<?= url('/frontend/dist/index.html') ?>">Enterprise Payroll</a></li>
-                    <li><a href="<?= url('/frontend/dist/index.html') ?>">Service Desk</a></li>
-                    <li><a href="<?= url('/frontend/dist/index.html') ?>">Employee Relations</a></li>
-                    <li><a href="<?= url('/frontend/dist/index.html') ?>">Attendance & Leaves</a></li>
+                    <li><a href="<?= url('/frontend/dist/index.html#/hr-directory') ?>">Core HR & People</a></li>
+                    <li><a href="<?= url('/frontend/dist/index.html#/ats') ?>">ATS Pipeline</a></li>
+                    <li><a href="<?= url('/frontend/dist/index.html#/payroll') ?>">Enterprise Payroll</a></li>
+                    <li><a href="<?= url('/frontend/dist/index.html#/service-desk') ?>">Service Desk</a></li>
+                    <li><a href="<?= url('/frontend/dist/index.html#/employee-relations') ?>">Employee Relations</a></li>
+                    <li><a href="<?= url('/frontend/dist/index.html#/attendance') ?>">Attendance & Leaves</a></li>
                 </ul>
             </div>
             <div class="footer-col">
@@ -1736,13 +1736,13 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
                 <ul>
                     <li><a href="<?= url('/login.php') ?>">Employee Login</a></li>
                     <li><a href="<?= url('/register.php') ?>">Create Workspace</a></li>
-                    <li><a href="<?= url('/onboarding/') ?>">Enterprise Onboarding</a></li>
+                    <li><a href="<?= url('/frontend/dist/index.html#/onboarding') ?>">Enterprise Onboarding</a></li>
                 </ul>
             </div>
             <div class="footer-col">
                 <h4>Resources</h4>
                 <ul>
-                    <li><a href="<?= url('/frontend/dist/index.html') ?>">Platform Dashboard</a></li>
+                    <li><a href="<?= url('/frontend/dist/index.html#/dashboard') ?>">Platform Dashboard</a></li>
                     <li><a href="<?= url('/pages/admin_platform_support.php') ?>">Help Center</a></li>
                 </ul>
             </div>
