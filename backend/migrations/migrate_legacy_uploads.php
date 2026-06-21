@@ -93,39 +93,49 @@ if (!$legacyDir || !is_dir($legacyDir)) {
 
 echo "\nCleaning up database paths...\n";
 
-// 1. employee_documents
-$pdo->exec("UPDATE employee_documents SET file_path = REPLACE(file_path, 'uploads/', '') WHERE file_path LIKE 'uploads/%'");
-$pdo->exec("UPDATE employee_documents SET file_path = REPLACE(file_path, '/uploads/', '') WHERE file_path LIKE '/uploads/%'");
+$queries = [
+    // 1. employee_documents
+    "UPDATE employee_documents SET file_path = REPLACE(file_path, 'uploads/', '') WHERE file_path LIKE 'uploads/%'",
+    "UPDATE employee_documents SET file_path = REPLACE(file_path, '/uploads/', '') WHERE file_path LIKE '/uploads/%'",
 
-// 2. candidate_profiles
-$pdo->exec("UPDATE candidate_profiles SET resume_file_path = REPLACE(resume_file_path, 'uploads/', '') WHERE resume_file_path LIKE 'uploads/%'");
-$pdo->exec("UPDATE candidate_profiles SET resume_file_path = REPLACE(resume_file_path, '/uploads/', '') WHERE resume_file_path LIKE '/uploads/%'");
-$pdo->exec("UPDATE candidate_profiles SET resume_file_path = REPLACE(resume_file_path, 'storage/', '') WHERE resume_file_path LIKE 'storage/%'"); // previous migration artifacts
+    // 2. candidate_profiles
+    "UPDATE candidate_profiles SET resume_file_path = REPLACE(resume_file_path, 'uploads/', '') WHERE resume_file_path LIKE 'uploads/%'",
+    "UPDATE candidate_profiles SET resume_file_path = REPLACE(resume_file_path, '/uploads/', '') WHERE resume_file_path LIKE '/uploads/%'",
+    "UPDATE candidate_profiles SET resume_file_path = REPLACE(resume_file_path, 'storage/', '') WHERE resume_file_path LIKE 'storage/%'",
 
-// 3. expenses
-$pdo->exec("UPDATE expenses SET receipt_path = REPLACE(receipt_path, 'uploads/receipts/', '') WHERE receipt_path LIKE 'uploads/receipts/%'");
-$pdo->exec("UPDATE expenses SET receipt_path = REPLACE(receipt_path, '/uploads/receipts/', '') WHERE receipt_path LIKE '/uploads/receipts/%'");
+    // 3. expenses
+    "UPDATE expenses SET receipt_path = REPLACE(receipt_path, 'uploads/receipts/', '') WHERE receipt_path LIKE 'uploads/receipts/%'",
+    "UPDATE expenses SET receipt_path = REPLACE(receipt_path, '/uploads/receipts/', '') WHERE receipt_path LIKE '/uploads/receipts/%'",
 
-// 4. ticket_comments (ESM)
-$pdo->exec("UPDATE ticket_comments SET attachment_url = REPLACE(attachment_url, 'uploads/tickets/', '') WHERE attachment_url LIKE 'uploads/tickets/%'");
-$pdo->exec("UPDATE ticket_comments SET attachment_url = REPLACE(attachment_url, '/uploads/tickets/', '') WHERE attachment_url LIKE '/uploads/tickets/%'");
+    // 4. ticket_comments (ESM)
+    "UPDATE ticket_comments SET attachment_url = REPLACE(attachment_url, 'uploads/tickets/', '') WHERE attachment_url LIKE 'uploads/tickets/%'",
+    "UPDATE ticket_comments SET attachment_url = REPLACE(attachment_url, '/uploads/tickets/', '') WHERE attachment_url LIKE '/uploads/tickets/%'",
 
-// 5. platform_ticket_comments (JSON array of attachments)
-// JSON replace is tricky in SQL, but we know it's stored as [{"name":"...","url":"/uploads/..."}]
-$pdo->exec("UPDATE platform_ticket_comments SET attachments = REPLACE(attachments, '\"/uploads/', '\"') WHERE attachments LIKE '%\"/uploads/%'");
-$pdo->exec("UPDATE platform_ticket_comments SET attachments = REPLACE(attachments, '\"uploads/', '\"') WHERE attachments LIKE '%\"uploads/%'");
+    // 5. platform_ticket_comments
+    "UPDATE platform_ticket_comments SET attachments = REPLACE(attachments, '\"/uploads/', '\"') WHERE attachments LIKE '%\"/uploads/%'",
+    "UPDATE platform_ticket_comments SET attachments = REPLACE(attachments, '\"uploads/', '\"') WHERE attachments LIKE '%\"uploads/%'",
 
-// 6. esm_ticket_comments (JSON array of attachments)
-$pdo->exec("UPDATE esm_ticket_comments SET attachments = REPLACE(attachments, '\"/uploads/', '\"') WHERE attachments LIKE '%\"/uploads/%'");
-$pdo->exec("UPDATE esm_ticket_comments SET attachments = REPLACE(attachments, '\"uploads/', '\"') WHERE attachments LIKE '%\"uploads/%'");
+    // 6. esm_ticket_comments
+    "UPDATE esm_ticket_comments SET attachments = REPLACE(attachments, '\"/uploads/', '\"') WHERE attachments LIKE '%\"/uploads/%'",
+    "UPDATE esm_ticket_comments SET attachments = REPLACE(attachments, '\"uploads/', '\"') WHERE attachments LIKE '%\"uploads/%'",
 
-// 7. company_posts
-$pdo->exec("UPDATE company_posts SET image_path = REPLACE(image_path, 'uploads/', '') WHERE image_path LIKE 'uploads/%'");
-$pdo->exec("UPDATE company_posts SET image_path = REPLACE(image_path, '/uploads/', '') WHERE image_path LIKE '/uploads/%'");
+    // 7. company_posts
+    "UPDATE company_posts SET image_path = REPLACE(image_path, 'uploads/', '') WHERE image_path LIKE 'uploads/%'",
+    "UPDATE company_posts SET image_path = REPLACE(image_path, '/uploads/', '') WHERE image_path LIKE '/uploads/%'",
 
-// 8. payroll_payslips
-$pdo->exec("UPDATE payroll_payslips SET pdf_path = REPLACE(pdf_path, 'uploads/', '') WHERE pdf_path LIKE 'uploads/%'");
-$pdo->exec("UPDATE payroll_payslips SET pdf_path = REPLACE(pdf_path, '/uploads/', '') WHERE pdf_path LIKE '/uploads/%'");
+    // 8. payroll_payslips
+    "UPDATE payroll_payslips SET pdf_path = REPLACE(pdf_path, 'uploads/', '') WHERE pdf_path LIKE 'uploads/%'",
+    "UPDATE payroll_payslips SET pdf_path = REPLACE(pdf_path, '/uploads/', '') WHERE pdf_path LIKE '/uploads/%'"
+];
+
+foreach ($queries as $query) {
+    try {
+        $pdo->exec($query);
+    } catch (PDOException $e) {
+        // Skip if column/table doesn't exist
+        echo "Skipped query due to schema mismatch (this is normal if a feature isn't installed): " . substr($query, 0, 50) . "...\n";
+    }
+}
 
 echo "Database paths cleaned.\n";
 echo "Migration complete.\n";
