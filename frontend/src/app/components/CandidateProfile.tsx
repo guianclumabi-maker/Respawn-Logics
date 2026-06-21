@@ -424,6 +424,10 @@ export function CandidateProfile({ onViewChange, candidateId }: Props) {
   const [hireData, setHireData] = useState({ employeeId: '', hireDate: new Date().toISOString().split('T')[0], jobTitle: '', department: '', baseSalary: '' });
   const [hireSuccessData, setHireSuccessData] = useState<{ email: string, tempPassword: string } | null>(null);
 
+  const [showAnonymizeModal, setShowAnonymizeModal] = useState(false);
+  const [anonymizeConfirmText, setAnonymizeConfirmText] = useState('');
+  const [isAnonymizing, setIsAnonymizing] = useState(false);
+
   const handleHireCandidate = async (e: React.FormEvent) => {
     e.preventDefault();
     setHiring(true);
@@ -459,6 +463,38 @@ export function CandidateProfile({ onViewChange, candidateId }: Props) {
       alert('An error occurred');
     } finally {
       setHiring(false);
+    }
+  };
+
+  const handleExportData = () => {
+    window.location.href = `${API}&action=export_candidate&id=${candidateId}`;
+  };
+
+  const handleAnonymize = async () => {
+    if (anonymizeConfirmText !== 'ANONYMIZE') return;
+    setIsAnonymizing(true);
+    try {
+      const res = await fetch(`${API}&action=erase_candidate`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRF-Token': (window as any).__CSRF_TOKEN__ || ''
+        },
+        body: JSON.stringify({ id: candidateId })
+      });
+      const data = await res.json();
+      if (data.success) {
+        setShowAnonymizeModal(false);
+        fetchCandidate();
+      } else {
+        alert(data.error || 'Failed to anonymize candidate');
+      }
+    } catch (err) {
+      console.error(err);
+      alert('An error occurred while anonymizing.');
+    } finally {
+      setIsAnonymizing(false);
     }
   };
 
@@ -704,6 +740,51 @@ export function CandidateProfile({ onViewChange, candidateId }: Props) {
                   </div>
                 </form>
               )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showAnonymizeModal && (
+        <div id="anonymizeModal" className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+          <div className="w-full max-w-md rounded-2xl border border-red-500/20 bg-[#0b0f1a] shadow-2xl overflow-hidden font-sans">
+            <div className="p-5 border-b border-white/10 flex items-center justify-between">
+              <div>
+                <h3 className="text-sm font-bold text-red-500 tracking-wide">Anonymize Candidate Data</h3>
+                <p className="text-[10px] text-muted-foreground mt-1">Right to be Forgotten Request</p>
+              </div>
+              <button onClick={() => setShowAnonymizeModal(false)} className="p-1 rounded-md text-muted-foreground hover:text-white hover:bg-white/5 transition-colors cursor-pointer">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+              </button>
+            </div>
+            <div className="p-5">
+              <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-lg mb-4">
+                <p className="text-xs text-red-400 leading-relaxed font-bold mb-2">WARNING: This action is irreversible.</p>
+                <p className="text-xs text-gray-300 leading-relaxed">
+                  This will permanently wipe all personally identifiable information (Name, Email, Phone, Skills, Resume File) 
+                  from the system. The shell record and hiring analytics will be preserved.
+                </p>
+              </div>
+              <div className="mb-4">
+                <label className="block text-xs font-bold text-muted-foreground mb-1.5 uppercase tracking-wide">Type "ANONYMIZE" to confirm</label>
+                <input
+                  type="text"
+                  value={anonymizeConfirmText}
+                  onChange={(e) => setAnonymizeConfirmText(e.target.value)}
+                  className="w-full bg-[#121827] border border-white/10 rounded-lg px-3 py-2.5 text-sm text-foreground focus:outline-none focus:border-red-500 transition-colors"
+                  placeholder="ANONYMIZE"
+                />
+              </div>
+              <div className="flex items-center justify-end gap-3">
+                <button onClick={() => setShowAnonymizeModal(false)} className="px-4 py-2 text-xs font-bold text-muted-foreground hover:text-white transition-colors cursor-pointer">Cancel</button>
+                <button 
+                  onClick={handleAnonymize} 
+                  disabled={anonymizeConfirmText !== 'ANONYMIZE' || isAnonymizing} 
+                  className="px-5 py-2 text-xs font-bold text-white bg-red-600 hover:bg-red-700 rounded-lg transition-colors disabled:opacity-50 cursor-pointer"
+                >
+                  {isAnonymizing ? 'Anonymizing...' : 'Confirm Anonymization'}
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -1283,6 +1364,46 @@ export function CandidateProfile({ onViewChange, candidateId }: Props) {
               )}
             </div>
           </div>
+
+          {/* Data Privacy & Compliance */}
+          <div className="p-5 rounded-xl border bg-background border-white/10">
+            <h3 className="text-xs font-bold tracking-wide text-muted-foreground uppercase mb-3 border-b border-white/10 pb-2">
+              Data Privacy & Compliance
+            </h3>
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <span className="text-xs text-muted-foreground">Consent Given</span>
+                <span className={`text-xs font-bold ${c.consent_given ? 'text-[#00e07a]' : 'text-red-400'}`}>
+                  {c.consent_given ? 'Yes' : 'No'}
+                </span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-xs text-muted-foreground">Consent Date</span>
+                <span className="text-xs font-bold text-foreground">{c.consent_at ? c.consent_at.split(' ')[0] : 'N/A'}</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-xs text-muted-foreground">Retention Until</span>
+                <span className="text-xs font-bold text-foreground">{c.data_retention_until || 'N/A'}</span>
+              </div>
+              
+              <div className="pt-2 flex gap-2">
+                <button
+                  onClick={handleExportData}
+                  className="flex-1 px-3 py-2 rounded-lg border border-[#00e07a]/40 bg-[#00e07a]/10 text-[#00e07a] hover:bg-[#00e07a]/20 text-[10px] font-bold text-center transition-all cursor-pointer"
+                >
+                  Export Data
+                </button>
+                <button
+                  onClick={() => setShowAnonymizeModal(true)}
+                  disabled={c.is_anonymized === 1}
+                  className="flex-1 px-3 py-2 rounded-lg border border-red-500/40 bg-red-500/10 text-red-500 hover:bg-red-500/20 text-[10px] font-bold text-center transition-all cursor-pointer disabled:opacity-50"
+                >
+                  {c.is_anonymized === 1 ? 'Anonymized' : 'Anonymize'}
+                </button>
+              </div>
+            </div>
+          </div>
+
         </div>
       </div>
     </div>
