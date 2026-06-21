@@ -1147,9 +1147,8 @@ class CandidatesController
         $ext = $allowedMimes[$mime];
         $originalName = basename($file['name']);
         
-        // Define storage base: /tmp on Railway (outside docroot), or local storage/ directory (protected by .htaccess)
-        $isRailway = getenv('RAILWAY_ENVIRONMENT') || getenv('NIXPACKS') || getenv('RAILWAY_PROJECT_ID');
-        $storageBase = $isRailway ? '/tmp/respawn_storage' : __DIR__ . '/../../storage';
+        // Define storage base configurable via env var for persistent storage (e.g. /data mounted on Railway), fallback to local storage
+        $storageBase = getenv('RESUME_STORAGE_PATH') ?: __DIR__ . '/../../storage';
         $storageDir = $storageBase . '/tenant_' . $this->tenantId . '/resumes';
 
         if (!is_dir($storageDir)) {
@@ -1208,8 +1207,7 @@ class CandidatesController
             exit;
         }
 
-        $isRailway = getenv('RAILWAY_ENVIRONMENT') || getenv('NIXPACKS') || getenv('RAILWAY_PROJECT_ID');
-        $storageBase = $isRailway ? '/tmp/respawn_storage' : __DIR__ . '/../../storage';
+        $storageBase = getenv('RESUME_STORAGE_PATH') ?: __DIR__ . '/../../storage';
 
         // Strip off any old 'storage/' prefix from earlier uploads to handle migration gracefully
         $dbPath = preg_replace('/^storage\//', '', $candidate['resume_file_path']);
