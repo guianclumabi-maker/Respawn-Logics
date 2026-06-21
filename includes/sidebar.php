@@ -109,7 +109,7 @@ if ($user) {
             <?php endif; ?>
             
             <?php if (hasPermission('ats.view') && tenantModuleEnabled('ats')): ?>
-            <a href="<?= url('/frontend/dist/index.html#/ats') ?>" class="menu-item">
+            <a href="<?= url('/frontend/dist/index.html?v=' . time() . '#/ats') ?>" class="menu-item">
                 <i data-lucide="crosshair"></i>
                 <span>Recruitment / ATS</span>
             </a>
@@ -152,7 +152,7 @@ if ($user) {
             <?php endif; ?>
 
             <?php if (hasPermission('payroll.manage') && tenantModuleEnabled('payroll')): ?>
-            <a href="<?= url('/payroll-frontend/dist/index.html') ?>" class="menu-item">
+            <a href="<?= url('/payroll-frontend/dist/index.html?v=' . time()) ?>" class="menu-item">
                 <i data-lucide="philippine-peso"></i>
                 <span>Payroll Engine</span>
             </a>
@@ -187,7 +187,7 @@ if ($user) {
             <?php endif; ?>
 
             <?php if (hasPermission('elr.view') && tenantModuleEnabled('elr')): ?>
-            <a href="<?= url('/employee-relations-dist/dist/index.html') ?>" class="menu-item <?= $current_page === 'index.html' ? 'active' : '' ?>" style="color:#ef4444;">
+            <a href="<?= url('/employee-relations-dist/dist/index.html?v=' . time()) ?>" class="menu-item <?= $current_page === 'index.html' ? 'active' : '' ?>" style="color:#ef4444;">
                 <i data-lucide="gavel"></i>
                 <span style="font-weight:600;">ELR Admin Console</span>
             </a>
