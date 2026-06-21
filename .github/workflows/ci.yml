@@ -33,6 +33,16 @@ jobs:
 
   backend-tests:
     runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: employee_system_test
+        ports:
+          - 3306:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+
     steps:
       - uses: actions/checkout@v3
       
@@ -40,10 +50,27 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: '8.2'
+          extensions: pdo, pdo_mysql, curl, mbstring
           tools: phpunit
           
+      - name: Verify MySQL Connection
+        run: |
+          while ! mysqladmin ping -h"127.0.0.1" -P3306 -uroot -proot --silent; do
+            sleep 1
+          done
+          
       - name: Install Composer Dependencies
-        run: composer install --no-progress --prefer-dist --optimize-autoloader || echo "No composer.json found, skipping."
+        run: composer install --no-progress --prefer-dist --optimize-autoloader
+        
+      - name: PHP Syntax Check
+        run: find backend/ -name "*.php" -print0 | xargs -0 -n1 php -l
         
       - name: Run PHPUnit Tests
-        run: phpunit
+        env:
+          DB_HOST: 127.0.0.1
+          DB_PORT: 3306
+          DB_USER: root
+          DB_PASS: root
+          DB_NAME: employee_system_test
+          APP_ENV: testing
+        run: vendor/bin/phpunit
