@@ -6,16 +6,19 @@ import { ThemeProvider } from "next-themes";
 import * as Sentry from "@sentry/react";
 import "./styles/index.css";
 
-Sentry.init({
-  dsn: "https://examplePublicKey@o0.ingest.sentry.io/0", // Replace with actual DSN
-  integrations: [
-    Sentry.browserTracingIntegration(),
-    Sentry.replayIntegration(),
-  ],
-  tracesSampleRate: 1.0,
-  replaysSessionSampleRate: 0.1,
-  replaysOnErrorSampleRate: 1.0,
-});
+const sentryDsn = import.meta.env.VITE_SENTRY_DSN;
+if (sentryDsn && sentryDsn !== "https://examplePublicKey@o0.ingest.sentry.io/0") {
+  Sentry.init({
+    dsn: sentryDsn,
+    integrations: [
+      Sentry.browserTracingIntegration(),
+      Sentry.replayIntegration(),
+    ],
+    tracesSampleRate: 1.0,
+    replaysSessionSampleRate: 0.1,
+    replaysOnErrorSampleRate: 1.0,
+  });
+}
 
 // Global fetch interceptor to handle session expiration
 const originalFetch = window.fetch;
