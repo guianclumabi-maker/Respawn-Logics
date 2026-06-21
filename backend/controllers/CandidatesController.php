@@ -1,4 +1,7 @@
 <?php
+require_once __DIR__ . '/../bootstrap/app.php';
+require_once __DIR__ . '/../models/User.php';
+require_once __DIR__ . '/../services/Mailer.php';
 require_once __DIR__ . '/../utils/Storage.php';
 
 class CandidatesController
@@ -905,7 +908,7 @@ class CandidatesController
         $id = (int)($input['id'] ?? 0); $stage = trim($input['stage'] ?? '');
         if (!$id || empty($stage)) { http_response_code(400); echo json_encode(['success' => false, 'error' => 'Missing ID or stage']); exit; }
         if (!in_array($stage, self::ALLOWED_STAGES, true)) { http_response_code(400); echo json_encode(['success' => false, 'error' => 'Invalid stage']); exit; }
-        $oldStage = $this->pdo->prepare("SELECT `stage`, `candidate_id`, `job_id` FROM `candidate_applications` WHERE `id` = ? AND `tenant_id` = ?"); $oldStage->execute([$id, $this->tenantId]); $old = $oldStage->fetch();
+        $oldStage = $this->pdo->prepare("SELECT a.`stage`, a.`candidate_id`, a.`job_id`, p.`email`, p.`name` FROM `candidate_applications` a JOIN `candidate_profiles` p ON a.`candidate_id` = p.`id` WHERE a.`id` = ? AND a.`tenant_id` = ?"); $oldStage->execute([$id, $this->tenantId]); $old = $oldStage->fetch();
         $updateFields = "`stage` = ?, `stage_entered_at` = NOW()";
         $updateParams = [$stage];
 
@@ -922,7 +925,20 @@ class CandidatesController
         $updateParams[] = $id;
         $updateParams[] = $this->tenantId;
         $this->pdo->prepare("UPDATE `candidate_applications` SET $updateFields WHERE `id` = ? AND `tenant_id` = ?")->execute($updateParams);
-        if ($old) { $this->logActivity('stage_changed', "Moved from {$old['stage']} to $stage", (int)$old['candidate_id'], (int)$old['job_id'], $id); }
+        if ($old) { 
+            $this->logActivity('stage_changed', "Moved from {$old['stage']} to $stage", (int)$old['candidate_id'], (int)$old['job_id'], $id); 
+            
+            // Send email notification based on new stage
+            if (!empty($old['email']) && $old['stage'] !== $stage) {
+                if ($stage === 'Offer') {
+                    Mailer::send($old['email'], $old['name'], 'You have received an offer!', "<p>Hi {$old['name']},</p><p>We are thrilled to extend an offer for your recent application. Please check your portal for more details.</p>");
+                } elseif ($stage === 'Hired') {
+                    Mailer::send($old['email'], $old['name'], 'Welcome to the team!', "<p>Hi {$old['name']},</p><p>Congratulations! We are excited to welcome you to the team.</p>");
+                } elseif ($stage === 'Rejected') {
+                    Mailer::send($old['email'], $old['name'], 'Update on your application', "<p>Hi {$old['name']},</p><p>Thank you for taking the time to interview with us. Unfortunately, we have decided to move forward with other candidates at this time. We wish you the best in your job search.</p>");
+                }
+            }
+        }
         echo json_encode(['success' => true]);
         exit;
     }
@@ -953,8 +969,20 @@ class CandidatesController
         $params[] = $this->tenantId;
         $this->pdo->prepare("UPDATE `candidate_applications` SET $set WHERE `id` IN ($placeholders) AND `tenant_id` = ?")->execute($params);
         foreach ($ids as $appId) {
-            $app = $this->pdo->prepare("SELECT `candidate_id`, `job_id` FROM `candidate_applications` WHERE `id` = ? AND `tenant_id` = ?"); $app->execute([$appId, $this->tenantId]); $a = $app->fetch();
-            if ($a) $this->logActivity('bulk_advance', "Bulk advanced to $stage", (int)$a['candidate_id'], (int)$a['job_id'], (int)$appId);
+            $app = $this->pdo->prepare("SELECT a.`candidate_id`, a.`job_id`, p.`email`, p.`name`, a.`stage` AS old_stage FROM `candidate_applications` a JOIN `candidate_profiles` p ON a.`candidate_id` = p.`id` WHERE a.`id` = ? AND a.`tenant_id` = ?"); $app->execute([$appId, $this->tenantId]); $a = $app->fetch();
+            if ($a) {
+                $this->logActivity('bulk_advance', "Bulk advanced to $stage", (int)$a['candidate_id'], (int)$a['job_id'], (int)$appId);
+                
+                if (!empty($a['email']) && $a['old_stage'] !== $stage) {
+                    if ($stage === 'Offer') {
+                        Mailer::send($a['email'], $a['name'], 'You have received an offer!', "<p>Hi {$a['name']},</p><p>We are thrilled to extend an offer for your recent application. Please check your portal for more details.</p>");
+                    } elseif ($stage === 'Hired') {
+                        Mailer::send($a['email'], $a['name'], 'Welcome to the team!', "<p>Hi {$a['name']},</p><p>Congratulations! We are excited to welcome you to the team.</p>");
+                    } elseif ($stage === 'Rejected') {
+                        Mailer::send($a['email'], $a['name'], 'Update on your application', "<p>Hi {$a['name']},</p><p>Thank you for taking the time to interview with us. Unfortunately, we have decided to move forward with other candidates at this time. We wish you the best in your job search.</p>");
+                    }
+                }
+            }
         }
         echo json_encode(['success' => true, 'updated' => count($ids)]);
         exit;
@@ -966,8 +994,13 @@ class CandidatesController
         $placeholders = implode(',', array_fill(0, count($ids), '?'));
         $params = array_merge([$reason], $ids); $params[] = $this->tenantId; $this->pdo->prepare("UPDATE `candidate_applications` SET `stage` = 'Rejected', `rejected_at` = NOW(), `rejection_reason` = ? WHERE `id` IN ($placeholders) AND `tenant_id` = ?")->execute($params);
         foreach ($ids as $appId) {
-            $app = $this->pdo->prepare("SELECT `candidate_id`, `job_id` FROM `candidate_applications` WHERE `id` = ? AND `tenant_id` = ?"); $app->execute([$appId, $this->tenantId]); $a = $app->fetch();
-            if ($a) $this->logActivity('bulk_reject', "Bulk rejected", (int)$a['candidate_id'], (int)$a['job_id'], (int)$appId);
+            $app = $this->pdo->prepare("SELECT a.`candidate_id`, a.`job_id`, p.`email`, p.`name`, a.`stage` AS old_stage FROM `candidate_applications` a JOIN `candidate_profiles` p ON a.`candidate_id` = p.`id` WHERE a.`id` = ? AND a.`tenant_id` = ?"); $app->execute([$appId, $this->tenantId]); $a = $app->fetch();
+            if ($a) {
+                $this->logActivity('bulk_reject', "Bulk rejected", (int)$a['candidate_id'], (int)$a['job_id'], (int)$appId);
+                if (!empty($a['email']) && $a['old_stage'] !== 'Rejected') {
+                    Mailer::send($a['email'], $a['name'], 'Update on your application', "<p>Hi {$a['name']},</p><p>Thank you for taking the time to interview with us. Unfortunately, we have decided to move forward with other candidates at this time. We wish you the best in your job search.</p>");
+                }
+            }
         }
         echo json_encode(['success' => true, 'updated' => count($ids)]);
         exit;
@@ -1002,6 +1035,27 @@ class CandidatesController
         $stmt->execute([$this->tenantId, $applicationId, $candidateId, $jobId, $input['interview_type'] ?? 'General', $scheduledAt, (int)($input['duration_minutes'] ?? 60), trim($input['location'] ?? ''), trim($input['meeting_link'] ?? ''), trim($input['interviewer_name'] ?? '')]);
         $interviewId = (int)$this->pdo->lastInsertId();
         $this->logActivity('interview_scheduled', "Interview scheduled for " . date('M j, Y', strtotime($scheduledAt)), $candidateId, $jobId, $applicationId);
+
+        $prof = $this->pdo->prepare("SELECT `name`, `email` FROM `candidate_profiles` WHERE `id` = ?"); $prof->execute([$candidateId]); $p = $prof->fetch();
+        if ($p && !empty($p['email'])) {
+            $type = htmlspecialchars($input['interview_type'] ?? 'General');
+            $loc = htmlspecialchars(trim($input['location'] ?? ''));
+            $link = htmlspecialchars(trim($input['meeting_link'] ?? ''));
+            $dateFormatted = date('l, M j, Y g:i A', strtotime($scheduledAt));
+            
+            $html = "<p>Hi {$p['name']},</p>";
+            $html .= "<p>An interview has been scheduled for your application.</p>";
+            $html .= "<ul>";
+            $html .= "<li><strong>Type:</strong> $type</li>";
+            $html .= "<li><strong>Date/Time:</strong> $dateFormatted</li>";
+            if ($loc) $html .= "<li><strong>Location:</strong> $loc</li>";
+            if ($link) $html .= "<li><strong>Meeting Link:</strong> <a href=\"$link\">$link</a></li>";
+            $html .= "</ul>";
+            $html .= "<p>Looking forward to speaking with you!</p>";
+            
+            Mailer::send($p['email'], $p['name'], "Interview Scheduled: $type", $html);
+        }
+
         echo json_encode(['success' => true, 'interview_id' => $interviewId]);
         exit;
     }
