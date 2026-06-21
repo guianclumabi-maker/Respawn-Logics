@@ -67,7 +67,6 @@ export const router = createHashRouter([
     element: <MainLayout />,
     children: [
       { path: "dashboard", element: <HomeDashboard /> },
-      { path: "onboarding", element: <OnboardingManager /> },
       { path: "employee-relations", element: <EmployeeRelations /> },
       { path: "hr-directory", element: <HRDirectory /> },
       { path: "org-chart", element: <OrgChart /> },
@@ -111,5 +110,6 @@ export const router = createHashRouter([
         ]
       }
     ]
-  }
+  },
+  { path: "/onboarding", element: <OnboardingManager /> }
 ]);
