@@ -1108,24 +1108,28 @@ class CandidatesController
         $interviewId = (int)$this->pdo->lastInsertId();
         $this->logActivity('interview_scheduled', "Interview scheduled for " . date('M j, Y', strtotime($scheduledAt)), $candidateId, $jobId, $applicationId);
 
-        $prof = $this->pdo->prepare("SELECT `name`, `email` FROM `candidate_profiles` WHERE `id` = ?"); $prof->execute([$candidateId]); $p = $prof->fetch();
+        $prof = $this->pdo->prepare("SELECT `name`, `email` FROM `candidate_profiles` WHERE `id` = ? AND `tenant_id` = ?"); 
+        $prof->execute([$candidateId, $this->tenantId]); 
+        $p = $prof->fetch();
         if ($p && !empty($p['email'])) {
             $type = htmlspecialchars($input['interview_type'] ?? 'General');
             $loc = htmlspecialchars(trim($input['location'] ?? ''));
             $link = htmlspecialchars(trim($input['meeting_link'] ?? ''));
             $dateFormatted = date('l, M j, Y g:i A', strtotime($scheduledAt));
+            $duration = (int)($input['duration_minutes'] ?? 60);
             
             $html = "<p>Hi {$p['name']},</p>";
             $html .= "<p>An interview has been scheduled for your application.</p>";
             $html .= "<ul>";
             $html .= "<li><strong>Type:</strong> $type</li>";
             $html .= "<li><strong>Date/Time:</strong> $dateFormatted</li>";
+            $html .= "<li><strong>Duration:</strong> $duration minutes</li>";
             if ($loc) $html .= "<li><strong>Location:</strong> $loc</li>";
             if ($link) $html .= "<li><strong>Meeting Link:</strong> <a href=\"$link\">$link</a></li>";
             $html .= "</ul>";
             $html .= "<p>Looking forward to speaking with you!</p>";
             
-            Mailer::send($p['email'], $p['name'], "Interview Scheduled: $type", $html);
+            \App\Services\Mailer::send($p['email'], $p['name'], "Interview Scheduled: $type", $html);
         }
 
         echo json_encode(['success' => true, 'interview_id' => $interviewId]);
