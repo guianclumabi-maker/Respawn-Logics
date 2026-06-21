@@ -14,7 +14,7 @@ $route = isset($_GET['route']) ? $_GET['route'] : '';
 $action = isset($_GET['action']) ? $_GET['action'] : '';
 
 // Middleware: Verify Authentication before ANY controller logic runs
-if (!isLoggedIn() && $route !== 'auth') {
+if (!isLoggedIn() && $route !== 'auth' && $route !== 'onboarding') {
     http_response_code(401);
     echo json_encode(['success' => false, 'error' => 'Unauthorized']);
     exit;
@@ -106,6 +106,7 @@ $controllers = [
     'announcements' => 'AnnouncementsController',
     'surveys' => 'SurveyController',
     'audit' => 'AuditController',
+    'onboarding' => 'OnboardingController',
 ];
 
 if (!array_key_exists($route, $controllers)) {

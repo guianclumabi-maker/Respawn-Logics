@@ -181,7 +181,7 @@ export default function App() {
     formData.append("setup_mode", setupMode);
     formData.append("mapping", JSON.stringify(mapping));
 
-    fetch(`${API_BASE}/import.php`, {
+    fetch(`${API_BASE}/api/index.php?route=onboarding&action=import`, {
       method: "POST",
       credentials: "same-origin",
       headers: {
@@ -212,7 +212,7 @@ export default function App() {
       }
     })
     .catch(err => {
-      console.error("Fetch failed for URL:", `${API_BASE}/import.php`, "Error:", err);
+      console.error("Fetch failed for URL:", `${API_BASE}/api/index.php?route=onboarding&action=import`, "Error:", err);
       showToast("Import failed: " + err.message + " (Check console for URL)");
       setCurrentView("mapping");
     });
@@ -233,7 +233,7 @@ export default function App() {
         return;
       }
 
-      const response = await fetch(`${API_BASE}/update_roles.php`, {
+      const response = await fetch(`${API_BASE}/api/index.php?route=onboarding&action=update_roles`, {
         method: "POST",
         credentials: "same-origin",
         headers: { 
