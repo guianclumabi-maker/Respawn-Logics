@@ -185,13 +185,17 @@ if (!function_exists('getCurrentUser')) {
         $tenantId = $_SESSION['tenant_id'] ?? null;
         try {
             if ($tenantId === null || $tenantId === '') {
-                $stmt = $pdo->prepare("SELECT * FROM `users` WHERE `email` = ? AND (`tenant_id` IS NULL OR `tenant_id` = '')");
+                $stmt = $pdo->prepare("SELECT * FROM `users` WHERE `email` = ?");
                 $stmt->execute([$_SESSION['user_email']]);
+                $cachedUser = $stmt->fetch();
+                if ($cachedUser && $cachedUser['tenant_id']) {
+                    $_SESSION['tenant_id'] = $cachedUser['tenant_id']; // Auto-heal session
+                }
             } else {
                 $stmt = $pdo->prepare("SELECT * FROM `users` WHERE `email` = ? AND `tenant_id` = ?");
                 $stmt->execute([$_SESSION['user_email'], $tenantId]);
+                $cachedUser = $stmt->fetch();
             }
-            $cachedUser = $stmt->fetch();
             return $cachedUser;
         } catch (PDOException $e) {
             return null;

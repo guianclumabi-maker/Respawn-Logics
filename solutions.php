@@ -1297,9 +1297,17 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
     }
     .module-hero h1 {
         font-size: 3.5rem;
-        color: #fff;
+        color: transparent;
+        background: linear-gradient(135deg, #fff 0%, #00e07a 100%);
+        -webkit-background-clip: text;
+        background-clip: text;
         margin-bottom: 20px;
         letter-spacing: -0.03em;
+        animation: hero-glow 3s ease-in-out infinite alternate;
+    }
+    @keyframes hero-glow {
+        from { filter: drop-shadow(0 0 10px rgba(0,224,122,0.1)); }
+        to { filter: drop-shadow(0 0 20px rgba(0,224,122,0.3)); }
     }
     .module-hero .tagline {
         font-size: 1.5rem;
@@ -1413,12 +1421,16 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
 <nav>
     <?= renderLogo('navbar') ?>
     <div class="nav-links">
-        <a href="#overview">Platform</a>
+        <a href="index.php#overview">Platform</a>
         <a href="deep_dive.php">Deep Dive</a>
         <a href="design.php">Design</a>
-        <a href="#why">Why Us</a>
-        <a href="#story">The Story</a>
-        <a href="#beta">Beta</a>
+        <a href="index.php#why">Why Us</a>
+        <a href="index.php#story">The Story</a>
+        <a href="index.php#beta">Beta</a>
+        <div style="width: 1px; height: 24px; background: var(--border2); margin: 0 10px;"></div>
+        <a href="index.php" class="btn-ghost" style="display: flex; align-items: center; gap: 8px; font-size: 0.85rem; padding: 6px 12px;">
+            <i class="fa-solid fa-arrow-left"></i> Back to Home
+        </a>
         <?php if ($loggedIn): ?>
             <a href="<?= url('/pages/dashboard.php') ?>" class="nav-cta">[ RESUME ]</a>
         <?php else: ?>
@@ -1507,12 +1519,12 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
             <div class="footer-col">
                 <h4>Platform Modules</h4>
                 <ul>
-                    <li><a href="<?= url('/frontend/dist/index.html#/hr-directory') ?>">Core HR & People</a></li>
-                    <li><a href="<?= url('/frontend/dist/index.html#/ats') ?>">ATS Pipeline</a></li>
-                    <li><a href="<?= url('/frontend/dist/index.html#/payroll') ?>">Enterprise Payroll</a></li>
-                    <li><a href="<?= url('/frontend/dist/index.html#/service-desk') ?>">Service Desk</a></li>
-                    <li><a href="<?= url('/frontend/dist/index.html#/employee-relations') ?>">Employee Relations</a></li>
-                    <li><a href="<?= url('/frontend/dist/index.html#/attendance') ?>">Attendance & Leaves</a></li>
+                    <li><a href="<?= url('/solutions.php?module=core-hr') ?>">Core HR & People</a></li>
+                    <li><a href="<?= url('/solutions.php?module=ats') ?>">ATS Pipeline</a></li>
+                    <li><a href="<?= url('/solutions.php?module=payroll') ?>">Enterprise Payroll</a></li>
+                    <li><a href="<?= url('/solutions.php?module=service-desk') ?>">Service Desk</a></li>
+                    <li><a href="<?= url('/solutions.php?module=employee-relations') ?>">Employee Relations</a></li>
+                    <li><a href="<?= url('/solutions.php?module=attendance') ?>">Attendance & Leaves</a></li>
                 </ul>
             </div>
             <div class="footer-col">

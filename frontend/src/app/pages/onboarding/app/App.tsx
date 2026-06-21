@@ -320,13 +320,19 @@ export default function App() {
           </span>
         </a>
 
-        <div className="hidden md:flex items-center gap-[30px] font-['Space_Grotesk'] text-[0.9rem] font-medium text-[#8b95a8]">
+        <div className="hidden md:flex items-center gap-[30px] text-[0.9rem] font-medium text-[#8b95a8]" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
           <a href={`${API_BASE}/index.php#overview`} className="hover:text-white transition-colors no-underline">Platform</a>
           <a href={`${API_BASE}/deep_dive.php`} className="hover:text-white transition-colors no-underline">Deep Dive</a>
           <a href={`${API_BASE}/design.php`} className="hover:text-white transition-colors no-underline">Design</a>
           <a href={`${API_BASE}/index.php#why`} className="hover:text-white transition-colors no-underline">Why Us</a>
           <a href={`${API_BASE}/index.php#story`} className="hover:text-white transition-colors no-underline">The Story</a>
           <a href={`${API_BASE}/index.php#beta`} className="hover:text-white transition-colors no-underline">Beta</a>
+          
+          <div className="w-[1px] h-[24px] bg-white/[0.07] mx-1"></div>
+          
+          <a href={`${API_BASE}/index.php`} className="flex items-center gap-2 hover:text-white transition-colors no-underline text-sm px-3 py-1.5 rounded-md hover:bg-white/5">
+            <i className="fa-solid fa-arrow-left"></i> Back to Home
+          </a>
           
           <a href={`${API_BASE}/login.php`} className="font-['JetBrains_Mono'] text-[0.8rem] font-bold tracking-[0.04em] text-black bg-[#00e07a] px-[20px] py-[9px] rounded-[5px] no-underline transition-all hover:bg-white hover:-translate-y-[1px] hover:shadow-[0_4px_16px_rgba(0,224,122,0.3)] ml-2">
             [ LOGIN ]
