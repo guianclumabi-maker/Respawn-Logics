@@ -60,18 +60,14 @@ class CandidatesController
             $action === 'add_pool' || $action === 'update_pool' || $action === 'add_to_pool' ||
             $action === 'remove_from_pool' || $action === 'submit_approval' || $action === 'compute_ai_scores'
         ) {
-            if (!hasPermission('ats.edit') && !hasPermission('ats.edit_job')) {
-                requirePermission('ats.edit');
-            }
+            requirePermission('ats.edit');
         } elseif (
             $action === 'delete_candidate' || $action === 'delete_pool' || 
             $action === 'delete' || $action === 'resolve_approval'
         ) {
             requirePermission('ats.delete');
         } elseif ($action === 'upload_resume') {
-            if (!hasPermission('ats.edit') && !hasPermission('ats.edit_job')) {
-                requirePermission('ats.edit');
-            }
+            requirePermission('ats.edit');
         }
 
         try {
