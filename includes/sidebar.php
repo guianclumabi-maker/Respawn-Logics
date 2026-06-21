@@ -152,7 +152,7 @@ if ($user) {
             <?php endif; ?>
 
             <?php if (hasPermission('payroll.manage') && tenantModuleEnabled('payroll')): ?>
-            <a href="<?= url('/payroll-frontend/dist/index.html?v=' . time()) ?>" class="menu-item">
+            <a href="<?= url('/frontend/dist/index.html?v=' . time() . '#/payroll') ?>" class="menu-item">
                 <i data-lucide="philippine-peso"></i>
                 <span>Payroll Engine</span>
             </a>
