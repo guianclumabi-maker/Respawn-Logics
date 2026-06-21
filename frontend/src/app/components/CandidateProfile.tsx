@@ -966,6 +966,7 @@ export function CandidateProfile({ onViewChange, candidateId }: Props) {
             <div className="space-y-2">
               {[
                 { label: "ADD COLLABORATION NOTE", action: () => setShowNoteModal(true) },
+                { label: "SCHEDULE INTERVIEW", action: () => onViewChange({ view: "Interviews", candidateId: c.id }) },
                 { label: "HIRE CANDIDATE", action: () => {
                     const latestApp = c.applications[0];
                     setHireData({ 
