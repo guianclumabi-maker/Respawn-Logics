@@ -569,6 +569,55 @@ export function CandidateProfile({ onViewChange, candidateId }: Props) {
       <div className="absolute bottom-[-150px] right-[-100px] w-[600px] h-[600px] rounded-full bg-[#9b6dff] blur-[140px] opacity-[0.05] pointer-events-none z-0" />
 
       {/* Modals */}
+      {showHireModal && (
+        <div id="hireModal" className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+          <div className="w-full max-w-md rounded-2xl border border-white/10 bg-[#0b0f1a] shadow-2xl overflow-hidden font-sans">
+            <div className="p-5 border-b border-white/10 flex items-center justify-between">
+              <div>
+                <h3 className="text-sm font-bold text-white tracking-wide">Hire Candidate</h3>
+                <p className="text-[10px] text-muted-foreground mt-1">Enroll this candidate into the Core HR system</p>
+              </div>
+              <button onClick={() => setShowHireModal(false)} className="p-1 rounded-md text-muted-foreground hover:text-white hover:bg-white/5 transition-colors">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+              </button>
+            </div>
+            <div className="p-5">
+              <form onSubmit={handleHireCandidate} className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] font-bold text-muted-foreground uppercase">Employee ID *</label>
+                    <input type="text" required value={hireData.employeeId} onChange={e => setHireData({...hireData, employeeId: e.target.value})} className="w-full bg-[#111827] border border-white/10 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-primary/50 transition-colors" placeholder="e.g. EMP-001" />
+                  </div>
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] font-bold text-muted-foreground uppercase">Hire Date *</label>
+                    <input type="date" required value={hireData.hireDate} onChange={e => setHireData({...hireData, hireDate: e.target.value})} className="w-full bg-[#111827] border border-white/10 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-primary/50 transition-colors" />
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] font-bold text-muted-foreground uppercase">Job Title</label>
+                    <input type="text" value={hireData.jobTitle} onChange={e => setHireData({...hireData, jobTitle: e.target.value})} className="w-full bg-[#111827] border border-white/10 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-primary/50 transition-colors" placeholder="Software Engineer" />
+                  </div>
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] font-bold text-muted-foreground uppercase">Department</label>
+                    <input type="text" value={hireData.department} onChange={e => setHireData({...hireData, department: e.target.value})} className="w-full bg-[#111827] border border-white/10 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-primary/50 transition-colors" placeholder="Engineering" />
+                  </div>
+                </div>
+                <div className="space-y-1.5">
+                  <label className="text-[10px] font-bold text-muted-foreground uppercase">Base Salary (Optional)</label>
+                  <input type="number" step="0.01" value={hireData.baseSalary} onChange={e => setHireData({...hireData, baseSalary: e.target.value})} className="w-full bg-[#111827] border border-white/10 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-primary/50 transition-colors" placeholder="85000" />
+                </div>
+                <div className="pt-2 flex items-center justify-end gap-3">
+                  <button type="button" onClick={() => setShowHireModal(false)} className="px-4 py-2 text-xs font-bold text-muted-foreground hover:text-white transition-colors">Cancel</button>
+                  <button type="submit" disabled={hiring} className="px-5 py-2 text-xs font-bold text-black bg-[#00e07a] hover:bg-[#00c9b1] rounded-lg transition-colors disabled:opacity-50">
+                    {hiring ? 'Hiring...' : 'Enroll Employee'}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      )}
       {showNoteModal && (
         <AddNoteModal onSubmit={handleAddNote} onClose={() => setShowNoteModal(false)} />
       )}
@@ -917,6 +966,15 @@ export function CandidateProfile({ onViewChange, candidateId }: Props) {
             <div className="space-y-2">
               {[
                 { label: "ADD COLLABORATION NOTE", action: () => setShowNoteModal(true) },
+                { label: "HIRE CANDIDATE", action: () => {
+                    const latestApp = c.applications[0];
+                    setHireData({ 
+                        ...hireData, 
+                        jobTitle: latestApp ? latestApp.job_title : '',
+                        department: latestApp ? latestApp.department : '',
+                    });
+                    setShowHireModal(true);
+                } },
                 { label: "ADD TO TALENT POOL", action: () => setShowPoolModal(true) },
               ].map((btn) => (
                 <button

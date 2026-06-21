@@ -99,6 +99,7 @@ class CandidatesController
                 case 'update_candidate': $this->updateCandidate($input); break;
                 case 'add_application': $this->addApplication($input); break;
                 case 'update_stage': $this->updateStage($input); break;
+                case 'hire_candidate': $this->hireCandidate($input); break;
                 case 'update_rating': $this->updateRating($input); break;
                 case 'bulk_advance': $this->bulkAdvance($input); break;
                 case 'bulk_reject': $this->bulkReject($input); break;
@@ -1283,6 +1284,101 @@ class CandidatesController
         
         readfile($fullPath);
         exit;
+    }
+
+    private function hireCandidate($data) {
+        // Enforce basic ATS edit and HR permission
+        if (!hasPermission('ats.edit') && !hasPermission('core_hr.create_employee')) {
+            http_response_code(403);
+            echo json_encode(['success' => false, 'error' => 'You do not have permission to hire candidates.']);
+            exit;
+        }
+
+        $appId = $data['application_id'] ?? null;
+        $employeeId = $data['employee_id'] ?? null;
+        $hireDate = $data['hire_date'] ?? null;
+        $jobTitle = $data['job_title'] ?? null;
+        $department = $data['department'] ?? null;
+        $baseSalary = $data['base_salary'] ?? null;
+
+        if (!$appId || !$employeeId || !$hireDate) {
+            http_response_code(400);
+            echo json_encode(['success' => false, 'error' => 'Application ID, Employee ID, and Hire Date are required.']);
+            exit;
+        }
+
+        try {
+            $this->pdo->beginTransaction();
+
+            // 1. Get candidate application and profile info
+            $stmt = $this->pdo->prepare("SELECT ca.candidate_id, ca.job_id, cp.name, cp.email, cp.phone 
+                FROM candidate_applications ca 
+                JOIN candidate_profiles cp ON ca.candidate_id = cp.id 
+                WHERE ca.id = ? AND ca.tenant_id = ?");
+            $stmt->execute([$appId, $this->tenantId]);
+            $candidate = $stmt->fetch();
+
+            if (!$candidate) {
+                $this->pdo->rollBack();
+                http_response_code(404);
+                echo json_encode(['success' => false, 'error' => 'Candidate application not found.']);
+                exit;
+            }
+
+            // Check if user email already exists
+            if ($candidate['email']) {
+                $checkStmt = $this->pdo->prepare("SELECT id FROM users WHERE email = ? AND tenant_id = ?");
+                $checkStmt->execute([$candidate['email'], $this->tenantId]);
+                if ($checkStmt->fetch()) {
+                    $this->pdo->rollBack();
+                    http_response_code(400);
+                    echo json_encode(['success' => false, 'error' => 'An employee with this email already exists in the system.']);
+                    exit;
+                }
+            }
+
+            // 2. Insert into users table
+            $passwordHash = password_hash('password123', PASSWORD_DEFAULT);
+            $emailToUse = $candidate['email'] ?: 'employee_' . uniqid() . '@example.com';
+            
+            $insertUser = $this->pdo->prepare("INSERT INTO users 
+                (tenant_id, full_name, email, password_hash, role, employment_status, employee_id, hire_date, job_title, department, base_salary, phone, created_at) 
+                VALUES (?, ?, ?, ?, 'Employee', 'Active', ?, ?, ?, ?, ?, ?, NOW())");
+            
+            $insertUser->execute([
+                $this->tenantId,
+                $candidate['name'],
+                $emailToUse,
+                $passwordHash,
+                $employeeId,
+                $hireDate,
+                $jobTitle,
+                $department,
+                $baseSalary,
+                $candidate['phone']
+            ]);
+
+            // 3. Update application stage
+            $updateApp = $this->pdo->prepare("UPDATE candidate_applications SET stage = 'Hired', hired_at = NOW() WHERE id = ?");
+            $updateApp->execute([$appId]);
+
+            // 4. Log activity
+            $this->logActivity(
+                "candidate_hired",
+                "Hired and enrolled as Employee ID: $employeeId",
+                $candidate['candidate_id'],
+                $candidate['job_id'],
+                $appId
+            );
+
+            $this->pdo->commit();
+            echo json_encode(['success' => true]);
+        } catch (\Exception $e) {
+            $this->pdo->rollBack();
+            error_log('Error hiring candidate: ' . $e->getMessage());
+            http_response_code(500);
+            echo json_encode(['success' => false, 'error' => 'Failed to hire candidate.']);
+        }
     }
 }
 
