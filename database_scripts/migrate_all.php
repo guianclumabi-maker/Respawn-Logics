@@ -30,7 +30,8 @@ $scripts = [
     'iam_seed.php',
     'setup_platform_tickets.php',
     'migrate_notifications.php',
-    'migrate_permissions_sync.php'
+    'migrate_permissions_sync.php',
+    'migrate_must_change_password.php'
 ];
 
 foreach ($scripts as $script) {

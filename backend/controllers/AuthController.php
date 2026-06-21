@@ -38,6 +38,7 @@ class AuthController
                         $_SESSION['user_name']         = $user['full_name'];
                         $_SESSION['tenant_id']         = $user['tenant_id'];
                         $_SESSION['theme_preference']  = $user['theme_preference'] ?? 'light';
+                        $_SESSION['must_change_password'] = !empty($user['must_change_password']);
 
                         echo json_encode([
                             'success' => true,
@@ -46,7 +47,8 @@ class AuthController
                                 'name' => $user['full_name'],
                                 'email' => $user['email'],
                                 'tenant_id' => $user['tenant_id'],
-                                'theme' => $user['theme_preference']
+                                'theme' => $user['theme_preference'],
+                                'must_change_password' => !empty($user['must_change_password'])
                             ]
                         ]);
                     } else {

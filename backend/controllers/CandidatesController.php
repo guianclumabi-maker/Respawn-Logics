@@ -1326,24 +1326,30 @@ class CandidatesController
             }
 
             // Check if user email already exists
-            if ($candidate['email']) {
-                $checkStmt = $this->pdo->prepare("SELECT id FROM users WHERE email = ? AND tenant_id = ?");
-                $checkStmt->execute([$candidate['email'], $this->tenantId]);
-                if ($checkStmt->fetch()) {
-                    $this->pdo->rollBack();
-                    http_response_code(400);
-                    echo json_encode(['success' => false, 'error' => 'An employee with this email already exists in the system.']);
-                    exit;
-                }
+            if (empty($candidate['email'])) {
+                $this->pdo->rollBack();
+                http_response_code(400);
+                echo json_encode(['success' => false, 'error' => 'Candidate email is required to create an employee account.']);
+                exit;
+            }
+
+            $checkStmt = $this->pdo->prepare("SELECT id FROM users WHERE email = ? AND tenant_id = ?");
+            $checkStmt->execute([$candidate['email'], $this->tenantId]);
+            if ($checkStmt->fetch()) {
+                $this->pdo->rollBack();
+                http_response_code(400);
+                echo json_encode(['success' => false, 'error' => 'An employee with this email already exists in the system.']);
+                exit;
             }
 
             // 2. Insert into users table
-            $passwordHash = password_hash('password123', PASSWORD_DEFAULT);
-            $emailToUse = $candidate['email'] ?: 'employee_' . uniqid() . '@example.com';
+            $tempPassword = bin2hex(random_bytes(6)); // 12-character random hex string
+            $passwordHash = password_hash($tempPassword, PASSWORD_DEFAULT);
+            $emailToUse = $candidate['email'];
             
             $insertUser = $this->pdo->prepare("INSERT INTO users 
-                (tenant_id, full_name, email, password_hash, role, employment_status, employee_id, hire_date, job_title, department, base_salary, phone, created_at) 
-                VALUES (?, ?, ?, ?, 'Employee', 'Active', ?, ?, ?, ?, ?, ?, NOW())");
+                (tenant_id, full_name, email, password_hash, role, employment_status, employee_id, hire_date, job_title, department, base_salary, phone, must_change_password, created_at) 
+                VALUES (?, ?, ?, ?, 'Employee', 'Active', ?, ?, ?, ?, ?, ?, 1, NOW())");
             
             $insertUser->execute([
                 $this->tenantId,
@@ -1372,7 +1378,7 @@ class CandidatesController
             );
 
             $this->pdo->commit();
-            echo json_encode(['success' => true]);
+            echo json_encode(['success' => true, 'temp_password' => $tempPassword]);
         } catch (\Exception $e) {
             $this->pdo->rollBack();
             error_log('Error hiring candidate: ' . $e->getMessage());

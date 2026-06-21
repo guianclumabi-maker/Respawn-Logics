@@ -132,6 +132,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                 $_SESSION['user_name']         = $user['full_name'];
                 $_SESSION['tenant_id']         = $user['tenant_id'];
                 $_SESSION['theme_preference']  = $user['theme_preference'] ?? 'light';
+                $_SESSION['must_change_password'] = !empty($user['must_change_password']);
 
                 header('Location: ' . url('/pages/dashboard.php'));
                 exit;
