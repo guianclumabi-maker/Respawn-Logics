@@ -676,60 +676,6 @@ export function CandidateProfile({ onViewChange, candidateId }: Props) {
       <div className="relative z-10 grid grid-cols-5 gap-6">
         {/* ── Left Column (60%) ──────────────────────────────────── */}
         <div className="col-span-5 lg:col-span-3 space-y-5">
-          {/* AI Summary Card */}
-          <div
-            className="p-5 rounded-xl border bg-background/60 border-white/10 backdrop-blur-md relative overflow-hidden"
-          >
-            <div className="flex items-center gap-2 mb-3">
-              <Brain size={14} className="text-primary" />
-              <h3 className="text-xs font-bold tracking-wide text-foreground font-semibold tracking-tight text-white uppercase">
-                AI Profile Analysis
-              </h3>
-            </div>
-            <p className="text-xs leading-relaxed text-gray-300 font-medium">
-              {c.ai_summary || "AI analysis profiling is currently complete. No anomalies detected in resume parameters."}
-            </p>
-          </div>
-
-          {/* Skills & Experience */}
-          <div
-            className="p-5 rounded-xl border bg-background border-white/10 font-medium"
-          >
-            <h3 className="text-xs font-bold tracking-wide text-muted-foreground uppercase mb-3 border-b border-white/10 pb-2">
-              Skills & Stats
-            </h3>
-            {skills.length > 0 && (
-              <div className="flex flex-wrap gap-1.5 mb-4">
-                {skills.map((skill, i) => (
-                  <span
-                    key={i}
-                    className="text-[9px] px-2 py-0.5 rounded border border-[#9b6dff]/20 bg-[#9b6dff]/10 text-[#9b6dff]"
-                  >
-                    {skill}
-                  </span>
-                ))}
-              </div>
-            )}
-            <div className="grid grid-cols-3 gap-4 border-t border-white/10 pt-3">
-              <div>
-                <span className="text-[10px] text-muted-foreground block">EXPERIENCE</span>
-                <span className="text-xs text-foreground font-bold">{c.experience_years} Years</span>
-              </div>
-              <div>
-                <span className="text-[10px] text-muted-foreground block">LOCATION</span>
-                <span className="text-xs text-foreground font-bold truncate block">{c.location || "Unknown"}</span>
-              </div>
-              <div>
-                <span className="text-[10px] text-muted-foreground block">EXPECTATION</span>
-                <span className="text-xs text-primary font-bold">
-                  {c.salary_expectation
-                    ? `$${c.salary_expectation.toLocaleString()}`
-                    : "—"}
-                </span>
-              </div>
-            </div>
-          </div>
-
           {/* Application History */}
           <div
             className="p-5 rounded-xl border bg-background border-white/10"
@@ -911,6 +857,52 @@ export function CandidateProfile({ onViewChange, candidateId }: Props) {
               </div>
             )}
           </div>
+          {/* Collaboration Panel - Notes */}
+          <div
+            className="p-5 rounded-xl border bg-background border-white/10"
+          >
+            <h3 className="text-xs font-bold tracking-wide text-muted-foreground uppercase mb-3 border-b border-white/10 pb-2">
+              Collaboration Notes
+            </h3>
+            {c.notes.length === 0 ? (
+              <p className="text-xs text-muted-foreground py-3 text-center">No discussion logs recorded.</p>
+            ) : (
+              <div className="space-y-2 max-h-64 overflow-y-auto scrollbar-thin pr-1 mb-4">
+                {c.notes.map((note) => (
+                  <div
+                    key={note.id}
+                    className="p-3 rounded border border-white/10 bg-white/[0.01]"
+                  >
+                    <div className="flex items-center justify-between mb-1.5">
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        <span className="text-[10px] font-bold text-foreground">
+                          {note.author_name}
+                        </span>
+                        <span
+                          className="text-[8px] font-bold uppercase px-1.5 py-0.5 rounded"
+                          style={{
+                            color: noteTypeColor(note.note_type),
+                            backgroundColor: `${noteTypeColor(note.note_type)}15`,
+                          }}
+                        >
+                          {note.note_type}
+                        </span>
+                      </div>
+                      <span className="text-[9px] text-muted-foreground">
+                        {note.created_at}
+                      </span>
+                    </div>
+                    <p className="text-[11px] text-muted-foreground leading-relaxed">
+                      {note.content}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            )}
+            {/* Inline add note form */}
+            <InlineNoteForm onSubmit={handleAddNote} />
+          </div>
+
         </div>
 
         {/* ── Right Column (40%) ─────────────────────────────────── */}
@@ -936,6 +928,21 @@ export function CandidateProfile({ onViewChange, candidateId }: Props) {
                 </button>
               ))}
             </div>
+          </div>
+
+          {/* AI Summary Card */}
+          <div
+            className="p-5 rounded-xl border bg-background/60 border-white/10 backdrop-blur-md relative overflow-hidden"
+          >
+            <div className="flex items-center gap-2 mb-3">
+              <Brain size={14} className="text-primary" />
+              <h3 className="text-xs font-bold tracking-wide text-foreground font-semibold tracking-tight text-white uppercase">
+                AI Profile Analysis
+              </h3>
+            </div>
+            <p className="text-xs leading-relaxed text-gray-300 font-medium">
+              {c.ai_summary || "AI analysis profiling is currently complete. No anomalies detected in resume parameters."}
+            </p>
           </div>
 
           {/* Resume Management */}
@@ -994,6 +1001,45 @@ export function CandidateProfile({ onViewChange, candidateId }: Props) {
             </div>
           </div>
 
+          {/* Skills & Experience */}
+          <div
+            className="p-5 rounded-xl border bg-background border-white/10 font-medium"
+          >
+            <h3 className="text-xs font-bold tracking-wide text-muted-foreground uppercase mb-3 border-b border-white/10 pb-2">
+              Skills & Stats
+            </h3>
+            {skills.length > 0 && (
+              <div className="flex flex-wrap gap-1.5 mb-4">
+                {skills.map((skill, i) => (
+                  <span
+                    key={i}
+                    className="text-[9px] px-2 py-0.5 rounded border border-[#9b6dff]/20 bg-[#9b6dff]/10 text-[#9b6dff]"
+                  >
+                    {skill}
+                  </span>
+                ))}
+              </div>
+            )}
+            <div className="grid grid-cols-3 gap-4 border-t border-white/10 pt-3">
+              <div>
+                <span className="text-[10px] text-muted-foreground block">EXPERIENCE</span>
+                <span className="text-xs text-foreground font-bold">{c.experience_years} Years</span>
+              </div>
+              <div>
+                <span className="text-[10px] text-muted-foreground block">LOCATION</span>
+                <span className="text-xs text-foreground font-bold truncate block">{c.location || "Unknown"}</span>
+              </div>
+              <div>
+                <span className="text-[10px] text-muted-foreground block">EXPECTATION</span>
+                <span className="text-xs text-primary font-bold">
+                  {c.salary_expectation
+                    ? `$${c.salary_expectation.toLocaleString()}`
+                    : "—"}
+                </span>
+              </div>
+            </div>
+          </div>
+
           {/* Talent Pool Memberships */}
           <div
             className="p-5 rounded-xl border bg-background border-white/10"
@@ -1033,52 +1079,6 @@ export function CandidateProfile({ onViewChange, candidateId }: Props) {
                 ))}
               </div>
             )}
-          </div>
-
-          {/* Collaboration Panel - Notes */}
-          <div
-            className="p-5 rounded-xl border bg-background border-white/10"
-          >
-            <h3 className="text-xs font-bold tracking-wide text-muted-foreground uppercase mb-3 border-b border-white/10 pb-2">
-              Collaboration Notes
-            </h3>
-            {c.notes.length === 0 ? (
-              <p className="text-xs text-muted-foreground py-3 text-center">No discussion logs recorded.</p>
-            ) : (
-              <div className="space-y-2 max-h-64 overflow-y-auto scrollbar-thin pr-1 mb-4">
-                {c.notes.map((note) => (
-                  <div
-                    key={note.id}
-                    className="p-3 rounded border border-white/10 bg-white/[0.01]"
-                  >
-                    <div className="flex items-center justify-between mb-1.5">
-                      <div className="flex items-center gap-1.5 flex-wrap">
-                        <span className="text-[10px] font-bold text-foreground">
-                          {note.author_name}
-                        </span>
-                        <span
-                          className="text-[8px] font-bold uppercase px-1.5 py-0.5 rounded"
-                          style={{
-                            color: noteTypeColor(note.note_type),
-                            backgroundColor: `${noteTypeColor(note.note_type)}15`,
-                          }}
-                        >
-                          {note.note_type}
-                        </span>
-                      </div>
-                      <span className="text-[9px] text-muted-foreground">
-                        {note.created_at}
-                      </span>
-                    </div>
-                    <p className="text-[11px] text-muted-foreground leading-relaxed">
-                      {note.content}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            )}
-            {/* Inline add note form */}
-            <InlineNoteForm onSubmit={handleAddNote} />
           </div>
 
           {/* Contact Info */}
