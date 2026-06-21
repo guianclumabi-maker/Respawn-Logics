@@ -134,12 +134,14 @@ try {
     http_response_code(500);
     echo json_encode([
         'success' => false, 
-        'error' => 'A database error occurred.'
+        'error' => 'A database error occurred: ' . $e->getMessage()
     ]);
-} catch (Exception $e) {
+} catch (Throwable $e) {
     http_response_code(500);
     echo json_encode([
         'success' => false, 
-        'error' => 'An internal server error occurred.'
+        'error' => 'An internal server error occurred: ' . $e->getMessage(),
+        'file' => $e->getFile(),
+        'line' => $e->getLine()
     ]);
 }
