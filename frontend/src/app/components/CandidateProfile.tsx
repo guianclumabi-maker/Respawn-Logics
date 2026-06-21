@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import {
+  AlertTriangle,
+  Check,
   ArrowLeft,
   Brain,
   Briefcase,
@@ -105,6 +107,10 @@ type CandidateData = {
   notes: Note[];
   pools: Pool[];
   activity_log: ActivityItem[];
+  consent_given?: boolean | number;
+  consent_at?: string;
+  data_retention_until?: string;
+  is_anonymized?: boolean | number;
 };
 
 type Props = {
@@ -411,6 +417,9 @@ function ProfileSkeleton() {
 // ─── Main Component ─────────────────────────────────────────────────────────────
 
 export function CandidateProfile({ onViewChange, candidateId }: Props) {
+    const [toast, setToast] = useState<{msg: string, type: "success"|"error"} | null>(null);
+  const showToast = (msg: string, type: "success"|"error" = "success") => { setToast({ msg, type }); setTimeout(() => setToast(null), 3500); };
+
   const [candidate, setCandidate] = useState<CandidateData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -456,11 +465,11 @@ export function CandidateProfile({ onViewChange, candidateId }: Props) {
           tempPassword: data.temp_password
         });
       } else {
-        alert(data.error || 'Failed to hire candidate');
+        showToast(data.error || 'Failed to hire candidate', "error");
       }
     } catch (err) {
       console.error(err);
-      alert('An error occurred');
+      showToast('An error occurred', "error");
     } finally {
       setHiring(false);
     }
@@ -488,11 +497,11 @@ export function CandidateProfile({ onViewChange, candidateId }: Props) {
         setShowAnonymizeModal(false);
         fetchCandidate();
       } else {
-        alert(data.error || 'Failed to anonymize candidate');
+        showToast(data.error || 'Failed to anonymize candidate', "error");
       }
     } catch (err) {
       console.error(err);
-      alert('An error occurred while anonymizing.');
+      showToast('An error occurred while anonymizing.', "error");
     } finally {
       setIsAnonymizing(false);
     }
@@ -526,7 +535,7 @@ export function CandidateProfile({ onViewChange, candidateId }: Props) {
     if (!file) return;
 
     if (file.size > 5 * 1024 * 1024) {
-      alert("File exceeds 5MB limit");
+      showToast("File exceeds 5MB limit", "error");
       return;
     }
 
@@ -551,10 +560,10 @@ export function CandidateProfile({ onViewChange, candidateId }: Props) {
           prev ? { ...prev, resume_filename: d.resume_filename, resume_uploaded_at: d.resume_uploaded_at, resume_download_url: d.resume_download_url } : prev
         );
       } else {
-        alert(d.error || "Failed to upload resume");
+        showToast(d.error || "Failed to upload resume", "error");
       }
     } catch (err: any) {
-      alert(err.message || "Upload error");
+      showToast(err.message || "Upload error", "error");
     } finally {
       setUploadingResume(false);
       if (fileInputRef.current) fileInputRef.current.value = "";
@@ -1404,8 +1413,16 @@ export function CandidateProfile({ onViewChange, candidateId }: Props) {
             </div>
           </div>
 
+
         </div>
       </div>
+
+      {toast && (
+        <div className={`fixed bottom-6 right-6 z-50 flex items-center gap-2 px-4 py-3 rounded-xl shadow-2xl text-xs font-mono font-bold border ${toast.type === "error" ? "border-red-500/20 text-red-400 bg-background" : "border-[#00e07a]/20 text-primary bg-background"}`}>
+          {toast.type === "error" ? <AlertTriangle size={14} /> : <Check size={14} />}
+          {toast.msg}
+        </div>
+      )}
     </div>
   );
 }

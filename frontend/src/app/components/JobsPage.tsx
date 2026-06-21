@@ -1,5 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import {
+  AlertTriangle,
+  Check,
   Briefcase,
   MapPin,
   Users,
@@ -305,6 +307,9 @@ function FilterDropdown({
 // ── Main Component ─────────────────────────────────────────────
 
 export function JobsPage({ onViewChange }: Props) {
+    const [toast, setToast] = useState<{msg: string, type: "success"|"error"} | null>(null);
+  const showToast = (msg: string, type: "success"|"error" = "success") => { setToast({ msg, type }); setTimeout(() => setToast(null), 3500); };
+
   const [jobs, setJobs] = useState<Job[]>([]);
   const [departments, setDepartments] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
@@ -404,15 +409,18 @@ export function JobsPage({ onViewChange }: Props) {
               onViewChange({ view: "Pipeline" });
             }
           } else {
-            alert("API Error: " + (data.error || JSON.stringify(data)));
+            console.error("API Error: " + (data.error || JSON.stringify(data)));
+            showToast("Failed to create job. Please try again.", "error");
           }
         } catch (e) {
-          alert("Server Response Error: " + text.substring(0, 100));
+          console.error("Server Response Error: " + text.substring(0, 100));
+          showToast("Failed to create job. Please try again.", "error");
         }
         setSubmitting(false);
       })
       .catch((err) => {
-        alert("Fetch Error: " + err);
+        console.error("Fetch Error: " + err);
+        showToast("Failed to create job. Please try again.", "error");
         setSubmitting(false);
       });
   };
@@ -669,6 +677,13 @@ export function JobsPage({ onViewChange }: Props) {
           }}
           onSubmit={handleAddCandidate}
         />
+      )}
+
+      {toast && (
+        <div className={`fixed bottom-6 right-6 z-50 flex items-center gap-2 px-4 py-3 rounded-xl shadow-2xl text-xs font-mono font-bold border ${toast.type === "error" ? "border-red-500/20 text-red-400 bg-background" : "border-[#00e07a]/20 text-primary bg-background"}`}>
+          {toast.type === "error" ? <AlertTriangle size={14} /> : <Check size={14} />}
+          {toast.msg}
+        </div>
       )}
     </div>
   );
