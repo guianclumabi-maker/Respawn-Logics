@@ -15,7 +15,10 @@ class PayrollService
         $this->pdo = $pdo;
     }
 
-    private function loadConfigs($payDate) {
+    private $tenantSettings = [];
+    private $payComponents = [];
+
+    private function loadConfigs($payDate, $tenantId) {
         $stmt = $this->pdo->prepare("SELECT * FROM sss_contribution_brackets WHERE effective_from <= ? AND (effective_to IS NULL OR effective_to >= ?) ORDER BY range_from ASC");
         $stmt->execute([$payDate, $payDate]);
         $this->sssBrackets = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -43,6 +46,21 @@ class PayrollService
         foreach ($dmRows as $row) {
             $this->deMinimisConfig[$row['item_name']] = $row;
         }
+
+        $stmt = $this->pdo->prepare("SELECT * FROM tenant_payroll_settings WHERE tenant_id = ?");
+        $stmt->execute([$tenantId]);
+        $settings = $stmt->fetch(PDO::FETCH_ASSOC);
+        if (!$settings) {
+            $settings = [
+                'proration_method' => 'split_even',
+                'mwe_auto_exempt' => 1,
+            ];
+        }
+        $this->tenantSettings = $settings;
+
+        $stmt = $this->pdo->prepare("SELECT * FROM pay_components WHERE tenant_id = ? AND is_active = 1 ORDER BY sort_order ASC");
+        $stmt->execute([$tenantId]);
+        $this->payComponents = $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
     private function calculateSSS($baseSalary, $prorateFactor) {
@@ -152,15 +170,30 @@ class PayrollService
         try {
             $this->pdo->beginTransaction();
 
-            // Load global configs based on pay date
-            $this->loadConfigs($payDate);
+            // Load global configs and tenant configs based on pay date
+            $this->loadConfigs($payDate, $tenantId);
 
             // Fetch schedule frequency
             $stmt = $this->pdo->prepare("SELECT frequency FROM payroll_schedules WHERE id = ?");
             $stmt->execute([$scheduleId]);
             $schedule = $stmt->fetch();
             $frequency = $schedule ? $schedule['frequency'] : 'Monthly';
+            
             $prorateFactor = ($frequency === 'Semi-Monthly') ? 0.5 : 1.0;
+            
+            // Determine statutory multiplier based on proration method
+            $isFirstCutoff = date('j', strtotime($end)) <= 15;
+            $prorationMethod = $this->tenantSettings['proration_method'] ?? 'split_even';
+            $statutoryMultiplier = 1.0;
+            if ($frequency === 'Semi-Monthly') {
+                if ($prorationMethod === 'split_even') {
+                    $statutoryMultiplier = 0.5;
+                } else if ($prorationMethod === 'full_first_cutoff') {
+                    $statutoryMultiplier = $isFirstCutoff ? 1.0 : 0.0;
+                } else if ($prorationMethod === 'full_second_cutoff') {
+                    $statutoryMultiplier = !$isFirstCutoff ? 1.0 : 0.0;
+                }
+            }
 
             // 1. Create the Run Record
             $stmt = $this->pdo->prepare("INSERT INTO `payroll_runs` (`tenant_id`, `payroll_schedule_id`, `payroll_period_start`, `payroll_period_end`, `pay_date`, `status`, `created_by`) VALUES (?, ?, ?, ?, ?, 'Draft', ?)");
@@ -232,13 +265,39 @@ class PayrollService
                     $totalExpenses += floatval($exp['amount']);
                 }
                 
-                $sss = $this->calculateSSS(floatval($emp['base_salary']), $prorateFactor);
-                $phic = $this->calculatePhilHealth(floatval($emp['base_salary']), $prorateFactor);
-                $hdmf = $this->calculatePagIbig(floatval($emp['base_salary']), $prorateFactor);
+                $sss = $this->calculateSSS(floatval($emp['base_salary']), $statutoryMultiplier);
+                $phic = $this->calculatePhilHealth(floatval($emp['base_salary']), $statutoryMultiplier);
+                $hdmf = $this->calculatePagIbig(floatval($emp['base_salary']), $statutoryMultiplier);
                 
                 $totalHmoDeduction = 0;
                 $totalAllowances = 0;
                 $otherBenefitsThisRun = 0;
+                
+                $customEarnings = 0;
+                $customTaxableEarnings = 0;
+                $customDeductions = 0;
+
+                foreach ($this->payComponents as $comp) {
+                    $amount = 0;
+                    if ($comp['calc_type'] === 'fixed') {
+                        $amount = floatval($comp['value']) * $prorateFactor;
+                    } else if ($comp['calc_type'] === 'percent_of_base') {
+                        $amount = (floatval($emp['base_salary']) * (floatval($comp['value']) / 100)) * $prorateFactor;
+                    }
+
+                    if ($amount > 0) {
+                        if ($comp['kind'] === 'earning') {
+                            $customEarnings += $amount;
+                            if (intval($comp['taxable']) === 1) {
+                                $customTaxableEarnings += $amount;
+                            }
+                            $earningStmt->execute([$runId, $empId, $comp['name'], $amount]);
+                        } else if ($comp['kind'] === 'deduction') {
+                            $customDeductions += $amount;
+                            $deductStmt->execute([$runId, $empId, $comp['name'], $amount]);
+                        }
+                    }
+                }
                 
                 $earningStmt->execute([$runId, $empId, 'Basic Salary', $cutoffBase]);
 
@@ -247,11 +306,7 @@ class PayrollService
                         // HMO deductions happen every cutoff if semi-monthly
                         $totalHmoDeduction += (floatval($ben['employee_cost']) * intval($ben['dependent_count'])) * $prorateFactor;
                     } else if ($ben['type'] === 'De Minimis') {
-                        // Allowance amounts in DB are usually Monthly. Prorate it.
                         $cutoffAllowance = floatval($ben['company_cost']) * $prorateFactor;
-                        $res = $this->getDeMinimisExemption($ben['name'], floatval($ben['company_cost']), $frequency); // Send full monthly for comparison, or prorated?
-                        
-                        // Wait, my getDeMinimisExemption limits are PRORATED. So we pass $cutoffAllowance.
                         $res = $this->getDeMinimisExemption($ben['name'], $cutoffAllowance, $frequency);
                         
                         $totalAllowances += $cutoffAllowance;
@@ -284,15 +339,20 @@ class PayrollService
                     $markExpStmt->execute([$exp['id']]);
                 }
 
-                $gross = $cutoffBase + $totalExpenses + $totalAllowances;
+                $gross = $cutoffBase + $totalExpenses + $totalAllowances + $customEarnings;
                 
                 // Taxable income is Cutoff Base + Taxable Allowances - Cutoff Statutory
-                $taxableIncome = ($cutoffBase + $taxableOtherBenefits) - ($sss['ee'] + $phic['ee'] + $hdmf['ee']);
+                $taxableIncome = ($cutoffBase + $taxableOtherBenefits + $customTaxableEarnings) - ($sss['ee'] + $phic['ee'] + $hdmf['ee']);
                 $tax = $this->calculateTax($taxableIncome, $frequency);
+                
+                $isMwe = isset($emp['is_mwe']) ? (bool)$emp['is_mwe'] : (floatval($emp['base_salary']) <= 15000);
+                if (intval($this->tenantSettings['mwe_auto_exempt'] ?? 1) === 1 && $isMwe) {
+                    $tax = 0;
+                }
                 
                 $thirteenthAccrual = $cutoffBase / 12;
 
-                $totalDeductions = $tax + $sss['ee'] + $phic['ee'] + $hdmf['ee'] + $totalHmoDeduction;
+                $totalDeductions = $tax + $sss['ee'] + $phic['ee'] + $hdmf['ee'] + $totalHmoDeduction + $customDeductions;
                 $net = $gross - $totalDeductions;
 
                 $reStmt->execute([$runId, $empId, $gross, $totalDeductions, $net, $sss['er'], $sss['ec'], $sss['wisp_er'], $phic['er'], $hdmf['er'], $thirteenthAccrual]);

@@ -229,10 +229,85 @@ class PayrollController
                     break;
 
                 case 'settings':
-                    echo json_encode(['success' => true, 'data' => [
-                        'extraction' => ['attendance' => true, 'leave' => true, 'recurring' => true],
-                        'processing' => ['mode' => 'manual', 'statutory' => true]
-                    ]]);
+                    $stmt = $this->pdo->prepare("SELECT * FROM `tenant_payroll_settings` WHERE `tenant_id` = ?");
+                    $stmt->execute([$this->tenantId]);
+                    $settings = $stmt->fetch(PDO::FETCH_ASSOC);
+                    if (!$settings) {
+                        $settings = [
+                            'default_pay_frequency' => 'Semi-Monthly',
+                            'proration_method' => 'split_even',
+                            'default_pay_basis' => 'monthly',
+                            'tax_annualization' => 0,
+                            'mwe_auto_exempt' => 1,
+                            'rounding_mode' => 'half_up',
+                            'approval_levels' => 1
+                        ];
+                    }
+                    echo json_encode(['success' => true, 'data' => $settings]);
+                    break;
+
+                case 'save_settings':
+                    if (!$this->canManagePayroll()) { echo json_encode(['success' => false, 'error' => 'Denied']); return; }
+                    $stmt = $this->pdo->prepare("
+                        INSERT INTO `tenant_payroll_settings` 
+                        (`tenant_id`, `default_pay_frequency`, `proration_method`, `default_pay_basis`, `tax_annualization`, `mwe_auto_exempt`, `rounding_mode`, `approval_levels`)
+                        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                        ON DUPLICATE KEY UPDATE 
+                        `default_pay_frequency`=VALUES(`default_pay_frequency`),
+                        `proration_method`=VALUES(`proration_method`),
+                        `default_pay_basis`=VALUES(`default_pay_basis`),
+                        `tax_annualization`=VALUES(`tax_annualization`),
+                        `mwe_auto_exempt`=VALUES(`mwe_auto_exempt`),
+                        `rounding_mode`=VALUES(`rounding_mode`),
+                        `approval_levels`=VALUES(`approval_levels`)
+                    ");
+                    $stmt->execute([
+                        $this->tenantId,
+                        $input['default_pay_frequency'] ?? 'Semi-Monthly',
+                        $input['proration_method'] ?? 'split_even',
+                        $input['default_pay_basis'] ?? 'monthly',
+                        (int)($input['tax_annualization'] ?? 0),
+                        (int)($input['mwe_auto_exempt'] ?? 1),
+                        $input['rounding_mode'] ?? 'half_up',
+                        (int)($input['approval_levels'] ?? 1)
+                    ]);
+                    echo json_encode(['success' => true]);
+                    break;
+
+                case 'components_list':
+                    $stmt = $this->pdo->prepare("SELECT * FROM `pay_components` WHERE `tenant_id` = ? ORDER BY `sort_order` ASC, `id` ASC");
+                    $stmt->execute([$this->tenantId]);
+                    echo json_encode(['success' => true, 'data' => $stmt->fetchAll(PDO::FETCH_ASSOC)]);
+                    break;
+
+                case 'component_save':
+                    if (!$this->canManagePayroll()) { echo json_encode(['success' => false, 'error' => 'Denied']); return; }
+                    $id = intval($input['id'] ?? 0);
+                    $code = $input['code'] ?? '';
+                    $name = $input['name'] ?? '';
+                    $kind = $input['kind'] ?? 'earning';
+                    $calc_type = $input['calc_type'] ?? 'fixed';
+                    $value = isset($input['value']) && $input['value'] !== '' ? floatval($input['value']) : null;
+                    $taxable = isset($input['taxable']) ? (int)$input['taxable'] : 1;
+                    $statutory_key = $input['statutory_key'] ?? null;
+                    $is_active = isset($input['is_active']) ? (int)$input['is_active'] : 1;
+
+                    if ($id > 0) {
+                        $stmt = $this->pdo->prepare("UPDATE `pay_components` SET `code`=?, `name`=?, `kind`=?, `calc_type`=?, `value`=?, `taxable`=?, `statutory_key`=?, `is_active`=? WHERE `id`=? AND `tenant_id`=?");
+                        $stmt->execute([$code, $name, $kind, $calc_type, $value, $taxable, $statutory_key, $is_active, $id, $this->tenantId]);
+                    } else {
+                        $stmt = $this->pdo->prepare("INSERT INTO `pay_components` (`tenant_id`, `code`, `name`, `kind`, `calc_type`, `value`, `taxable`, `statutory_key`, `is_active`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                        $stmt->execute([$this->tenantId, $code, $name, $kind, $calc_type, $value, $taxable, $statutory_key, $is_active]);
+                    }
+                    echo json_encode(['success' => true]);
+                    break;
+
+                case 'component_delete':
+                    if (!$this->canManagePayroll()) { echo json_encode(['success' => false, 'error' => 'Denied']); return; }
+                    $id = intval($input['id'] ?? 0);
+                    $stmt = $this->pdo->prepare("DELETE FROM `pay_components` WHERE `id` = ? AND `tenant_id` = ?");
+                    $stmt->execute([$id, $this->tenantId]);
+                    echo json_encode(['success' => true]);
                     break;
 
                 case 'gov_reports':
