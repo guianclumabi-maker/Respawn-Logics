@@ -309,34 +309,32 @@ export default function App() {
       )}
 
       {/* HEADER */}
-      <nav className="border-b border-white/[0.05] bg-[#0b0f1a]/80 backdrop-blur-md sticky top-0 z-40">
-        <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-6">
-            <button onClick={() => window.location.href = `${API_BASE}/index.php`} className="text-[#8b95a8] hover:text-white font-['JetBrains_Mono'] text-sm flex items-center gap-2 transition-colors cursor-pointer">
-              <ArrowRight size={16} className="rotate-180" />
-              Cancel & Exit
-            </button>
-            <div className="h-6 w-px bg-white/10 hidden md:block"></div>
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-[7px] bg-gradient-to-br from-[#00e07a] to-[#00b8ff] flex items-center justify-center shadow-[0_0_15px_rgba(0,224,122,0.4)]">
-                <i className="fa-solid fa-gamepad" style={{fontSize: "14px", color: "#000"}}></i>
-              </div>
-              <div className="hidden sm:flex items-center gap-2">
-                <span className="text-white font-bold tracking-tight font-['JetBrains_Mono'] text-[16px]">Respawn Logics</span>
-                <span className="font-['JetBrains_Mono'] text-[10px] font-bold tracking-[0.1em] text-[#00e07a] bg-[#00e07a]/10 border border-[#00e07a]/20 px-1.5 py-[2px] rounded-[4px]">v2.0</span>
-              </div>
-            </div>
+      <nav className="border-b border-white/[0.07] bg-[#0b0f1a]/90 backdrop-blur-[20px] fixed top-0 left-0 right-0 z-50 h-[62px] flex items-center justify-between px-6 md:px-12">
+        <a href={`${API_BASE}/index.php`} className="flex items-center gap-[10px] no-underline font-['JetBrains_Mono'] text-[0.9375rem] font-bold text-white">
+          <div className="w-[40px] h-[40px] rounded-[10px] bg-gradient-to-br from-[#00e07a] to-[#00b8ff] flex items-center justify-center shadow-[0_8px_20px_rgba(0,224,122,0.25)]">
+            <i className="fa-solid fa-gamepad" style={{fontSize: "20px", color: "#000"}}></i>
           </div>
-          <div className="flex items-center gap-4">
-            <div className="flex items-center gap-2 px-3 py-1 bg-[#00e07a]/10 border border-[#00e07a]/20 rounded-sm">
-              <div className="w-2 h-2 rounded-full bg-[#00e07a] animate-pulse"></div>
-              <span className="text-[#00e07a] text-xs font-bold font-['JetBrains_Mono'] uppercase tracking-wider">Onboarding_Engine</span>
-            </div>
-          </div>
+          <span className="hidden sm:flex items-center gap-1">
+            Respawn Logics
+            <span className="text-[9px] text-[#00e07a] border border-[#00e07a]/20 bg-[#00e07a]/10 px-1 py-0.5 rounded ml-1 tracking-[0.1em] font-bold">v2.0</span>
+          </span>
+        </a>
+
+        <div className="hidden md:flex items-center gap-[30px] font-['Space_Grotesk'] text-[0.9rem] font-medium text-[#8b95a8]">
+          <a href={`${API_BASE}/index.php#overview`} className="hover:text-white transition-colors no-underline">Platform</a>
+          <a href={`${API_BASE}/deep_dive.php`} className="hover:text-white transition-colors no-underline">Deep Dive</a>
+          <a href={`${API_BASE}/design.php`} className="hover:text-white transition-colors no-underline">Design</a>
+          <a href={`${API_BASE}/index.php#why`} className="hover:text-white transition-colors no-underline">Why Us</a>
+          <a href={`${API_BASE}/index.php#story`} className="hover:text-white transition-colors no-underline">The Story</a>
+          <a href={`${API_BASE}/index.php#beta`} className="hover:text-white transition-colors no-underline">Beta</a>
+          
+          <a href={`${API_BASE}/login.php`} className="font-['JetBrains_Mono'] text-[0.8rem] font-bold tracking-[0.04em] text-black bg-[#00e07a] px-[20px] py-[9px] rounded-[5px] no-underline transition-all hover:bg-white hover:-translate-y-[1px] hover:shadow-[0_4px_16px_rgba(0,224,122,0.3)] ml-2">
+            [ LOGIN ]
+          </a>
         </div>
       </nav>
 
-      <main className="max-w-5xl mx-auto px-6 py-12">
+      <main className="max-w-5xl mx-auto px-6 py-12 mt-16">
         {currentView === "setup_mode" && (
           <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
             <div className="text-center max-w-2xl mx-auto mb-16 mt-8">
