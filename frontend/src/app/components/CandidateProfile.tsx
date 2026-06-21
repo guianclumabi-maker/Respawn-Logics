@@ -97,6 +97,9 @@ type CandidateData = {
   assigned_hiring_manager: string;
   ai_summary: string;
   status: string;
+  resume_filename?: string;
+  resume_uploaded_at?: string;
+  resume_download_url?: string;
   applications: Application[];
   interviews: Interview[];
   notes: Note[];
@@ -413,6 +416,8 @@ export function CandidateProfile({ onViewChange, candidateId }: Props) {
   const [error, setError] = useState<string | null>(null);
   const [showNoteModal, setShowNoteModal] = useState(false);
   const [showPoolModal, setShowPoolModal] = useState(false);
+  const [uploadingResume, setUploadingResume] = useState(false);
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
 
   const fetchCandidate = useCallback(() => {
     setLoading(true);
@@ -436,6 +441,46 @@ export function CandidateProfile({ onViewChange, candidateId }: Props) {
   useEffect(() => {
     fetchCandidate();
   }, [fetchCandidate]);
+
+  const handleUploadResume = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > 5 * 1024 * 1024) {
+      alert("File exceeds 5MB limit");
+      return;
+    }
+
+    setUploadingResume(true);
+    const formData = new FormData();
+    formData.append("action", "upload_resume");
+    formData.append("candidate_id", candidateId.toString());
+    formData.append("resume", file);
+
+    try {
+      const r = await fetch(API, {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "X-CSRF-Token": (window as any).__CSRF_TOKEN__ || "",
+        },
+        body: formData,
+      });
+      const d = await r.json();
+      if (d.success) {
+        setCandidate((prev) => 
+          prev ? { ...prev, resume_filename: d.resume_filename, resume_uploaded_at: d.resume_uploaded_at, resume_download_url: d.resume_download_url } : prev
+        );
+      } else {
+        alert(d.error || "Failed to upload resume");
+      }
+    } catch (err: any) {
+      alert(err.message || "Upload error");
+    } finally {
+      setUploadingResume(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  };
 
   const handleAddNote = (content: string, noteType: string) => {
     fetch(API, { credentials: "include",
@@ -890,6 +935,62 @@ export function CandidateProfile({ onViewChange, candidateId }: Props) {
                   {`[ ${btn.label} ]`}
                 </button>
               ))}
+            </div>
+          </div>
+
+          {/* Resume Management */}
+          <div className="p-5 rounded-xl border bg-background border-border">
+            <h3 className="text-xs font-bold tracking-wide text-muted-foreground uppercase mb-3 border-b border-border pb-2">
+              // RESUME_
+            </h3>
+            <div className="space-y-3">
+              {c.resume_filename ? (
+                <div className="p-3 rounded-lg border border-border bg-white/[0.01]">
+                  <div className="flex items-center gap-2 mb-1 text-xs font-bold text-[#00e07a]">
+                    <ClipboardList size={14} />
+                    <span className="truncate">{c.resume_filename}</span>
+                  </div>
+                  <div className="text-[10px] text-muted-foreground mb-3">
+                    Uploaded: {c.resume_uploaded_at ? c.resume_uploaded_at.split(' ')[0] : 'N/A'}
+                  </div>
+                  <div className="flex gap-2">
+                    {c.resume_download_url && (
+                      <a
+                        href={c.resume_download_url}
+                        className="flex-1 px-3 py-1.5 rounded bg-primary/10 border border-primary/20 text-[#00e07a] text-[10px] font-bold text-center hover:bg-primary/20 transition-all"
+                        download
+                      >
+                        [ DOWNLOAD ]
+                      </a>
+                    )}
+                    <button
+                      onClick={() => fileInputRef.current?.click()}
+                      disabled={uploadingResume}
+                      className="flex-1 px-3 py-1.5 rounded border border-border bg-muted text-muted-foreground text-[10px] font-bold text-center hover:text-foreground hover:border-[#00e07a]/40 transition-all cursor-pointer disabled:opacity-50"
+                    >
+                      {uploadingResume ? "[ UPLOADING... ]" : "[ REPLACE ]"}
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <div className="text-center py-2">
+                  <p className="text-[10px] text-muted-foreground mb-3">No resume uploaded.</p>
+                  <button
+                    onClick={() => fileInputRef.current?.click()}
+                    disabled={uploadingResume}
+                    className="w-full px-3 py-2.5 rounded border border-[#00e07a]/20 bg-[#00e07a]/10 text-[#00e07a] text-xs font-bold text-center hover:bg-[#00e07a]/20 transition-all cursor-pointer disabled:opacity-50"
+                  >
+                    {uploadingResume ? "[ UPLOADING... ]" : "[ + UPLOAD RESUME ]"}
+                  </button>
+                </div>
+              )}
+              <input
+                type="file"
+                ref={fileInputRef}
+                className="hidden"
+                accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                onChange={handleUploadResume}
+              />
             </div>
           </div>
 

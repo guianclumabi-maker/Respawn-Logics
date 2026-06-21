@@ -60,6 +60,8 @@ class CandidatesController
             $action === 'delete' || $action === 'resolve_approval'
         ) {
             requirePermission('ats.delete');
+        } elseif ($action === 'upload_resume') {
+            requirePermission('ats.edit');
         }
 
         try {
@@ -81,6 +83,7 @@ class CandidatesController
                 case 'approvals': $this->approvals(); break;
                 case 'permissions': $this->permissions(); break;
                 case 'current_user': $this->currentUserAction(); break;
+                case 'download_resume': $this->downloadResume(); break;
 
                 // POST
                 case 'add_job': $this->addJob($input); break;
@@ -107,6 +110,7 @@ class CandidatesController
                 case 'submit_approval': $this->submitApproval($input); break;
                 case 'resolve_approval': $this->resolveApproval($input); break;
                 case 'compute_ai_scores': $this->computeAiScores($input); break;
+                case 'upload_resume': $this->uploadResume(); break;
                 case 'add': $this->legacyAdd($input); break;
                 case 'delete': $this->legacyDelete($input); break;
 
@@ -448,6 +452,9 @@ class CandidatesController
         $candidate['id'] = (int)$candidate['id'];
         $candidate['tags'] = !empty($candidate['tags']) ? array_map('trim', explode(',', $candidate['tags'])) : [];
         $candidate['skills_array'] = !empty($candidate['skills']) ? array_map('trim', explode(',', $candidate['skills'])) : [];
+        if (!empty($candidate['resume_filename'])) {
+            $candidate['resume_download_url'] = '../api/index.php?route=candidates&action=download_resume&id=' . $candidate['id'];
+        }
         $appsStmt = $this->pdo->prepare("SELECT ca.*, j.`title` as job_title, j.`department`, j.`location` as job_location FROM `candidate_applications` ca JOIN `jobs` j ON j.`id` = ca.`job_id` WHERE ca.`candidate_id` = ? AND ca.`tenant_id` = ? ORDER BY ca.`applied_at` DESC");
         $appsStmt->execute([$id, $this->tenantId]);
         $candidate['applications'] = $appsStmt->fetchAll();
@@ -1089,6 +1096,125 @@ class CandidatesController
         if (!$id) { http_response_code(400); echo json_encode(['success' => false, 'error' => 'Missing ID']); exit; }
         $this->pdo->prepare("DELETE FROM `candidate_profiles` WHERE `id` = ? AND `tenant_id` = ?")->execute([$id, $this->tenantId]);
         echo json_encode(['success' => true]);
+        exit;
+    }
+
+    private function uploadResume() {
+        $candidateId = (int)($_POST['candidate_id'] ?? 0);
+        if (!$candidateId) {
+            echo json_encode(['success' => false, 'error' => 'Missing candidate ID']);
+            exit;
+        }
+
+        // Verify candidate ownership
+        $stmt = $this->pdo->prepare("SELECT id, resume_file_path FROM `candidate_profiles` WHERE `id` = ? AND `tenant_id` = ?");
+        $stmt->execute([$candidateId, $this->tenantId]);
+        $candidate = $stmt->fetch();
+        if (!$candidate) {
+            echo json_encode(['success' => false, 'error' => 'Candidate not found or access denied']);
+            exit;
+        }
+
+        if (!isset($_FILES['resume']) || $_FILES['resume']['error'] !== UPLOAD_ERR_OK) {
+            echo json_encode(['success' => false, 'error' => 'No valid file uploaded']);
+            exit;
+        }
+
+        $file = $_FILES['resume'];
+
+        // Size check (5MB)
+        if ($file['size'] > 5 * 1024 * 1024) {
+            echo json_encode(['success' => false, 'error' => 'File exceeds 5MB limit']);
+            exit;
+        }
+
+        // MIME check
+        $finfo = finfo_open(FILEINFO_MIME_TYPE);
+        $mime = finfo_file($finfo, $file['tmp_name']);
+        finfo_close($finfo);
+
+        $allowedMimes = [
+            'application/pdf' => 'pdf',
+            'application/msword' => 'doc',
+            'application/vnd.openxmlformats-officedocument.wordprocessingml.document' => 'docx'
+        ];
+
+        if (!array_key_exists($mime, $allowedMimes)) {
+            echo json_encode(['success' => false, 'error' => 'Invalid file type. Only PDF, DOC, and DOCX are allowed.']);
+            exit;
+        }
+
+        $ext = $allowedMimes[$mime];
+        $originalName = basename($file['name']);
+        
+        // Ensure storage directory exists
+        $storageDir = __DIR__ . '/../../storage/tenant_' . $this->tenantId . '/resumes';
+        if (!is_dir($storageDir)) {
+            mkdir($storageDir, 0755, true);
+        }
+
+        // Generate secure filename
+        $secureFilename = bin2hex(random_bytes(16)) . '.' . $ext;
+        $destPath = $storageDir . '/' . $secureFilename;
+
+        if (move_uploaded_file($file['tmp_name'], $destPath)) {
+            // Delete old resume if exists
+            if (!empty($candidate['resume_file_path']) && file_exists(__DIR__ . '/../../' . $candidate['resume_file_path'])) {
+                unlink(__DIR__ . '/../../' . $candidate['resume_file_path']);
+            }
+
+            $relativePath = 'storage/tenant_' . $this->tenantId . '/resumes/' . $secureFilename;
+            $now = date('Y-m-d H:i:s');
+
+            $updateStmt = $this->pdo->prepare("UPDATE `candidate_profiles` SET `resume_file_path` = ?, `resume_filename` = ?, `resume_mime` = ?, `resume_uploaded_at` = ? WHERE `id` = ?");
+            $updateStmt->execute([$relativePath, $originalName, $mime, $now, $candidateId]);
+
+            $this->logActivity('resume_uploaded', "Uploaded resume: $originalName", $candidateId);
+
+            echo json_encode([
+                'success' => true,
+                'resume_filename' => $originalName,
+                'resume_uploaded_at' => $now,
+                'resume_download_url' => '../api/index.php?route=candidates&action=download_resume&id=' . $candidateId
+            ]);
+        } else {
+            echo json_encode(['success' => false, 'error' => 'Failed to save uploaded file']);
+        }
+        exit;
+    }
+
+    private function downloadResume() {
+        $candidateId = (int)($_GET['id'] ?? 0);
+        if (!$candidateId) {
+            http_response_code(400);
+            echo "Missing candidate ID";
+            exit;
+        }
+
+        $stmt = $this->pdo->prepare("SELECT resume_file_path, resume_filename, resume_mime FROM `candidate_profiles` WHERE `id` = ? AND `tenant_id` = ?");
+        $stmt->execute([$candidateId, $this->tenantId]);
+        $candidate = $stmt->fetch();
+
+        if (!$candidate || empty($candidate['resume_file_path'])) {
+            http_response_code(404);
+            echo "Resume not found";
+            exit;
+        }
+
+        $fullPath = __DIR__ . '/../../' . $candidate['resume_file_path'];
+        if (!file_exists($fullPath)) {
+            http_response_code(404);
+            echo "File missing from storage";
+            exit;
+        }
+
+        header('Content-Type: ' . $candidate['resume_mime']);
+        header('Content-Disposition: attachment; filename="' . basename($candidate['resume_filename']) . '"');
+        header('Content-Length: ' . filesize($fullPath));
+        header('Cache-Control: private, max-age=0, must-revalidate');
+        header('Pragma: public');
+        
+        readfile($fullPath);
         exit;
     }
 }

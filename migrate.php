@@ -9,3 +9,6 @@ require_once __DIR__ . '/backend/migrations/migrate_statutory_rates.php';
 
 echo "\nRunning Permissions Sync...\n";
 require_once __DIR__ . '/database_scripts/migrate_permissions_sync.php';
+
+echo "\nAdding Resume Columns...\n";
+require_once __DIR__ . '/backend/migrations/migrate_resume_columns.php';
