@@ -20,17 +20,26 @@ if (isset($port)) {
     $dsn = "mysql:host=$host;port=$port;dbname=$db;charset=utf8mb4";
 }
 
-function insertVersionedRecord($pdo, $table, $columns, $rows) {
+function insertVersionedRecord($pdo, $table, $columns, $rows, $idempotencyKeys = ['effective_from']) {
     if (empty($rows)) return;
-    $effectiveFrom = $rows[0]['effective_from'];
+    $firstRow = $rows[0];
 
-    $stmt = $pdo->prepare("SELECT 1 FROM `$table` WHERE `effective_from` = ? LIMIT 1");
-    $stmt->execute([$effectiveFrom]);
+    $whereClauses = [];
+    $whereVals = [];
+    foreach ($idempotencyKeys as $key) {
+        $whereClauses[] = "`$key` = ?";
+        $whereVals[] = $firstRow[$key];
+    }
+    $whereSql = implode(' AND ', $whereClauses);
+
+    $stmt = $pdo->prepare("SELECT 1 FROM `$table` WHERE $whereSql LIMIT 1");
+    $stmt->execute($whereVals);
     if ($stmt->fetch()) {
-        echo "Version $effectiveFrom for $table already exists. Skipping.\n";
+        echo "Version (" . implode(', ', $whereVals) . ") for $table already exists. Skipping.\n";
         return;
     }
 
+    $effectiveFrom = $firstRow['effective_from'];
     $stmt = $pdo->prepare("SELECT `effective_from` FROM `$table` WHERE `effective_to` IS NULL LIMIT 1");
     $stmt->execute();
     $active = $stmt->fetch();
@@ -125,12 +134,15 @@ try {
         );
     ");
 
+    // Delete incorrect SSS 2025-01-01 seed (MSC 4000) so it can be re-inserted cleanly starting at MSC 5000
+    $pdo->exec("DELETE FROM `sss_contribution_brackets` WHERE `effective_from` = '2025-01-01'");
+
     $sssRows = [];
     $effective_from = '2025-01-01';
-    $sssRows[] = ['range_from' => -999999, 'range_to' => 4249.99, 'msc' => 4000, 'ee_amount' => 200, 'er_amount' => 400, 'ec_amount' => 10, 'wisp_ee' => 0, 'wisp_er' => 0, 'effective_from' => $effective_from];
+    $sssRows[] = ['range_from' => -999999, 'range_to' => 5249.99, 'msc' => 5000, 'ee_amount' => 250, 'er_amount' => 500, 'ec_amount' => 10, 'wisp_ee' => 0, 'wisp_er' => 0, 'effective_from' => $effective_from];
 
-    $msc = 4500;
-    $range_from = 4250;
+    $msc = 5500;
+    $range_from = 5250;
     while ($msc <= 35000) {
         $range_to = $msc == 35000 ? 9999999.99 : $range_from + 499.99;
         $regular_msc = min($msc, 20000);
@@ -194,21 +206,53 @@ try {
             `effective_to` DATE NULL
         );
     ");
-    $birRows = [
+    // Correct existing BIR centavos for Monthly/Semi-Monthly
+    $pdo->exec("UPDATE `bir_withholding_brackets` SET `base_tax` = 8541.80 WHERE `pay_frequency` = 'Monthly' AND `lower_limit` = 66667 AND `effective_from` = '2023-01-01'");
+    $pdo->exec("UPDATE `bir_withholding_brackets` SET `base_tax` = 33541.80 WHERE `pay_frequency` = 'Monthly' AND `lower_limit` = 166667 AND `effective_from` = '2023-01-01'");
+    $pdo->exec("UPDATE `bir_withholding_brackets` SET `base_tax` = 183541.80 WHERE `pay_frequency` = 'Monthly' AND `lower_limit` = 666667 AND `effective_from` = '2023-01-01'");
+    $pdo->exec("UPDATE `bir_withholding_brackets` SET `base_tax` = 4270.70 WHERE `pay_frequency` = 'Semi-Monthly' AND `lower_limit` = 33333 AND `effective_from` = '2023-01-01'");
+    $pdo->exec("UPDATE `bir_withholding_brackets` SET `base_tax` = 16770.70 WHERE `pay_frequency` = 'Semi-Monthly' AND `lower_limit` = 83333 AND `effective_from` = '2023-01-01'");
+    $pdo->exec("UPDATE `bir_withholding_brackets` SET `base_tax` = 91770.70 WHERE `pay_frequency` = 'Semi-Monthly' AND `lower_limit` = 333333 AND `effective_from` = '2023-01-01'");
+
+    $birRowsMonthly = [
         ['pay_frequency' => 'Monthly', 'lower_limit' => 0, 'base_tax' => 0, 'rate_on_excess' => 0, 'effective_from' => '2023-01-01'],
         ['pay_frequency' => 'Monthly', 'lower_limit' => 20833, 'base_tax' => 0, 'rate_on_excess' => 0.15, 'effective_from' => '2023-01-01'],
         ['pay_frequency' => 'Monthly', 'lower_limit' => 33333, 'base_tax' => 1875, 'rate_on_excess' => 0.20, 'effective_from' => '2023-01-01'],
-        ['pay_frequency' => 'Monthly', 'lower_limit' => 66667, 'base_tax' => 8541.67, 'rate_on_excess' => 0.25, 'effective_from' => '2023-01-01'],
-        ['pay_frequency' => 'Monthly', 'lower_limit' => 166667, 'base_tax' => 33541.67, 'rate_on_excess' => 0.30, 'effective_from' => '2023-01-01'],
-        ['pay_frequency' => 'Monthly', 'lower_limit' => 666667, 'base_tax' => 183541.67, 'rate_on_excess' => 0.35, 'effective_from' => '2023-01-01'],
+        ['pay_frequency' => 'Monthly', 'lower_limit' => 66667, 'base_tax' => 8541.80, 'rate_on_excess' => 0.25, 'effective_from' => '2023-01-01'],
+        ['pay_frequency' => 'Monthly', 'lower_limit' => 166667, 'base_tax' => 33541.80, 'rate_on_excess' => 0.30, 'effective_from' => '2023-01-01'],
+        ['pay_frequency' => 'Monthly', 'lower_limit' => 666667, 'base_tax' => 183541.80, 'rate_on_excess' => 0.35, 'effective_from' => '2023-01-01']
+    ];
+    insertVersionedRecord($pdo, 'bir_withholding_brackets', ['pay_frequency', 'lower_limit', 'base_tax', 'rate_on_excess', 'effective_from'], $birRowsMonthly, ['pay_frequency', 'effective_from']);
+
+    $birRowsSemi = [
         ['pay_frequency' => 'Semi-Monthly', 'lower_limit' => 0, 'base_tax' => 0, 'rate_on_excess' => 0, 'effective_from' => '2023-01-01'],
         ['pay_frequency' => 'Semi-Monthly', 'lower_limit' => 10417, 'base_tax' => 0, 'rate_on_excess' => 0.15, 'effective_from' => '2023-01-01'],
         ['pay_frequency' => 'Semi-Monthly', 'lower_limit' => 16667, 'base_tax' => 937.50, 'rate_on_excess' => 0.20, 'effective_from' => '2023-01-01'],
-        ['pay_frequency' => 'Semi-Monthly', 'lower_limit' => 33333, 'base_tax' => 4270.83, 'rate_on_excess' => 0.25, 'effective_from' => '2023-01-01'],
-        ['pay_frequency' => 'Semi-Monthly', 'lower_limit' => 83333, 'base_tax' => 16770.83, 'rate_on_excess' => 0.30, 'effective_from' => '2023-01-01'],
-        ['pay_frequency' => 'Semi-Monthly', 'lower_limit' => 333333, 'base_tax' => 91770.83, 'rate_on_excess' => 0.35, 'effective_from' => '2023-01-01']
+        ['pay_frequency' => 'Semi-Monthly', 'lower_limit' => 33333, 'base_tax' => 4270.70, 'rate_on_excess' => 0.25, 'effective_from' => '2023-01-01'],
+        ['pay_frequency' => 'Semi-Monthly', 'lower_limit' => 83333, 'base_tax' => 16770.70, 'rate_on_excess' => 0.30, 'effective_from' => '2023-01-01'],
+        ['pay_frequency' => 'Semi-Monthly', 'lower_limit' => 333333, 'base_tax' => 91770.70, 'rate_on_excess' => 0.35, 'effective_from' => '2023-01-01']
     ];
-    insertVersionedRecord($pdo, 'bir_withholding_brackets', ['pay_frequency', 'lower_limit', 'base_tax', 'rate_on_excess', 'effective_from'], $birRows);
+    insertVersionedRecord($pdo, 'bir_withholding_brackets', ['pay_frequency', 'lower_limit', 'base_tax', 'rate_on_excess', 'effective_from'], $birRowsSemi, ['pay_frequency', 'effective_from']);
+
+    $birRowsWeekly = [
+        ['pay_frequency' => 'Weekly', 'lower_limit' => 0, 'base_tax' => 0, 'rate_on_excess' => 0, 'effective_from' => '2023-01-01'],
+        ['pay_frequency' => 'Weekly', 'lower_limit' => 4808, 'base_tax' => 0, 'rate_on_excess' => 0.15, 'effective_from' => '2023-01-01'],
+        ['pay_frequency' => 'Weekly', 'lower_limit' => 7692, 'base_tax' => 432.60, 'rate_on_excess' => 0.20, 'effective_from' => '2023-01-01'],
+        ['pay_frequency' => 'Weekly', 'lower_limit' => 15385, 'base_tax' => 1971.20, 'rate_on_excess' => 0.25, 'effective_from' => '2023-01-01'],
+        ['pay_frequency' => 'Weekly', 'lower_limit' => 38462, 'base_tax' => 7740.45, 'rate_on_excess' => 0.30, 'effective_from' => '2023-01-01'],
+        ['pay_frequency' => 'Weekly', 'lower_limit' => 153846, 'base_tax' => 42355.65, 'rate_on_excess' => 0.35, 'effective_from' => '2023-01-01']
+    ];
+    insertVersionedRecord($pdo, 'bir_withholding_brackets', ['pay_frequency', 'lower_limit', 'base_tax', 'rate_on_excess', 'effective_from'], $birRowsWeekly, ['pay_frequency', 'effective_from']);
+
+    $birRowsDaily = [
+        ['pay_frequency' => 'Daily', 'lower_limit' => 0, 'base_tax' => 0, 'rate_on_excess' => 0, 'effective_from' => '2023-01-01'],
+        ['pay_frequency' => 'Daily', 'lower_limit' => 685, 'base_tax' => 0, 'rate_on_excess' => 0.15, 'effective_from' => '2023-01-01'],
+        ['pay_frequency' => 'Daily', 'lower_limit' => 1096, 'base_tax' => 61.65, 'rate_on_excess' => 0.20, 'effective_from' => '2023-01-01'],
+        ['pay_frequency' => 'Daily', 'lower_limit' => 2192, 'base_tax' => 280.85, 'rate_on_excess' => 0.25, 'effective_from' => '2023-01-01'],
+        ['pay_frequency' => 'Daily', 'lower_limit' => 5479, 'base_tax' => 1102.60, 'rate_on_excess' => 0.30, 'effective_from' => '2023-01-01'],
+        ['pay_frequency' => 'Daily', 'lower_limit' => 21918, 'base_tax' => 6034.30, 'rate_on_excess' => 0.35, 'effective_from' => '2023-01-01']
+    ];
+    insertVersionedRecord($pdo, 'bir_withholding_brackets', ['pay_frequency', 'lower_limit', 'base_tax', 'rate_on_excess', 'effective_from'], $birRowsDaily, ['pay_frequency', 'effective_from']);
 
     // 6. De Minimis
     $pdo->exec("

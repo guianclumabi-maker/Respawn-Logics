@@ -192,7 +192,7 @@ class PayrollService
         return max(0, $cap - $used);
     }
 
-    public function generateRun($tenantId, $scheduleId, $start, $end, $payDate, $createdById)
+    public function generateRun($tenantId, $scheduleId, $start, $end, $payDate, $createdById, $runType = 'Regular')
     {
         try {
             $this->pdo->beginTransaction();
@@ -223,12 +223,12 @@ class PayrollService
             }
 
             // 1. Create the Run Record
-            $stmt = $this->pdo->prepare("INSERT INTO `payroll_runs` (`tenant_id`, `payroll_schedule_id`, `payroll_period_start`, `payroll_period_end`, `pay_date`, `status`, `created_by`) VALUES (?, ?, ?, ?, ?, 'Draft', ?)");
-            $stmt->execute([$tenantId, $scheduleId, $start, $end, $payDate, $createdById]);
+            $stmt = $this->pdo->prepare("INSERT INTO `payroll_runs` (`tenant_id`, `payroll_schedule_id`, `payroll_period_start`, `payroll_period_end`, `pay_date`, `status`, `created_by`, `run_type`) VALUES (?, ?, ?, ?, ?, 'Draft', ?, ?)");
+            $stmt->execute([$tenantId, $scheduleId, $start, $end, $payDate, $createdById, $runType]);
             $runId = $this->pdo->lastInsertId();
 
             // 2. Fetch all eligible employees
-            $empStmt = $this->pdo->prepare("SELECT `id`, `base_salary`, `employment_status` FROM `users` WHERE `tenant_id` = ? AND `payroll_schedule_id` = ? AND `employment_status` = 'Active'");
+            $empStmt = $this->pdo->prepare("SELECT `id`, `base_salary`, `employment_status`, `is_mwe` FROM `users` WHERE `tenant_id` = ? AND `payroll_schedule_id` = ? AND `employment_status` = 'Active'");
             $empStmt->execute([$tenantId, $scheduleId]);
             $employees = $empStmt->fetchAll(PDO::FETCH_ASSOC);
 
@@ -300,6 +300,19 @@ class PayrollService
                 $totalAllowances = 0;
                 $otherBenefitsThisRun = 0;
                 
+                $is13thMonth = ($runType === '13th Month');
+                $thirteenthPayout = 0;
+
+                if ($is13thMonth) {
+                    $sss = ['ee' => 0, 'er' => 0, 'ec' => 0, 'wisp_er' => 0];
+                    $phic = ['ee' => 0, 'er' => 0];
+                    $hdmf = ['ee' => 0, 'er' => 0];
+                    // Approximation: payout full base salary
+                    $thirteenthPayout = floatval($emp['base_salary']);
+                    $otherBenefitsThisRun += $thirteenthPayout;
+                    $cutoffBase = 0; // No regular basic salary this run
+                }
+                
                 $customEarnings = 0;
                 $customTaxableEarnings = 0;
                 $customDeductions = 0;
@@ -326,7 +339,12 @@ class PayrollService
                     }
                 }
                 
-                $earningStmt->execute([$runId, $empId, 'Basic Salary', $cutoffBase]);
+                if ($cutoffBase > 0) {
+                    $earningStmt->execute([$runId, $empId, 'Basic Salary', round($cutoffBase, 2)]);
+                }
+                if ($thirteenthPayout > 0) {
+                    $earningStmt->execute([$runId, $empId, '13th Month Pay (Included in Other Benefits)', round($thirteenthPayout, 2)]);
+                }
 
                 foreach ($empBenefits as $ben) {
                     if ($ben['type'] === 'HMO') {
@@ -366,28 +384,29 @@ class PayrollService
                     $markExpStmt->execute([$exp['id']]);
                 }
 
-                $gross = $cutoffBase + $totalExpenses + $totalAllowances + $customEarnings;
+                $gross = round($cutoffBase + $totalExpenses + $totalAllowances + $customEarnings + $thirteenthPayout, 2);
                 
-                // Taxable income is Cutoff Base + Taxable Allowances - Cutoff Statutory
-                $taxableIncome = ($cutoffBase + $taxableOtherBenefits + $customTaxableEarnings) - ($sss['ee'] + $phic['ee'] + $hdmf['ee']);
-                $tax = $this->calculateTax($taxableIncome, $frequency);
+                $isMwe = (intval($emp['is_mwe']) === 1);
                 
-                $isMwe = isset($emp['is_mwe']) ? (bool)$emp['is_mwe'] : (floatval($emp['base_salary']) <= 15000);
-                if (intval($this->tenantSettings['mwe_auto_exempt'] ?? 1) === 1 && $isMwe) {
-                    $tax = 0;
+                if ($isMwe) {
+                    $taxableIncome = ($taxableOtherBenefits + $customTaxableEarnings);
+                } else {
+                    $taxableIncome = ($cutoffBase + $taxableOtherBenefits + $customTaxableEarnings) - ($sss['ee'] + $phic['ee'] + $hdmf['ee']);
                 }
                 
-                $thirteenthAccrual = $cutoffBase / 12;
+                $tax = round($this->calculateTax($taxableIncome, $frequency), 2);
+                
+                $thirteenthAccrual = round($cutoffBase / 12, 2);
 
-                $totalDeductions = $tax + $sss['ee'] + $phic['ee'] + $hdmf['ee'] + $totalHmoDeduction + $customDeductions;
-                $net = $gross - $totalDeductions;
+                $totalDeductions = round($tax + $sss['ee'] + $phic['ee'] + $hdmf['ee'] + $totalHmoDeduction + $customDeductions, 2);
+                $net = round($gross - $totalDeductions, 2);
 
-                $reStmt->execute([$runId, $empId, $gross, $totalDeductions, $net, $sss['er'], $sss['ec'], $sss['wisp_er'], $phic['er'], $hdmf['er'], $thirteenthAccrual]);
+                $reStmt->execute([$runId, $empId, $gross, $totalDeductions, $net, round($sss['er'], 2), round($sss['ec'], 2), round($sss['wisp_er'], 2), round($phic['er'], 2), round($hdmf['er'], 2), $thirteenthAccrual]);
 
                 if ($tax > 0) $deductStmt->execute([$runId, $empId, 'Withholding Tax', $tax]);
-                if ($sss['ee'] > 0) $deductStmt->execute([$runId, $empId, 'SSS Contribution', $sss['ee']]);
-                if ($phic['ee'] > 0) $deductStmt->execute([$runId, $empId, 'PhilHealth Contribution', $phic['ee']]);
-                if ($hdmf['ee'] > 0) $deductStmt->execute([$runId, $empId, 'Pag-IBIG Contribution', $hdmf['ee']]);
+                if ($sss['ee'] > 0) $deductStmt->execute([$runId, $empId, 'SSS Contribution', round($sss['ee'], 2)]);
+                if ($phic['ee'] > 0) $deductStmt->execute([$runId, $empId, 'PhilHealth Contribution', round($phic['ee'], 2)]);
+                if ($hdmf['ee'] > 0) $deductStmt->execute([$runId, $empId, 'Pag-IBIG Contribution', round($hdmf['ee'], 2)]);
                 
                 foreach ($empBenefits as $ben) {
                     if ($ben['type'] === 'HMO' && intval($ben['dependent_count']) > 0) {
