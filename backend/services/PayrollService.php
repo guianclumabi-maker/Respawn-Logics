@@ -47,20 +47,30 @@ class PayrollService
             $this->deMinimisConfig[$row['item_name']] = $row;
         }
 
-        $stmt = $this->pdo->prepare("SELECT * FROM tenant_payroll_settings WHERE tenant_id = ?");
-        $stmt->execute([$tenantId]);
-        $settings = $stmt->fetch(PDO::FETCH_ASSOC);
-        if (!$settings) {
-            $settings = [
-                'proration_method' => 'split_even',
-                'mwe_auto_exempt' => 1,
-            ];
+        $settings = [
+            'proration_method' => 'split_even',
+            'mwe_auto_exempt' => 1,
+        ];
+        try {
+            $stmt = $this->pdo->prepare("SELECT * FROM tenant_payroll_settings WHERE tenant_id = ?");
+            $stmt->execute([$tenantId]);
+            $row = $stmt->fetch(PDO::FETCH_ASSOC);
+            if ($row) {
+                $settings = $row;
+            }
+        } catch (Exception $e) {
+            // Table might not exist yet, fallback to defaults
         }
         $this->tenantSettings = $settings;
 
-        $stmt = $this->pdo->prepare("SELECT * FROM pay_components WHERE tenant_id = ? AND is_active = 1 ORDER BY sort_order ASC");
-        $stmt->execute([$tenantId]);
-        $this->payComponents = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $this->payComponents = [];
+        try {
+            $stmt = $this->pdo->prepare("SELECT * FROM pay_components WHERE tenant_id = ? AND is_active = 1 ORDER BY sort_order ASC");
+            $stmt->execute([$tenantId]);
+            $this->payComponents = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (Exception $e) {
+            // Table might not exist yet, fallback to empty array
+        }
     }
 
     private function calculateSSS($baseSalary, $prorateFactor) {

@@ -229,19 +229,24 @@ class PayrollController
                     break;
 
                 case 'settings':
-                    $stmt = $this->pdo->prepare("SELECT * FROM `tenant_payroll_settings` WHERE `tenant_id` = ?");
-                    $stmt->execute([$this->tenantId]);
-                    $settings = $stmt->fetch(PDO::FETCH_ASSOC);
-                    if (!$settings) {
-                        $settings = [
-                            'default_pay_frequency' => 'Semi-Monthly',
-                            'proration_method' => 'split_even',
-                            'default_pay_basis' => 'monthly',
-                            'tax_annualization' => 0,
-                            'mwe_auto_exempt' => 1,
-                            'rounding_mode' => 'half_up',
-                            'approval_levels' => 1
-                        ];
+                    $settings = [
+                        'default_pay_frequency' => 'Semi-Monthly',
+                        'proration_method' => 'split_even',
+                        'default_pay_basis' => 'monthly',
+                        'tax_annualization' => 0,
+                        'mwe_auto_exempt' => 1,
+                        'rounding_mode' => 'half_up',
+                        'approval_levels' => 1
+                    ];
+                    try {
+                        $stmt = $this->pdo->prepare("SELECT * FROM `tenant_payroll_settings` WHERE `tenant_id` = ?");
+                        $stmt->execute([$this->tenantId]);
+                        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+                        if ($row) {
+                            $settings = $row;
+                        }
+                    } catch (Exception $e) {
+                        // Fallback
                     }
                     echo json_encode(['success' => true, 'data' => $settings]);
                     break;
@@ -275,9 +280,13 @@ class PayrollController
                     break;
 
                 case 'components_list':
-                    $stmt = $this->pdo->prepare("SELECT * FROM `pay_components` WHERE `tenant_id` = ? ORDER BY `sort_order` ASC, `id` ASC");
-                    $stmt->execute([$this->tenantId]);
-                    echo json_encode(['success' => true, 'data' => $stmt->fetchAll(PDO::FETCH_ASSOC)]);
+                    try {
+                        $stmt = $this->pdo->prepare("SELECT * FROM `pay_components` WHERE `tenant_id` = ? ORDER BY `sort_order` ASC, `id` ASC");
+                        $stmt->execute([$this->tenantId]);
+                        echo json_encode(['success' => true, 'data' => $stmt->fetchAll(PDO::FETCH_ASSOC)]);
+                    } catch (Exception $e) {
+                        echo json_encode(['success' => true, 'data' => []]);
+                    }
                     break;
 
                 case 'component_save':
