@@ -419,6 +419,49 @@ export function CandidateProfile({ onViewChange, candidateId }: Props) {
   const [uploadingResume, setUploadingResume] = useState(false);
   const fileInputRef = React.useRef<HTMLInputElement>(null);
 
+  const [showHireModal, setShowHireModal] = useState(false);
+  const [hiring, setHiring] = useState(false);
+  const [hireData, setHireData] = useState({ employeeId: '', hireDate: new Date().toISOString().split('T')[0], jobTitle: '', department: '', baseSalary: '' });
+  const [hireSuccessData, setHireSuccessData] = useState<{ email: string, tempPassword: string } | null>(null);
+
+  const handleHireCandidate = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setHiring(true);
+    try {
+      const res = await fetch(`${API}&action=hire`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRF-Token': (window as any).__CSRF_TOKEN__ || ''
+        },
+        body: JSON.stringify({
+          candidate_id: candidateId,
+          application_id: candidate?.applications[0]?.id,
+          employee_id: hireData.employeeId,
+          hire_date: hireData.hireDate,
+          job_title: hireData.jobTitle,
+          department: hireData.department,
+          base_salary: hireData.baseSalary
+        })
+      });
+      const data = await res.json();
+      if (data.success) {
+        setHireSuccessData({
+          email: candidate?.email || '',
+          tempPassword: data.temp_password
+        });
+      } else {
+        alert(data.error || 'Failed to hire candidate');
+      }
+    } catch (err) {
+      console.error(err);
+      alert('An error occurred');
+    } finally {
+      setHiring(false);
+    }
+  };
+
   const fetchCandidate = useCallback(() => {
     setLoading(true);
     setError(null);
@@ -582,38 +625,85 @@ export function CandidateProfile({ onViewChange, candidateId }: Props) {
               </button>
             </div>
             <div className="p-5">
-              <form onSubmit={handleHireCandidate} className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-1.5">
-                    <label className="text-[10px] font-bold text-muted-foreground uppercase">Employee ID *</label>
-                    <input type="text" required value={hireData.employeeId} onChange={e => setHireData({...hireData, employeeId: e.target.value})} className="w-full bg-[#111827] border border-white/10 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-primary/50 transition-colors" placeholder="e.g. EMP-001" />
+              {hireSuccessData ? (
+                <div className="space-y-4 text-center">
+                  <div className="w-12 h-12 rounded-full bg-[#00e07a]/20 border border-[#00e07a]/40 flex items-center justify-center mx-auto text-[#00e07a] mb-2">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
                   </div>
-                  <div className="space-y-1.5">
-                    <label className="text-[10px] font-bold text-muted-foreground uppercase">Hire Date *</label>
-                    <input type="date" required value={hireData.hireDate} onChange={e => setHireData({...hireData, hireDate: e.target.value})} className="w-full bg-[#111827] border border-white/10 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-primary/50 transition-colors" />
+                  <h4 className="text-lg font-bold text-white">Employee Enrolled!</h4>
+                  <p className="text-xs text-muted-foreground">
+                    Temporary password — copy and give this to the employee. It won't be shown again.
+                  </p>
+                  <div className="bg-[#111827] border border-white/10 rounded-lg p-4 space-y-3 mt-4 text-left">
+                    <div>
+                      <div className="text-[10px] font-bold text-muted-foreground uppercase mb-1">Email</div>
+                      <div className="text-sm font-mono text-white">{hireSuccessData.email}</div>
+                    </div>
+                    <div>
+                      <div className="text-[10px] font-bold text-muted-foreground uppercase mb-1">Temporary Password</div>
+                      <div className="flex items-center gap-2">
+                        <code className="flex-1 bg-black/50 px-3 py-2 rounded text-sm text-[#00e07a] border border-[#00e07a]/20 font-mono tracking-wider">
+                          {hireSuccessData.tempPassword}
+                        </code>
+                        <button 
+                          type="button"
+                          onClick={() => navigator.clipboard.writeText(hireSuccessData.tempPassword)}
+                          className="p-2 rounded bg-white/5 hover:bg-white/10 text-muted-foreground hover:text-white transition-colors cursor-pointer"
+                          title="Copy to clipboard"
+                        >
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="pt-4">
+                    <button 
+                      type="button"
+                      onClick={() => {
+                        setShowHireModal(false);
+                        setHireSuccessData(null);
+                        fetchCandidate();
+                      }} 
+                      className="w-full px-5 py-2.5 text-xs font-bold text-black bg-[#00e07a] hover:bg-[#00c9b1] rounded-lg transition-colors cursor-pointer"
+                    >
+                      Done
+                    </button>
                   </div>
                 </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-1.5">
-                    <label className="text-[10px] font-bold text-muted-foreground uppercase">Job Title</label>
-                    <input type="text" value={hireData.jobTitle} onChange={e => setHireData({...hireData, jobTitle: e.target.value})} className="w-full bg-[#111827] border border-white/10 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-primary/50 transition-colors" placeholder="Software Engineer" />
+              ) : (
+                <form onSubmit={handleHireCandidate} className="space-y-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-1.5">
+                      <label className="text-[10px] font-bold text-muted-foreground uppercase">Employee ID *</label>
+                      <input type="text" required value={hireData.employeeId} onChange={e => setHireData({...hireData, employeeId: e.target.value})} className="w-full bg-[#111827] border border-white/10 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-primary/50 transition-colors" placeholder="e.g. EMP-001" />
+                    </div>
+                    <div className="space-y-1.5">
+                      <label className="text-[10px] font-bold text-muted-foreground uppercase">Hire Date *</label>
+                      <input type="date" required value={hireData.hireDate} onChange={e => setHireData({...hireData, hireDate: e.target.value})} className="w-full bg-[#111827] border border-white/10 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-primary/50 transition-colors" />
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-1.5">
+                      <label className="text-[10px] font-bold text-muted-foreground uppercase">Job Title</label>
+                      <input type="text" value={hireData.jobTitle} onChange={e => setHireData({...hireData, jobTitle: e.target.value})} className="w-full bg-[#111827] border border-white/10 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-primary/50 transition-colors" placeholder="Software Engineer" />
+                    </div>
+                    <div className="space-y-1.5">
+                      <label className="text-[10px] font-bold text-muted-foreground uppercase">Department</label>
+                      <input type="text" value={hireData.department} onChange={e => setHireData({...hireData, department: e.target.value})} className="w-full bg-[#111827] border border-white/10 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-primary/50 transition-colors" placeholder="Engineering" />
+                    </div>
                   </div>
                   <div className="space-y-1.5">
-                    <label className="text-[10px] font-bold text-muted-foreground uppercase">Department</label>
-                    <input type="text" value={hireData.department} onChange={e => setHireData({...hireData, department: e.target.value})} className="w-full bg-[#111827] border border-white/10 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-primary/50 transition-colors" placeholder="Engineering" />
+                    <label className="text-[10px] font-bold text-muted-foreground uppercase">Base Salary (Optional)</label>
+                    <input type="number" step="0.01" value={hireData.baseSalary} onChange={e => setHireData({...hireData, baseSalary: e.target.value})} className="w-full bg-[#111827] border border-white/10 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-primary/50 transition-colors" placeholder="85000" />
                   </div>
-                </div>
-                <div className="space-y-1.5">
-                  <label className="text-[10px] font-bold text-muted-foreground uppercase">Base Salary (Optional)</label>
-                  <input type="number" step="0.01" value={hireData.baseSalary} onChange={e => setHireData({...hireData, baseSalary: e.target.value})} className="w-full bg-[#111827] border border-white/10 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-primary/50 transition-colors" placeholder="85000" />
-                </div>
-                <div className="pt-2 flex items-center justify-end gap-3">
-                  <button type="button" onClick={() => setShowHireModal(false)} className="px-4 py-2 text-xs font-bold text-muted-foreground hover:text-white transition-colors">Cancel</button>
-                  <button type="submit" disabled={hiring} className="px-5 py-2 text-xs font-bold text-black bg-[#00e07a] hover:bg-[#00c9b1] rounded-lg transition-colors disabled:opacity-50">
-                    {hiring ? 'Hiring...' : 'Enroll Employee'}
-                  </button>
-                </div>
-              </form>
+                  <div className="pt-2 flex items-center justify-end gap-3">
+                    <button type="button" onClick={() => setShowHireModal(false)} className="px-4 py-2 text-xs font-bold text-muted-foreground hover:text-white transition-colors cursor-pointer">Cancel</button>
+                    <button type="submit" disabled={hiring} className="px-5 py-2 text-xs font-bold text-black bg-[#00e07a] hover:bg-[#00c9b1] rounded-lg transition-colors disabled:opacity-50 cursor-pointer">
+                      {hiring ? 'Hiring...' : 'Enroll Employee'}
+                    </button>
+                  </div>
+                </form>
+              )}
             </div>
           </div>
         </div>
