@@ -35,7 +35,7 @@ type Job = {
   health: HealthData; applications: Application[];
 };
 
-type JobListItem = { id: number; title: string; department: string; status: string };
+type JobListItem = { id: number; title: string; department: string; status: string; location?: string; health?: any; priority?: string; days_open?: number; hiring_manager?: string; };
 
 type CandidateForm = {
   name: string;

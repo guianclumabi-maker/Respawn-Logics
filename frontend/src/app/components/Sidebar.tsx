@@ -64,7 +64,7 @@ type NavEntry = {
   label: string;
   view: string;
   icon: React.ReactNode;
-  badgeKey?: keyof SidebarBadges;
+  badgeKey?: string | keyof SidebarBadges;
 };
 
 type NavSection = {
@@ -79,7 +79,7 @@ const getSections = (hasPermission: (p: string) => boolean): NavSection[] => [
   {
     title: "Workspace",
     items: [
-      { label: "Dashboard", view: "Dashboard", icon: <LayoutDashboard size={19} />, badgeKey: "actions" },
+      { label: "Dashboard", view: "Dashboard", icon: <LayoutDashboard size={19} />, badgeKey: "actions" as keyof SidebarBadges },
       { label: "Onboarding", view: "Onboarding", icon: <UserPlus size={19} /> },
       { label: "Employee Relations", view: "Employee Relations", icon: <Shield size={19} /> },
       ...(hasPermission("leave.view") || hasPermission("leave.request") ? [
@@ -248,7 +248,7 @@ export function Sidebar({ activeView, onViewChange, badges = {} }: SidebarProps)
             <nav className="space-y-1">
               {section.items.map((item) => {
                 const active = isActive(item.view);
-                const badgeCount = item.badgeKey ? badges[item.badgeKey] : undefined;
+                const badgeCount = item.badgeKey ? badges[item.badgeKey as keyof SidebarBadges] : undefined;
 
                 return (
                   <button

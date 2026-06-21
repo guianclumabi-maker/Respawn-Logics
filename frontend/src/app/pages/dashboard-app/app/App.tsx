@@ -143,7 +143,7 @@ export default function App() {
   const handleAddMessage = (ticketId: string, body: string, internal: boolean, attachments: any[]) => {
     const newMsg = {
       id: "m" + Date.now(),
-      author: { name: "You", initials: "YO", color: role === "client" ? "#3b82f6" : "#ec4899", role },
+      author: { name: "You", initials: "YO", color: role === "client" ? "#3b82f6" : "#ec4899", role: (role === "client" ? "user" : "agent") as "user" | "agent" },
       body,
       timestamp: new Date().toISOString(),
       internal,
