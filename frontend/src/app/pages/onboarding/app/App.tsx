@@ -295,7 +295,7 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0b0f1a] bg-[linear-gradient(to_right,rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:40px_40px] font-['Space_Grotesk'] selection:bg-[#00e07a]/30 overflow-hidden relative text-[#c8d0e0]">
+    <div className="h-full bg-[#0b0f1a] bg-[linear-gradient(to_right,rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:40px_40px] font-['Space_Grotesk'] selection:bg-[#00e07a]/30 overflow-hidden relative text-[#c8d0e0]">
       {/* Ambient Background Blobs */}
       <div className="ambient-blob blob-1"></div>
       <div className="ambient-blob blob-2"></div>
@@ -308,32 +308,6 @@ export default function App() {
         </div>
       )}
 
-      {/* HEADER */}
-      <nav className="border-b border-white/[0.05] bg-[#0b0f1a]/80 backdrop-blur-md sticky top-0 z-40">
-        <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-6">
-            <button onClick={() => window.location.href = `${API_BASE}/index.php`} className="text-[#8b95a8] hover:text-white font-['JetBrains_Mono'] text-sm flex items-center gap-2 transition-colors">
-              <ArrowRight size={16} className="rotate-180" />
-              Cancel & Exit       </button>
-            <div className="h-6 w-px bg-white/10 hidden md:block"></div>
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-[7px] bg-gradient-to-br from-[#00e07a] to-[#00b8ff] flex items-center justify-center shadow-[0_0_15px_rgba(0,224,122,0.4)]">
-                <i className="fa-solid fa-gamepad" style={{fontSize: "14px", color: "#000"}}></i>
-              </div>
-              <div className="hidden sm:flex items-center gap-2">
-                <span className="text-white font-bold tracking-tight font-['JetBrains_Mono'] text-[16px]">Respawn Logics</span>
-                <span className="font-['JetBrains_Mono'] text-[10px] font-bold tracking-[0.1em] text-[#00e07a] bg-[#00e07a]/10 border border-[#00e07a]/20 px-1.5 py-[2px] rounded-[4px]">v2.0</span>
-              </div>
-            </div>
-          </div>
-          <div className="flex items-center gap-4">
-            <div className="flex items-center gap-2 px-3 py-1 bg-[#00e07a]/10 border border-[#00e07a]/20 rounded-sm">
-              <div className="w-2 h-2 rounded-full bg-[#00e07a] animate-pulse"></div>
-              <span className="text-[#00e07a] text-xs font-bold font-['JetBrains_Mono'] uppercase tracking-wider">Onboarding_Engine</span>
-            </div>
-          </div>
-        </div>
-      </nav>
 
       <main className="max-w-5xl mx-auto px-6 py-12">
         {currentView === "setup_mode" && (

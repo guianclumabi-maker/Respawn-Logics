@@ -191,7 +191,7 @@ export default function App() {
 
   return (
     <div style={{
-      minHeight: "100vh",
+      height: "100%",
       background: "linear-gradient(160deg, #080d14 0%, #0d1117 40%, #0f1420 100%)",
       fontFamily: "'Inter', system-ui, sans-serif",
       color: "#f0f4ff",
@@ -203,7 +203,7 @@ export default function App() {
       {/* Global Background Glow Effects */}
       <div style={{ position: "absolute", top: -100, left: -100, width: 500, height: 500, borderRadius: "50%", background: "#00e07a", filter: "blur(120px)", opacity: 0.06, pointerEvents: "none", zIndex: -1 }} />
       <div style={{ position: "absolute", bottom: -150, right: -100, width: 600, height: 600, borderRadius: "50%", background: "#9b6dff", filter: "blur(140px)", opacity: 0.05, pointerEvents: "none", zIndex: -1 }} />
-      {/* Top nav */}
+      {/* Module-specific top bar (stripped of global chrome) */}
       <header style={{
         borderBottom: "1px solid rgba(255,255,255,0.07)",
         padding: "0 1.5rem",
@@ -218,48 +218,8 @@ export default function App() {
         zIndex: 30,
         flexShrink: 0,
       }}>
-        {/* Left: logo + nav */}
+        {/* Left: module nav + search */}
         <div style={{ display: "flex", alignItems: "center", gap: "1.75rem" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: "0.625rem" }}>
-            <a href="dashboard.php" style={{ 
-              color: "#8899b4", textDecoration: "none", display: "flex", alignItems: "center", gap: "0.5rem",
-              background: "rgba(255,255,255,0.05)", padding: "0.3rem 0.75rem", borderRadius: "0.5rem",
-              fontSize: "0.875rem", transition: "background 0.2s"
-            }}
-            onMouseEnter={(e) => e.currentTarget.style.background = "rgba(255,255,255,0.1)"}
-            onMouseLeave={(e) => e.currentTarget.style.background = "rgba(255,255,255,0.05)"}>
-              <ArrowLeft size={14} /> Back to Hub
-            </a>
-            <span style={{ color: "rgba(255,255,255,0.15)", fontSize: "0.875rem", margin: "0 0.25rem" }}>|</span>
-            <div style={{
-              width: 30, height: 30, borderRadius: "0.5rem",
-              background: "linear-gradient(135deg, #00e07a, #00b8ff)",
-              display: "flex", alignItems: "center", justifyContent: "center",
-            }}>
-              <Headphones size={15} color="white" />
-            </div>
-            <span style={{ fontWeight: 600, fontSize: "0.9375rem" }}>Support</span>
-
-            {/* Global Search */}
-            <div style={{ position: "relative", marginLeft: "1rem" }}>
-              <Search size={13} style={{ position: "absolute", left: "0.75rem", top: "50%", transform: "translateY(-50%)", color: "#8899b4" }} />
-              <input 
-                type="text" 
-                placeholder="Search globally..." 
-                value={globalSearch}
-                onChange={e => { setGlobalSearch(e.target.value); setPage("tickets"); }}
-                style={{
-                  background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)",
-                  borderRadius: "99px", padding: "0.35rem 1rem 0.35rem 2rem", color: "#f0f4ff",
-                  fontSize: "0.8125rem", width: "200px", outline: "none", transition: "all 0.2s"
-                }}
-                onFocus={e => e.currentTarget.style.background = "rgba(255,255,255,0.08)"}
-                onBlur={e => e.currentTarget.style.background = "rgba(255,255,255,0.04)"}
-              />
-            </div>
-          </div>
-
-          {/* Nav tabs */}
           <nav style={{ display: "flex", alignItems: "center", gap: "0.125rem" }}>
             {navItems.map(item => {
               const active = page === item.key;
@@ -301,9 +261,27 @@ export default function App() {
               );
             })}
           </nav>
+          
+          {/* Module Search */}
+          <div style={{ position: "relative" }}>
+            <Search size={13} style={{ position: "absolute", left: "0.75rem", top: "50%", transform: "translateY(-50%)", color: "#8899b4" }} />
+            <input 
+              type="text" 
+              placeholder="Search tickets..." 
+              value={globalSearch}
+              onChange={e => { setGlobalSearch(e.target.value); setPage("tickets"); }}
+              style={{
+                background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)",
+                borderRadius: "99px", padding: "0.35rem 1rem 0.35rem 2rem", color: "#f0f4ff",
+                fontSize: "0.8125rem", width: "200px", outline: "none", transition: "all 0.2s"
+              }}
+              onFocus={e => e.currentTarget.style.background = "rgba(255,255,255,0.08)"}
+              onBlur={e => e.currentTarget.style.background = "rgba(255,255,255,0.04)"}
+            />
+          </div>
         </div>
 
-        {/* Right: status + avatar */}
+        {/* Right: module stats */}
         <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
           {openCritical > 0 && (
             <div style={{ display: "flex", alignItems: "center", gap: "0.375rem" }}>
@@ -313,24 +291,6 @@ export default function App() {
               </span>
             </div>
           )}
-
-          <button style={{
-            background: "transparent", border: "1px solid rgba(255,255,255,0.08)",
-            color: "#4b5a6e", borderRadius: "0.5rem",
-            width: 30, height: 30, display: "flex", alignItems: "center", justifyContent: "center",
-            cursor: "pointer",
-          }}>
-            <Bell size={14} />
-          </button>
-
-          <div style={{
-            width: 30, height: 30, borderRadius: "50%",
-            background: "linear-gradient(135deg, #00e07a, #00b8ff)",
-            display: "flex", alignItems: "center", justifyContent: "center",
-            fontSize: "0.6875rem", fontWeight: 700, color: "#0b0f1a",
-          }}>
-            {(typeof window !== 'undefined' && window.__USER_INITIALS__) || 'RL'}
-          </div>
         </div>
       </header>
 

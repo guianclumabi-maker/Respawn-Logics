@@ -860,14 +860,9 @@ export function PayrollManager() {
       
       {/* Main Content */}
       <div className="flex-1 flex flex-col h-full overflow-hidden">
-        <header className="flex-none px-8 py-6 border-b border-white/5 bg-[#161922]/50 backdrop-blur-md flex items-center justify-between">
-          <div className="page-title">
-            <h1 className="text-2xl font-bold text-white mb-1 capitalize" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
-              {activeTab === 'govreports' ? 'Tax & Gov Reports' : activeTab.replace('-', ' ')}
-            </h1>
-            <p className="text-sm text-gray-400">Enterprise Payroll Module</p>
-          </div>
-          <div className="flex items-center gap-4">
+        {/* Module-specific top bar (stripped of global chrome) */}
+        <header className="flex-none px-8 py-4 border-b border-white/5 bg-[#161922]/50 backdrop-blur-md flex items-center justify-between">
+          <div className="flex items-center gap-4 w-full justify-between">
             <div className="flex bg-black/20 rounded-lg p-1 border border-white/10">
               <button className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${activeTab === 'dashboard' ? 'bg-[#00e07a]/20 text-[#00e07a]' : 'text-gray-400 hover:text-white'}`} onClick={() => setActiveTab('dashboard')}>Dashboard</button>
               <button className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${activeTab === 'queue' ? 'bg-[#00e07a]/20 text-[#00e07a]' : 'text-gray-400 hover:text-white'}`} onClick={() => setActiveTab('queue')}>Queue</button>

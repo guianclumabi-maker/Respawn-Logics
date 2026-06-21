@@ -94,7 +94,7 @@ export default function App() {
 
   return (
     <div style={{
-      minHeight: "100vh",
+      height: "100%",
       background: "#0b0f1a",
       backgroundImage: "linear-gradient(rgba(0, 224, 122, 0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 224, 122, 0.03) 1px, transparent 1px)",
       backgroundSize: "30px 30px",
@@ -108,7 +108,7 @@ export default function App() {
       {/* Global Background Glow Effects */}
       <div style={{ position: "absolute", top: -100, left: -100, width: 500, height: 500, borderRadius: "50%", background: "#00e07a", filter: "blur(120px)", opacity: 0.06, pointerEvents: "none", zIndex: -1 }} />
       <div style={{ position: "absolute", bottom: -150, right: -100, width: 600, height: 600, borderRadius: "50%", background: "#9b6dff", filter: "blur(140px)", opacity: 0.05, pointerEvents: "none", zIndex: -1 }} />
-      {/* Top nav */}
+      {/* Module-specific top bar (stripped of global chrome) */}
       <header style={{
         borderBottom: "1px solid rgba(255,255,255,0.07)",
         padding: "0 1.5rem",
@@ -123,31 +123,9 @@ export default function App() {
         zIndex: 30,
         flexShrink: 0,
       }}>
-        <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
-          <span style={{ color: "rgba(255,255,255,0.15)", fontSize: "0.875rem", margin: "0 0.25rem" }}>|</span>
-          <div style={{
-            width: 30, height: 30, borderRadius: "0.5rem",
-            background: "rgba(0, 224, 122, 0.1)",
-            border: "1px solid rgba(0, 224, 122, 0.2)",
-            display: "flex", alignItems: "center", justifyContent: "center",
-          }}>
-            <Headphones size={15} color="#00e07a" />
-          </div>
-          <span style={{ fontWeight: 600, fontSize: "0.9375rem", fontFamily: "'Space Grotesk', sans-serif", marginRight: "1rem" }}>Support</span>
-          
-          <div style={{ position: "relative", width: "200px" }}>
-            <Search size={14} color="#8899b4" style={{ position: "absolute", left: "0.75rem", top: "50%", transform: "translateY(-50%)" }} />
-            <input 
-              placeholder="Search globally..." 
-              style={{
-                background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)",
-                borderRadius: "99px", padding: "0.35rem 1rem 0.35rem 2rem", fontSize: "0.8125rem",
-                color: "#f0f4ff", outline: "none", width: "100%", fontFamily: "'Inter', sans-serif"
-              }}
-            />
-          </div>
-
-          <div style={{ display: "flex", gap: "0.5rem", marginLeft: "1rem" }}>
+        {/* Left: module nav + search */}
+        <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
+          <div style={{ display: "flex", gap: "0.5rem" }}>
             <button 
               onClick={() => setActiveTab("analytics")}
               style={{
@@ -171,10 +149,22 @@ export default function App() {
               Tickets
             </button>
           </div>
+
+          <div style={{ position: "relative", width: "200px", marginLeft: "1rem" }}>
+            <Search size={14} color="#8899b4" style={{ position: "absolute", left: "0.75rem", top: "50%", transform: "translateY(-50%)" }} />
+            <input 
+              placeholder="Search tickets..." 
+              style={{
+                background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)",
+                borderRadius: "99px", padding: "0.35rem 1rem 0.35rem 2rem", fontSize: "0.8125rem",
+                color: "#f0f4ff", outline: "none", width: "100%", fontFamily: "'Inter', sans-serif"
+              }}
+            />
+          </div>
         </div>
 
+        {/* Right: stats */}
         <div style={{ display: "flex", alignItems: "center", gap: "1.25rem" }}>
-          {/* Stats */}
           <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
             <div style={{ display: "flex", alignItems: "center", gap: "0.375rem" }}>
               <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#00e07a", boxShadow: "0 0 8px #00e07a" }} />
@@ -190,57 +180,6 @@ export default function App() {
                 </span>
               </div>
             )}
-          </div>
-
-          <GamifiedThemeToggle />
-
-          <button style={{
-            background: "transparent", border: "1px solid rgba(255,255,255,0.08)",
-            color: "#4b5a6e", borderRadius: "0.5rem",
-            width: 30, height: 30, display: "flex", alignItems: "center", justifyContent: "center",
-            cursor: "pointer",
-          }}>
-            <Bell size={14} />
-          </button>
-
-          {/* Agent Status Dropdown */}
-          <div style={{ position: "relative", display: "flex", alignItems: "center" }}>
-            <select 
-              value={agentStatus}
-              onChange={(e) => setAgentStatus(e.target.value as any)}
-              style={{
-                appearance: "none",
-                background: "rgba(255,255,255,0.05)",
-                border: "1px solid rgba(255,255,255,0.08)",
-                color: agentStatus === "online" ? "#00e07a" : agentStatus === "away" ? "#f59e0b" : "#8899b4",
-                borderRadius: "99px",
-                padding: "0.35rem 1.5rem 0.35rem 1.5rem",
-                fontSize: "0.75rem",
-                fontWeight: 600,
-                fontFamily: "'JetBrains Mono', monospace",
-                cursor: "pointer",
-                outline: "none",
-              }}
-            >
-              <option value="online" style={{ background: "#0f1422", color: "#00e07a" }}>● Online</option>
-              <option value="away" style={{ background: "#0f1422", color: "#f59e0b" }}>● Away</option>
-              <option value="offline" style={{ background: "#0f1422", color: "#8899b4" }}>● Offline</option>
-            </select>
-            <div style={{
-              position: "absolute", left: "0.5rem", width: 6, height: 6, borderRadius: "50%", pointerEvents: "none",
-              background: agentStatus === "online" ? "#00e07a" : agentStatus === "away" ? "#f59e0b" : "#8899b4",
-              boxShadow: agentStatus === "online" ? "0 0 6px #00e07a" : agentStatus === "away" ? "0 0 6px #f59e0b" : "none"
-            }} />
-          </div>
-
-          <div style={{
-            width: 30, height: 30, borderRadius: "50%",
-            background: "rgba(0, 224, 122, 0.1)", border: "1px solid rgba(0, 224, 122, 0.3)",
-            display: "flex", alignItems: "center", justifyContent: "center",
-            fontSize: "0.6875rem", fontWeight: 700, color: "#00e07a",
-            fontFamily: "'JetBrains Mono', monospace"
-          }}>
-            {USER_INITIALS}
           </div>
         </div>
       </header>
