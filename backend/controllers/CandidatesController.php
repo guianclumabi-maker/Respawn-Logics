@@ -1075,20 +1075,24 @@ class CandidatesController
         $id = (int)($input['id'] ?? 0);
         if (!$id) { http_response_code(400); echo json_encode(['success' => false, 'error' => 'Missing candidate ID']); exit; }
 
-        $profile = $this->pdo->prepare("SELECT `resume_filename` FROM `candidate_profiles` WHERE `id` = ? AND `tenant_id` = ?");
+        $profile = $this->pdo->prepare("SELECT `resume_file_path` FROM `candidate_profiles` WHERE `id` = ? AND `tenant_id` = ?");
         $profile->execute([$id, $this->tenantId]);
         $data = $profile->fetch();
 
         if (!$data) { http_response_code(404); echo json_encode(['success' => false, 'error' => 'Candidate not found']); exit; }
 
-        if (!empty($data['resume_filename'])) {
-            $path = \App\Utils\Storage::resolveStorageBase(true) . '/' . basename($data['resume_filename']);
+        if (!empty($data['resume_file_path'])) {
+            $dbPath = $data['resume_file_path'];
+            if (strpos($dbPath, 'storage/') === 0) {
+                $dbPath = substr($dbPath, 8);
+            }
+            $path = rtrim(\App\Utils\Storage::resolveStorageBase(true), '/') . '/' . ltrim($dbPath, '/');
             if (file_exists($path)) {
                 @unlink($path);
             }
         }
 
-        $this->pdo->prepare("UPDATE `candidate_profiles` SET `name` = 'Anonymized', `email` = '', `phone` = '', `location` = '', `skills` = '', `resume_text` = '', `resume_filename` = NULL, `is_anonymized` = 1 WHERE `id` = ? AND `tenant_id` = ?")->execute([$id, $this->tenantId]);
+        $this->pdo->prepare("UPDATE `candidate_profiles` SET `name` = 'Anonymized', `email` = '', `phone` = '', `location` = '', `skills` = '', `resume_text` = '', `resume_filename` = NULL, `resume_file_path` = NULL, `is_anonymized` = 1 WHERE `id` = ? AND `tenant_id` = ?")->execute([$id, $this->tenantId]);
 
         $this->logActivity('candidate_erased', "Candidate anonymized for data privacy", $id);
 

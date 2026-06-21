@@ -29,12 +29,12 @@ try {
             p.`id`, 
             p.`tenant_id`, 
             p.`name`, 
-            p.`resume_filename`, 
+            p.`resume_file_path`, 
             MAX(COALESCE(a.`rejected_at`, a.`stage_entered_at`)) as last_activity
         FROM `candidate_profiles` p
         JOIN `candidate_applications` a ON p.`id` = a.`candidate_id`
         WHERE p.`is_anonymized` = 0
-        GROUP BY p.`id`, p.`tenant_id`, p.`name`, p.`resume_filename`
+        GROUP BY p.`id`, p.`tenant_id`, p.`name`, p.`resume_file_path`
         HAVING 
             SUM(CASE WHEN a.`stage` NOT IN ('Rejected', 'Withdrawn') THEN 1 ELSE 0 END) = 0
             AND MAX(COALESCE(a.`rejected_at`, a.`stage_entered_at`)) < ?
@@ -49,7 +49,7 @@ try {
             p.`id`, 
             p.`tenant_id`, 
             p.`name`, 
-            p.`resume_filename`, 
+            p.`resume_file_path`, 
             p.`created_at` as last_activity
         FROM `candidate_profiles` p
         LEFT JOIN `candidate_applications` a ON p.`id` = a.`candidate_id`
@@ -67,7 +67,7 @@ try {
 
     echo "Found " . count($allExpired) . " candidates eligible for purge.\n";
 
-    $anonymizeStmt = $pdo->prepare("UPDATE `candidate_profiles` SET `name` = 'Anonymized', `email` = '', `phone` = '', `location` = '', `skills` = '', `resume_text` = '', `resume_filename` = NULL, `is_anonymized` = 1 WHERE `id` = ? AND `tenant_id` = ?");
+    $anonymizeStmt = $pdo->prepare("UPDATE `candidate_profiles` SET `name` = 'Anonymized', `email` = '', `phone` = '', `location` = '', `skills` = '', `resume_text` = '', `resume_filename` = NULL, `resume_file_path` = NULL, `is_anonymized` = 1 WHERE `id` = ? AND `tenant_id` = ?");
     $auditStmt = $pdo->prepare("INSERT INTO `audit_logs` (`tenant_id`, `user_id`, `action`, `details`, `target_type`, `target_id`) VALUES (?, NULL, 'candidate_auto_purged', 'Candidate automatically anonymized per retention policy', 'candidate', ?)");
 
     $processed = 0;
@@ -76,8 +76,12 @@ try {
         
         if (!$isDryRun) {
             // Delete resume file if exists
-            if (!empty($cand['resume_filename'])) {
-                $path = \App\Utils\Storage::resolveStorageBase(true) . '/' . basename($cand['resume_filename']);
+            if (!empty($cand['resume_file_path'])) {
+                $dbPath = $cand['resume_file_path'];
+                if (strpos($dbPath, 'storage/') === 0) {
+                    $dbPath = substr($dbPath, 8);
+                }
+                $path = rtrim(\App\Utils\Storage::resolveStorageBase(true), '/') . '/' . ltrim($dbPath, '/');
                 if (file_exists($path)) {
                     @unlink($path);
                     echo "   > Deleted resume file.\n";
