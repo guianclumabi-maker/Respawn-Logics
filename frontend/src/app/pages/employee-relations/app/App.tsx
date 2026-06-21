@@ -12,6 +12,8 @@ import { DailyReports } from "./components/DailyReports";
 export default function App() {
   const [activeView, setActiveView] = useState<"Dashboard" | "AICompanion" | "Cases" | "Incident Reports" | "Investigations" | "Tasks" | "Approvals" | "Daily Reports" | "Analytics" | "Case Types" | "Settings">("Dashboard");
 
+  const handleViewChange = (v: string) => setActiveView(v as any);
+
   return (
     <div
       className="flex h-screen w-full overflow-hidden bg-slate-100 dark:bg-[#06070a] relative z-0"
@@ -19,10 +21,10 @@ export default function App() {
       {/* Global Background Glow Effects */}
       <div className="absolute top-[-100px] left-[-100px] w-[500px] h-[500px] rounded-full bg-[#00e07a] blur-[120px] opacity-[0.05] dark:opacity-[0.06] pointer-events-none z-[-1]" />
       <div className="absolute bottom-[-150px] right-[-100px] w-[600px] h-[600px] rounded-full bg-[#9b6dff] blur-[140px] opacity-[0.03] dark:opacity-[0.05] pointer-events-none z-[-1]" />
-      <Sidebar activeView={activeView} onViewChange={setActiveView} />
+      <Sidebar activeView={activeView} onViewChange={handleViewChange} />
       
       {activeView === "Dashboard" && (
-        <ATSDashboard onViewChange={setActiveView} />
+        <ATSDashboard onViewChange={handleViewChange} />
       )}
       
       {activeView === "AICompanion" && (
@@ -30,19 +32,19 @@ export default function App() {
       )}
       
       {activeView === "Cases" && (
-        <PipelineBoard onViewChange={setActiveView} />
+        <PipelineBoard onViewChange={handleViewChange} />
       )}
       
       {activeView === "Case Types" && (
-        <JobsPage onViewChange={setActiveView} />
+        <JobsPage onViewChange={handleViewChange} />
       )}
       
       {activeView === "Tasks" && (
-        <TasksPipeline onViewChange={setActiveView} />
+        <TasksPipeline onViewChange={handleViewChange} />
       )}
 
       {activeView === "Approvals" && (
-        <Approvals onViewChange={setActiveView} />
+        <Approvals onViewChange={handleViewChange} />
       )}
 
       {activeView === "Daily Reports" && (
@@ -50,7 +52,7 @@ export default function App() {
       )}
 
       {activeView === "Analytics" && (
-        <InsightsPage onViewChange={setActiveView} />
+        <InsightsPage onViewChange={handleViewChange} />
       )}
     </div>
   );

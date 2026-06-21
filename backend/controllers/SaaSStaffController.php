@@ -13,6 +13,11 @@ class SaaSStaffController
 
     public function handleRequest($action)
     {
+        if ($this->tenantId === null || $this->tenantId === '') {
+            http_response_code(403);
+            echo json_encode(['success' => false, 'error' => 'Unable to resolve tenant context']);
+            return;
+        }
         // Only Platform_Admin can manage internal staff
         if (!hasRole('Platform_Admin')) {
             http_response_code(403);

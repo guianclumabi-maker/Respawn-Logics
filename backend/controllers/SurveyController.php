@@ -10,11 +10,16 @@ class SurveyController
     {
         $this->pdo = $pdo;
         $this->currentUser = getCurrentUser() ?: null;
-        $this->tenantId = is_array($this->currentUser) && isset($this->currentUser['tenant_id']) ? $this->currentUser['tenant_id'] : ($_SESSION['tenant_id'] ?? '1');
+        $this->tenantId = is_array($this->currentUser) && isset($this->currentUser['tenant_id']) ? $this->currentUser['tenant_id'] : ($_SESSION['tenant_id'] ?? null);
     }
 
     public function handleRequest($action)
     {
+        if ($this->tenantId === null || $this->tenantId === '') {
+            http_response_code(403);
+            echo json_encode(['success' => false, 'error' => 'Unable to resolve tenant context']);
+            return;
+        }
         if (!$this->currentUser) {
             echo json_encode(['success' => false, 'error' => 'Unauthorized']);
             return;
@@ -23,9 +28,11 @@ class SurveyController
         try {
             switch ($action) {
                 case 'create_survey':
-                    $this->createSurvey();
+                    if (!hasPermission('surveys.manage')) { http_response_code(403); echo json_encode(['success'=>false, 'error'=>'Denied']); return; }
+                $this->createSurvey();
                     break;
                 case 'launch_survey':
+                    if (!hasPermission('surveys.manage')) { http_response_code(403); echo json_encode(['success'=>false, 'error'=>'Denied']); return; }
                     $this->launchSurvey();
                     break;
                 case 'fetch_my_surveys':
@@ -52,7 +59,8 @@ class SurveyController
     private function createSurvey()
     {
         if (!hasPermission('surveys.manage')) {
-            echo json_encode(['success' => false, 'error' => 'Permission denied']);
+            http_response_code(403);
+            echo json_encode(['success' => false, 'error' => 'Denied']);
             return;
         }
 
@@ -91,7 +99,8 @@ class SurveyController
     private function launchSurvey()
     {
         if (!hasPermission('surveys.manage')) {
-            echo json_encode(['success' => false, 'error' => 'Permission denied']);
+            http_response_code(403);
+            echo json_encode(['success' => false, 'error' => 'Denied']);
             return;
         }
 
@@ -102,6 +111,9 @@ class SurveyController
         try {
             $stmt = $this->pdo->prepare("UPDATE surveys SET status = 'Active' WHERE id = ? AND tenant_id = ?");
             $stmt->execute([$surveyId, $this->tenantId]);
+            if ($stmt->rowCount() === 0) {
+                throw new Exception("Survey not found or access denied");
+            }
 
             // Fetch active employees
             $empStmt = $this->pdo->prepare("SELECT email FROM users WHERE tenant_id = ? AND employment_status = 'Active'");
@@ -139,17 +151,18 @@ class SurveyController
             SELECT s.id, s.title, s.description, s.created_at, p.has_completed 
             FROM survey_participants p
             JOIN surveys s ON p.survey_id = s.id
-            WHERE p.tenant_id = ? AND p.user_email = ? AND s.status = 'Active'
+            WHERE p.tenant_id = ? AND s.tenant_id = ? AND p.user_email = ? AND s.status = 'Active'
             ORDER BY s.created_at DESC
         ");
-        $stmt->execute([$this->tenantId, $this->currentUser['email']]);
+        $stmt->execute([$this->tenantId, $this->tenantId, $this->currentUser['email']]);
         echo json_encode(['success' => true, 'data' => $stmt->fetchAll()]);
     }
 
     private function fetchAdminSurveys()
     {
         if (!hasPermission('surveys.manage')) {
-            echo json_encode(['success' => false, 'error' => 'Permission denied']);
+            http_response_code(403);
+            echo json_encode(['success' => false, 'error' => 'Denied']);
             return;
         }
 
@@ -160,8 +173,8 @@ class SurveyController
         $data = [];
         foreach ($surveys as $s) {
             // Get completion rate
-            $partStmt = $this->pdo->prepare("SELECT COUNT(*) as total, SUM(has_completed) as completed FROM survey_participants WHERE survey_id = ?");
-            $partStmt->execute([$s['id']]);
+            $partStmt = $this->pdo->prepare("SELECT COUNT(*) as total, SUM(has_completed) as completed FROM survey_participants WHERE survey_id = ? AND tenant_id = ?");
+            $partStmt->execute([$s['id'], $this->tenantId]);
             $parts = $partStmt->fetch();
             $total = (int)($parts['total'] ?? 0);
             $completed = (int)($parts['completed'] ?? 0);
@@ -171,12 +184,13 @@ class SurveyController
             // Calculate eNPS
             // Promoters (9-10), Passives (7-8), Detractors (0-6)
             $enpsStmt = $this->pdo->prepare("
-                SELECT response_value 
+                SELECT r.response_value 
                 FROM survey_responses r 
                 JOIN survey_questions q ON r.question_id = q.id 
-                WHERE r.survey_id = ? AND q.question_type = 'eNPS'
+                JOIN surveys s ON r.survey_id = s.id
+                WHERE r.survey_id = ? AND s.tenant_id = ? AND q.question_type = 'eNPS'
             ");
-            $enpsStmt->execute([$s['id']]);
+            $enpsStmt->execute([$s['id'], $this->tenantId]);
             $enpsResponses = $enpsStmt->fetchAll();
 
             $totalNps = count($enpsResponses);
@@ -220,8 +234,8 @@ class SurveyController
             return;
         }
 
-        $qStmt = $this->pdo->prepare("SELECT * FROM survey_questions WHERE survey_id = ?");
-        $qStmt->execute([$id]);
+        $qStmt = $this->pdo->prepare("SELECT q.* FROM survey_questions q JOIN surveys s ON q.survey_id = s.id WHERE q.survey_id = ? AND s.tenant_id = ?");
+        $qStmt->execute([$id, $this->tenantId]);
         $questions = $qStmt->fetchAll();
 
         echo json_encode(['success' => true, 'data' => ['survey' => $survey, 'questions' => $questions]]);
@@ -234,8 +248,8 @@ class SurveyController
         $answers = $input['answers'] ?? []; // [{question_id, value}]
 
         // Check if already completed
-        $checkStmt = $this->pdo->prepare("SELECT has_completed FROM survey_participants WHERE survey_id = ? AND user_email = ?");
-        $checkStmt->execute([$surveyId, $this->currentUser['email']]);
+        $checkStmt = $this->pdo->prepare("SELECT has_completed FROM survey_participants WHERE survey_id = ? AND user_email = ? AND tenant_id = ?");
+        $checkStmt->execute([$surveyId, $this->currentUser['email'], $this->tenantId]);
         $part = $checkStmt->fetch();
 
         if (!$part || $part['has_completed']) {
@@ -252,8 +266,8 @@ class SurveyController
             }
 
             // Mark participant as completed
-            $updateStmt = $this->pdo->prepare("UPDATE survey_participants SET has_completed = TRUE WHERE survey_id = ? AND user_email = ?");
-            $updateStmt->execute([$surveyId, $this->currentUser['email']]);
+            $updateStmt = $this->pdo->prepare("UPDATE survey_participants SET has_completed = TRUE WHERE survey_id = ? AND user_email = ? AND tenant_id = ?");
+            $updateStmt->execute([$surveyId, $this->currentUser['email'], $this->tenantId]);
 
             $this->pdo->commit();
             echo json_encode(['success' => true]);

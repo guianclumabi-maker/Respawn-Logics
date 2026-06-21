@@ -10,11 +10,16 @@ class AuditController
     {
         $this->pdo = $pdo;
         $this->currentUser = getCurrentUser() ?: null;
-        $this->tenantId = is_array($this->currentUser) && isset($this->currentUser['tenant_id']) ? $this->currentUser['tenant_id'] : ($_SESSION['tenant_id'] ?? '1');
+        $this->tenantId = is_array($this->currentUser) && isset($this->currentUser['tenant_id']) ? $this->currentUser['tenant_id'] : ($_SESSION['tenant_id'] ?? null);
     }
 
     public function handleRequest($action)
     {
+        if ($this->tenantId === null || $this->tenantId === '') {
+            http_response_code(403);
+            echo json_encode(['success' => false, 'error' => 'Unable to resolve tenant context']);
+            return;
+        }
         if (!$this->currentUser || !hasPermission('audit.view')) {
             echo json_encode(['success' => false, 'error' => 'Permission denied']);
             return;

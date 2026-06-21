@@ -212,7 +212,7 @@ export default function App() {
       }
     })
     .catch(err => {
-      console.error("Fetch failed for URL:", apiUrl, "Error:", err);
+      console.error("Fetch failed for URL:", `${API_BASE}/import.php`, "Error:", err);
       showToast("Import failed: " + err.message + " (Check console for URL)");
       setCurrentView("mapping");
     });

@@ -19,6 +19,11 @@ class ESMSupportController
 
     public function handleRequest($action)
     {
+        if ($this->tenantId === null || $this->tenantId === '') {
+            http_response_code(403);
+            echo json_encode(['success' => false, 'error' => 'Unable to resolve tenant context']);
+            return;
+        }
         if ($this->tenantId === null) {
             http_response_code(403);
             echo json_encode(['success' => false, 'error' => 'Must be a tenant user to access ESM']);

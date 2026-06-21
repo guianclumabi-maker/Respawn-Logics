@@ -10,7 +10,7 @@ class ExpensesController
     {
         $this->pdo = $pdo;
         $this->currentUser = getCurrentUser() ?: null;
-        $this->tenantId = is_array($this->currentUser) && isset($this->currentUser['tenant_id']) ? $this->currentUser['tenant_id'] : ($_SESSION['tenant_id'] ?? '1');
+        $this->tenantId = is_array($this->currentUser) && isset($this->currentUser['tenant_id']) ? $this->currentUser['tenant_id'] : ($_SESSION['tenant_id'] ?? null);
     }
 
     private function isManager() {
@@ -25,6 +25,11 @@ class ExpensesController
 
     public function handleRequest($action)
     {
+        if ($this->tenantId === null || $this->tenantId === '') {
+            http_response_code(403);
+            echo json_encode(['success' => false, 'error' => 'Unable to resolve tenant context']);
+            return;
+        }
         if ($_SERVER['REQUEST_METHOD'] === 'POST' && strpos($_SERVER['CONTENT_TYPE'] ?? '', 'application/json') !== false) {
             $input = json_decode(file_get_contents('php://input'), true) ?? [];
         } else {
@@ -57,7 +62,8 @@ class ExpensesController
                     break;
 
                 case 'approve_claim':
-                    $this->approveClaim($input);
+                    if (!hasPermission('expenses.manage')) { http_response_code(403); echo json_encode(['success'=>false, 'error'=>'Denied']); return; }
+                $this->approveClaim($input);
                     break;
 
                 default:

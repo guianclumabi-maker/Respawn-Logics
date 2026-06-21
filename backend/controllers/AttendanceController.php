@@ -10,11 +10,16 @@ class AttendanceController
     {
         $this->pdo = $pdo;
         $this->currentUser = getCurrentUser() ?: null;
-        $this->tenantId = is_array($this->currentUser) && isset($this->currentUser['tenant_id']) ? $this->currentUser['tenant_id'] : ($_SESSION['tenant_id'] ?? '1');
+        $this->tenantId = is_array($this->currentUser) && isset($this->currentUser['tenant_id']) ? $this->currentUser['tenant_id'] : ($_SESSION['tenant_id'] ?? null);
     }
 
     public function handleRequest($action)
     {
+        if ($this->tenantId === null || $this->tenantId === '') {
+            http_response_code(403);
+            echo json_encode(['success' => false, 'error' => 'Unable to resolve tenant context']);
+            return;
+        }
         $data = json_decode(file_get_contents('php://input'), true);
         if (!$data && $_SERVER['REQUEST_METHOD'] === 'POST') {
             $data = $_POST;
@@ -49,7 +54,8 @@ class AttendanceController
                         $this->clockOut();
                         break;
                     case 'approve_timesheet':
-                        $this->approveTimesheet($data);
+                        if (!hasPermission('attendance.manage')) { http_response_code(403); echo json_encode(['success'=>false, 'error'=>'Denied']); return; }
+                $this->approveTimesheet($data);
                         break;
                     default:
                         http_response_code(400);

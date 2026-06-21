@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import {
   Search, Plus, Star, ChevronDown, ChevronUp, X, Check, Trash2,
-  ArrowRight, ChevronRight, LayoutList, Columns3, Linkedin, Globe,
+  ArrowRight, ChevronRight, LayoutList, Columns3, Globe, Link,
   UserPlus, Briefcase, Clock, Users, Zap, Award, MapPin, User
 } from "lucide-react";
 
@@ -16,6 +16,7 @@ type Props = { onViewChange: (v: ViewState) => void; jobId?: number };
 type Application = {
   id: number; candidate_id: number; name: string; email: string;
   stage: string; rating: number; ai_match_score: number | null;
+  score_breakdown?: { skill: number, experience: number, location: number, salary: number } | null;
   source: string; days_in_stage: number; tags: string[];
   formatted_applied: string; skills: string;
   assigned_recruiter?: string; recruiter?: string;
@@ -68,13 +69,25 @@ function StarRating({ value, onChange }: { value: number; onChange?: (r: number)
   );
 }
 
-function AiScoreBadge({ score }: { score: number | null }) {
+function AiScoreBadge({ score, breakdown }: { score: number | null, breakdown?: { skill: number, experience: number, location: number, salary: number } | null }) {
   if (score === null || score === undefined) return <span className="text-[10px] text-muted-foreground font-mono">—</span>;
   const color = score > 70 ? "#00e07a" : score >= 40 ? "#f5a623" : "#ff4d6a";
   return (
-    <div className="flex items-center gap-1.5 font-mono">
+    <div className="group relative flex items-center gap-1.5 font-mono">
       <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ backgroundColor: color }} />
-      <span className="text-[10px] font-bold" style={{ color }}>{`MATCH: ${score}%`}</span>
+      <span className="text-[10px] font-bold cursor-help" style={{ color }}>{`SCORE: ${score}%`}</span>
+      
+      {breakdown && (
+        <div className="absolute left-0 bottom-full mb-2 hidden group-hover:block z-50 bg-popover/95 border border-white/10 rounded-lg p-3 text-xs w-48 shadow-xl backdrop-blur-xl pointer-events-none">
+          <div className="font-bold mb-2 text-white/90 pb-2 border-b border-white/10">Score Breakdown</div>
+          <div className="space-y-1.5">
+            <div className="flex justify-between"><span>Skill Match</span><span className="text-white/80">{breakdown.skill}%</span></div>
+            <div className="flex justify-between"><span>Experience</span><span className="text-white/80">{breakdown.experience}%</span></div>
+            <div className="flex justify-between"><span>Location</span><span className="text-white/80">{breakdown.location}%</span></div>
+            <div className="flex justify-between"><span>Salary Req</span><span className="text-white/80">{breakdown.salary}%</span></div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -85,7 +98,7 @@ function SlaDays({ days }: { days: number }) {
 }
 
 function SourceIcon({ source }: { source: string }) {
-  if (source?.toLowerCase().includes("linkedin")) return <Linkedin size={11} className="text-blue-400" />;
+  if (source?.toLowerCase().includes("linkedin")) return <Link size={11} className="text-blue-400" />;
   if (source?.toLowerCase().includes("careers") || source?.toLowerCase().includes("site")) return <Globe size={11} className="text-cyan-400" />;
   if (source?.toLowerCase().includes("referral")) return <UserPlus size={11} className="text-primary" />;
   if (source?.toLowerCase().includes("indeed")) return <Briefcase size={11} className="text-amber-400" />;
@@ -183,7 +196,7 @@ function KanbanCard({ app, onClick }: { app: Application; onClick: () => void })
         <div className="flex items-center gap-1 ml-1.5"><SourceIcon source={app.source || app.candidate_source || ""} /></div>
       </div>
       <div className="flex items-center justify-between mb-2">
-        <AiScoreBadge score={app.ai_match_score} />
+        <AiScoreBadge score={app.ai_match_score} breakdown={app.score_breakdown} />
         <SlaDays days={app.days_in_stage} />
       </div>
       <div className="flex items-center justify-between mt-2 pt-2 border-t border-border">
@@ -726,7 +739,7 @@ export function PipelineBoard({ onViewChange, jobId }: Props) {
                   <th className="w-10 px-4 py-3 text-center">
                     <input type="checkbox" checked={allChecked} onChange={toggleAll} className="rounded accent-[#00e07a]" />
                   </th>
-                  {([["name", "// NAME"], ["stage", "// STAGE"], ["source", "// SOURCE"], ["ai_match_score", "// AI MATCH"], ["days_in_stage", "// TIME IN STAGE"], ["formatted_applied", "// SUMMONED"], ["rating", "// RATING"]] as [SortKey, string][]).map(([key, label]) => (
+                  {([["name", "// NAME"], ["stage", "// STAGE"], ["source", "// SOURCE"], ["ai_match_score", "// MATCH SCORE"], ["days_in_stage", "// TIME IN STAGE"], ["formatted_applied", "// SUMMONED"], ["rating", "// RATING"]] as [SortKey, string][]).map(([key, label]) => (
                     <th key={key} className="px-4 py-3 text-left cursor-pointer hover:text-primary transition-colors" onClick={() => toggleSort(key)}>
                       <div className="flex items-center gap-1">{label} <SortIcon col={key} /></div>
                     </th>
@@ -759,7 +772,7 @@ export function PipelineBoard({ onViewChange, jobId }: Props) {
                         <span>{a.source || a.candidate_source || "—"}</span>
                       </div>
                     </td>
-                    <td className="px-4 py-3"><AiScoreBadge score={a.ai_match_score} /></td>
+                    <td className="px-4 py-3"><AiScoreBadge score={a.ai_match_score} breakdown={a.score_breakdown} /></td>
                     <td className="px-4 py-3"><SlaDays days={a.days_in_stage} /></td>
                     <td className="px-4 py-3 text-xs text-muted-foreground font-mono">{a.formatted_applied}</td>
                     <td className="px-4 py-3"><StarRating value={a.rating} onChange={r => updateRating(a.id, r)} /></td>

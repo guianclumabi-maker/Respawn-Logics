@@ -89,6 +89,12 @@ class PlatformSupportController
     }
 
     private function tenantCreate($input) {
+        if (!hasPermission('module.permission')) {
+            http_response_code(403);
+            echo json_encode(['success' => false, 'error' => 'Denied']);
+            return;
+        }
+
         if ($this->tenantId === null) {
             http_response_code(403);
             echo json_encode(['success' => false, 'error' => 'Only Tenant Users can submit platform tickets']);
@@ -108,19 +114,33 @@ class PlatformSupportController
         $priorityMap = ['Critical' => 4, 'High' => 12, 'Medium' => 24, 'Low' => 48];
         $hours = $priorityMap[$priority] ?? 24;
 
-        $stmt = $this->pdo->prepare("INSERT INTO `platform_tickets` (`tenant_id`, `created_by`, `subject`, `description`, `priority`, `sla_breach_at`) VALUES (?, ?, ?, ?, ?, DATE_ADD(NOW(), INTERVAL ? HOUR))");
-        $stmt->execute([$this->tenantId, $this->currentUser['id'], $subject, $description, $priority, $hours]);
-        
-        $ticketId = $this->pdo->lastInsertId();
-        
-        // Auto-comment
-        $this->pdo->prepare("INSERT INTO `platform_ticket_comments` (`ticket_id`, `user_id`, `comment`) VALUES (?, ?, ?)")
-             ->execute([$ticketId, $this->currentUser['id'], "Ticket opened by Tenant Admin."]);
+        try {
+            $this->pdo->beginTransaction();
+            $stmt = $this->pdo->prepare("INSERT INTO `platform_tickets` (`tenant_id`, `created_by`, `subject`, `description`, `priority`, `sla_breach_at`) VALUES (?, ?, ?, ?, ?, DATE_ADD(NOW(), INTERVAL ? HOUR))");
+            $stmt->execute([$this->tenantId, $this->currentUser['id'], $subject, $description, $priority, $hours]);
+            
+            $ticketId = $this->pdo->lastInsertId();
+            
+            // Auto-comment
+            $this->pdo->prepare("INSERT INTO `platform_ticket_comments` (`ticket_id`, `user_id`, `comment`) VALUES (?, ?, ?)")
+                 ->execute([$ticketId, $this->currentUser['id'], "Ticket opened by Tenant Admin."]);
 
-        echo json_encode(['success' => true, 'ticket_id' => $ticketId]);
+            $this->pdo->commit();
+            echo json_encode(['success' => true, 'ticket_id' => $ticketId]);
+        } catch (\Exception $e) {
+            $this->pdo->rollBack();
+            http_response_code(500);
+            echo json_encode(['success' => false, 'error' => 'Database error']);
+        }
     }
 
     private function submitFeedback($input) {
+        if (!hasPermission('module.permission')) {
+            http_response_code(403);
+            echo json_encode(['success' => false, 'error' => 'Denied']);
+            return;
+        }
+
         $feedback = trim($input['feedback'] ?? '');
         if (empty($feedback)) {
             http_response_code(400);
@@ -132,24 +152,38 @@ class PlatformSupportController
         $priority = "Low";
         $hours = 48; // Low priority SLA
 
-        // Create ticket
-        $stmt = $this->pdo->prepare("INSERT INTO `platform_tickets` (`tenant_id`, `created_by`, `subject`, `description`, `priority`, `sla_breach_at`) VALUES (?, ?, ?, ?, ?, DATE_ADD(NOW(), INTERVAL ? HOUR))");
-        $stmt->execute([$this->tenantId, $this->currentUser['id'], $subject, $feedback, $priority, $hours]);
-        $ticketId = $this->pdo->lastInsertId();
-
-        // Add "Feedback" tag
         try {
-            $this->pdo->prepare("INSERT INTO `platform_ticket_tags` (`ticket_id`, `tag`) VALUES (?, ?)")->execute([$ticketId, "Feedback"]);
-        } catch (PDOException $e) {}
+            $this->pdo->beginTransaction();
+            // Create ticket
+            $stmt = $this->pdo->prepare("INSERT INTO `platform_tickets` (`tenant_id`, `created_by`, `subject`, `description`, `priority`, `sla_breach_at`) VALUES (?, ?, ?, ?, ?, DATE_ADD(NOW(), INTERVAL ? HOUR))");
+            $stmt->execute([$this->tenantId, $this->currentUser['id'], $subject, $feedback, $priority, $hours]);
+            $ticketId = $this->pdo->lastInsertId();
 
-        // Add initial comment
-        $this->pdo->prepare("INSERT INTO `platform_ticket_comments` (`ticket_id`, `user_id`, `comment`) VALUES (?, ?, ?)")
-             ->execute([$ticketId, $this->currentUser['id'], "Feedback submitted via global feedback button."]);
+            // Add "Feedback" tag
+            try {
+                $this->pdo->prepare("INSERT INTO `platform_ticket_tags` (`ticket_id`, `tag`) VALUES (?, ?)")->execute([$ticketId, "Feedback"]);
+            } catch (PDOException $e) {}
 
-        echo json_encode(['success' => true]);
+            // Add initial comment
+            $this->pdo->prepare("INSERT INTO `platform_ticket_comments` (`ticket_id`, `user_id`, `comment`) VALUES (?, ?, ?)")
+                 ->execute([$ticketId, $this->currentUser['id'], "Feedback submitted via global feedback button."]);
+
+            $this->pdo->commit();
+            echo json_encode(['success' => true]);
+        } catch (\Exception $e) {
+            $this->pdo->rollBack();
+            http_response_code(500);
+            echo json_encode(['success' => false, 'error' => 'Database error']);
+        }
     }
 
     private function submitCSAT($input) {
+        if (!hasPermission('module.permission')) {
+            http_response_code(403);
+            echo json_encode(['success' => false, 'error' => 'Denied']);
+            return;
+        }
+
         $id = (int)($input['ticket_id'] ?? 0);
         $score = (int)($input['score'] ?? 0);
         $comment = trim($input['comment'] ?? '');
@@ -179,16 +213,24 @@ class PlatformSupportController
             http_response_code(400); echo json_encode(['success' => false, 'error' => 'Feedback already submitted']); return;
         }
 
-        $this->pdo->prepare("UPDATE `platform_tickets` SET `csat_score` = ?, `csat_comment` = ? WHERE `id` = ?")
-             ->execute([$score, $comment, $id]);
+        try {
+            $this->pdo->beginTransaction();
+            $this->pdo->prepare("UPDATE `platform_tickets` SET `csat_score` = ?, `csat_comment` = ? WHERE `id` = ? AND `tenant_id` = ?")
+                 ->execute([$score, $comment, $id, $this->tenantId]);
 
-        // Auto-comment
-        $uName = ($this->currentUser['first_name'] || $this->currentUser['last_name']) ? trim($this->currentUser['first_name'] . ' ' . $this->currentUser['last_name']) : 'User';
-        $sysComment = "[SYSTEM] $uName submitted a CSAT rating of $score/5 stars.";
-        $this->pdo->prepare("INSERT INTO `platform_ticket_comments` (`ticket_id`, `user_id`, `comment`) VALUES (?, ?, ?)")
-             ->execute([$id, $this->currentUser['id'], $sysComment]);
+            // Auto-comment
+            $uName = ($this->currentUser['first_name'] || $this->currentUser['last_name']) ? trim($this->currentUser['first_name'] . ' ' . $this->currentUser['last_name']) : 'User';
+            $sysComment = "[SYSTEM] $uName submitted a CSAT rating of $score/5 stars.";
+            $this->pdo->prepare("INSERT INTO `platform_ticket_comments` (`ticket_id`, `user_id`, `comment`) VALUES (?, ?, ?)")
+                 ->execute([$id, $this->currentUser['id'], $sysComment]);
 
-        echo json_encode(['success' => true]);
+            $this->pdo->commit();
+            echo json_encode(['success' => true]);
+        } catch (\Exception $e) {
+            $this->pdo->rollBack();
+            http_response_code(500);
+            echo json_encode(['success' => false, 'error' => 'Database error']);
+        }
     }
 
     private function tenantList() {
@@ -298,6 +340,12 @@ class PlatformSupportController
     }
 
     private function addComment($input) {
+        if (!hasPermission('module.permission')) {
+            http_response_code(403);
+            echo json_encode(['success' => false, 'error' => 'Denied']);
+            return;
+        }
+
         $id = (int)($input['ticket_id'] ?? 0);
         $comment = trim($input['comment'] ?? '');
         $attachments = $input['attachments'] ?? null;
@@ -318,15 +366,35 @@ class PlatformSupportController
 
         $attachmentsJson = $attachments ? json_encode($attachments) : null;
 
-        $this->pdo->prepare("INSERT INTO `platform_ticket_comments` (`ticket_id`, `user_id`, `comment`, `attachments`) VALUES (?, ?, ?, ?)")
-             ->execute([$id, $this->currentUser['id'], $comment, $attachmentsJson]);
-             
-        $this->pdo->prepare("UPDATE `platform_tickets` SET `updated_at` = NOW() WHERE `id` = ?")->execute([$id]);
+        try {
+            $this->pdo->beginTransaction();
+            $this->pdo->prepare("INSERT INTO `platform_ticket_comments` (`ticket_id`, `user_id`, `comment`, `attachments`) VALUES (?, ?, ?, ?)")
+                 ->execute([$id, $this->currentUser['id'], $comment, $attachmentsJson]);
+                 
+            $sql = "UPDATE `platform_tickets` SET `updated_at` = NOW() WHERE `id` = ?";
+            $params = [$id];
+            if ($this->tenantId !== null) {
+                $sql .= " AND `tenant_id` = ?";
+                $params[] = $this->tenantId;
+            }
+            $this->pdo->prepare($sql)->execute($params);
 
-        echo json_encode(['success' => true]);
+            $this->pdo->commit();
+            echo json_encode(['success' => true]);
+        } catch (\Exception $e) {
+            $this->pdo->rollBack();
+            http_response_code(500);
+            echo json_encode(['success' => false, 'error' => 'Database error']);
+        }
     }
 
     private function updateStatus($input) {
+        if (!hasPermission('module.permission')) {
+            http_response_code(403);
+            echo json_encode(['success' => false, 'error' => 'Denied']);
+            return;
+        }
+
         if (!$this->isVendorStaff()) {
             http_response_code(403); echo json_encode(['success' => false, 'error' => 'Only vendor staff can update status']); return;
         }
@@ -338,6 +406,12 @@ class PlatformSupportController
     }
 
     private function updateTicket($input) {
+        if (!hasPermission('module.permission')) {
+            http_response_code(403);
+            echo json_encode(['success' => false, 'error' => 'Denied']);
+            return;
+        }
+
         if (!$this->isVendorStaff()) {
             http_response_code(403); echo json_encode(['success' => false, 'error' => 'Only vendor staff can update tickets']); return;
         }
@@ -397,16 +471,25 @@ class PlatformSupportController
         }
 
         if (!empty($updates)) {
-            $params[] = $id;
-            $this->pdo->prepare("UPDATE `platform_tickets` SET " . implode(", ", $updates) . ", `updated_at` = NOW() WHERE `id` = ?")->execute($params);
+            try {
+                $this->pdo->beginTransaction();
+                $params[] = $id;
+                $this->pdo->prepare("UPDATE `platform_tickets` SET " . implode(", ", $updates) . ", `updated_at` = NOW() WHERE `id` = ?")->execute($params);
 
-            // Create System Audit Log Comments
-            $uName = ($this->currentUser['first_name'] || $this->currentUser['last_name']) ? trim($this->currentUser['first_name'] . ' ' . $this->currentUser['last_name']) : 'Agent';
-            foreach ($logMessages as $log) {
-                // Prepend [SYSTEM] so the UI can detect it
-                $sysComment = "[SYSTEM] " . $uName . " " . $log . ".";
-                $this->pdo->prepare("INSERT INTO `platform_ticket_comments` (`ticket_id`, `user_id`, `comment`) VALUES (?, ?, ?)")
-                     ->execute([$id, $this->currentUser['id'], $sysComment]);
+                // Create System Audit Log Comments
+                $uName = ($this->currentUser['first_name'] || $this->currentUser['last_name']) ? trim($this->currentUser['first_name'] . ' ' . $this->currentUser['last_name']) : 'Agent';
+                foreach ($logMessages as $log) {
+                    // Prepend [SYSTEM] so the UI can detect it
+                    $sysComment = "[SYSTEM] " . $uName . " " . $log . ".";
+                    $this->pdo->prepare("INSERT INTO `platform_ticket_comments` (`ticket_id`, `user_id`, `comment`) VALUES (?, ?, ?)")
+                         ->execute([$id, $this->currentUser['id'], $sysComment]);
+                }
+                $this->pdo->commit();
+            } catch (\Exception $e) {
+                $this->pdo->rollBack();
+                http_response_code(500);
+                echo json_encode(['success' => false, 'error' => 'Database error']);
+                return;
             }
         }
 
@@ -414,6 +497,12 @@ class PlatformSupportController
     }
 
     private function addTicketTag($input) {
+        if (!hasPermission('module.permission')) {
+            http_response_code(403);
+            echo json_encode(['success' => false, 'error' => 'Denied']);
+            return;
+        }
+
         if (!$this->isVendorStaff()) {
             http_response_code(403); echo json_encode(['success' => false, 'error' => 'Only vendor staff can add tags']); return;
         }
@@ -425,6 +514,7 @@ class PlatformSupportController
         }
 
         try {
+            $this->pdo->beginTransaction();
             $this->pdo->prepare("INSERT INTO `platform_ticket_tags` (`ticket_id`, `tag`) VALUES (?, ?)")->execute([$id, $tag]);
             
             // Log it
@@ -433,31 +523,49 @@ class PlatformSupportController
             $this->pdo->prepare("INSERT INTO `platform_ticket_comments` (`ticket_id`, `user_id`, `comment`) VALUES (?, ?, ?)")
                  ->execute([$id, $this->currentUser['id'], $sysComment]);
 
+            $this->pdo->commit();
             echo json_encode(['success' => true]);
-        } catch (PDOException $e) {
+        } catch (\Exception $e) {
+            if ($this->pdo->inTransaction()) {
+                $this->pdo->rollBack();
+            }
             // Might be duplicate
             echo json_encode(['success' => true]); // Ignore duplicates silently
         }
     }
 
     private function removeTicketTag($input) {
+        if (!hasPermission('module.permission')) {
+            http_response_code(403);
+            echo json_encode(['success' => false, 'error' => 'Denied']);
+            return;
+        }
+
         if (!$this->isVendorStaff()) {
             http_response_code(403); echo json_encode(['success' => false, 'error' => 'Only vendor staff can remove tags']); return;
         }
         $id = (int)($input['ticket_id'] ?? 0);
         $tag = trim($input['tag'] ?? '');
 
-        $stmt = $this->pdo->prepare("DELETE FROM `platform_ticket_tags` WHERE `ticket_id` = ? AND `tag` = ?");
-        $stmt->execute([$id, $tag]);
+        try {
+            $this->pdo->beginTransaction();
+            $stmt = $this->pdo->prepare("DELETE FROM `platform_ticket_tags` WHERE `ticket_id` = ? AND `tag` = ?");
+            $stmt->execute([$id, $tag]);
 
-        if ($stmt->rowCount() > 0) {
-            $uName = ($this->currentUser['first_name'] || $this->currentUser['last_name']) ? trim($this->currentUser['first_name'] . ' ' . $this->currentUser['last_name']) : 'Agent';
-            $sysComment = "[SYSTEM] " . $uName . " removed tag '" . $tag . "'.";
-            $this->pdo->prepare("INSERT INTO `platform_ticket_comments` (`ticket_id`, `user_id`, `comment`) VALUES (?, ?, ?)")
-                 ->execute([$id, $this->currentUser['id'], $sysComment]);
+            if ($stmt->rowCount() > 0) {
+                $uName = ($this->currentUser['first_name'] || $this->currentUser['last_name']) ? trim($this->currentUser['first_name'] . ' ' . $this->currentUser['last_name']) : 'Agent';
+                $sysComment = "[SYSTEM] " . $uName . " removed tag '" . $tag . "'.";
+                $this->pdo->prepare("INSERT INTO `platform_ticket_comments` (`ticket_id`, `user_id`, `comment`) VALUES (?, ?, ?)")
+                     ->execute([$id, $this->currentUser['id'], $sysComment]);
+            }
+
+            $this->pdo->commit();
+            echo json_encode(['success' => true]);
+        } catch (\Exception $e) {
+            $this->pdo->rollBack();
+            http_response_code(500);
+            echo json_encode(['success' => false, 'error' => 'Database error']);
         }
-
-        echo json_encode(['success' => true]);
     }
 
     private function exportReport() {
@@ -541,6 +649,12 @@ class PlatformSupportController
     }
 
     private function bulkAction($input) {
+        if (!hasPermission('module.permission')) {
+            http_response_code(403);
+            echo json_encode(['success' => false, 'error' => 'Denied']);
+            return;
+        }
+
         if (!$this->isVendorStaff()) {
             http_response_code(403); echo json_encode(['success' => false, 'error' => 'Denied']); return;
         }
@@ -557,38 +671,52 @@ class PlatformSupportController
         $uName = ($this->currentUser['first_name'] || $this->currentUser['last_name']) ? trim($this->currentUser['first_name'] . ' ' . $this->currentUser['last_name']) : 'Agent';
         $sysComment = "";
 
-        if ($action === 'resolve') {
-            $this->pdo->exec("UPDATE `platform_tickets` SET `status` = 'Resolved', `updated_at` = NOW() WHERE `id` IN ($idList)");
-            $sysComment = "[SYSTEM] $uName mass-resolved this ticket.";
-        } else if ($action === 'close') {
-            $this->pdo->exec("UPDATE `platform_tickets` SET `status` = 'Closed', `updated_at` = NOW() WHERE `id` IN ($idList)");
-            $sysComment = "[SYSTEM] $uName mass-closed this ticket.";
-        } else if ($action === 'assign') {
-            $assigneeId = (int)$value;
-            if ($assigneeId) {
-                $uStmt = $this->pdo->prepare("SELECT first_name, last_name, email FROM `users` WHERE `id` = ?");
-                $uStmt->execute([$assigneeId]);
-                $aUser = $uStmt->fetch();
-                $name = ($aUser['first_name'] || $aUser['last_name']) ? trim($aUser['first_name'] . ' ' . $aUser['last_name']) : $aUser['email'];
-                $this->pdo->exec("UPDATE `platform_tickets` SET `assigned_to` = $assigneeId, `updated_at` = NOW() WHERE `id` IN ($idList)");
-                $sysComment = "[SYSTEM] $uName mass-assigned this ticket to $name.";
-            } else {
-                $this->pdo->exec("UPDATE `platform_tickets` SET `assigned_to` = NULL, `updated_at` = NOW() WHERE `id` IN ($idList)");
-                $sysComment = "[SYSTEM] $uName mass-unassigned this ticket.";
+        try {
+            $this->pdo->beginTransaction();
+            if ($action === 'resolve') {
+                $this->pdo->exec("UPDATE `platform_tickets` SET `status` = 'Resolved', `updated_at` = NOW() WHERE `id` IN ($idList)");
+                $sysComment = "[SYSTEM] $uName mass-resolved this ticket.";
+            } else if ($action === 'close') {
+                $this->pdo->exec("UPDATE `platform_tickets` SET `status` = 'Closed', `updated_at` = NOW() WHERE `id` IN ($idList)");
+                $sysComment = "[SYSTEM] $uName mass-closed this ticket.";
+            } else if ($action === 'assign') {
+                $assigneeId = (int)$value;
+                if ($assigneeId) {
+                    $uStmt = $this->pdo->prepare("SELECT first_name, last_name, email FROM `users` WHERE `id` = ?");
+                    $uStmt->execute([$assigneeId]);
+                    $aUser = $uStmt->fetch();
+                    $name = ($aUser['first_name'] || $aUser['last_name']) ? trim($aUser['first_name'] . ' ' . $aUser['last_name']) : $aUser['email'];
+                    $this->pdo->exec("UPDATE `platform_tickets` SET `assigned_to` = $assigneeId, `updated_at` = NOW() WHERE `id` IN ($idList)");
+                    $sysComment = "[SYSTEM] $uName mass-assigned this ticket to $name.";
+                } else {
+                    $this->pdo->exec("UPDATE `platform_tickets` SET `assigned_to` = NULL, `updated_at` = NOW() WHERE `id` IN ($idList)");
+                    $sysComment = "[SYSTEM] $uName mass-unassigned this ticket.";
+                }
             }
-        }
 
-        if ($sysComment) {
-            $stmt = $this->pdo->prepare("INSERT INTO `platform_ticket_comments` (`ticket_id`, `user_id`, `comment`) VALUES (?, ?, ?)");
-            foreach ($ticketIds as $tid) {
-                $stmt->execute([(int)$tid, $this->currentUser['id'], $sysComment]);
+            if ($sysComment) {
+                $stmt = $this->pdo->prepare("INSERT INTO `platform_ticket_comments` (`ticket_id`, `user_id`, `comment`) VALUES (?, ?, ?)");
+                foreach ($ticketIds as $tid) {
+                    $stmt->execute([(int)$tid, $this->currentUser['id'], $sysComment]);
+                }
             }
-        }
 
-        echo json_encode(['success' => true]);
+            $this->pdo->commit();
+            echo json_encode(['success' => true]);
+        } catch (\Exception $e) {
+            $this->pdo->rollBack();
+            http_response_code(500);
+            echo json_encode(['success' => false, 'error' => 'Database error']);
+        }
     }
 
     private function uploadAttachment() {
+        if (!hasPermission('module.permission')) {
+            http_response_code(403);
+            echo json_encode(['success' => false, 'error' => 'Denied']);
+            return;
+        }
+
         if (!isset($_FILES['attachment'])) {
             http_response_code(400); echo json_encode(['success' => false, 'error' => 'No file uploaded']); return;
         }

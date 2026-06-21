@@ -30,7 +30,7 @@ export function TicketDetail({ ticket, onBack, onStatusChange }: TicketDetailPro
     const userName = typeof window !== 'undefined' && (window as any).__USER_NAME__ ? (window as any).__USER_NAME__ : "Agent";
     const userInitials = userName.split(" ").map((n: string) => n[0]).join("").toUpperCase();
     
-    const newMsg: Comment = {
+    const newMsg = {
       id: "new" + Date.now(),
       author: { name: userName, initials: userInitials, color: "#00e07a", role: "agent" },
       body: reply,

@@ -3,7 +3,19 @@ import { RouterProvider } from "react-router-dom";
 import { router } from "./app/Router";
 import { AuthProvider } from "./app/context/AuthContext.tsx";
 import { ThemeProvider } from "next-themes";
+import * as Sentry from "@sentry/react";
 import "./styles/index.css";
+
+Sentry.init({
+  dsn: "https://examplePublicKey@o0.ingest.sentry.io/0", // Replace with actual DSN
+  integrations: [
+    Sentry.browserTracingIntegration(),
+    Sentry.replayIntegration(),
+  ],
+  tracesSampleRate: 1.0,
+  replaysSessionSampleRate: 0.1,
+  replaysOnErrorSampleRate: 1.0,
+});
 
 // Global fetch interceptor to handle session expiration
 const originalFetch = window.fetch;
@@ -54,9 +66,12 @@ async function boot() {
 
   createRoot(document.getElementById("root")!).render(
     <ThemeProvider attribute="data-theme" defaultTheme="dark" storageKey="theme">
-      <AuthProvider>
-        <RouterProvider router={router} />
-      </AuthProvider>
+      {/* @ts-ignore: React 18 type mismatch from Sentry */}
+      <Sentry.ErrorBoundary fallback={<div className="p-8 text-red-500">Something went wrong. Please reload the page.</div>}>
+        <AuthProvider>
+          <RouterProvider router={router} />
+        </AuthProvider>
+      </Sentry.ErrorBoundary>
     </ThemeProvider>
   );
 }

@@ -11,7 +11,7 @@ class PayrollController
     {
         $this->pdo = $pdo;
         $this->currentUser = getCurrentUser() ?: null;
-        $this->tenantId = is_array($this->currentUser) && isset($this->currentUser['tenant_id']) ? $this->currentUser['tenant_id'] : ($_SESSION['tenant_id'] ?? '1');
+        $this->tenantId = is_array($this->currentUser) && isset($this->currentUser['tenant_id']) ? $this->currentUser['tenant_id'] : ($_SESSION['tenant_id'] ?? null);
         
         // Load the new Service Layer
         require_once __DIR__ . '/../services/PayrollService.php';
@@ -25,6 +25,11 @@ class PayrollController
 
     public function handleRequest($action)
     {
+        if ($this->tenantId === null || $this->tenantId === '') {
+            http_response_code(403);
+            echo json_encode(['success' => false, 'error' => 'Unable to resolve tenant context']);
+            return;
+        }
         $input = json_decode(file_get_contents('php://input'), true) ?? [];
 
         try {
@@ -36,7 +41,8 @@ class PayrollController
                     break;
 
                 case 'create_schedule':
-                    if (!$this->canManagePayroll()) { echo json_encode(['success' => false, 'error' => 'Denied']); return; }
+                    if (!hasPermission('payroll.manage')) { http_response_code(403); echo json_encode(['success'=>false, 'error'=>'Denied']); return; }
+                if (!$this->canManagePayroll()) { echo json_encode(['success' => false, 'error' => 'Denied']); return; }
                     $name = $input['name'] ?? '';
                     $freq = $input['frequency'] ?? 'Monthly';
                     
@@ -121,7 +127,8 @@ class PayrollController
                     break;
 
                 case 'update_run_status':
-                    if (!$this->canManagePayroll()) { echo json_encode(['success' => false, 'error' => 'Denied']); return; }
+                    if (!hasPermission('payroll.manage')) { http_response_code(403); echo json_encode(['success'=>false, 'error'=>'Denied']); return; }
+                if (!$this->canManagePayroll()) { echo json_encode(['success' => false, 'error' => 'Denied']); return; }
                     $runId = $input['run_id'] ?? 0;
                     $status = $input['status'] ?? ''; 
 

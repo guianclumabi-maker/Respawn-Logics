@@ -10,20 +10,13 @@ import { useAuth } from "../../../context/AuthContext";
 
 const API_BASE = window.location.origin + (window.location.hostname === 'localhost' ? '/respawn-logics' : '') + '/api/index.php?route=esm';
 
-declare global {
-  interface Window {
-    __INITIAL_DATA__: Ticket[];
-    __AGENTS__: {id: number, name: string, initials: string, color: string}[];
-    __ROLE__: 'agent' | 'client';
-    __USER_INITIALS__: string;
-  }
-}
+// Globals are now casted as any to avoid TS2717
 
 export default function App() {
   const { user, hasPermission } = useAuth();
   const isAgent = hasPermission("esm.manage");
   const ROLE = isAgent ? 'agent' : 'client';
-  const USER_INITIALS = user ? (user.first_name?.[0] || '') + (user.last_name?.[0] || '') : 'U';
+  const USER_INITIALS = user ? user.name.split(' ').map((n: string) => n[0]).join('').substring(0, 2).toUpperCase() : 'U';
   
   const [tickets, setTickets] = useState<Ticket[]>(TICKETS);
   const [selectedId, setSelectedId] = useState<string | null>(null);

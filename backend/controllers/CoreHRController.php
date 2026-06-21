@@ -11,11 +11,16 @@ class CoreHRController
         $this->pdo = $pdo;
         // Since we already ran isLoggedIn() in api/index.php, getCurrentUser() will work.
         $this->currentUser = getCurrentUser() ?: null;
-        $this->tenantId = is_array($this->currentUser) && isset($this->currentUser['tenant_id']) ? $this->currentUser['tenant_id'] : ($_SESSION['tenant_id'] ?? '1');
+        $this->tenantId = is_array($this->currentUser) && isset($this->currentUser['tenant_id']) ? $this->currentUser['tenant_id'] : ($_SESSION['tenant_id'] ?? null);
     }
 
     public function handleRequest($action)
     {
+        if ($this->tenantId === null || $this->tenantId === '') {
+            http_response_code(403);
+            echo json_encode(['success' => false, 'error' => 'Unable to resolve tenant context']);
+            return;
+        }
         $input = json_decode(file_get_contents('php://input'), true) ?? [];
 
         try {
@@ -27,16 +32,20 @@ class CoreHRController
                     $this->directory();
                     break;
                 case 'update_master_record':
-                    $this->updateMasterRecord($input);
+                    if (!hasPermission('employees.manage')) { http_response_code(403); echo json_encode(['success'=>false, 'error'=>'Denied']); return; }
+                $this->updateMasterRecord($input);
                     break;
                 case 'custom_fields_def':
+                    if ($_SERVER['REQUEST_METHOD'] === 'POST' && !hasPermission('settings.manage')) { http_response_code(403); echo json_encode(['success'=>false, 'error'=>'Denied']); return; }
                     $this->customFieldsDef($input);
                     break;
                 case 'upload_document':
+                    if (!hasPermission('settings.manage')) { http_response_code(403); echo json_encode(['success'=>false, 'error'=>'Denied']); return; }
                     $this->uploadDocument();
                     break;
                 case 'save_tenant_modules':
-                    $this->saveTenantModules($input);
+                    if (!hasPermission('settings.manage')) { http_response_code(403); echo json_encode(['success'=>false, 'error'=>'Denied']); return; }
+                $this->saveTenantModules($input);
                     break;
                 default:
                     echo json_encode(['success' => false, 'error' => 'Unknown action']);
@@ -56,7 +65,8 @@ class CoreHRController
     private function directory()
     {
         if (!hasPermission('employees.view')) {
-            echo json_encode(['success' => false, 'error' => 'Permission denied']);
+            http_response_code(403);
+            echo json_encode(['success' => false, 'error' => 'Denied']);
             return;
         }
 
@@ -128,7 +138,8 @@ class CoreHRController
     private function updateMasterRecord($input)
     {
         if (!hasPermission('users.manage') && !hasPermission('employees.manage')) {
-            echo json_encode(['success' => false, 'error' => 'Permission denied']);
+            http_response_code(403);
+            echo json_encode(['success' => false, 'error' => 'Denied']);
             return;
         }
 
@@ -146,49 +157,57 @@ class CoreHRController
             return;
         }
 
-        // Prepare update
-        $fields = [];
-        $params = [];
-        $updatable = ['full_name', 'employment_status', 'department', 'work_location', 'job_title', 'base_salary'];
-        
-        $changedCoreFields = false;
+        try {
+            $this->pdo->beginTransaction();
 
-        foreach ($updatable as $f) {
-            if (isset($input[$f])) {
-                $fields[] = "`$f` = ?";
-                $params[] = $input[$f];
-                
-                if (in_array($f, ['job_title', 'department', 'base_salary', 'manager_id']) && $oldUser[$f] != $input[$f]) {
-                    $changedCoreFields = true;
+            // Prepare update
+            $fields = [];
+            $params = [];
+            $updatable = ['full_name', 'employment_status', 'department', 'work_location', 'job_title', 'base_salary'];
+            
+            $changedCoreFields = false;
+
+            foreach ($updatable as $f) {
+                if (isset($input[$f])) {
+                    $fields[] = "`$f` = ?";
+                    $params[] = $input[$f];
+                    
+                    if (in_array($f, ['job_title', 'department', 'base_salary', 'manager_id']) && $oldUser[$f] != $input[$f]) {
+                        $changedCoreFields = true;
+                    }
                 }
             }
-        }
 
-        if (!empty($fields)) {
-            $params[] = $userId;
-            $params[] = $this->tenantId;
-            $this->pdo->prepare("UPDATE `users` SET " . implode(', ', $fields) . " WHERE `id` = ? AND `tenant_id` = ?")->execute($params);
-        }
-
-        // Log history if it's a structural change
-        if ($changedCoreFields || $changeType !== 'Profile Update') {
-            $newTitle = $input['job_title'] ?? $oldUser['job_title'];
-            $newDept = $input['department'] ?? $oldUser['department'];
-            $newMgr = $input['manager_id'] ?? ($oldUser['manager_id'] ?? null);
-            $newSal = $input['base_salary'] ?? $oldUser['base_salary'];
-
-            $this->logEmploymentHistory($userId, $changeType, $newTitle, $newDept, $newMgr, $newSal, $notes, $this->currentUser['full_name']);
-        }
-
-        // Handle custom fields
-        if (isset($input['custom_fields']) && is_array($input['custom_fields'])) {
-            $cfStmt = $this->pdo->prepare("INSERT INTO `custom_field_values` (`tenant_id`, `user_id`, `field_id`, `field_value`) VALUES (?, ?, ?, ?) ON DUPLICATE KEY UPDATE `field_value` = ?");
-            foreach ($input['custom_fields'] as $fieldId => $val) {
-                $cfStmt->execute([$this->tenantId, $userId, $fieldId, $val, $val]);
+            if (!empty($fields)) {
+                $params[] = $userId;
+                $params[] = $this->tenantId;
+                $this->pdo->prepare("UPDATE `users` SET " . implode(', ', $fields) . " WHERE `id` = ? AND `tenant_id` = ?")->execute($params);
             }
-        }
 
-        echo json_encode(['success' => true]);
+            // Log history if it's a structural change
+            if ($changedCoreFields || $changeType !== 'Profile Update') {
+                $newTitle = $input['job_title'] ?? $oldUser['job_title'];
+                $newDept = $input['department'] ?? $oldUser['department'];
+                $newMgr = $input['manager_id'] ?? ($oldUser['manager_id'] ?? null);
+                $newSal = $input['base_salary'] ?? $oldUser['base_salary'];
+
+                $this->logEmploymentHistory($userId, $changeType, $newTitle, $newDept, $newMgr, $newSal, $notes, $this->currentUser['full_name']);
+            }
+
+            // Handle custom fields
+            if (isset($input['custom_fields']) && is_array($input['custom_fields'])) {
+                $cfStmt = $this->pdo->prepare("INSERT INTO `custom_field_values` (`tenant_id`, `user_id`, `field_id`, `field_value`) VALUES (?, ?, ?, ?) ON DUPLICATE KEY UPDATE `field_value` = ?");
+                foreach ($input['custom_fields'] as $fieldId => $val) {
+                    $cfStmt->execute([$this->tenantId, $userId, $fieldId, $val, $val]);
+                }
+            }
+
+            $this->pdo->commit();
+            echo json_encode(['success' => true]);
+        } catch (\Exception $e) {
+            $this->pdo->rollBack();
+            echo json_encode(['success' => false, 'error' => 'Database error: ' . $e->getMessage()]);
+        }
     }
 
     private function customFieldsDef($input)
@@ -199,7 +218,8 @@ class CoreHRController
             echo json_encode(['success' => true, 'data' => $stmt->fetchAll()]);
         } else if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if (!hasPermission('settings.manage')) {
-                echo json_encode(['success' => false, 'error' => 'Permission denied']);
+                http_response_code(403);
+                echo json_encode(['success' => false, 'error' => 'Denied']);
                 return;
             }
             $name = $input['field_name'] ?? '';
@@ -219,7 +239,8 @@ class CoreHRController
     private function uploadDocument()
     {
         if (!hasPermission('settings.manage')) {
-            echo json_encode(['success' => false, 'error' => 'Permission denied']);
+            http_response_code(403);
+            echo json_encode(['success' => false, 'error' => 'Denied']);
             return;
         }
 
@@ -259,7 +280,8 @@ class CoreHRController
     private function saveTenantModules($input)
     {
         if (!hasPermission('settings.manage')) {
-            echo json_encode(['success' => false, 'error' => 'Permission denied']);
+            http_response_code(403);
+            echo json_encode(['success' => false, 'error' => 'Denied']);
             return;
         }
 

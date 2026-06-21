@@ -21,23 +21,38 @@ type Candidate = {
 export function CandidatesList({ onViewChange }: { onViewChange: (v: ViewState) => void }) {
   const [candidates, setCandidates] = useState<Candidate[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+
+  // Reset page on filter change
+  useEffect(() => { setPage(1); }, [search, statusFilter]);
 
   useEffect(() => {
     setLoading(true);
-    let url = `${API}&action=candidates&limit=100`;
+    setError(null);
+    let url = `${API}&action=candidates&page=${page}&limit=10`;
     if (search) url += `&search=${encodeURIComponent(search)}`;
     if (statusFilter) url += `&status=${encodeURIComponent(statusFilter)}`;
 
     fetch(url, { credentials: "include" })
       .then((r) => r.json())
       .then((d) => {
-        if (d.success) setCandidates(d.candidates);
+        if (d.success) {
+          setCandidates(d.candidates);
+          setTotalPages(Math.ceil(d.total / d.limit) || 1);
+        } else {
+          setError(d.error || "Failed to fetch candidates");
+        }
       })
-      .catch((err) => console.error("Error fetching candidates:", err))
+      .catch((err) => {
+        console.error("Error fetching candidates:", err);
+        setError("Network error occurred.");
+      })
       .finally(() => setLoading(false));
-  }, [search, statusFilter]);
+  }, [search, statusFilter, page]);
 
   const statusBadge = (status: string) => {
     const map: Record<string, string> = {
@@ -103,8 +118,15 @@ export function CandidatesList({ onViewChange }: { onViewChange: (v: ViewState) 
 
       <div className="flex-1 border border-border bg-background/40 rounded-2xl overflow-hidden relative z-10 flex flex-col font-mono">
         {loading ? (
-          <div className="flex-1 flex items-center justify-center">
-            <div className="animate-spin w-8 h-8 border-2 border-[#00e07a] border-t-transparent rounded-full" />
+          <div className="flex-1 p-6 space-y-4">
+            {[1, 2, 3, 4, 5, 6].map((i) => (
+              <div key={i} className="h-16 bg-muted/50 rounded-lg animate-pulse border border-border" />
+            ))}
+          </div>
+        ) : error ? (
+          <div className="flex-1 flex items-center justify-center flex-col text-red-400 py-20">
+             <p className="text-xs uppercase font-bold tracking-wider">[ ERROR: {error} ]</p>
+             <button onClick={() => { setError(null); setPage(page); }} className="mt-4 px-4 py-2 border border-red-500/20 bg-red-500/10 text-red-400 text-xs rounded hover:bg-red-500/20">RETRY</button>
           </div>
         ) : candidates.length === 0 ? (
           <div className="flex-1 flex items-center justify-center flex-col text-muted-foreground py-20">
@@ -186,6 +208,29 @@ export function CandidatesList({ onViewChange }: { onViewChange: (v: ViewState) 
                 ))}
               </tbody>
             </table>
+          </div>
+        )}
+        {!loading && !error && candidates.length > 0 && (
+          <div className="p-4 border-t border-border bg-[#121625] flex justify-between items-center z-10 text-xs text-muted-foreground">
+            <div>
+               PAGE {page} OF {totalPages}
+            </div>
+            <div className="flex gap-2">
+               <button 
+                 disabled={page <= 1} 
+                 onClick={() => setPage(p => p - 1)}
+                 className="px-3 py-1.5 rounded border border-border bg-muted disabled:opacity-50 hover:bg-accent transition-colors"
+               >
+                 PREV
+               </button>
+               <button 
+                 disabled={page >= totalPages} 
+                 onClick={() => setPage(p => p + 1)}
+                 className="px-3 py-1.5 rounded border border-border bg-muted disabled:opacity-50 hover:bg-accent transition-colors"
+               >
+                 NEXT
+               </button>
+            </div>
           </div>
         )}
       </div>

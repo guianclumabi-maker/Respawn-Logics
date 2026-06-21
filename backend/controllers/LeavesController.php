@@ -10,7 +10,7 @@ class LeavesController
     {
         $this->pdo = $pdo;
         $this->currentUser = getCurrentUser() ?: null;
-        $this->tenantId = is_array($this->currentUser) && isset($this->currentUser['tenant_id']) ? $this->currentUser['tenant_id'] : ($_SESSION['tenant_id'] ?? '1');
+        $this->tenantId = is_array($this->currentUser) && isset($this->currentUser['tenant_id']) ? $this->currentUser['tenant_id'] : ($_SESSION['tenant_id'] ?? null);
     }
 
     private function getBusinessDays($start_date, $end_date) {
@@ -30,6 +30,11 @@ class LeavesController
 
     public function handleRequest($action)
     {
+        if ($this->tenantId === null || $this->tenantId === '') {
+            http_response_code(403);
+            echo json_encode(['success' => false, 'error' => 'Unable to resolve tenant context']);
+            return;
+        }
         $input = json_decode(file_get_contents('php://input'), true) ?? [];
         $email = $this->currentUser['email'] ?? '';
 
@@ -74,10 +79,12 @@ class LeavesController
             } else if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 switch ($action) {
                     case 'apply':
+                        if (!hasPermission('leaves.apply')) { http_response_code(403); echo json_encode(['success'=>false, 'error'=>'Denied']); return; }
                         $this->applyLeave($input, $email);
                         break;
                     case 'approve_reject':
-                        $this->approveRejectLeave($input, $email);
+                        if (!hasPermission('leaves.manage')) { http_response_code(403); echo json_encode(['success'=>false, 'error'=>'Denied']); return; }
+                $this->approveRejectLeave($input, $email);
                         break;
                     default:
                         echo json_encode(['success' => false, 'error' => 'Unknown action']);
@@ -134,16 +141,24 @@ class LeavesController
         
         $initial_status = (empty($supervisor_email) && empty($manager_email)) ? 'Approved' : 'Pending';
         
-        $stmt = $this->pdo->prepare("INSERT INTO `leave_requests` (`tenant_id`, `employee_email`, `leave_type`, `start_date`, `end_date`, `reason`, `status`, `tl_decision`, `manager_decision`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
-        $stmt->execute([$this->tenantId, $email, $leave_type, $start_date, $end_date, $reason, $initial_status, $tl_decision_default, $mgr_decision_default]);
-        
-        // Auto deduct if auto approved
-        if ($initial_status === 'Approved') {
-            $deduct_stmt = $this->pdo->prepare("UPDATE `leave_balances` SET `used_balance` = `used_balance` + ? WHERE `employee_email` = ? AND `leave_type` = ? AND `tenant_id` = ?");
-            $deduct_stmt->execute([$requested_days, $email, $leave_type, $this->tenantId]);
-        }
+        try {
+            $this->pdo->beginTransaction();
 
-        echo json_encode(['success' => true]);
+            $stmt = $this->pdo->prepare("INSERT INTO `leave_requests` (`tenant_id`, `employee_email`, `leave_type`, `start_date`, `end_date`, `reason`, `status`, `tl_decision`, `manager_decision`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+            $stmt->execute([$this->tenantId, $email, $leave_type, $start_date, $end_date, $reason, $initial_status, $tl_decision_default, $mgr_decision_default]);
+            
+            // Auto deduct if auto approved
+            if ($initial_status === 'Approved') {
+                $deduct_stmt = $this->pdo->prepare("UPDATE `leave_balances` SET `used_balance` = `used_balance` + ? WHERE `employee_email` = ? AND `leave_type` = ? AND `tenant_id` = ?");
+                $deduct_stmt->execute([$requested_days, $email, $leave_type, $this->tenantId]);
+            }
+
+            $this->pdo->commit();
+            echo json_encode(['success' => true]);
+        } catch (\Exception $e) {
+            $this->pdo->rollBack();
+            throw $e;
+        }
     }
 
     private function approveRejectLeave($input, $email)
@@ -174,42 +189,53 @@ class LeavesController
             return;
         }
 
-        if ($isSupervisor && $req['tl_decision'] === 'Pending') {
-            $status = ($decision === 'Rejected') ? 'Rejected' : 'Pending';
-            
-            // If the employee has NO manager, and TL approves, auto-approve the whole request
-            $emp_manager = trim($req['department_manager'] ?? '');
-            if ($decision === 'Approved' && empty($emp_manager)) {
-                $status = 'Approved';
-                $req_days = $this->getBusinessDays($req['start_date'], $req['end_date']);
-                $deduct_stmt = $this->pdo->prepare("UPDATE `leave_balances` SET `used_balance` = `used_balance` + ? WHERE `employee_email` = ? AND `leave_type` = ? AND `tenant_id` = ?");
-                $deduct_stmt->execute([$req_days, $req['employee_email'], $req['leave_type'], $this->tenantId]);
-            }
-            
-            $manager_dec = (empty($emp_manager) && $decision === 'Approved') ? 'Approved' : $req['manager_decision'];
-            
-            $stmt_update = $this->pdo->prepare("UPDATE `leave_requests` SET `tl_decision` = ?, `tl_decided_by` = ?, `tl_decision_date` = NOW(), `tl_comments` = ?, `status` = ?, `manager_decision` = ? WHERE `id` = ? AND `tenant_id` = ?");
-            $stmt_update->execute([$decision, $email, $comments, $status, $manager_dec, $request_id, $this->tenantId]);
-            
-            echo json_encode(['success' => true]);
-            return;
-        }
+        try {
+            $this->pdo->beginTransaction();
 
-        if ($isManager && $req['tl_decision'] === 'Approved' && $req['manager_decision'] === 'Pending') {
-            $status = ($decision === 'Approved') ? 'Approved' : 'Rejected';
-            
-            $stmt_update = $this->pdo->prepare("UPDATE `leave_requests` SET `manager_decision` = ?, `manager_decided_by` = ?, `manager_decision_date` = NOW(), `manager_comments` = ?, `status` = ? WHERE `id` = ? AND `tenant_id` = ?");
-            $stmt_update->execute([$decision, $email, $comments, $status, $request_id, $this->tenantId]);
-            
-            if ($status === 'Approved') {
-                $req_days = $this->getBusinessDays($req['start_date'], $req['end_date']);
-                $deduct_stmt = $this->pdo->prepare("UPDATE `leave_balances` SET `used_balance` = `used_balance` + ? WHERE `employee_email` = ? AND `leave_type` = ? AND `tenant_id` = ?");
-                $deduct_stmt->execute([$req_days, $req['employee_email'], $req['leave_type'], $this->tenantId]);
+            if ($isSupervisor && $req['tl_decision'] === 'Pending') {
+                $status = ($decision === 'Rejected') ? 'Rejected' : 'Pending';
+                
+                // If the employee has NO manager, and TL approves, auto-approve the whole request
+                $emp_manager = trim($req['department_manager'] ?? '');
+                if ($decision === 'Approved' && empty($emp_manager)) {
+                    $status = 'Approved';
+                    $req_days = $this->getBusinessDays($req['start_date'], $req['end_date']);
+                    $deduct_stmt = $this->pdo->prepare("UPDATE `leave_balances` SET `used_balance` = `used_balance` + ? WHERE `employee_email` = ? AND `leave_type` = ? AND `tenant_id` = ?");
+                    $deduct_stmt->execute([$req_days, $req['employee_email'], $req['leave_type'], $this->tenantId]);
+                }
+                
+                $manager_dec = (empty($emp_manager) && $decision === 'Approved') ? 'Approved' : $req['manager_decision'];
+                
+                $stmt_update = $this->pdo->prepare("UPDATE `leave_requests` SET `tl_decision` = ?, `tl_decided_by` = ?, `tl_decision_date` = NOW(), `tl_comments` = ?, `status` = ?, `manager_decision` = ? WHERE `id` = ? AND `tenant_id` = ?");
+                $stmt_update->execute([$decision, $email, $comments, $status, $manager_dec, $request_id, $this->tenantId]);
+                
+                $this->pdo->commit();
+                echo json_encode(['success' => true]);
+                return;
             }
-            echo json_encode(['success' => true]);
-            return;
-        }
 
-        echo json_encode(['success' => false, 'error' => 'Action cannot be performed at this time.']);
+            if ($isManager && $req['tl_decision'] === 'Approved' && $req['manager_decision'] === 'Pending') {
+                $status = ($decision === 'Approved') ? 'Approved' : 'Rejected';
+                
+                $stmt_update = $this->pdo->prepare("UPDATE `leave_requests` SET `manager_decision` = ?, `manager_decided_by` = ?, `manager_decision_date` = NOW(), `manager_comments` = ?, `status` = ? WHERE `id` = ? AND `tenant_id` = ?");
+                $stmt_update->execute([$decision, $email, $comments, $status, $request_id, $this->tenantId]);
+                
+                if ($status === 'Approved') {
+                    $req_days = $this->getBusinessDays($req['start_date'], $req['end_date']);
+                    $deduct_stmt = $this->pdo->prepare("UPDATE `leave_balances` SET `used_balance` = `used_balance` + ? WHERE `employee_email` = ? AND `leave_type` = ? AND `tenant_id` = ?");
+                    $deduct_stmt->execute([$req_days, $req['employee_email'], $req['leave_type'], $this->tenantId]);
+                }
+                
+                $this->pdo->commit();
+                echo json_encode(['success' => true]);
+                return;
+            }
+
+            $this->pdo->commit();
+            echo json_encode(['success' => false, 'error' => 'Action cannot be performed at this time.']);
+        } catch (\Exception $e) {
+            $this->pdo->rollBack();
+            throw $e;
+        }
     }
 }

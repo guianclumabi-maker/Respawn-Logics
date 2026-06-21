@@ -1221,7 +1221,7 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
                 <i data-lucide="play"></i> Resume Session
             </a>
         <?php else: ?>
-            <a href="<?= url('/onboarding/') ?>" class="btn-primary">
+            <a href="<?= url('/frontend/dist/index.html') ?>" class="btn-primary">
                 <i data-lucide="play"></i> Initialize Setup
             </a>
             <a href="<?= url('/login.php') ?>" class="btn-ghost">

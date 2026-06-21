@@ -308,13 +308,21 @@ export function JobsPage({ onViewChange }: Props) {
   const [jobs, setJobs] = useState<Job[]>([]);
   const [departments, setDepartments] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
 
   // Filters
   const [search, setSearch] = useState("");
   const [selectedDept, setSelectedDept] = useState("");
   const [selectedStatus, setSelectedStatus] = useState("");
   const [selectedPriority, setSelectedPriority] = useState("");
+
+  // Reset page on filter change
+  useEffect(() => {
+    setPage(1);
+  }, [search, selectedDept, selectedStatus, selectedPriority]);
 
   // Modals
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -327,7 +335,8 @@ export function JobsPage({ onViewChange }: Props) {
   // ── Data fetching ──
   const fetchJobs = useCallback(() => {
     setLoading(true);
-    const params = new URLSearchParams({ action: "jobs" });
+    setError(null);
+    const params = new URLSearchParams({ action: "jobs", page: page.toString(), limit: "10" });
     if (search) params.set("search", search);
     if (selectedDept) params.set("department", selectedDept);
     if (selectedStatus) params.set("status", selectedStatus);
@@ -339,14 +348,18 @@ export function JobsPage({ onViewChange }: Props) {
         if (data.success) {
           setJobs(data.jobs || []);
           setDepartments(data.departments || []);
+          setTotalPages(Math.ceil(data.total / data.limit) || 1);
+        } else {
+          setError(data.error || "Failed to fetch jobs");
         }
         setLoading(false);
       })
       .catch((err) => {
         console.error("Failed to fetch jobs:", err);
+        setError("Network error occurred.");
         setLoading(false);
       });
-  }, [search, selectedDept, selectedStatus, selectedPriority]);
+  }, [search, selectedDept, selectedStatus, selectedPriority, page]);
 
   useEffect(() => {
     fetchJobs();
@@ -560,6 +573,11 @@ export function JobsPage({ onViewChange }: Props) {
       {/* Content */}
       {loading ? (
         <LoadingSkeleton />
+      ) : error ? (
+        <div className="relative z-10 flex-1 flex flex-col items-center justify-center py-20 font-mono text-red-400">
+           <p className="text-xs uppercase font-bold tracking-wider">[ ERROR: {error} ]</p>
+           <button onClick={() => { setError(null); fetchJobs(); }} className="mt-4 px-4 py-2 border border-red-500/20 bg-red-500/10 text-red-400 text-xs rounded hover:bg-red-500/20">RETRY</button>
+        </div>
       ) : jobs.length === 0 ? (
         /* Empty State */
         <div className="relative z-10 flex-1 flex flex-col items-center justify-center py-20 font-mono">
@@ -584,22 +602,41 @@ export function JobsPage({ onViewChange }: Props) {
         </div>
       ) : (
         /* Jobs Grid */
-        <div className="relative z-10 grid md:grid-cols-2 lg:grid-cols-3 gap-5">
-          {jobs.map((job) => (
-            <JobCard
-              key={job.id}
-              job={job}
-              onViewPipeline={() =>
-                onViewChange({ view: "Pipeline", jobId: job.id })
-              }
-              onAddCandidate={() => {
-                setActiveJobId(job.id);
-                setShowCandidateModal(true);
-              }}
-              onDuplicate={() => handleDuplicate(job.id)}
-              onTogglePause={() => handleTogglePause(job)}
-            />
-          ))}
+        <div className="flex flex-col flex-1 relative z-10">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5 mb-6">
+            {jobs.map((job) => (
+              <JobCard
+                key={job.id}
+                job={job}
+                onViewPipeline={() =>
+                  onViewChange({ view: "Pipeline", jobId: job.id })
+                }
+                onAddCandidate={() => {
+                  setActiveJobId(job.id);
+                  setShowCandidateModal(true);
+                }}
+                onDuplicate={() => handleDuplicate(job.id)}
+                onTogglePause={() => handleTogglePause(job)}
+              />
+            ))}
+          </div>
+          {!loading && !error && jobs.length > 0 && (
+            <div className="p-4 mt-auto border-t border-border bg-[#121625]/50 flex justify-between items-center text-xs text-muted-foreground font-mono rounded-b-xl">
+              <div>PAGE {page} OF {totalPages}</div>
+              <div className="flex gap-2">
+                <button 
+                  disabled={page <= 1} 
+                  onClick={() => setPage(p => p - 1)}
+                  className="px-3 py-1.5 rounded border border-border bg-muted disabled:opacity-50 hover:bg-accent transition-colors"
+                >PREV</button>
+                <button 
+                  disabled={page >= totalPages} 
+                  onClick={() => setPage(p => p + 1)}
+                  className="px-3 py-1.5 rounded border border-border bg-muted disabled:opacity-50 hover:bg-accent transition-colors"
+                >NEXT</button>
+              </div>
+            </div>
+          )}
         </div>
       )}
 
@@ -783,7 +820,7 @@ function CreateJobModal({
   onClose: () => void;
   onSubmit: () => void;
 }) {
-  const update = (field: keyof JobForm, value: string) =>
+  const update = <K extends keyof JobForm>(field: K, value: JobForm[K]) =>
     setForm({ ...form, [field]: value });
 
   const inputClass =

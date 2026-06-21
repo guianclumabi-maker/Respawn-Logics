@@ -134,7 +134,10 @@ class CandidatesController
         }
     }
 
-    private function computeAIMatchScore($candidateId, $jobId) {
+    private function updateMatchScore($appId, $candidateId, $jobId) {
+        require_once __DIR__ . '/../services/Scoring/ScoringProvider.php';
+        require_once __DIR__ . '/../services/Scoring/HeuristicScoringProvider.php';
+        
         $candidate = $this->pdo->prepare("SELECT * FROM `candidate_profiles` WHERE `id` = ?");
         $candidate->execute([$candidateId]);
         $c = $candidate->fetch();
@@ -143,62 +146,13 @@ class CandidatesController
         $job->execute([$jobId]);
         $j = $job->fetch();
         
-        if (!$c || !$j) return ['total' => 0, 'skill_fit' => 0, 'experience_fit' => 0, 'location_fit' => 0, 'salary_fit' => 0];
+        $provider = new \Respawn\Services\Scoring\HeuristicScoringProvider();
+        $match = $provider->score($c ?: [], $j ?: []);
         
-        $candidateSkills = array_map('trim', array_map('strtolower', explode(',', $c['skills'] ?? '')));
-        $jobReqs = strtolower(($j['requirements'] ?? '') . ' ' . ($j['description'] ?? ''));
-        $matchedSkills = 0;
-        $totalSkills = max(count(array_filter($candidateSkills)), 1);
-        foreach ($candidateSkills as $skill) {
-            if (!empty($skill) && strpos($jobReqs, $skill) !== false) {
-                $matchedSkills++;
-            }
-        }
-        $skillFit = round(($matchedSkills / $totalSkills) * 100);
+        $stmt = $this->pdo->prepare("UPDATE `candidate_applications` SET `ai_match_score` = ?, `score_breakdown` = ?, `score_source` = ?, `scored_at` = NOW() WHERE `id` = ? AND `tenant_id` = ?");
+        $stmt->execute([$match['total'], json_encode($match['breakdown']), $match['source'], $appId, $this->tenantId]);
         
-        $candidateYears = (int)($c['experience_years'] ?? 0);
-        preg_match('/(\d+)\+?\s*(?:years?|yrs?)/i', $j['requirements'] ?? '', $m);
-        $requiredYears = (int)($m[1] ?? 3);
-        $experienceFit = $requiredYears > 0 ? round(min($candidateYears / $requiredYears, 1.5) / 1.5 * 100) : 75;
-        
-        $candidateLoc = strtolower(trim($c['location'] ?? ''));
-        $jobLoc = strtolower(trim($j['location'] ?? ''));
-        if (empty($candidateLoc) || empty($jobLoc)) {
-            $locationFit = 50;
-        } elseif ($candidateLoc === $jobLoc) {
-            $locationFit = 100;
-        } elseif (strpos($candidateLoc, $jobLoc) !== false || strpos($jobLoc, $candidateLoc) !== false) {
-            $locationFit = 75;
-        } elseif (stripos($jobLoc, 'remote') !== false || stripos($candidateLoc, 'remote') !== false) {
-            $locationFit = 80;
-        } else {
-            $locationFit = 30;
-        }
-        
-        $salaryExp = (float)($c['salary_expectation'] ?? 0);
-        $salaryMin = (float)($j['salary_min'] ?? 0);
-        $salaryMax = (float)($j['salary_max'] ?? 0);
-        if ($salaryExp <= 0 || ($salaryMin <= 0 && $salaryMax <= 0)) {
-            $salaryFit = 60;
-        } elseif ($salaryExp >= $salaryMin && $salaryExp <= $salaryMax) {
-            $salaryFit = 100;
-        } elseif ($salaryExp < $salaryMin) {
-            $salaryFit = 90;
-        } elseif ($salaryMax > 0 && $salaryExp <= $salaryMax * 1.2) {
-            $salaryFit = 50;
-        } else {
-            $salaryFit = 20;
-        }
-        
-        $total = round($skillFit * 0.40 + $experienceFit * 0.25 + $locationFit * 0.20 + $salaryFit * 0.15);
-        
-        return [
-            'total' => $total,
-            'skill_fit' => $skillFit,
-            'experience_fit' => $experienceFit,
-            'location_fit' => $locationFit,
-            'salary_fit' => $salaryFit
-        ];
+        return $match;
     }
 
     private function computePipelineHealth($jobId) {
@@ -362,8 +316,10 @@ class CandidatesController
             }
         }
         
-        // Temporary mock for activities until the ATS event engine is built
-        $activities = [];
+        $stmtAct = $this->pdo->prepare("SELECT a.*, cp.`name` as candidate_name, j.`title` as job_title FROM `activities` a LEFT JOIN `candidate_profiles` cp ON cp.`id` = a.`candidate_id` LEFT JOIN `jobs` j ON j.`id` = a.`job_id` WHERE a.`tenant_id` = ? ORDER BY a.`created_at` DESC LIMIT 10");
+        $stmtAct->execute([$this->tenantId]);
+        $activities = $stmtAct->fetchAll();
+        foreach ($activities as &$act) { $act['id'] = (int)$act['id']; $act['time_ago'] = humanTimeAgo($act['created_at']); }
         
         $upcomingStmt = $this->pdo->prepare("SELECT i.*, cp.`name` as candidate_name, j.`title` as job_title FROM `interviews` i JOIN `candidate_profiles` cp ON cp.`id` = i.`candidate_id` JOIN `jobs` j ON j.`id` = i.`job_id` WHERE i.`scheduled_at` >= NOW() AND i.`status` = 'Scheduled' AND i.`tenant_id` = ? ORDER BY i.`scheduled_at` ASC LIMIT 5");
         $upcomingStmt->execute([$this->tenantId]);
@@ -397,11 +353,18 @@ class CandidatesController
 
     private function jobs() {
         $where = ["j.tenant_id = ?"]; $params = [$this->tenantId];
+        $page = max(1, (int)($_GET['page'] ?? 1)); $limit = min(100, max(10, (int)($_GET['limit'] ?? 50))); $offset = ($page - 1) * $limit;
         if (!empty($_GET['status'])) { $where[] = "j.`status` = ?"; $params[] = $_GET['status']; }
         if (!empty($_GET['department'])) { $where[] = "j.`department` = ?"; $params[] = $_GET['department']; }
         if (!empty($_GET['priority'])) { $where[] = "j.`priority` = ?"; $params[] = $_GET['priority']; }
         if (!empty($_GET['search'])) { $where[] = "(j.`title` LIKE ? OR j.`department` LIKE ? OR j.`location` LIKE ?)"; $params = array_merge($params, ["%{$_GET['search']}%", "%{$_GET['search']}%", "%{$_GET['search']}%"]); }
-        $stmt = $this->pdo->prepare("SELECT j.* FROM `jobs` j " . (!empty($where) ? 'WHERE ' . implode(' AND ', $where) : '') . " ORDER BY j.`created_at` DESC");
+        $whereClause = !empty($where) ? 'WHERE ' . implode(' AND ', $where) : '';
+        
+        $countStmt = $this->pdo->prepare("SELECT COUNT(*) FROM `jobs` j $whereClause");
+        $countStmt->execute($params);
+        $totalCount = (int)$countStmt->fetchColumn();
+        
+        $stmt = $this->pdo->prepare("SELECT j.* FROM `jobs` j $whereClause ORDER BY j.`created_at` DESC LIMIT $limit OFFSET $offset");
         $stmt->execute($params);
         $jobs = $stmt->fetchAll();
         $fetchedJobIds = array_column($jobs, 'id');
@@ -419,7 +382,7 @@ class CandidatesController
         $deptStmt = $this->pdo->prepare("SELECT DISTINCT `department` FROM `jobs` WHERE `tenant_id` = ? AND `department` IS NOT NULL AND `department` != '' ORDER BY `department`");
         $deptStmt->execute([$this->tenantId]);
         $departments = $deptStmt->fetchAll(PDO::FETCH_COLUMN);
-        echo json_encode(['success' => true, 'jobs' => $jobs, 'departments' => $departments]);
+        echo json_encode(['success' => true, 'jobs' => $jobs, 'departments' => $departments, 'total' => $totalCount, 'page' => $page, 'limit' => $limit]);
         exit;
     }
 
@@ -438,6 +401,7 @@ class CandidatesController
         foreach ($applications as &$app) {
             $app['id'] = (int)$app['id']; $app['candidate_id'] = (int)$app['candidate_id']; $app['rating'] = (int)$app['rating'];
             $app['ai_match_score'] = $app['ai_match_score'] !== null ? (int)$app['ai_match_score'] : null;
+            $app['score_breakdown'] = !empty($app['score_breakdown']) ? json_decode($app['score_breakdown'], true) : null;
             $app['days_in_stage'] = (int)((time() - strtotime($app['stage_entered_at'])) / 86400);
             $app['tags'] = !empty($app['skills']) ? array_map('trim', explode(',', $app['skills'])) : [];
             $app['formatted_applied'] = date('M j, Y', strtotime($app['applied_at']));
@@ -485,6 +449,8 @@ class CandidatesController
         $candidate['applications'] = $appsStmt->fetchAll();
         foreach ($candidate['applications'] as &$app) {
             $app['id'] = (int)$app['id']; $app['days_in_stage'] = (int)((time() - strtotime($app['stage_entered_at'])) / 86400);
+            $app['ai_match_score'] = $app['ai_match_score'] !== null ? (int)$app['ai_match_score'] : null;
+            $app['score_breakdown'] = !empty($app['score_breakdown']) ? json_decode($app['score_breakdown'], true) : null;
             $app['formatted_applied'] = date('M j, Y', strtotime($app['applied_at']));
         }
         $intStmt = $this->pdo->prepare("SELECT i.*, j.`title` as job_title FROM `interviews` i JOIN `jobs` j ON j.`id` = i.`job_id` WHERE i.`candidate_id` = ? AND i.`tenant_id` = ? ORDER BY i.`scheduled_at` DESC");
@@ -639,7 +605,24 @@ class CandidatesController
     }
 
     private function aiMatch() {
-        echo json_encode(['success' => true, 'match' => $this->computeAIMatchScore((int)($_GET['candidate_id'] ?? 0), (int)($_GET['job_id'] ?? 0))]);
+        require_once __DIR__ . '/../services/Scoring/ScoringProvider.php';
+        require_once __DIR__ . '/../services/Scoring/HeuristicScoringProvider.php';
+
+        $candidateId = (int)($_GET['candidate_id'] ?? 0);
+        $jobId = (int)($_GET['job_id'] ?? 0);
+
+        $cStmt = $this->pdo->prepare("SELECT * FROM `candidate_profiles` WHERE `id` = ? AND `tenant_id` = ?");
+        $cStmt->execute([$candidateId, $this->tenantId]);
+        $c = $cStmt->fetch();
+
+        $jStmt = $this->pdo->prepare("SELECT * FROM `jobs` WHERE `id` = ? AND `tenant_id` = ?");
+        $jStmt->execute([$jobId, $this->tenantId]);
+        $j = $jStmt->fetch();
+
+        $provider = new \Respawn\Services\Scoring\HeuristicScoringProvider();
+        $match = $provider->score($c ?: [], $j ?: []);
+
+        echo json_encode(['success' => true, 'match' => $match]);
         exit;
     }
 
@@ -813,8 +796,7 @@ class CandidatesController
             $appStmt->execute([$this->tenantId, $candidateId, $jobId, $input['source'] ?? 'Direct', trim($input['assigned_recruiter'] ?? '')]);
             $appId = (int)$this->pdo->lastInsertId();
             $this->logActivity('application_created', "Applied to job", $candidateId, $jobId, $appId);
-            $match = $this->computeAIMatchScore($candidateId, $jobId);
-            $this->pdo->prepare("UPDATE `candidate_applications` SET `ai_match_score` = ? WHERE `id` = ? AND `tenant_id` = ?")->execute([$match['total'], $appId, $this->tenantId]);
+            $match = $this->updateMatchScore($appId, $candidateId, $jobId);
         }
         echo json_encode(['success' => true, 'candidate_id' => $candidateId]);
         exit;
@@ -847,8 +829,7 @@ class CandidatesController
         $stmt = $this->pdo->prepare("INSERT INTO `candidate_applications` (`tenant_id`, `candidate_id`, `job_id`, `stage`, `source`, `assigned_recruiter`) VALUES (?, ?, ?, 'Applied', ?, ?)");
         $stmt->execute([$this->tenantId, $candidateId, $jobId, $input['source'] ?? 'Direct', trim($input['assigned_recruiter'] ?? '')]);
         $appId = (int)$this->pdo->lastInsertId();
-        $match = $this->computeAIMatchScore($candidateId, $jobId);
-        $this->pdo->prepare("UPDATE `candidate_applications` SET `ai_match_score` = ? WHERE `id` = ? AND `tenant_id` = ?")->execute([$match['total'], $appId, $this->tenantId]);
+        $match = $this->updateMatchScore($appId, $candidateId, $jobId);
         $this->logActivity('application_created', "Applied to job", $candidateId, $jobId, $appId);
         echo json_encode(['success' => true, 'application_id' => $appId, 'ai_match_score' => $match['total']]);
         exit;
@@ -1082,8 +1063,7 @@ class CandidatesController
         $apps = $this->pdo->prepare("SELECT `id`, `candidate_id` FROM `candidate_applications` WHERE `job_id` = ? AND `tenant_id` = ?"); $apps->execute([$jobId, $this->tenantId]);
         $updated = 0;
         foreach ($apps->fetchAll() as $app) {
-            $match = $this->computeAIMatchScore((int)$app['candidate_id'], $jobId);
-            $this->pdo->prepare("UPDATE `candidate_applications` SET `ai_match_score` = ? WHERE `id` = ? AND `tenant_id` = ?")->execute([$match['total'], (int)$app['id'], $this->tenantId]);
+            $match = $this->updateMatchScore((int)$app['id'], (int)$app['candidate_id'], $jobId);
             $updated++;
         }
         echo json_encode(['success' => true, 'updated' => $updated]);

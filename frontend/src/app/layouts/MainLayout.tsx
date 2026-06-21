@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Outlet, useNavigate, useLocation } from "react-router-dom";
 import { Sidebar } from "../components/Sidebar";
 import type { ViewState, SidebarBadges } from "../components/Sidebar";
+import { viewStateToPath } from "../lib/atsNav";
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL;
 const API = `${API_BASE}/api/index.php?route=candidates`;
@@ -74,54 +75,7 @@ export default function MainLayout() {
     const viewState = typeof viewOrState === "string" ? { view: viewOrState } : viewOrState;
     setActiveView(viewState);
 
-    // Map old view names to new routes
-    switch (viewState.view) {
-      // Apps
-      case "Dashboard": navigate("/dashboard"); break;
-      case "Employee Relations": navigate("/employee-relations"); break;
-      case "Onboarding": navigate("/onboarding"); break;
-      
-      // Core HR
-      case "HR Directory": navigate("/hr-directory"); break;
-      case "Org Chart": navigate("/org-chart"); break;
-      case "Leaves": navigate("/leaves"); break;
-      case "Attendance": navigate("/attendance"); break;
-      case "Scheduling": navigate("/scheduling"); break;
-      
-      // Finance & Services
-      case "Payroll Engine": navigate("/payroll"); break;
-      case "Benefits": navigate("/benefits"); break;
-      case "Compensation": navigate("/compensation"); break;
-      case "Expenses": navigate("/expenses"); break;
-      case "IT / HR Service Desk": navigate("/service-desk"); break;
-      
-      // Talent
-      case "Performance": navigate("/performance"); break;
-      case "Knowledge Base": navigate("/knowledge"); break;
-      case "Surveys": navigate("/surveys"); break;
-      
-      // ATS
-      case "ATS Dashboard": navigate("/ats"); break;
-      case "Pipeline": navigate("/ats/pipeline"); break;
-      case "Jobs": navigate("/ats/jobs"); break;
-      case "Candidates": navigate("/ats/candidates"); break;
-      case "Interviews": navigate("/ats/interviews"); break;
-      case "Approvals": navigate("/ats/approvals"); break;
-      case "Talent Pools": navigate("/ats/pools"); break;
-      case "Talent Search": navigate("/ats/search"); break;
-      case "Recruiting Copilot": navigate("/ats/copilot"); break;
-      case "Insights": navigate("/ats/insights"); break;
-      
-      // Analytics & System
-      case "AI Companion": navigate("/ai-companion"); break;
-      case "Analytics": navigate("/analytics"); break;
-      case "Admin Users": navigate("/admin/users"); break;
-      case "Admin Roles": navigate("/admin/roles"); break;
-      case "Tenant Settings": navigate("/admin/settings"); break;
-      case "Audit Logs": navigate("/admin/audit"); break;
-      
-      default: navigate("/dashboard"); break; // fallback
-    }
+    navigate(viewStateToPath(viewState));
   };
 
   // Fetch badges

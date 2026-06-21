@@ -8,4 +8,4 @@ cmds = ["npm install"]
 cmds = ["echo 'Skipping build, using pre-built dist'"]
 
 [start]
-# We let the default PHP provider handle the start command (Nginx + PHP-FPM)
+cmd = "php backend/scripts/migrate.php && php-fpm -y /etc/php-fpm.conf && nginx -c /etc/nginx/nginx.conf"

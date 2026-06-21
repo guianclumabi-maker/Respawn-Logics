@@ -10,11 +10,16 @@ class ShiftController
     {
         $this->pdo = $pdo;
         $this->currentUser = getCurrentUser() ?: null;
-        $this->tenantId = is_array($this->currentUser) && isset($this->currentUser['tenant_id']) ? $this->currentUser['tenant_id'] : ($_SESSION['tenant_id'] ?? '1');
+        $this->tenantId = is_array($this->currentUser) && isset($this->currentUser['tenant_id']) ? $this->currentUser['tenant_id'] : ($_SESSION['tenant_id'] ?? null);
     }
 
     public function handleRequest($action)
     {
+        if ($this->tenantId === null || $this->tenantId === '') {
+            http_response_code(403);
+            echo json_encode(['success' => false, 'error' => 'Unable to resolve tenant context']);
+            return;
+        }
         // Require logged-in user
         if (!$this->currentUser) {
             echo json_encode(['success' => false, 'error' => 'Unauthorized']);
@@ -27,7 +32,8 @@ class ShiftController
                     $this->fetchShiftTypes();
                     break;
                 case 'create_shift_type':
-                    $this->createShiftType();
+                    if (!hasPermission('shifts.manage')) { http_response_code(403); echo json_encode(['success'=>false, 'error'=>'Denied']); return; }
+                $this->createShiftType();
                     break;
                 case 'fetch_roster':
                     $this->fetchRoster();

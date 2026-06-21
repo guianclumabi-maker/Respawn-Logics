@@ -1,5 +1,6 @@
-import { createBrowserRouter } from "react-router-dom";
+import { createBrowserRouter, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import MainLayout from "./layouts/MainLayout";
+import { viewStateToPath } from "./lib/atsNav";
 
 // Apps & Fully Ported
 import { HomeDashboard } from "./pages/HomeDashboard";
@@ -21,6 +22,8 @@ import { TalentPools } from "./components/TalentPools";
 import { TalentSearch } from "./components/TalentSearch";
 import { RecruitingCopilot } from "./components/RecruitingCopilot";
 import { InsightsPage } from "./components/InsightsPage";
+import { CandidateProfile } from "./components/CandidateProfile";
+import { PoolDetail } from "./components/PoolDetail";
 
 // Shell Components
 import { AttendanceDashboard } from "./pages/AttendanceDashboard";
@@ -38,6 +41,25 @@ import { TenantSettings } from "./pages/TenantSettings";
 import { AuditLogs } from "./pages/AuditLogs";
 import { AICompanion } from "./pages/AICompanion";
 import { Analytics } from "./pages/Analytics";
+
+function AtsRoute({ component: Component }: { component: any }) {
+  const navigate = useNavigate();
+  const { id } = useParams();
+  const [searchParams] = useSearchParams();
+  
+  const jobIdStr = searchParams.get("jobId");
+  const jobId = jobIdStr ? parseInt(jobIdStr, 10) : undefined;
+  const paramId = id ? parseInt(id, 10) : undefined;
+
+  return (
+    <Component
+      onViewChange={(v: any) => navigate(viewStateToPath(v))}
+      jobId={jobId}
+      candidateId={paramId}
+      poolId={paramId}
+    />
+  );
+}
 
 export const router = createBrowserRouter([
   {
@@ -63,16 +85,18 @@ export const router = createBrowserRouter([
       {
         path: "ats",
         children: [
-          { index: true, element: <ATSDashboard onViewChange={() => {}} /> },
-          { path: "pipeline", element: <PipelineBoard onViewChange={() => {}} /> },
-          { path: "jobs", element: <JobsPage onViewChange={() => {}} /> },
-          { path: "candidates", element: <CandidatesList onViewChange={() => {}} /> },
-          { path: "interviews", element: <InterviewsPage onViewChange={() => {}} /> },
-          { path: "approvals", element: <Approvals onViewChange={() => {}} /> },
-          { path: "pools", element: <TalentPools onViewChange={() => {}} /> },
-          { path: "search", element: <TalentSearch onViewChange={() => {}} /> },
-          { path: "copilot", element: <RecruitingCopilot onViewChange={() => {}} /> },
-          { path: "insights", element: <InsightsPage /> }
+          { index: true, element: <AtsRoute component={ATSDashboard} /> },
+          { path: "pipeline", element: <AtsRoute component={PipelineBoard} /> },
+          { path: "jobs", element: <AtsRoute component={JobsPage} /> },
+          { path: "candidates", element: <AtsRoute component={CandidatesList} /> },
+          { path: "candidates/:id", element: <AtsRoute component={CandidateProfile} /> },
+          { path: "interviews", element: <AtsRoute component={InterviewsPage} /> },
+          { path: "approvals", element: <AtsRoute component={Approvals} /> },
+          { path: "pools", element: <AtsRoute component={TalentPools} /> },
+          { path: "pools/:id", element: <AtsRoute component={PoolDetail} /> },
+          { path: "search", element: <AtsRoute component={TalentSearch} /> },
+          { path: "copilot", element: <AtsRoute component={RecruitingCopilot} /> },
+          { path: "insights", element: <AtsRoute component={InsightsPage} /> }
         ]
       },
       { path: "analytics", element: <Analytics /> },

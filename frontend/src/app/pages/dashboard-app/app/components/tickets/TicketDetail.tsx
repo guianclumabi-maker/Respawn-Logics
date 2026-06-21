@@ -520,7 +520,7 @@ export function TicketDetail({ ticket, onBack, onStatusChange, onPriorityChange,
       </div>
 
       {/* Reply box or CSAT */}
-      {isClient && (ticket.status === 'Resolved' || ticket.status === 'Closed') && !ticket.csat_score ? (
+      {isClient && (ticket.status === 'resolved' || ticket.status === 'closed') && !ticket.csat_score ? (
         <div style={{
           borderTop: "1px solid rgba(255,255,255,0.07)",
           padding: "1.5rem",

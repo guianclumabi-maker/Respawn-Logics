@@ -10,11 +10,16 @@ class AnnouncementsController
     {
         $this->pdo = $pdo;
         $this->currentUser = getCurrentUser() ?: null;
-        $this->tenantId = is_array($this->currentUser) && isset($this->currentUser['tenant_id']) ? $this->currentUser['tenant_id'] : ($_SESSION['tenant_id'] ?? '1');
+        $this->tenantId = is_array($this->currentUser) && isset($this->currentUser['tenant_id']) ? $this->currentUser['tenant_id'] : ($_SESSION['tenant_id'] ?? null);
     }
 
     public function handleRequest($action)
     {
+        if ($this->tenantId === null || $this->tenantId === '') {
+            http_response_code(403);
+            echo json_encode(['success' => false, 'error' => 'Unable to resolve tenant context']);
+            return;
+        }
         // Require logged-in user
         if (!$this->currentUser) {
             echo json_encode(['success' => false, 'error' => 'Unauthorized']);
@@ -27,7 +32,8 @@ class AnnouncementsController
                     $this->fetchPosts();
                     break;
                 case 'create_post':
-                    $this->createPost();
+                    if (!hasPermission('announcements.manage')) { http_response_code(403); echo json_encode(['success'=>false, 'error'=>'Denied']); return; }
+                $this->createPost();
                     break;
                 default:
                     echo json_encode(['success' => false, 'error' => 'Unknown action']);
