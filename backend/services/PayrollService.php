@@ -9,6 +9,7 @@ class PayrollService
     private $hdmfConfig = [];
     private $birBrackets = [];
     private $deMinimisConfig = [];
+    private $statutoryParams = [];
 
     public function __construct($pdo)
     {
@@ -18,7 +19,7 @@ class PayrollService
     private $tenantSettings = [];
     private $payComponents = [];
 
-    private function loadConfigs($payDate, $tenantId) {
+    private function loadConfigs($payDate, $tenantId, $frequency) {
         $stmt = $this->pdo->prepare("SELECT * FROM sss_contribution_brackets WHERE effective_from <= ? AND (effective_to IS NULL OR effective_to >= ?) ORDER BY range_from ASC");
         $stmt->execute([$payDate, $payDate]);
         $this->sssBrackets = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -46,6 +47,21 @@ class PayrollService
         foreach ($dmRows as $row) {
             $this->deMinimisConfig[$row['item_name']] = $row;
         }
+
+        $stmt = $this->pdo->prepare("SELECT * FROM statutory_parameters WHERE effective_from <= ? AND (effective_to IS NULL OR effective_to >= ?)");
+        $stmt->execute([$payDate, $payDate]);
+        $paramRows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $this->statutoryParams = [];
+        foreach ($paramRows as $row) {
+            $this->statutoryParams[$row['param_key']] = floatval($row['param_value']);
+        }
+
+        if (empty($this->sssBrackets)) throw new Exception("No statutory SSS rate configured for $payDate");
+        if (empty($this->phicConfig)) throw new Exception("No statutory PhilHealth rate configured for $payDate");
+        if (empty($this->hdmfConfig)) throw new Exception("No statutory Pag-IBIG rate configured for $payDate");
+        if (empty($this->birBrackets[$frequency])) throw new Exception("No statutory BIR withholding rate configured for $frequency on $payDate");
+        if (empty($this->deMinimisConfig)) throw new Exception("No statutory De Minimis rates configured for $payDate");
+        if (empty($this->statutoryParams['thirteenth_month_exemption_cap'])) throw new Exception("No statutory parameters configured for $payDate");
 
         $settings = [
             'proration_method' => 'split_even',
@@ -172,7 +188,8 @@ class PayrollService
         ");
         $stmt->execute([$empId, $year]);
         $used = floatval($stmt->fetchColumn());
-        return max(0, 90000 - $used);
+        $cap = $this->statutoryParams['thirteenth_month_exemption_cap'] ?? 90000;
+        return max(0, $cap - $used);
     }
 
     public function generateRun($tenantId, $scheduleId, $start, $end, $payDate, $createdById)
@@ -180,14 +197,14 @@ class PayrollService
         try {
             $this->pdo->beginTransaction();
 
-            // Load global configs and tenant configs based on pay date
-            $this->loadConfigs($payDate, $tenantId);
-
             // Fetch schedule frequency
             $stmt = $this->pdo->prepare("SELECT frequency FROM payroll_schedules WHERE id = ?");
             $stmt->execute([$scheduleId]);
             $schedule = $stmt->fetch();
             $frequency = $schedule ? $schedule['frequency'] : 'Monthly';
+
+            // Load global configs and tenant configs based on pay date
+            $this->loadConfigs($payDate, $tenantId, $frequency);
             
             $prorateFactor = ($frequency === 'Semi-Monthly') ? 0.5 : 1.0;
             
