@@ -35,6 +35,7 @@ class PayrollController
         try {
             switch ($action) {
                 case 'schedules':
+                    if (!$this->canManagePayroll()) { http_response_code(403); echo json_encode(['success' => false, 'error' => 'Denied']); return; }
                     $stmt = $this->pdo->prepare("SELECT * FROM `payroll_schedules` WHERE `tenant_id` = ?");
                     $stmt->execute([$this->tenantId]);
                     echo json_encode(['success' => true, 'data' => $stmt->fetchAll()]);
@@ -62,6 +63,7 @@ class PayrollController
                     break;
 
                 case 'runs':
+                    if (!$this->canManagePayroll()) { http_response_code(403); echo json_encode(['success' => false, 'error' => 'Denied']); return; }
                     $stmt = $this->pdo->prepare("SELECT pr.*, ps.name as schedule_name FROM `payroll_runs` pr LEFT JOIN `payroll_schedules` ps ON pr.payroll_schedule_id = ps.id WHERE pr.tenant_id = ? ORDER BY pr.id DESC");
                     $stmt->execute([$this->tenantId]);
                     echo json_encode(['success' => true, 'data' => $stmt->fetchAll()]);
@@ -173,6 +175,7 @@ class PayrollController
                     break;
 
                 case 'dashboard_kpis':
+                    if (!$this->canManagePayroll()) { http_response_code(403); echo json_encode(['success' => false, 'error' => 'Denied']); return; }
                     $empStmt = $this->pdo->prepare("SELECT COUNT(*) as cnt, SUM(base_salary) as total_base FROM `users` WHERE `tenant_id` = ? AND `employment_status` = 'Active'");
                     $empStmt->execute([$this->tenantId]);
                     $empData = $empStmt->fetch();
@@ -324,6 +327,7 @@ class PayrollController
                     break;
 
                 case 'payslips_admin':
+                    if (!$this->canManagePayroll()) { http_response_code(403); echo json_encode(['success' => false, 'error' => 'Denied']); return; }
                     $stmt = $this->pdo->prepare("
                         SELECT pp.id, pp.employee_id, u.full_name as empName, 
                                CONCAT(pr.payroll_period_start, ' to ', pr.payroll_period_end) as period,
@@ -340,6 +344,7 @@ class PayrollController
                     break;
 
                 case 'payslip_details':
+                    if (!$this->canManagePayroll()) { http_response_code(403); echo json_encode(['success' => false, 'error' => 'Denied']); return; }
                     $id = intval($_GET['id'] ?? 0);
                     $stmt = $this->pdo->prepare("
                         SELECT pp.id, pp.employee_id, u.full_name as empName, u.employee_number as empId, pp.payroll_run_id,
