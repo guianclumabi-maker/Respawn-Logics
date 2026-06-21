@@ -4,7 +4,7 @@
  * php backend/migrations/migrate_legacy_uploads.php
  */
 
-require_once __DIR__ . '/../../config/db.php';
+require_once __DIR__ . '/../../bootstrap/app.php';
 require_once __DIR__ . '/../utils/Storage.php';
 
 $fileStorage = rtrim(\App\Utils\Storage::resolveStorageBase(false, false), '/');
