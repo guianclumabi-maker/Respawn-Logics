@@ -1704,7 +1704,7 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
             <div class="footer-col">
                 <h4>Resources</h4>
                 <ul>
-                    <li><a href="<?= url('/pages/admin_platform_support.php') ?>">Help Center</a></li>
+                    <li><a href="<?= url('/submit_ticket.php') ?>">Help Center</a></li>
                 </ul>
             </div>
             <div class="footer-col">

@@ -1299,12 +1299,12 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
             <div class="footer-col">
                 <h4>Platform Modules</h4>
                 <ul>
-                    <li><a href="<?= url('/frontend/dist/index.html#/hr-directory') ?>">Core HR & People</a></li>
-                    <li><a href="<?= url('/frontend/dist/index.html#/ats') ?>">ATS Pipeline</a></li>
-                    <li><a href="<?= url('/frontend/dist/index.html#/payroll') ?>">Enterprise Payroll</a></li>
-                    <li><a href="<?= url('/frontend/dist/index.html#/service-desk') ?>">Service Desk</a></li>
-                    <li><a href="<?= url('/frontend/dist/index.html#/employee-relations') ?>">Employee Relations</a></li>
-                    <li><a href="<?= url('/frontend/dist/index.html#/attendance') ?>">Attendance & Leaves</a></li>
+                    <li><a href="<?= url('/solutions.php?module=core-hr') ?>">Core HR & People</a></li>
+                    <li><a href="<?= url('/solutions.php?module=ats') ?>">ATS Pipeline</a></li>
+                    <li><a href="<?= url('/solutions.php?module=payroll') ?>">Enterprise Payroll</a></li>
+                    <li><a href="<?= url('/solutions.php?module=service-desk') ?>">Service Desk</a></li>
+                    <li><a href="<?= url('/solutions.php?module=employee-relations') ?>">Employee Relations</a></li>
+                    <li><a href="<?= url('/solutions.php?module=attendance') ?>">Attendance & Leaves</a></li>
                 </ul>
             </div>
             <div class="footer-col">
@@ -1318,7 +1318,7 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
             <div class="footer-col">
                 <h4>Resources</h4>
                 <ul>
-                    <li><a href="<?= url('/pages/admin_platform_support.php') ?>">Help Center</a></li>
+                    <li><a href="<?= url('/submit_ticket.php') ?>">Help Center</a></li>
                 </ul>
             </div>
             <div class="footer-col">
