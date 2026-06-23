@@ -13,15 +13,9 @@ class PerformanceController
         $this->tenantId = is_array($this->currentUser) && isset($this->currentUser['tenant_id']) ? $this->currentUser['tenant_id'] : ($_SESSION['tenant_id'] ?? null);
     }
 
-    private function isManagerOrHR()
+    private function canManagePerformance()
     {
-        if (hasPermission('performance.manage')) return true;
-        if (hasPermission('performance.manage_team')) {
-            $stmt = $this->pdo->prepare("SELECT COUNT(*) FROM `users` WHERE `manager_id` = ? AND `tenant_id` = ?");
-            $stmt->execute([$this->currentUser['id'], $this->tenantId]);
-            return $stmt->fetchColumn() > 0;
-        }
-        return false;
+        return hasPermission('performance.manage') || hasPermission('performance.manage_team');
     }
 
     public function handleRequest($action)
@@ -106,16 +100,20 @@ class PerformanceController
                     break;
 
                 case 'team_reviews': 
-                    if (!$this->isManagerOrHR()) { echo json_encode(['success' => false, 'error' => 'Denied']); return; }
+                    if (!$this->canManagePerformance()) { echo json_encode(['success' => false, 'error' => 'Denied']); return; }
+                    
+                    require_once __DIR__ . '/../services/ScopeResolver.php';
+                    $scopeClause = ScopeResolver::getScopeWhereClause($this->pdo, $this->currentUser, 'u');
                     
                     $stmt = $this->pdo->prepare("
                         SELECT pr.*, pc.name as cycle_name, u.full_name as employee_name, u.job_title 
                         FROM `performance_reviews` pr
                         JOIN `performance_cycles` pc ON pr.cycle_id = pc.id
-                        JOIN `users` u ON pr.employee_id = u.id
-                        WHERE pr.reviewer_id = ? AND pr.tenant_id = ?
+                        JOIN `users` u ON pr.employee_id = u.id AND pr.tenant_id = u.tenant_id
+                        WHERE pr.tenant_id = :tenant_id
+                        $scopeClause
                     ");
-                    $stmt->execute([$this->currentUser['id'], $this->tenantId]);
+                    $stmt->execute([':tenant_id' => $this->tenantId]);
                     echo json_encode(['success' => true, 'data' => $stmt->fetchAll()]);
                     break;
 
@@ -129,16 +127,26 @@ class PerformanceController
                     break;
 
                 case 'submit_manager_eval':
-                    if (!$this->isManagerOrHR()) { echo json_encode(['success' => false, 'error' => 'Denied']); return; }
+                    if (!$this->canManagePerformance()) { echo json_encode(['success' => false, 'error' => 'Denied']); return; }
                     
                     $reviewId = $input['review_id'] ?? 0;
+
+                    $checkStmt = $this->pdo->prepare("SELECT employee_id FROM performance_reviews WHERE id = ? AND tenant_id = ?");
+                    $checkStmt->execute([$reviewId, $this->tenantId]);
+                    $targetEmpId = $checkStmt->fetchColumn();
+
+                    require_once __DIR__ . '/../services/ScopeResolver.php';
+                    if (!$targetEmpId || !ScopeResolver::hasScopedAccess($this->pdo, $this->currentUser, (int)$targetEmpId)) {
+                        echo json_encode(['success' => false, 'error' => 'Unauthorized']); return;
+                    }
+
                     $comments = $input['manager_comments'] ?? '';
                     $score = floatval($input['overall_score_1_to_5'] ?? 0);
                     $perf = intval($input['nine_box_performance'] ?? 0);
                     $pot = intval($input['nine_box_potential'] ?? 0);
 
-                    $stmt = $this->pdo->prepare("UPDATE `performance_reviews` SET `manager_comments` = ?, `overall_score_1_to_5` = ?, `nine_box_performance` = ?, `nine_box_potential` = ?, `status` = 'Finalized' WHERE `id` = ? AND `reviewer_id` = ? AND `tenant_id` = ?");
-                    $stmt->execute([$comments, $score, $perf, $pot, $reviewId, $this->currentUser['id'], $this->tenantId]);
+                    $stmt = $this->pdo->prepare("UPDATE `performance_reviews` SET `manager_comments` = ?, `overall_score_1_to_5` = ?, `nine_box_performance` = ?, `nine_box_potential` = ?, `status` = 'Finalized', `reviewer_id` = ? WHERE `id` = ? AND `tenant_id` = ?");
+                    $stmt->execute([$comments, $score, $perf, $pot, $this->currentUser['id'], $reviewId, $this->tenantId]);
                     
                     echo json_encode(['success' => true]);
                     break;

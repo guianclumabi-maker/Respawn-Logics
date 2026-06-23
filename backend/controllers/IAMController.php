@@ -75,10 +75,10 @@ class IAMController
                     $stmt->execute([$this->tenantId]);
                     $users = $stmt->fetchAll();
 
-                    // Fetch roles for each user
+                    // Fetch roles and their scopes for each user
                     foreach ($users as &$user) {
                         $roleStmt = $this->pdo->prepare("
-                            SELECT r.id, r.name 
+                            SELECT r.id, r.name, ur.scope, ur.org_unit_id 
                             FROM roles r
                             JOIN user_roles ur ON r.id = ur.role_id
                             WHERE ur.user_id = ?
@@ -157,6 +157,15 @@ class IAMController
             }
         }
 
+        if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+            if ($action === 'org_units') {
+                $stmt = $this->pdo->prepare("SELECT * FROM org_units WHERE tenant_id = ?");
+                $stmt->execute([$this->tenantId]);
+                echo json_encode(['success' => true, 'data' => $stmt->fetchAll(PDO::FETCH_ASSOC)]);
+                return;
+            }
+        }
+
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $data = json_decode(file_get_contents('php://input'), true);
 
@@ -183,14 +192,21 @@ class IAMController
                         throw new Exception("Invalid user or role for this tenant.");
                     }
 
-                    $stmt = $this->pdo->prepare("INSERT IGNORE INTO user_roles (user_id, role_id) VALUES (?, ?)");
-                    $stmt->execute([$user_id, $role_id]);
+                    $scope = $data['scope'] ?? 'tenant';
+                    $org_unit_id = $data['org_unit_id'] ?? null;
+
+                    $stmt = $this->pdo->prepare("
+                        INSERT INTO user_roles (user_id, role_id, scope, org_unit_id) 
+                        VALUES (?, ?, ?, ?)
+                        ON DUPLICATE KEY UPDATE scope = VALUES(scope), org_unit_id = VALUES(org_unit_id)
+                    ");
+                    $stmt->execute([$user_id, $role_id, $scope, $org_unit_id]);
                     
                     // Audit Log
                     $emailStmt = $this->pdo->prepare("SELECT email FROM users WHERE id = ?");
                     $emailStmt->execute([$user_id]);
                     $uEmail = $emailStmt->fetchColumn();
-                    logAction($uEmail, 'Role Assigned', "Assigned role_id {$role_id}");
+                    logAction($uEmail, 'Role Assigned/Updated', "Role ID {$role_id} assigned with scope {$scope}");
 
                     // Increment permission_version to invalidate cache for this tenant
                     $this->pdo->prepare("UPDATE tenants SET permission_version = permission_version + 1 WHERE id = ?")->execute([$this->tenantId]);
@@ -200,6 +216,38 @@ class IAMController
                     http_response_code(500);
                     echo json_encode(['success' => false, 'error' => $e->getMessage()]);
                 }
+                return;
+            }
+
+            if ($action === 'save_org_unit') {
+                $id = $data['id'] ?? 0;
+                $name = $data['name'] ?? '';
+                $parentId = $data['parent_id'] ?? null;
+                
+                if ($id > 0) {
+                    $stmt = $this->pdo->prepare("UPDATE org_units SET name = ?, parent_id = ? WHERE id = ? AND tenant_id = ?");
+                    $stmt->execute([$name, $parentId, $id, $this->tenantId]);
+                } else {
+                    $stmt = $this->pdo->prepare("INSERT INTO org_units (tenant_id, name, parent_id) VALUES (?, ?, ?)");
+                    $stmt->execute([$this->tenantId, $name, $parentId]);
+                }
+                echo json_encode(['success' => true]);
+                return;
+            }
+
+            if ($action === 'assign_org_unit') {
+                $userId = $data['user_id'] ?? 0;
+                $orgUnitId = $data['org_unit_id'] ?? null;
+                $stmt = $this->pdo->prepare("UPDATE users SET org_unit_id = ? WHERE id = ? AND tenant_id = ?");
+                $stmt->execute([$orgUnitId, $userId, $this->tenantId]);
+                
+                // Audit Log
+                $emailStmt = $this->pdo->prepare("SELECT email FROM users WHERE id = ?");
+                $emailStmt->execute([$userId]);
+                $uEmail = $emailStmt->fetchColumn();
+                logAction($uEmail, 'Org Unit Changed', "Assigned to org_unit_id {$orgUnitId}");
+                
+                echo json_encode(['success' => true]);
                 return;
             }
 

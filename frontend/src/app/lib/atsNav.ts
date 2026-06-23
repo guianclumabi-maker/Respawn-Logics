@@ -50,6 +50,7 @@ export function viewStateToPath(viewState: ViewState): string {
     case "Analytics": return "/analytics";
     case "Admin Users": return "/admin/users";
     case "Admin Roles": return "/admin/roles";
+    case "Org Units": return "/admin/org-units";
     case "Tenant Settings": return "/admin/settings";
     case "Audit Logs": return "/admin/audit";
     

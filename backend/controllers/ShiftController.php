@@ -84,16 +84,12 @@ class ShiftController
         $start_date = $_GET['start_date'] ?? date('Y-m-d');
         $end_date = $_GET['end_date'] ?? date('Y-m-d', strtotime('+6 days'));
 
-        // Get employees
-        $sql = "SELECT id, email, full_name, department, job_title, profile_image FROM users WHERE tenant_id = ? AND employment_status = 'Active'";
-        $params = [$this->tenantId];
+        require_once __DIR__ . '/../services/ScopeResolver.php';
+        $scopeClause = ScopeResolver::getScopeWhereClause($this->pdo, $this->currentUser, 'users');
 
-        // Restrict visibility for Managers
-        if (!hasPermission('shifts.manage')) {
-            $sql .= " AND (immediate_supervisor = ? OR department_manager = ?)";
-            $params[] = $this->currentUser['email'];
-            $params[] = $this->currentUser['email'];
-        }
+        // Get employees
+        $sql = "SELECT id, email, full_name, department, job_title, profile_image FROM users WHERE tenant_id = ? AND employment_status = 'Active' $scopeClause";
+        $params = [$this->tenantId];
 
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute($params);
@@ -154,12 +150,18 @@ class ShiftController
         $assignments = $input['assignments'] ?? [];
         $notifiedUsers = [];
 
+        require_once __DIR__ . '/../services/ScopeResolver.php';
+
         $this->pdo->beginTransaction();
         try {
             foreach ($assignments as $a) {
-                $userId = $a['user_id'];
+                $userId = (int)$a['user_id'];
                 $date = $a['date'];
-                $shiftId = $a['shift_id']; // If 0 or null, we delete the shift
+                $shiftId = (int)$a['shift_id']; // If 0 or null, we delete the shift
+
+                if (!ScopeResolver::hasScopedAccess($this->pdo, $this->currentUser, $userId)) {
+                    continue; // Skip assignments outside their scope
+                }
 
                 // Delete existing shift for this date
                 $delStmt = $this->pdo->prepare("DELETE FROM employee_shifts WHERE tenant_id = ? AND user_id = ? AND effective_date = ?");

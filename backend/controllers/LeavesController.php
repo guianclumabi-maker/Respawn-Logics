@@ -54,21 +54,18 @@ class LeavesController
                         break;
 
                     case 'pending_approvals':
-                        // Fetch requests where the current user is either the supervisor or manager and it needs action
+                        require_once __DIR__ . '/../services/ScopeResolver.php';
+                        $scopeClause = ScopeResolver::getScopeWhereClause($this->pdo, $this->currentUser, 'u');
                         $stmt = $this->pdo->prepare("
                             SELECT lr.*, u.full_name, u.department, u.immediate_supervisor, u.department_manager
                             FROM `leave_requests` lr 
                             JOIN `users` u ON lr.employee_email = u.email AND lr.tenant_id = u.tenant_id 
-                            WHERE lr.tenant_id = ? 
+                            WHERE lr.tenant_id = :tenant_id 
                             AND lr.status = 'Pending'
-                            AND (
-                                (u.immediate_supervisor = ? AND lr.tl_decision = 'Pending') 
-                                OR 
-                                (u.department_manager = ? AND lr.tl_decision = 'Approved' AND lr.manager_decision = 'Pending')
-                            )
+                            $scopeClause
                             ORDER BY lr.created_at DESC
                         ");
-                        $stmt->execute([$this->tenantId, $email, $email]);
+                        $stmt->execute([':tenant_id' => $this->tenantId]);
                         echo json_encode(['success' => true, 'data' => $stmt->fetchAll(PDO::FETCH_ASSOC)]);
                         break;
 
@@ -172,7 +169,7 @@ class LeavesController
             return;
         }
 
-        $stmt = $this->pdo->prepare("SELECT lr.*, u.immediate_supervisor, u.department_manager FROM `leave_requests` lr JOIN `users` u ON lr.employee_email = u.email AND lr.tenant_id = u.tenant_id WHERE lr.id = ? AND lr.tenant_id = ?");
+        $stmt = $this->pdo->prepare("SELECT lr.*, u.id as user_id, u.immediate_supervisor, u.department_manager FROM `leave_requests` lr JOIN `users` u ON lr.employee_email = u.email AND lr.tenant_id = u.tenant_id WHERE lr.id = ? AND lr.tenant_id = ?");
         $stmt->execute([$request_id, $this->tenantId]);
         $req = $stmt->fetch();
         
@@ -181,13 +178,15 @@ class LeavesController
             return;
         }
 
-        $isSupervisor = strtolower($req['immediate_supervisor']) === strtolower($email);
-        $isManager = strtolower($req['department_manager']) === strtolower($email);
-
-        if (!$isSupervisor && !$isManager) {
+        require_once __DIR__ . '/../services/ScopeResolver.php';
+        if (!ScopeResolver::hasScopedAccess($this->pdo, $this->currentUser, (int)$req['user_id'])) {
             echo json_encode(['success' => false, 'error' => 'Unauthorized.']);
             return;
         }
+
+        // Determine if acting as TL or Manager based on current state
+        $isSupervisor = ($req['tl_decision'] === 'Pending');
+        $isManager = ($req['tl_decision'] === 'Approved' && $req['manager_decision'] === 'Pending');
 
         try {
             $this->pdo->beginTransaction();

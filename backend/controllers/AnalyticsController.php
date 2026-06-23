@@ -51,14 +51,18 @@ class AnalyticsController
 
     private function headcountByDept()
     {
+        require_once __DIR__ . '/../services/ScopeResolver.php';
+        $scopeClause = ScopeResolver::getScopeWhereClause($this->pdo, $this->currentUser, 'users');
+
         $stmt = $this->pdo->prepare("
             SELECT IFNULL(department, 'Unassigned') as label, COUNT(id) as count 
             FROM `users` 
-            WHERE `tenant_id` = ? AND `employment_status` = 'Active' 
+            WHERE `tenant_id` = :tenant_id AND `employment_status` = 'Active' 
+            $scopeClause
             GROUP BY department
             ORDER BY count DESC
         ");
-        $stmt->execute([$this->tenantId]);
+        $stmt->execute([':tenant_id' => $this->tenantId]);
         $results = $stmt->fetchAll();
         
         $labels = [];
@@ -73,16 +77,21 @@ class AnalyticsController
 
     private function payrollTrend()
     {
+        require_once __DIR__ . '/../services/ScopeResolver.php';
+        $scopeClause = ScopeResolver::getScopeWhereClause($this->pdo, $this->currentUser, 'u');
+
         $stmt = $this->pdo->prepare("
             SELECT pr.payroll_period_end as label, SUM(pre.gross_pay) as total_gross 
             FROM `payroll_runs` pr
             JOIN `payroll_run_employees` pre ON pr.id = pre.payroll_run_id
-            WHERE pr.tenant_id = ? AND pr.status IN ('Processed', 'Locked')
+            JOIN `users` u ON pre.employee_id = u.id AND pr.tenant_id = u.tenant_id
+            WHERE pr.tenant_id = :tenant_id AND pr.status IN ('Processed', 'Locked')
+            $scopeClause
             GROUP BY pr.id, pr.payroll_period_end
             ORDER BY pr.payroll_period_end ASC
             LIMIT 12
         ");
-        $stmt->execute([$this->tenantId]);
+        $stmt->execute([':tenant_id' => $this->tenantId]);
         $results = $stmt->fetchAll();
         
         $labels = [];
@@ -97,15 +106,20 @@ class AnalyticsController
 
     private function talentDensity()
     {
+        require_once __DIR__ . '/../services/ScopeResolver.php';
+        $scopeClause = ScopeResolver::getScopeWhereClause($this->pdo, $this->currentUser, 'u');
+
         $stmt = $this->pdo->prepare("
             SELECT 
-                CONCAT(nine_box_performance, '-', nine_box_potential) as box_key,
+                CONCAT(pr.nine_box_performance, '-', pr.nine_box_potential) as box_key,
                 COUNT(*) as count
-            FROM `performance_reviews`
-            WHERE `tenant_id` = ? AND `status` = 'Finalized'
-            GROUP BY nine_box_performance, nine_box_potential
+            FROM `performance_reviews` pr
+            JOIN `users` u ON pr.employee_id = u.id AND pr.tenant_id = u.tenant_id
+            WHERE pr.tenant_id = :tenant_id AND pr.status = 'Finalized'
+            $scopeClause
+            GROUP BY pr.nine_box_performance, pr.nine_box_potential
         ");
-        $stmt->execute([$this->tenantId]);
+        $stmt->execute([':tenant_id' => $this->tenantId]);
         $results = $stmt->fetchAll();
         
         $mapping = [
@@ -136,27 +150,20 @@ class AnalyticsController
             echo json_encode(['success' => false, 'error' => 'Denied']); return;
         }
 
-        // Base query to pull active users
-        // If not Admin/HR/CEO, filter to only users where immediate_supervisor = current user or department_manager = current user
-        $sql = "SELECT id, email, full_name, role, department, job_title, hire_date, immediate_supervisor, base_salary, profile_image FROM `users` WHERE `tenant_id` = ? AND `employment_status` = 'Active'";
-        $params = [$this->tenantId];
+        require_once __DIR__ . '/../services/ScopeResolver.php';
+        $scopeClause = ScopeResolver::getScopeWhereClause($this->pdo, $this->currentUser, 'users');
 
-        if (!hasPermission('analytics.view')) {
-            $sql .= " AND (`immediate_supervisor` = ? OR `department_manager` = ?)";
-            $params[] = $this->currentUser['email'];
-            $params[] = $this->currentUser['email'];
-        }
-
+        $sql = "SELECT id, email, full_name, role, department, job_title, hire_date, immediate_supervisor, base_salary, profile_image FROM `users` WHERE `tenant_id` = :tenant_id AND `employment_status` = 'Active' $scopeClause";
         $stmt = $this->pdo->prepare($sql);
-        $stmt->execute($params);
+        $stmt->execute([':tenant_id' => $this->tenantId]);
         $employees = $stmt->fetchAll();
 
         $risks = [];
         
-        // Fetch global average salary per department to use as a benchmark
+        // Fetch scoped average salary per department to use as a benchmark
         $avgSalaries = [];
-        $stmtAvg = $this->pdo->prepare("SELECT department, AVG(base_salary) as avg_sal FROM `users` WHERE `tenant_id` = ? AND `employment_status` = 'Active' GROUP BY department");
-        $stmtAvg->execute([$this->tenantId]);
+        $stmtAvg = $this->pdo->prepare("SELECT department, AVG(base_salary) as avg_sal FROM `users` WHERE `tenant_id` = :tenant_id AND `employment_status` = 'Active' $scopeClause GROUP BY department");
+        $stmtAvg->execute([':tenant_id' => $this->tenantId]);
         foreach ($stmtAvg->fetchAll() as $row) {
             $avgSalaries[$row['department']] = $row['avg_sal'];
         }

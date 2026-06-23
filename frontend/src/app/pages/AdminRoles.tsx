@@ -1,37 +1,167 @@
-export function AdminRoles() {
-  return (
-    <div className="h-full w-full flex flex-col items-center justify-center p-8 text-center" style={{ backgroundColor: '#0b0f19', color: '#8899b4' }}>
-      <div className="max-w-md space-y-4">
-        <div className="w-16 h-16 bg-blue-500/10 rounded-2xl border border-blue-500/20 flex items-center justify-center mx-auto mb-6 shadow-[0_0_20px_rgba(59,130,246,0.15)]">
-          <svg className="w-8 h-8 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 002-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-          </svg>
-        </div>
-        <h2 className="text-2xl font-bold text-white tracking-tight">AdminRoles</h2>
-        <p className="text-sm">This module has been structurally migrated to the new Unified React SPA, but its internal logic is pending implementation in a future phase.</p>
-        <div className="pt-6">
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/10 rounded-full text-xs font-medium text-gray-300">
-            <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
-            Migration Pending
-          </div>
-        </div>
+import React, { useState, useEffect } from 'react';
+import { useAuth } from '../context/AuthContext';
 
-        {/* Maker-Checker Continuity Warning */}
-        <div className="mt-8 text-left bg-amber-500/10 border border-amber-500/20 rounded-lg p-4">
-          <div className="flex items-start gap-3">
-            <svg className="w-5 h-5 text-amber-500 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-            </svg>
-            <div>
-              <h4 className="text-sm font-semibold text-amber-500 mb-1">Payroll Maker-Checker Policy</h4>
-              <p className="text-xs text-amber-500/80 leading-relaxed">
-                Existing payroll managers retain both <code className="bg-amber-500/20 px-1 rounded">payroll.run</code> and <code className="bg-amber-500/20 px-1 rounded">payroll.approve</code> access to ensure business continuity. 
-                However, this defeats separation of duties. Please review and split these permissions into separate Maker and Checker roles when managing users.
-              </p>
+export function AdminRoles() {
+    const { user } = useAuth();
+    const [users, setUsers] = useState([]);
+    const [roles, setRoles] = useState([]);
+    const [orgUnits, setOrgUnits] = useState([]);
+    const [loading, setLoading] = useState(true);
+
+    // Form state
+    const [selectedUser, setSelectedUser] = useState('');
+    const [selectedRole, setSelectedRole] = useState('');
+    const [selectedScope, setSelectedScope] = useState('tenant');
+    const [selectedOrgUnit, setSelectedOrgUnit] = useState('');
+
+    useEffect(() => {
+        if (user?.tenant_setup_mode === 'Solo') {
+            return; // Hide for solo
+        }
+        fetchData();
+    }, [user]);
+
+    const fetchData = async () => {
+        try {
+            const [usersRes, rolesRes, unitsRes] = await Promise.all([
+                fetch('/api/index.php?route=iam&action=users', {credentials: 'include'}).then(r=>r.json()),
+                fetch('/api/index.php?route=iam&action=roles', {credentials: 'include'}).then(r=>r.json()),
+                fetch('/api/index.php?route=iam&action=org_units', {credentials: 'include'}).then(r=>r.json())
+            ]);
+            setUsers(usersRes.data || []);
+            setRoles(rolesRes.data || []);
+            setOrgUnits(unitsRes.data || []);
+        } catch (e) {
+            console.error(e);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleAssignRole = async (e) => {
+        e.preventDefault();
+        try {
+            await fetch('/api/index.php?route=iam&action=assign_role', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
+                body: JSON.stringify({
+                    user_id: selectedUser,
+                    role_id: selectedRole,
+                    scope: selectedScope,
+                    org_unit_id: selectedScope === 'department' || selectedScope === 'team' ? selectedOrgUnit : null
+                })
+            });
+            fetchData();
+            setSelectedUser('');
+            setSelectedRole('');
+            setSelectedScope('tenant');
+            setSelectedOrgUnit('');
+        } catch (e) {
+            alert('Failed to assign role');
+        }
+    };
+
+    if (user?.tenant_setup_mode === 'Solo') {
+        return <div className="p-8 text-center text-gray-500">Roles are hidden in Solo mode.</div>;
+    }
+
+    if (loading) return <div className="p-8 text-white">Loading...</div>;
+
+    return (
+        <div className="p-8 bg-[#0b0f19] min-h-screen text-gray-300">
+            <h1 className="text-2xl font-bold text-white mb-6">Manage Roles & Scopes</h1>
+            
+            <div className="bg-white/5 border border-white/10 rounded-lg p-6 mb-8">
+                <h2 className="text-lg font-semibold text-white mb-4">Assign / Update Role Scope</h2>
+                <form onSubmit={handleAssignRole} className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label className="block text-sm mb-1">User</label>
+                        <select 
+                            value={selectedUser} 
+                            onChange={e => setSelectedUser(e.target.value)} 
+                            className="w-full bg-[#0b0f19] border border-white/10 rounded px-3 py-2 text-white"
+                            required
+                        >
+                            <option value="">-- Select User --</option>
+                            {users.map(u => (
+                                <option key={u.id} value={u.id}>{u.full_name} ({u.email})</option>
+                            ))}
+                        </select>
+                    </div>
+                    <div>
+                        <label className="block text-sm mb-1">Role</label>
+                        <select 
+                            value={selectedRole} 
+                            onChange={e => setSelectedRole(e.target.value)} 
+                            className="w-full bg-[#0b0f19] border border-white/10 rounded px-3 py-2 text-white"
+                            required
+                        >
+                            <option value="">-- Select Role --</option>
+                            {roles.map(r => (
+                                <option key={r.id} value={r.id}>{r.name}</option>
+                            ))}
+                        </select>
+                    </div>
+                    <div>
+                        <label className="block text-sm mb-1">Scope</label>
+                        <select 
+                            value={selectedScope} 
+                            onChange={e => setSelectedScope(e.target.value)} 
+                            className="w-full bg-[#0b0f19] border border-white/10 rounded px-3 py-2 text-white"
+                            required
+                        >
+                            <option value="tenant">Tenant (All)</option>
+                            <option value="department">Department</option>
+                            <option value="team">Team (Direct Reports)</option>
+                            <option value="self">Self</option>
+                        </select>
+                    </div>
+                    {(selectedScope === 'department' || selectedScope === 'team') && (
+                        <div>
+                            <label className="block text-sm mb-1">Org Unit</label>
+                            <select 
+                                value={selectedOrgUnit} 
+                                onChange={e => setSelectedOrgUnit(e.target.value)} 
+                                className="w-full bg-[#0b0f19] border border-white/10 rounded px-3 py-2 text-white"
+                                required
+                            >
+                                <option value="">-- Select Org Unit --</option>
+                                {orgUnits.map(u => (
+                                    <option key={u.id} value={u.id}>{u.name}</option>
+                                ))}
+                            </select>
+                        </div>
+                    )}
+                    <div className="md:col-span-2 pt-2">
+                        <button type="submit" className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">
+                            Assign / Update Role
+                        </button>
+                    </div>
+                </form>
             </div>
-          </div>
+
+            <div className="bg-white/5 border border-white/10 rounded-lg p-6">
+                <h2 className="text-lg font-semibold text-white mb-4">Current Assignments</h2>
+                <div className="space-y-4">
+                    {users.map(u => (
+                        <div key={u.id} className="bg-white/5 p-4 rounded border border-white/5">
+                            <div className="font-medium text-white mb-2">{u.full_name} <span className="text-sm text-gray-500">({u.email})</span></div>
+                            {u.roles && u.roles.length > 0 ? (
+                                <div className="flex flex-wrap gap-2">
+                                    {u.roles.map((r, i) => (
+                                        <span key={i} className="px-2 py-1 bg-blue-500/20 text-blue-400 text-xs rounded border border-blue-500/30">
+                                            {r.name} — Scope: {r.scope} {r.org_unit_id ? `(Org Unit ID: ${r.org_unit_id})` : ''}
+                                        </span>
+                                    ))}
+                                </div>
+                            ) : (
+                                <span className="text-xs text-gray-500">No roles assigned</span>
+                            )}
+                        </div>
+                    ))}
+                </div>
+            </div>
         </div>
-      </div>
-    </div>
-  );
+    );
 }

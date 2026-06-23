@@ -142,6 +142,7 @@ const getSections = (hasPermission: (p: string) => boolean): NavSection[] => [
     items: [
       { label: "Admin Users", view: "Admin Users", icon: <User size={19} /> },
       { label: "Admin Roles", view: "Admin Roles", icon: <Key size={19} /> },
+      { label: "Org Units", view: "Org Units", icon: <Users size={19} /> },
       { label: "Tenant Settings", view: "Tenant Settings", icon: <Settings size={19} /> },
       { label: "Audit Logs", view: "Audit Logs", icon: <Lock size={19} /> },
     ],

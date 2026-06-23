@@ -41,6 +41,7 @@ import { TenantSettings } from "./pages/TenantSettings";
 import { AuditLogs } from "./pages/AuditLogs";
 import { AICompanion } from "./pages/AICompanion";
 import { Analytics } from "./pages/Analytics";
+import { OrgUnits } from "./pages/OrgUnits";
 
 function AtsRoute({ component: Component }: { component: any }) {
   const navigate = useNavigate();
@@ -105,6 +106,7 @@ export const router = createHashRouter([
         children: [
           { path: "users", element: <AdminUsers /> },
           { path: "roles", element: <AdminRoles /> },
+          { path: "org-units", element: <OrgUnits /> },
           { path: "settings", element: <TenantSettings /> },
           { path: "audit", element: <AuditLogs /> },
         ]

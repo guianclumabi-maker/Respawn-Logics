@@ -75,10 +75,14 @@ class ELRController
         $userRole = strtolower($this->currentUser['role'] ?? '');
         $userEmployeeId = $this->currentUser['employee_id'] ?? '';
         
+        require_once __DIR__ . '/../services/ScopeResolver.php';
+        $scopeClause = ScopeResolver::getScopeWhereClause($this->pdo, $this->currentUser, 'u');
+
         $sql = "SELECT c.*, t.name as case_type_name 
                 FROM `elr_cases` c 
                 LEFT JOIN `elr_case_types` t ON c.case_type_id = t.id 
-                WHERE c.tenant_id = :tenant_id";
+                LEFT JOIN `users` u ON c.employee_id = u.employee_id AND c.tenant_id = u.tenant_id
+                WHERE c.tenant_id = :tenant_id $scopeClause";
         $params = [':tenant_id' => $this->tenantId];
         
         // Confidentiality Filter
@@ -158,13 +162,17 @@ class ELRController
     }
 
     private function getAnalytics() {
+        require_once __DIR__ . '/../services/ScopeResolver.php';
+        $scopeClause = ScopeResolver::getScopeWhereClause($this->pdo, $this->currentUser, 'u');
+
         // Case Volume Trend (Last 6 Months)
         $trendSql = "
-            SELECT DATE_FORMAT(created_at, '%b') as month, COUNT(*) as count 
-            FROM elr_cases 
-            WHERE tenant_id = ? AND created_at >= DATE_SUB(NOW(), INTERVAL 6 MONTH)
-            GROUP BY DATE_FORMAT(created_at, '%Y-%m'), DATE_FORMAT(created_at, '%b')
-            ORDER BY DATE_FORMAT(created_at, '%Y-%m') ASC
+            SELECT DATE_FORMAT(c.created_at, '%b') as month, COUNT(*) as count 
+            FROM elr_cases c
+            LEFT JOIN `users` u ON c.employee_id = u.employee_id AND c.tenant_id = u.tenant_id
+            WHERE c.tenant_id = ? AND c.created_at >= DATE_SUB(NOW(), INTERVAL 6 MONTH) $scopeClause
+            GROUP BY DATE_FORMAT(c.created_at, '%Y-%m'), DATE_FORMAT(c.created_at, '%b')
+            ORDER BY DATE_FORMAT(c.created_at, '%Y-%m') ASC
         ";
         $stmt = $this->pdo->prepare($trendSql);
         $stmt->execute([$this->tenantId]);
@@ -175,7 +183,8 @@ class ELRController
             SELECT t.name as source, COUNT(c.id) as applications
             FROM elr_cases c
             JOIN elr_case_types t ON c.case_type_id = t.id
-            WHERE c.tenant_id = ?
+            LEFT JOIN `users` u ON c.employee_id = u.employee_id AND c.tenant_id = u.tenant_id
+            WHERE c.tenant_id = ? $scopeClause
             GROUP BY t.id
             ORDER BY applications DESC
         ";

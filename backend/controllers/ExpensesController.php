@@ -167,16 +167,20 @@ class ExpensesController
     private function getManagerPending()
     {
         if (!$this->isManager() && !$this->isFinanceOrHR()) { echo json_encode(['success' => false, 'error' => 'Denied']); return; }
-        // Fetch claims for employees whose manager is the current user
+        
+        require_once __DIR__ . '/../services/ScopeResolver.php';
+        $scopeClause = ScopeResolver::getScopeWhereClause($this->pdo, $this->currentUser, 'u');
+
         $stmt = $this->pdo->prepare("
             SELECT ec.*, cat.name as category_name, u.full_name as employee_name
             FROM `expense_claims` ec
             JOIN `expense_categories` cat ON ec.category_id = cat.id
-            JOIN `users` u ON ec.employee_id = u.id
-            WHERE u.manager_id = ? AND ec.tenant_id = ? AND ec.status = 'Pending Manager'
+            JOIN `users` u ON ec.employee_id = u.id AND ec.tenant_id = u.tenant_id
+            WHERE ec.tenant_id = :tenant_id AND ec.status = 'Pending Manager'
+            $scopeClause
             ORDER BY ec.id ASC
         ");
-        $stmt->execute([$this->currentUser['id'], $this->tenantId]);
+        $stmt->execute([':tenant_id' => $this->tenantId]);
         $claims = $stmt->fetchAll(PDO::FETCH_ASSOC);
         foreach ($claims as &$c) {
             if ($c['receipt_path']) {
@@ -225,6 +229,12 @@ class ExpensesController
 
         if ($claim['status'] === 'Pending Manager') {
             if (!$this->isManager() && !$this->isFinanceOrHR()) { echo json_encode(['success' => false, 'error' => 'Denied']); return; }
+            
+            require_once __DIR__ . '/../services/ScopeResolver.php';
+            if (!ScopeResolver::hasScopedAccess($this->pdo, $this->currentUser, (int)$claim['employee_id'])) {
+                echo json_encode(['success' => false, 'error' => 'Unauthorized']); return;
+            }
+
             if ($decision === 'Approve') {
                 $newStatus = 'Pending Finance';
                 $auditAction = 'Approved by Manager';

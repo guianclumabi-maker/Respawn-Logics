@@ -74,8 +74,11 @@ class CoreHRController
             return;
         }
 
-        $stmt = $this->pdo->prepare("SELECT id, full_name, email, employment_status, department, job_title, created_at FROM users WHERE tenant_id = ? ORDER BY created_at DESC");
-        $stmt->execute([$this->tenantId]);
+        require_once __DIR__ . '/../services/ScopeResolver.php';
+        $scopeClause = ScopeResolver::getScopeWhereClause($this->pdo, $this->currentUser, 'users');
+
+        $stmt = $this->pdo->prepare("SELECT id, full_name, email, employment_status, department, job_title, created_at FROM users WHERE tenant_id = :tenant_id $scopeClause ORDER BY created_at DESC");
+        $stmt->execute([':tenant_id' => $this->tenantId]);
         $employees = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         echo json_encode(['success' => true, 'data' => $employees]);
@@ -84,6 +87,12 @@ class CoreHRController
     private function masterRecord()
     {
         $userId = intval($_GET['user_id'] ?? 0);
+        
+        require_once __DIR__ . '/../services/ScopeResolver.php';
+        if (!ScopeResolver::hasScopedAccess($this->pdo, $this->currentUser, $userId)) {
+            echo json_encode(['success' => false, 'error' => 'Unauthorized']);
+            return;
+        }
         
         // Fetch user basic
         $stmt = $this->pdo->prepare("SELECT * FROM `users` WHERE `id` = ? AND `tenant_id` = ?");
@@ -152,6 +161,12 @@ class CoreHRController
         }
 
         $userId = intval($input['user_id'] ?? 0);
+        
+        require_once __DIR__ . '/../services/ScopeResolver.php';
+        if (!ScopeResolver::hasScopedAccess($this->pdo, $this->currentUser, $userId)) {
+            echo json_encode(['success' => false, 'error' => 'Unauthorized']);
+            return;
+        }
         $changeType = $input['change_type'] ?? 'Profile Update';
         $notes = $input['notes'] ?? '';
 

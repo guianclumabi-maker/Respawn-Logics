@@ -56,6 +56,7 @@ export default function MainLayout() {
     if (path.includes("/analytics")) return { view: "Analytics" };
     if (path.includes("/admin/users")) return { view: "Admin Users" };
     if (path.includes("/admin/roles")) return { view: "Admin Roles" };
+    if (path.includes("/admin/org-units")) return { view: "Org Units" };
     if (path.includes("/admin/settings")) return { view: "Tenant Settings" };
     if (path.includes("/admin/audit")) return { view: "Audit Logs" };
 

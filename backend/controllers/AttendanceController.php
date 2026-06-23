@@ -137,14 +137,18 @@ class AttendanceController
             return;
         }
 
+        require_once __DIR__ . '/../services/ScopeResolver.php';
+        $scopeClause = ScopeResolver::getScopeWhereClause($this->pdo, $this->currentUser, 'u');
+
         $stmt = $this->pdo->prepare("
             SELECT a.*, u.full_name, u.department 
             FROM attendance a
-            JOIN users u ON a.employee_email = u.email
-            WHERE a.tenant_id = ? AND a.manager_approved = 0 AND a.time_out IS NOT NULL
+            JOIN users u ON a.employee_email = u.email AND a.tenant_id = u.tenant_id
+            WHERE a.tenant_id = :tenant_id AND a.manager_approved = 0 AND a.time_out IS NOT NULL
+            $scopeClause
             ORDER BY a.time_in DESC
         ");
-        $stmt->execute([$this->tenantId]);
+        $stmt->execute([':tenant_id' => $this->tenantId]);
         $pending = $stmt->fetchAll();
 
         echo json_encode(['success' => true, 'data' => $pending]);
@@ -220,6 +224,27 @@ class AttendanceController
         $recordId = $data['record_id'] ?? null;
         if (!$recordId) {
             echo json_encode(['success' => false, 'error' => 'Missing record ID']);
+            return;
+        }
+
+        // Fetch the target user ID to verify scope access
+        $checkStmt = $this->pdo->prepare("
+            SELECT u.id as target_user_id 
+            FROM attendance a 
+            JOIN users u ON a.employee_email = u.email AND a.tenant_id = u.tenant_id 
+            WHERE a.id = ? AND a.tenant_id = ?
+        ");
+        $checkStmt->execute([$recordId, $this->tenantId]);
+        $target = $checkStmt->fetch();
+
+        if (!$target) {
+            echo json_encode(['success' => false, 'error' => 'Record not found']);
+            return;
+        }
+
+        require_once __DIR__ . '/../services/ScopeResolver.php';
+        if (!ScopeResolver::hasScopedAccess($this->pdo, $this->currentUser, (int)$target['target_user_id'])) {
+            echo json_encode(['success' => false, 'error' => 'Unauthorized']);
             return;
         }
 
