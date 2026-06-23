@@ -3,8 +3,8 @@ import { useAuth } from '../context/AuthContext';
 
 export function OrgUnits() {
     const { user } = useAuth();
-    const [units, setUnits] = useState([]);
-    const [users, setUsers] = useState([]);
+    const [units, setUnits] = useState<any[]>([]);
+    const [users, setUsers] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [name, setName] = useState('');
     const [parentId, setParentId] = useState('');
@@ -33,7 +33,7 @@ export function OrgUnits() {
         }
     };
 
-    const handleCreateUnit = async (e) => {
+    const handleCreateUnit = async (e: any) => {
         e.preventDefault();
         await fetch('/api/index.php?route=iam&action=save_org_unit', {
             method: 'POST',
@@ -46,7 +46,7 @@ export function OrgUnits() {
         fetchData();
     };
 
-    const handleAssignUser = async (e) => {
+    const handleAssignUser = async (e: any) => {
         e.preventDefault();
         await fetch('/api/index.php?route=iam&action=assign_org_unit', {
             method: 'POST',

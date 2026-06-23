@@ -7,6 +7,7 @@ interface AuthUser {
   job_title?: string;
   roles: string[];
   permissions: string[];
+  tenant_setup_mode?: string;
 }
 
 interface AuthContextType {

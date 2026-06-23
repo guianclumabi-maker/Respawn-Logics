@@ -3,9 +3,9 @@ import { useAuth } from '../context/AuthContext';
 
 export function AdminRoles() {
     const { user } = useAuth();
-    const [users, setUsers] = useState([]);
-    const [roles, setRoles] = useState([]);
-    const [orgUnits, setOrgUnits] = useState([]);
+    const [users, setUsers] = useState<any[]>([]);
+    const [roles, setRoles] = useState<any[]>([]);
+    const [orgUnits, setOrgUnits] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
 
     // Form state
@@ -38,7 +38,7 @@ export function AdminRoles() {
         }
     };
 
-    const handleAssignRole = async (e) => {
+    const handleAssignRole = async (e: any) => {
         e.preventDefault();
         try {
             await fetch('/api/index.php?route=iam&action=assign_role', {
@@ -149,7 +149,7 @@ export function AdminRoles() {
                             <div className="font-medium text-white mb-2">{u.full_name} <span className="text-sm text-gray-500">({u.email})</span></div>
                             {u.roles && u.roles.length > 0 ? (
                                 <div className="flex flex-wrap gap-2">
-                                    {u.roles.map((r, i) => (
+                                    {u.roles.map((r: any, i: number) => (
                                         <span key={i} className="px-2 py-1 bg-blue-500/20 text-blue-400 text-xs rounded border border-blue-500/30">
                                             {r.name} — Scope: {r.scope} {r.org_unit_id ? `(Org Unit ID: ${r.org_unit_id})` : ''}
                                         </span>
