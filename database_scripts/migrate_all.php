@@ -54,5 +54,20 @@ foreach ($scripts as $script) {
     }
 }
 
+$extraMigrations = [
+    __DIR__ . '/../database/migrations/rbac_phase1.php',
+    __DIR__ . '/../database/migrations/rbac_phase2.php',
+    __DIR__ . '/../backend/migrations/migrate_statutory_rates.php',
+];
+foreach ($extraMigrations as $path) {
+    if (file_exists($path)) {
+        echo "[RUNNING] " . basename($path) . "\n";
+        try { include $path; echo "\n------------------------------------\n"; }
+        catch (Throwable $e) { echo "[ERROR] " . basename($path) . ": " . $e->getMessage() . "\n------------------------------------\n"; }
+    } else {
+        echo "[WARNING] not found: $path\n";
+    }
+}
+
 $pdo->exec("SET FOREIGN_KEY_CHECKS = 1;");
 echo "All migrations finished!\n";

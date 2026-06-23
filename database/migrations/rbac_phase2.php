@@ -54,7 +54,9 @@ try {
         }
     }
 
-    $pdo->commit();
+    if ($pdo->inTransaction()) {
+        $pdo->commit();
+    }
     echo "Phase 2 Migrations completed successfully.\n";
 
 } catch (Exception $e) {

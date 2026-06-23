@@ -132,7 +132,9 @@ try {
     }
     echo "Assigned Account Owner role to initial tenant creators.\n";
 
-    $pdo->commit();
+    if ($pdo->inTransaction()) {
+        $pdo->commit();
+    }
     echo "Phase 1 Migrations completed successfully.\n";
 
 } catch (Exception $e) {
