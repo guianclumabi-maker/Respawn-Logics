@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/bootstrap/app.php';
+require_once __DIR__ . '/backend/services/RoleSeederService.php';
 
 // If already logged in normally, redirect to dashboard
 if (isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESSION['must_change_password'] !== true)) {
@@ -42,8 +43,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                 }
             } while (empty($tenantId));
 
-            $stmtTenant = $pdo->prepare("INSERT INTO tenants (id, company_name, contact_email, subscription_tier, status, permission_version) VALUES (?, ?, ?, 'Trial', 'Active', 1)");
-            $stmtTenant->execute([$tenantId, $companyName, $email]);
+            $setupMode = $_POST['setup_mode'] ?? 'Solo';
+            $validModes = ['Solo', 'Small', 'Mid', 'Enterprise'];
+            if (!in_array($setupMode, $validModes)) $setupMode = 'Solo';
+
+            $stmtTenant = $pdo->prepare("INSERT INTO tenants (id, company_name, contact_email, subscription_tier, status, setup_mode, permission_version) VALUES (?, ?, ?, 'Trial', 'Active', ?, 1)");
+            $stmtTenant->execute([$tenantId, $companyName, $email, $setupMode]);
 
             // 3. Create Admin User
             $passwordHash = password_hash($password, PASSWORD_BCRYPT);
@@ -62,6 +67,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                 $tenantId, $firstName, $lastName, $fullName, $email, $email, $passwordHash
             ]);
             $userId = $pdo->lastInsertId();
+
+            // Seed Roles using the new service
+            RoleSeederService::seedTenantRoles($pdo, $tenantId, $setupMode, $userId);
 
             // 4. Create Default Payroll Schedule
             $scheduleName = "Standard Monthly";
@@ -177,7 +185,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                         </div>
                     </div>
                     
-                    <button type="submit" class="btn btn-primary w-full" style="margin-top: 10px;">
+                    <div class="form-group">
+                        <label for="setup_mode">Company Setup Mode</label>
+                        <div class="input-wrapper" style="position: relative;">
+                            <i class="fa-solid fa-layer-group input-icon" style="position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: var(--text-secondary); pointer-events: none; z-index: 2;"></i>
+                            <select id="setup_mode" name="setup_mode" required class="form-control" style="width: 100%; padding: 12px 15px 12px 40px; border-radius: 6px; border: 1px solid var(--border); background: var(--bg-alt); color: var(--text); font-family: inherit; font-size: 14px; appearance: none; position: relative; z-index: 1;">
+                                <option value="Solo">Solo (Just me)</option>
+                                <option value="Small">Small Team (< 10 employees)</option>
+                                <option value="Mid">Growing Business (10 - 500 employees)</option>
+                                <option value="Enterprise">Enterprise (500+ employees)</option>
+                            </select>
+                            <i class="fa-solid fa-chevron-down" style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); color: var(--text-secondary); pointer-events: none; z-index: 2; font-size: 12px;"></i>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary w-full" style="margin-top: 20px;">
                         <span>Create Workspace</span>
                         <i class="fa-solid fa-arrow-right"></i>
                     </button>

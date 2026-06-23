@@ -19,9 +19,19 @@ class PayrollController
         $this->payrollService = new PayrollService($pdo);
     }
 
-    private function canManagePayroll()
+    private function canViewPayroll()
     {
-        return hasPermission('payroll.manage');
+        return hasPermission('payroll.view') || hasPermission('payroll.manage');
+    }
+
+    private function canRunPayroll()
+    {
+        return hasPermission('payroll.run') || hasPermission('payroll.manage');
+    }
+
+    private function canApprovePayroll()
+    {
+        return hasPermission('payroll.approve') || hasPermission('payroll.manage');
     }
 
     public function handleRequest($action)
@@ -36,15 +46,14 @@ class PayrollController
         try {
             switch ($action) {
                 case 'schedules':
-                    if (!$this->canManagePayroll()) { http_response_code(403); echo json_encode(['success' => false, 'error' => 'Denied']); return; }
+                    if (!$this->canViewPayroll()) { http_response_code(403); echo json_encode(['success' => false, 'error' => 'Denied']); return; }
                     $stmt = $this->pdo->prepare("SELECT * FROM `payroll_schedules` WHERE `tenant_id` = ?");
                     $stmt->execute([$this->tenantId]);
                     echo json_encode(['success' => true, 'data' => $stmt->fetchAll()]);
                     break;
 
                 case 'create_schedule':
-                    if (!hasPermission('payroll.manage')) { http_response_code(403); echo json_encode(['success'=>false, 'error'=>'Denied']); return; }
-                if (!$this->canManagePayroll()) { echo json_encode(['success' => false, 'error' => 'Denied']); return; }
+                    if (!$this->canRunPayroll()) { http_response_code(403); echo json_encode(['success'=>false, 'error'=>'Denied']); return; }
                     $name = $input['name'] ?? '';
                     $freq = $input['frequency'] ?? 'Monthly';
                     
@@ -54,7 +63,7 @@ class PayrollController
                     break;
 
                 case 'assign_schedule':
-                    if (!$this->canManagePayroll()) { echo json_encode(['success' => false, 'error' => 'Denied']); return; }
+                    if (!$this->canRunPayroll()) { echo json_encode(['success' => false, 'error' => 'Denied']); return; }
                     $userId = $input['user_id'] ?? 0;
                     $schedId = $input['schedule_id'] ?? 0;
                     
@@ -64,14 +73,14 @@ class PayrollController
                     break;
 
                 case 'runs':
-                    if (!$this->canManagePayroll()) { http_response_code(403); echo json_encode(['success' => false, 'error' => 'Denied']); return; }
+                    if (!$this->canViewPayroll()) { http_response_code(403); echo json_encode(['success' => false, 'error' => 'Denied']); return; }
                     $stmt = $this->pdo->prepare("SELECT pr.*, ps.name as schedule_name FROM `payroll_runs` pr LEFT JOIN `payroll_schedules` ps ON pr.payroll_schedule_id = ps.id WHERE pr.tenant_id = ? ORDER BY pr.id DESC");
                     $stmt->execute([$this->tenantId]);
                     echo json_encode(['success' => true, 'data' => $stmt->fetchAll()]);
                     break;
 
                 case 'generate_run':
-                    if (!$this->canManagePayroll()) { echo json_encode(['success' => false, 'error' => 'Denied']); return; }
+                    if (!$this->canRunPayroll()) { echo json_encode(['success' => false, 'error' => 'Denied']); return; }
                     
                     $scheduleId = $input['schedule_id'] ?? 0;
                     $start = $input['start_date'] ?? '';
@@ -97,7 +106,7 @@ class PayrollController
                     break;
 
                 case 'run_details':
-                    if (!$this->canManagePayroll()) { echo json_encode(['success' => false, 'error' => 'Denied']); return; }
+                    if (!$this->canViewPayroll()) { echo json_encode(['success' => false, 'error' => 'Denied']); return; }
                     $runId = intval($_GET['id'] ?? 0);
 
                     $runStmt = $this->pdo->prepare("SELECT * FROM `payroll_runs` WHERE `id` = ? AND `tenant_id` = ?");
@@ -449,7 +458,7 @@ class PayrollController
 
         if (!$ps) { http_response_code(404); echo "Payslip not found"; return; }
 
-        $isPayrollManager = $this->canManagePayroll();
+        $isPayrollManager = $this->canViewPayroll();
         if (!$isPayrollManager && $this->currentUser['id'] !== $ps['employee_id']) {
             http_response_code(403);
             echo "Access denied";

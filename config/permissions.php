@@ -28,10 +28,17 @@ return [
         'shifts.manage'
     ],
     'Compensation' => [
+        'payroll.view',
         'payroll.manage',
+        'payroll.run',
+        'payroll.approve',
+        'benefits.view',
         'benefits.manage',
+        'benefits.approve',
         'expenses.manage',
-        'compensation.manage'
+        'compensation.view',
+        'compensation.manage',
+        'compensation.approve'
     ],
     'Performance' => [
         'performance.manage',
