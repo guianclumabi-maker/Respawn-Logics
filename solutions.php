@@ -21,13 +21,24 @@ Core HR & People replaces all of it with a single, always-current system of reco
             "AES-256 Data Encryption",
             "99.99% Guaranteed Uptime"
         ],
-        'workflow' => [
-            ['title' => 'Onboard', 'desc' => 'Employees enter their details securely via self-service portals.'],
-            ['title' => 'Verify', 'desc' => 'HR reviews and approves documents with a single click.'],
-            ['title' => 'Manage', 'desc' => 'Data flows seamlessly into Payroll, ATS, and Attendance modules.']
-        ],
         'why' => "Core HR is the foundation everything else builds on. Get your people data clean, secure, and centralized, and every other module—payroll, ATS, attendance—runs on data you can trust. Security isn't an afterthought here; it's the core primitive.",
-        'cta' => "Give your team a single, secure home for everything people-related."
+        'cta' => "Give your team a single, secure home for everything people-related.",
+        'problem' => "HR teams lose hours hunting for employee data scattered across spreadsheets, inboxes, and folders — and every stray copy is a chance for an error or a leak.",
+        'steps' => [
+            ['title' => 'Bring your people in', 'desc' => 'Add or import employees in minutes.'],
+            ['title' => 'One secure source of truth', 'desc' => 'Profiles, documents, and org chart stay current in one place.'],
+            ['title' => 'Everything else builds on it', 'desc' => 'Payroll, ATS, and Attendance all read from the same trusted data.']
+        ],
+        'connects_to' => [
+            ['slug' => 'ats', 'label' => 'ATS Pipeline', 'blurb' => 'Hires flow straight into a clean employee record'],
+            ['slug' => 'payroll', 'label' => 'Enterprise Payroll', 'blurb' => 'Accurate people data means correct pay'],
+            ['slug' => 'attendance', 'label' => 'Attendance & Leaves', 'blurb' => 'Profiles power time tracking and leave']
+        ],
+        'faqs' => [
+            ['q' => "Is my company's data isolated from others?", 'a' => "Yes — strict multi-tenant separation."],
+            ['q' => "Who can see employee records?", 'a' => "Role-based access; people see only what they should."],
+            ['q' => "Can I store documents securely?", 'a' => "Yes — contracts and IDs in a protected, access-controlled vault."]
+        ]
     ],
     'ats' => [
         'title' => 'ATS Pipeline',
@@ -48,13 +59,24 @@ ATS Pipeline gives your whole hiring team one shared, visual pipeline where ever
             "Unbiased AI Scoring Algorithms",
             "Secure PII Data Handling"
         ],
-        'workflow' => [
-            ['title' => 'Source & Score', 'desc' => 'AI parses resumes and ranks candidates against job requirements.'],
-            ['title' => 'Collaborative Interview', 'desc' => 'Hiring managers submit standardized scorecards to prevent bias.'],
-            ['title' => 'Offer & Onboard', 'desc' => 'Approved candidates are moved to HR seamlessly.']
-        ],
         'why' => "A disorganized hiring process costs you the best candidates—they accept somewhere else while you deliberate. ATS Pipeline keeps every opportunity moving securely so good people don't fall through the cracks.",
-        'cta' => "Build an elite hiring machine your whole team can run from one screen."
+        'cta' => "Build an elite hiring machine your whole team can run from one screen.",
+        'problem' => "Great candidates slip away when résumés are buried in inboxes and no one knows whose turn it is to move.",
+        'steps' => [
+            ['title' => 'Open the role', 'desc' => 'Post a job and collect candidates in one pipeline.'],
+            ['title' => 'Move them through stages', 'desc' => 'Drag candidates from Applied to Hired with match scoring and scorecards.'],
+            ['title' => 'Hire to onboard in one click', 'desc' => 'A hire becomes an onboarded employee instantly.']
+        ],
+        'connects_to' => [
+            ['slug' => 'core-hr', 'label' => 'Core HR & People', 'blurb' => 'Hires become full employee records automatically'],
+            ['slug' => 'payroll', 'label' => 'Enterprise Payroll', 'blurb' => 'New hires are ready to be paid'],
+            ['slug' => 'service-desk', 'label' => 'Service Desk', 'blurb' => 'Onboarding requests tracked end to end']
+        ],
+        'faqs' => [
+            ['q' => "Can I store and manage résumés?", 'a' => "Yes — secure upload and quick access per candidate."],
+            ['q' => "Can I schedule interviews?", 'a' => "Yes, with structured scorecards for comparable feedback."],
+            ['q' => "What happens when I hire someone?", 'a' => "They're enrolled as an employee in Core HR in one click."]
+        ]
     ],
     'payroll' => [
         'title' => 'Enterprise Payroll',
@@ -75,13 +97,24 @@ Enterprise Payroll is built around the strict realities of Philippine payroll, a
             "Immutable Historical Records",
             "Bank-Grade Security"
         ],
-        'workflow' => [
-            ['title' => 'Sync Attendance', 'desc' => 'Approved hours, OT, and leaves flow directly into the payroll engine.'],
-            ['title' => 'Automated Calculation', 'desc' => 'Taxes, statutory deductions, and custom components are computed instantly.'],
-            ['title' => 'Review & Disburse', 'desc' => 'Generate bank files, ledgers, and secure payslips with confidence.']
-        ],
         'why' => "Enterprise Payroll automates the hard parts so you pay people correctly and on time—and can show your work. Designed and built for the realities of Philippine compliance.",
-        'cta' => "Spend less time on payroll, and more time confident it's right."
+        'cta' => "Spend less time on payroll, and more time confident it's right.",
+        'problem' => "Manual payroll spreadsheets are slow and error-prone — and one miscalculation hits both your people and your legal standing.",
+        'steps' => [
+            ['title' => 'Configure once', 'desc' => 'Set pay schedules and components per company.'],
+            ['title' => 'Run payroll', 'desc' => 'Statutory deductions are computed automatically for the period.'],
+            ['title' => 'Pay and report', 'desc' => 'Generate payslips and remittance-ready figures.']
+        ],
+        'connects_to' => [
+            ['slug' => 'core-hr', 'label' => 'Core HR & People', 'blurb' => 'Runs on your verified employee data'],
+            ['slug' => 'attendance', 'label' => 'Attendance & Leaves', 'blurb' => 'Hours and leave feed straight into pay'],
+            ['slug' => 'ats', 'label' => 'ATS Pipeline', 'blurb' => 'New hires become payees automatically']
+        ],
+        'faqs' => [
+            ['q' => "Which contributions are handled?", 'a' => "Designed for SSS, PhilHealth, Pag-IBIG, and BIR withholding."],
+            ['q' => "Does it handle 13th-month pay?", 'a' => "Yes, with de-minimis handling aligned to current thresholds."],
+            ['q' => "What happens when rates change?", 'a' => "Rates live in versioned tables, so updates are data changes and past runs stay accurate."]
+        ]
     ],
     'service-desk' => [
         'title' => 'Service Desk',
@@ -102,13 +135,23 @@ Service Desk turns every IT and HR request into a proper, auditable ticket with 
             "Granular Data Access",
             "Real-Time SLA Tracking"
         ],
-        'workflow' => [
-            ['title' => 'Ticket Creation', 'desc' => 'Employees submit structured requests via a clean self-service portal.'],
-            ['title' => 'Smart Triage', 'desc' => 'Requests are automatically routed and prioritized based on urgency and category.'],
-            ['title' => 'Swift Resolution', 'desc' => 'Agents resolve issues with full context, updating the employee instantly.']
-        ],
         'why' => "Untracked requests erode employee trust and bury your operational teams in noise. Service Desk makes support measurable and highly accountable, so nothing slips through the cracks.",
-        'cta' => "Give your team support that's organized, lightning-fast, and deeply accountable."
+        'cta' => "Give your team support that's organized, lightning-fast, and deeply accountable.",
+        'problem' => "When IT and HR requests arrive by chat and hallway, they get dropped — and no one can prove what happened.",
+        'steps' => [
+            ['title' => 'Submit a ticket', 'desc' => 'Employees raise IT or HR requests in one place.'],
+            ['title' => 'Route and prioritize', 'desc' => 'Tickets get an owner, a priority, and an SLA.'],
+            ['title' => 'Resolve and measure', 'desc' => 'Agents work one queue; everyone sees status.']
+        ],
+        'connects_to' => [
+            ['slug' => 'core-hr', 'label' => 'Core HR & People', 'blurb' => 'Requester identity and context built in'],
+            ['slug' => 'employee-relations', 'label' => 'Employee Relations', 'blurb' => 'Escalate sensitive matters into a confidential case']
+        ],
+        'faqs' => [
+            ['q' => "Can employees attach files?", 'a' => "Yes — screenshots and documents per ticket."],
+            ['q' => "Can I set response targets?", 'a' => "Yes, with SLAs and priorities."],
+            ['q' => "Who can see tickets?", 'a' => "Access is controlled by role."]
+        ]
     ],
     'employee-relations' => [
         'title' => 'Employee Relations',
@@ -129,13 +172,23 @@ Employee Relations gives you a confidential, highly structured environment to do
             "Tamper-Proof Audit Logs",
             "Supports Due Process"
         ],
-        'workflow' => [
-            ['title' => 'Secure Reporting', 'desc' => 'Incidents are logged securely with initial evidence and statements.'],
-            ['title' => 'Confidential Investigation', 'desc' => 'Authorized HR personnel conduct fact-finding within an isolated workspace.'],
-            ['title' => 'Defensible Resolution', 'desc' => 'Actions are taken with a complete, auditable paper trail backing every decision.']
-        ],
         'why' => "Mishandled employee relations cases create massive legal, financial, and human risk. This module provides a disciplined, incredibly discreet process that fiercely protects your people and your organization's integrity.",
-        'cta' => "Manage the hardest conversations with extreme care and a bulletproof paper trail."
+        'cta' => "Manage the hardest conversations with extreme care and a bulletproof paper trail.",
+        'problem' => "Sensitive cases handled in private notes create legal risk and quietly erode trust.",
+        'steps' => [
+            ['title' => 'Log it confidentially', 'desc' => 'Open a case with restricted visibility.'],
+            ['title' => 'Work the process', 'desc' => 'Move through a structured workflow with documented actions.'],
+            ['title' => 'Resolve with a record', 'desc' => 'Close with a complete, defensible audit trail.']
+        ],
+        'connects_to' => [
+            ['slug' => 'core-hr', 'label' => 'Core HR & People', 'blurb' => 'Full employee context for every case'],
+            ['slug' => 'service-desk', 'label' => 'Service Desk', 'blurb' => 'Receive escalations from support']
+        ],
+        'faqs' => [
+            ['q' => "Who can access cases?", 'a' => "Only authorized roles — strict confidentiality."],
+            ['q' => "Is there an audit trail?", 'a' => "Yes — every action is recorded."],
+            ['q' => "Does it support due process?", 'a' => "Built-in Philippine labor-law guidance to help you follow it."]
+        ]
     ],
     'attendance' => [
         'title' => 'Attendance & Leaves',
@@ -156,13 +209,23 @@ Attendance & Leaves automates the entire complex cycle: time-in/time-out, leave 
             "Seamless Payroll Sync",
             "Automated Accrual Logic"
         ],
-        'workflow' => [
-            ['title' => 'Track Time & Request', 'desc' => 'Employees log hours and request time off via intuitive self-service.'],
-            ['title' => 'Managerial Approval', 'desc' => 'Managers review requests against team schedules and approve instantly.'],
-            ['title' => 'Sync to Payroll', 'desc' => 'Perfectly reconciled timesheets are pushed to payroll without human intervention.']
-        ],
         'why' => "Attendance errors quietly become payroll errors and severe employee frustration. Automate the tracking, accruals, and approvals once, and the numbers stay permanently right.",
-        'cta' => "Replace the fragile attendance spreadsheet with a system your whole company can trust."
+        'cta' => "Replace the fragile attendance spreadsheet with a system your whole company can trust.",
+        'problem' => "Tracking time and leave by hand is tedious — and the errors flow straight into payroll.",
+        'steps' => [
+            ['title' => 'Track time and requests', 'desc' => 'Employees clock time and request leave.'],
+            ['title' => 'Approve in a click', 'desc' => 'Managers handle approvals from a clear queue.'],
+            ['title' => 'Balances stay right', 'desc' => 'Credits update automatically and feed payroll.']
+        ],
+        'connects_to' => [
+            ['slug' => 'payroll', 'label' => 'Enterprise Payroll', 'blurb' => 'Hours and leave flow directly into pay'],
+            ['slug' => 'core-hr', 'label' => 'Core HR & People', 'blurb' => 'Built on employee profiles']
+        ],
+        'faqs' => [
+            ['q' => "Are leave balances real-time?", 'a' => "Yes — they update automatically."],
+            ['q' => "Can managers approve quickly?", 'a' => "Yes, from a dedicated approval queue."],
+            ['q' => "Does it connect to payroll?", 'a' => "Yes — attendance and leave feed payroll directly."]
+        ]
     ]
 ];
 
@@ -1602,7 +1665,7 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
     </section>
 
     <div class="module-content">
-        <div class="module-section module-intro">
+                        <div class="module-section module-intro">
             <?php 
             $paragraphs = explode("\n\n", $module['intro']);
             foreach ($paragraphs as $p) {
@@ -1620,6 +1683,25 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
                 <?php endforeach; ?>
             </div>
             <?php endif; ?>
+        </div>
+
+        <!-- NEW: The Problem band -->
+        <div class="module-section problem-band" style="background: rgba(255,77,106,0.05); border: 1px solid rgba(255,77,106,0.15); border-radius: 8px; padding: 30px; margin-bottom: 40px;">
+            <h3 style="color: var(--red); margin-bottom: 15px; font-size: 1.3rem;"><i class="fa-solid fa-triangle-exclamation"></i> The Problem</h3>
+            <p style="color: var(--text-mid); font-size: 1.1rem; line-height: 1.6;"><?= htmlspecialchars($module['problem']) ?></p>
+        </div>
+
+        <!-- NEW: How it works (steps) -->
+        <div class="module-section workflow-section">
+            <h2>How it works</h2>
+            <div class="workflow-grid">
+                <?php foreach ($module['steps'] as $step): ?>
+                    <div class="workflow-step">
+                        <h4><?= htmlspecialchars($step['title']) ?></h4>
+                        <p><?= htmlspecialchars($step['desc']) ?></p>
+                    </div>
+                <?php endforeach; ?>
+            </div>
         </div>
 
         <div class="module-section">
@@ -1640,20 +1722,38 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
                 <?php endforeach; ?>
             </div>
         </div>
-        
-        <?php if (isset($module['workflow'])): ?>
-        <div class="module-section workflow-section">
-            <h2>The Workflow</h2>
-            <div class="workflow-grid">
-                <?php foreach ($module['workflow'] as $step): ?>
-                    <div class="workflow-step">
-                        <h4><?= htmlspecialchars($step['title']) ?></h4>
-                        <p><?= htmlspecialchars($step['desc']) ?></p>
+
+        <!-- NEW: Part of one connected platform -->
+        <div class="module-section connected-platform" style="margin-top: 60px;">
+            <h2 style="color: #fff; margin-bottom: 30px; border-bottom: 1px solid var(--border2); padding-bottom: 15px;">Part of one connected platform</h2>
+            <div class="features-grid">
+                <?php foreach ($module['connects_to'] as $conn): ?>
+                    <a href="solutions.php?module=<?= urlencode($conn['slug']) ?>" class="feature-card" style="text-decoration: none; display: block;">
+                        <h3><i class="fa-solid fa-link" style="color: var(--blue);"></i> <?= htmlspecialchars($conn['label']) ?></h3>
+                        <p style="color: var(--text-dim);"><?= htmlspecialchars($conn['blurb']) ?></p>
+                    </a>
+                <?php endforeach; ?>
+            </div>
+        </div>
+
+        <!-- NEW: Shared trust band -->
+        <div class="module-section trust-band" style="margin-top: 40px; background: rgba(0,224,122,0.05); border: 1px solid rgba(0,224,122,0.2); padding: 40px; border-radius: 8px; text-align: center;">
+            <h3 style="color: #fff; margin-bottom: 15px; font-size: 1.5rem;"><i class="fa-solid fa-shield-halved" style="color: var(--green);"></i> Built for the Philippines. Secure by default.</h3>
+            <p style="color: var(--text-mid); font-size: 1.1rem; line-height: 1.6; max-width: 700px; margin: 0 auto;">Every module runs on a multi-tenant architecture with strict data isolation between companies, role-based access control, and privacy-minded data handling — and it's built around Philippine workplace realities, not retrofitted from abroad.</p>
+        </div>
+
+        <!-- NEW: FAQ -->
+        <div class="module-section faq-section" style="margin-top: 60px;">
+            <h2 style="color: #fff; margin-bottom: 30px; border-bottom: 1px solid var(--border2); padding-bottom: 15px;">Frequently Asked Questions</h2>
+            <div class="faq-grid" style="display: grid; gap: 20px;">
+                <?php foreach ($module['faqs'] as $faq): ?>
+                    <div class="faq-card" style="background: rgba(255,255,255,0.02); border: 1px solid var(--border2); padding: 25px; border-radius: 8px;">
+                        <h4 style="color: #fff; font-size: 1.1rem; margin-bottom: 10px;"><i class="fa-solid fa-circle-question" style="color: var(--blue);"></i> <?= htmlspecialchars($faq['q']) ?></h4>
+                        <p style="color: var(--text-mid); line-height: 1.6; margin: 0;"><?= htmlspecialchars($faq['a']) ?></p>
                     </div>
                 <?php endforeach; ?>
             </div>
         </div>
-        <?php endif; ?>
 
         <div class="module-section why-card" style="margin-top: 40px; background: rgba(0,224,122,0.05); border: 1px solid rgba(0,224,122,0.2); padding: 30px; border-radius: 8px;">
             <h3 style="color: #fff; margin-bottom: 15px; font-size: 1.3rem;">Why Trust Us?</h3>
