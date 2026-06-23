@@ -1,5 +1,6 @@
 <?php
-require_once __DIR__ . '/../db.php';
+if (!defined('MIGRATION_SAFE')) die('Forbidden');
+require_once __DIR__ . '/../bootstrap/app.php';
 
 try {
     $pdo->exec("ALTER TABLE `candidate_applications` ADD COLUMN `score_breakdown` JSON DEFAULT NULL AFTER `ai_match_score`");

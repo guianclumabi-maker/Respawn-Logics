@@ -10,7 +10,7 @@ $_ENV['DB_PORT'] = $_ENV['DB_PORT'] ?? '3306';
 $_ENV['DB_USER'] = $_ENV['DB_USER'] ?? 'root';
 $_ENV['DB_PASS'] = $_ENV['DB_PASS'] ?? '';
 
-echo "Setting up Test Database: " . $_ENV['DB_NAME'] . "...\n";
+// echo "Setting up Test Database: " . $_ENV['DB_NAME'] . "...\n";
 
 // 2. Drop and recreate test database
 try {
@@ -29,6 +29,9 @@ require_once __DIR__ . '/../bootstrap/app.php';
 // Ensure global $pdo exists
 global $pdo;
 if (!$pdo) {
+    if (isset($pdoError)) {
+        die("Failed to establish PDO connection to test database: " . $pdoError->getMessage() . "\n");
+    }
     die("Failed to establish PDO connection to test database.\n");
 }
 
@@ -37,15 +40,18 @@ echo "Running schema migrations...\n";
 $pdo->exec("SET FOREIGN_KEY_CHECKS = 0;");
 $migrationScripts = [
     'migrate_tenants.php',
+    'seed_admin.php',
+    'setup_db.php',
+    'iam_seed.php',
     'migrate_core_hr.php',
     'migrate_core_hr_columns.php',
     'migrate_ats_tables.php',
     'migrate_ats_queries.php',
     'migrate_benefits.php',
     'migrate_compensation.php',
+    'migrate_esm.php',
     'migrate_elr.php',
     'migrate_elr_knowledge.php',
-    'migrate_esm.php',
     'migrate_expenses.php',
     'migrate_global_cache.php',
     'migrate_knowledge_base.php',

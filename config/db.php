@@ -1,6 +1,6 @@
 <?php
 // Database configurations for Employee System
-global $config;
+global $config, $pdo;
 $dbConfig = $config['database'] ?? [
     'host' => 'localhost',
     'port' => 3306,
