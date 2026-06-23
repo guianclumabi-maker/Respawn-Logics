@@ -139,10 +139,18 @@ class PayrollController
                     break;
 
                 case 'update_run_status':
-                    if (!hasPermission('payroll.manage')) { http_response_code(403); echo json_encode(['success'=>false, 'error'=>'Denied']); return; }
-                if (!$this->canManagePayroll()) { echo json_encode(['success' => false, 'error' => 'Denied']); return; }
                     $runId = $input['run_id'] ?? 0;
                     $status = $input['status'] ?? ''; 
+
+                    if (in_array($status, ['Approved', 'Processed'])) {
+                        if (!$this->canApprovePayroll()) {
+                            http_response_code(403); echo json_encode(['success' => false, 'error' => 'Denied: Payroll Approver role required']); return;
+                        }
+                    } else {
+                        if (!$this->canRunPayroll()) {
+                            http_response_code(403); echo json_encode(['success' => false, 'error' => 'Denied: Payroll Run access required']); return;
+                        }
+                    } 
 
                     // Verify run ownership first to prevent unauthorized cross-tenant operations
                     $verifyStmt = $this->pdo->prepare("SELECT id FROM `payroll_runs` WHERE `id` = ? AND `tenant_id` = ?");
