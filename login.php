@@ -28,6 +28,11 @@ if ($activationToken) {
     } catch (PDOException $e) {
         $error = 'Database error: ' . $e->getMessage();
     }
+} elseif ((isset($_GET['step']) && $_GET['step'] === 'set_password') || !empty($_SESSION['must_change_password'])) {
+    if (isset($_SESSION['user_id'])) {
+        $showChangePasswordModal = true;
+        $activatingUserId = $_SESSION['user_id'];
+    }
 }
 
 // ── Helper: DB-based IP rate limiting ────────────────────────────────────────
@@ -134,6 +139,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                 $_SESSION['theme_preference']  = $user['theme_preference'] ?? 'light';
                 $_SESSION['must_change_password'] = !empty($user['must_change_password']);
 
+                if (!empty($user['must_change_password'])) {
+                    $_SESSION['must_change_password'] = true;
+                    header('Location: ' . url('/login.php?step=set_password'));
+                    exit;
+                }
+
                 header('Location: ' . url('/frontend/dist/index.html?v=' . time() . '#/dashboard'));
                 exit;
             } else {
@@ -184,6 +195,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                 $_SESSION['user_name']        = $user['full_name'];
                 $_SESSION['tenant_id']        = $user['tenant_id'];
                 $_SESSION['theme_preference'] = $user['theme_preference'] ?? 'light';
+                $_SESSION['must_change_password'] = !empty($user['must_change_password']);
+
+                if (!empty($user['must_change_password'])) {
+                    $_SESSION['must_change_password'] = true;
+                    header('Location: ' . url('/login.php?step=set_password'));
+                    exit;
+                }
+
                 header('Location: ' . url('/frontend/dist/index.html?v=' . time() . '#/dashboard'));
                 exit;
             } else {
@@ -212,11 +231,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                 $pdo->beginTransaction();
                 
                 $newHash = password_hash($newPass, PASSWORD_BCRYPT);
-                $stmt = $pdo->prepare("UPDATE `users` SET `password_hash` = ? WHERE `id` = ?");
+                $stmt = $pdo->prepare("UPDATE `users` SET `password_hash` = ?, `must_change_password` = 0 WHERE `id` = ?");
                 $stmt->execute([$newHash, $activatingUserId]);
                 
-                $stmtTok = $pdo->prepare("UPDATE `user_activation_tokens` SET `used_at` = NOW() WHERE `token` = ?");
-                $stmtTok->execute([$activationToken]);
+                if ($activationToken) {
+                    $stmtTok = $pdo->prepare("UPDATE `user_activation_tokens` SET `used_at` = NOW() WHERE `token` = ?");
+                    $stmtTok->execute([$activationToken]);
+                }
                 
                 $stmtUser = $pdo->prepare("SELECT * FROM `users` WHERE `id` = ?");
                 $stmtUser->execute([$activatingUserId]);
@@ -230,6 +251,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                 $_SESSION['tenant_id'] = $user['tenant_id'];
                 $_SESSION['theme_preference'] = $user['theme_preference'] ?? 'light';
                 
+                unset($_SESSION['must_change_password']);
+
                 header('Location: ' . url('/frontend/dist/index.html?v=' . time() . '#/dashboard'));
                 exit;
             } catch (PDOException $e) {
