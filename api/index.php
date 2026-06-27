@@ -20,6 +20,18 @@ if (!isLoggedIn() && $route !== 'auth' && $route !== 'onboarding') {
     exit;
 }
 
+// Block all data/action routes while a forced password change is pending
+if (isLoggedIn() && !empty($_SESSION['must_change_password']) && $route !== 'auth') {
+    http_response_code(403);
+    echo json_encode([
+        'success' => false,
+        'error' => 'Password change required',
+        'must_change_password' => true,
+        'redirect' => url('/login.php?step=set_password')
+    ]);
+    exit;
+}
+
 if (empty($route)) {
     http_response_code(400);
     echo json_encode(['success' => false, 'error' => 'No route specified']);

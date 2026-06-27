@@ -50,6 +50,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       .then((res) => res.json())
       .then((data) => {
         if (data.success && data.user) {
+          if (data.user.must_change_password) {
+            window.location.href = `${API_BASE}/login.php?step=set_password`;
+            return;
+          }
           setUser(data.user);
           if (data.user.theme) setTheme(data.user.theme);
           if (data.csrf_token) (window as any).__CSRF_TOKEN__ = data.csrf_token;

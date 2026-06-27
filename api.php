@@ -63,7 +63,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                 'profile_image' => $user['profile_image'] ?? null,
                 'job_title' => $user['job_title'] ?? null,
                 'roles' => $roles,
-                'permissions' => $_SESSION['permissions'] ?? []
+                'permissions' => $_SESSION['permissions'] ?? [],
+                'must_change_password' => !empty($_SESSION['must_change_password'])
             ]
         ]);
         exit;
