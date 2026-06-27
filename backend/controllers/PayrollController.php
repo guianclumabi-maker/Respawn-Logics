@@ -472,8 +472,170 @@ class PayrollController
                     echo json_encode(['success' => true]);
                     break;
 
-                case 'gov_reports':
-                    echo json_encode(['success' => true, 'data' => []]);
+                case 'remittance_report':
+                    if (!$this->canViewPayroll()) { 
+                        http_response_code(403); echo json_encode(['success' => false, 'error' => 'Denied']); return; 
+                    }
+                    
+                    $agency = $_GET['agency'] ?? '';
+                    $runId = intval($_GET['period'] ?? 0);
+                    $format = $_GET['format'] ?? 'json';
+
+                    if (!in_array($agency, ['sss', 'philhealth', 'pagibig', 'bir'])) {
+                        echo json_encode(['success' => false, 'error' => 'Invalid agency']); return;
+                    }
+
+                    $runStmt = $this->pdo->prepare("SELECT * FROM payroll_runs WHERE id = ? AND tenant_id = ? AND status IN ('Processed', 'Locked')");
+                    $runStmt->execute([$runId, $this->tenantId]);
+                    $run = $runStmt->fetch(PDO::FETCH_ASSOC);
+                    if (!$run) {
+                        echo json_encode(['success' => false, 'error' => 'Payroll run not found or not processed']); return;
+                    }
+
+                    $tenantStmt = $this->pdo->prepare("SELECT company_name FROM tenants WHERE id = ?");
+                    $tenantStmt->execute([$this->tenantId]);
+                    $tenantName = $tenantStmt->fetchColumn() ?: 'Company Name';
+
+                    $header = [
+                        'tenant' => $tenantName,
+                        'agency' => strtoupper($agency),
+                        'period' => $run['payroll_period_start'] . ' to ' . $run['payroll_period_end'],
+                        'generated_at' => date('Y-m-d H:i:s')
+                    ];
+
+                    $sql = "
+                        SELECT 
+                            u.full_name, 
+                            u.sss_number, 
+                            u.philhealth_number, 
+                            u.pagibig_number, 
+                            u.tin,
+                            pre.gross_pay,
+                            pre.sss_er,
+                            pre.sss_ec,
+                            pre.wisp_er,
+                            pre.phic_er,
+                            pre.hdmf_er,
+                            (SELECT SUM(amount) FROM payroll_deductions pd WHERE pd.payroll_run_id = pre.payroll_run_id AND pd.employee_id = pre.employee_id AND pd.deduction_type = 'SSS Contribution') as sss_ee,
+                            (SELECT SUM(amount) FROM payroll_deductions pd WHERE pd.payroll_run_id = pre.payroll_run_id AND pd.employee_id = pre.employee_id AND pd.deduction_type = 'PhilHealth Contribution') as phic_ee,
+                            (SELECT SUM(amount) FROM payroll_deductions pd WHERE pd.payroll_run_id = pre.payroll_run_id AND pd.employee_id = pre.employee_id AND pd.deduction_type = 'Pag-IBIG Contribution') as hdmf_ee,
+                            (SELECT SUM(amount) FROM payroll_deductions pd WHERE pd.payroll_run_id = pre.payroll_run_id AND pd.employee_id = pre.employee_id AND pd.deduction_type = 'Withholding Tax') as bir_tax,
+                            (SELECT SUM(amount) FROM payroll_earnings pe WHERE pe.payroll_run_id = pre.payroll_run_id AND pe.employee_id = pre.employee_id AND pe.earning_type LIKE '%Taxable%') as total_taxable_earnings
+                        FROM payroll_run_employees pre
+                        JOIN users u ON pre.employee_id = u.id
+                        WHERE pre.payroll_run_id = ?
+                        ORDER BY u.full_name ASC
+                    ";
+                    
+                    $stmt = $this->pdo->prepare($sql);
+                    $stmt->execute([$runId]);
+                    $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+                    $reportData = [];
+                    $totals = [];
+
+                    if ($agency === 'sss') {
+                        $totals = ['sss_ee' => 0, 'sss_er' => 0, 'ec' => 0, 'wisp_er' => 0, 'total' => 0];
+                        foreach ($rows as $row) {
+                            $ee = floatval($row['sss_ee']);
+                            $er = floatval($row['sss_er']);
+                            $ec = floatval($row['sss_ec']);
+                            $wisp_er = floatval($row['wisp_er']);
+                            $total = $ee + $er + $ec;
+                            $reportData[] = [
+                                'employee' => $row['full_name'],
+                                'sss_number' => $row['sss_number'] ?: '',
+                                'sss_ee' => $ee,
+                                'sss_er' => $er - $wisp_er, 
+                                'ec' => $ec,
+                                'wisp_ee' => 'Merged in EE',
+                                'wisp_er' => $wisp_er,
+                                'total_premium' => $total
+                            ];
+                            $totals['sss_ee'] += $ee;
+                            $totals['sss_er'] += ($er - $wisp_er);
+                            $totals['ec'] += $ec;
+                            $totals['wisp_er'] += $wisp_er;
+                            $totals['total'] += $total;
+                        }
+                    } else if ($agency === 'philhealth') {
+                        $totals = ['ee' => 0, 'er' => 0, 'total' => 0];
+                        foreach ($rows as $row) {
+                            $ee = floatval($row['phic_ee']);
+                            $er = floatval($row['phic_er']);
+                            $total = $ee + $er;
+                            $reportData[] = [
+                                'employee' => $row['full_name'],
+                                'philhealth_number' => $row['philhealth_number'] ?: '',
+                                'ee' => $ee,
+                                'er' => $er,
+                                'total_premium' => $total
+                            ];
+                            $totals['ee'] += $ee;
+                            $totals['er'] += $er;
+                            $totals['total'] += $total;
+                        }
+                    } else if ($agency === 'pagibig') {
+                        $totals = ['ee' => 0, 'er' => 0, 'total' => 0];
+                        foreach ($rows as $row) {
+                            $ee = floatval($row['hdmf_ee']);
+                            $er = floatval($row['hdmf_er']);
+                            $total = $ee + $er;
+                            $reportData[] = [
+                                'employee' => $row['full_name'],
+                                'pagibig_number' => $row['pagibig_number'] ?: '',
+                                'ee' => $ee,
+                                'er' => $er,
+                                'total_premium' => $total
+                            ];
+                            $totals['ee'] += $ee;
+                            $totals['er'] += $er;
+                            $totals['total'] += $total;
+                        }
+                    } else if ($agency === 'bir') {
+                        $totals = ['taxable_comp' => 0, 'tax_withheld' => 0];
+                        foreach ($rows as $row) {
+                            $taxable = floatval($row['gross_pay']); 
+                            $tax = floatval($row['bir_tax']);
+                            $reportData[] = [
+                                'employee' => $row['full_name'],
+                                'tin' => $row['tin'] ?: '',
+                                'taxable_comp' => $taxable,
+                                'tax_withheld' => $tax
+                            ];
+                            $totals['taxable_comp'] += $taxable;
+                            $totals['tax_withheld'] += $tax;
+                        }
+                    }
+
+                    if ($format === 'csv') {
+                        header('Content-Type: text/csv');
+                        header('Content-Disposition: attachment; filename="'.$agency.'_report_'.$runId.'.csv"');
+                        $out = fopen('php://output', 'w');
+                        fputcsv($out, array_keys($header));
+                        fputcsv($out, array_values($header));
+                        fputcsv($out, []); 
+
+                        if (!empty($reportData)) {
+                            fputcsv($out, array_keys($reportData[0]));
+                            foreach ($reportData as $r) {
+                                fputcsv($out, array_values($r));
+                            }
+                            fputcsv($out, []);
+                            
+                            $totalsRow = array_fill(0, count($reportData[0]), '');
+                            $totalsRow[0] = 'TOTALS';
+                            $i = count($totalsRow) - count($totals);
+                            foreach (array_values($totals) as $val) {
+                                $totalsRow[$i++] = $val;
+                            }
+                            fputcsv($out, $totalsRow);
+                        }
+                        fclose($out);
+                        exit;
+                    }
+
+                    echo json_encode(['success' => true, 'header' => $header, 'data' => $reportData, 'totals' => $totals]);
                     break;
 
                 case 'payslips_admin':
