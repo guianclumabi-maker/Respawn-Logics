@@ -322,6 +322,33 @@ class PayrollController
                             'severity' => 'Critical'
                         ];
                     }
+
+                    $activeRunStmt = $this->pdo->prepare("SELECT * FROM payroll_runs WHERE tenant_id = ? AND status IN ('Draft', 'Processing') ORDER BY id DESC LIMIT 1");
+                    $activeRunStmt->execute([$this->tenantId]);
+                    $activeRun = $activeRunStmt->fetch();
+
+                    if ($activeRun) {
+                        $tsStmt = $this->pdo->prepare("
+                            SELECT u.full_name 
+                            FROM users u 
+                            WHERE u.tenant_id = ? AND u.employment_status = 'Active' 
+                            AND NOT EXISTS (
+                                SELECT 1 FROM timesheets t 
+                                WHERE t.tenant_id = u.tenant_id AND t.employee_id = u.id 
+                                AND t.timesheet_date >= ? AND t.timesheet_date <= ? 
+                                AND t.status = 'Approved'
+                            )
+                        ");
+                        $tsStmt->execute([$this->tenantId, $activeRun['payroll_period_start'], $activeRun['payroll_period_end']]);
+                        while ($row = $tsStmt->fetch(PDO::FETCH_ASSOC)) {
+                            $exceptions[] = [
+                                'employee' => $row['full_name'],
+                                'issue' => 'Unapproved / Missing Timesheets',
+                                'severity' => 'High'
+                            ];
+                        }
+                    }
+
                     echo json_encode(['success' => true, 'data' => $exceptions]);
                     break;
 
