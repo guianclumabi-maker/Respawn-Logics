@@ -1,6 +1,18 @@
 import { createHashRouter, Navigate, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import MainLayout from "./layouts/MainLayout";
 import { viewStateToPath } from "./lib/atsNav";
+import { LoginPage } from "./pages/LoginPage";
+import { useAuth } from "./context/AuthContext";
+
+// AuthGuard — redirects to /login if no session
+function AuthGuard({ children }: { children: React.ReactNode }) {
+  const { user, loading } = useAuth();
+  if (loading) return null; // wait for session check
+  if (!user) return <Navigate to="/login" replace />;
+  return <>{children}</>;
+}
+
+import React from "react";
 
 // Apps & Fully Ported
 import { HomeDashboard } from "./pages/HomeDashboard";
@@ -63,9 +75,10 @@ function AtsRoute({ component: Component }: { component: any }) {
 }
 
 export const router = createHashRouter([
+  { path: "/login", element: <LoginPage /> },
   {
     path: "/",
-    element: <MainLayout />,
+    element: <AuthGuard><MainLayout /></AuthGuard>,
     children: [
       { index: true, element: <Navigate to="/dashboard" replace /> },
       { path: "dashboard", element: <HomeDashboard /> },

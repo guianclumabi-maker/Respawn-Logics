@@ -40,7 +40,8 @@ import {
   GitBranch,
   CheckCircle,
   Database,
-  Search
+  Search,
+  LogOut
 } from "lucide-react";
 
 // ── Types ──────────────────────────────────────────────────
@@ -208,7 +209,7 @@ function Badge({ count }: { count: number }) {
 
 export function Sidebar({ activeView, onViewChange, badges = {} }: SidebarProps) {
   const [collapsed, setCollapsed] = useState(false);
-  const { user, hasPermission, hasRole } = useAuth();
+  const { user, hasPermission, hasRole, logout } = useAuth();
   const location = useLocation();
   const isAtsContext = location.pathname.startsWith("/ats");
 
@@ -334,6 +335,34 @@ export function Sidebar({ activeView, onViewChange, badges = {} }: SidebarProps)
         {/* ── Gamified Theme Toggle ─────────────────────── */}
         <div className="mt-4 pt-4 border-t border-gray-200 dark:border-border">
           <GamifiedThemeToggle collapsed={collapsed} />
+        </div>
+      </div>
+
+      {/* ── Profile Footer ────────────────────────────── */}
+      <div className="border-t border-gray-200 dark:border-border p-3 flex-shrink-0 bg-slate-50/50 dark:bg-slate-900/50">
+        <div className={`flex items-center ${collapsed ? "justify-center flex-col gap-3" : "justify-between"}`}>
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0 text-primary font-bold text-sm uppercase">
+              {user?.name?.charAt(0) || "U"}
+            </div>
+            {!collapsed && (
+              <div className="min-w-0 flex-1">
+                <div className="text-[13px] font-bold text-slate-900 dark:text-slate-100 truncate">
+                  {user?.name || "User"}
+                </div>
+                <div className="text-[11px] text-slate-500 truncate">
+                  {user?.email || "user@example.com"}
+                </div>
+              </div>
+            )}
+          </div>
+          <button
+            onClick={() => logout()}
+            className="p-2 text-slate-500 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-lg transition-colors flex-shrink-0"
+            title="Log out"
+          >
+            <LogOut size={16} />
+          </button>
         </div>
       </div>
     </aside>

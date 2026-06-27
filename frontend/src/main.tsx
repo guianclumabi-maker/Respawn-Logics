@@ -28,13 +28,72 @@ window.fetch = async (...args) => {
   if (response.status === 401) {
     const url = typeof args[0] === 'string' ? args[0] : (args[0] instanceof Request ? args[0].url : '');
     // Ignore 401s for initial auth/csrf checks to prevent immediate lockout
-    if (!url.includes('action=current_user') && !url.includes('action=csrf') && !url.includes('get_csrf.php')) {
-      alert("Session expired. Please log in again.");
-      window.location.href = `${API_BASE}/login.php`;
+    if (!url.includes('action=current_user') && !url.includes('action=csrf') && !url.includes('get_csrf.php') && !url.includes('action=login')) {
+      window.location.hash = '#/login';
     }
   }
   return response;
 };
+
+// ── PHP legacy link interceptor ───────────────────────────────────────
+// Show a warning toast instead of navigating to any *.php page.
+function createPhpWarningToast() {
+  const existing = document.getElementById('__php_warn_toast');
+  if (existing) {
+    // Reset animation
+    existing.style.animation = 'none';
+    void (existing as any).offsetHeight;
+    existing.style.animation = '';
+    return;
+  }
+  const toast = document.createElement('div');
+  toast.id = '__php_warn_toast';
+  toast.innerHTML = `
+    <div style="display:flex;align-items:flex-start;gap:12px">
+      <div style="font-size:20px;flex-shrink:0">⚠️</div>
+      <div>
+        <div style="font-weight:700;font-size:14px;color:#fff;margin-bottom:4px">Legacy Page</div>
+        <div style="font-size:13px;color:#94a3b8;line-height:1.5">This section is still part of the legacy system and hasn't been migrated to the new portal yet.</div>
+      </div>
+      <button onclick="this.closest('#__php_warn_toast').remove()" style="flex-shrink:0;background:none;border:none;color:#64748b;font-size:18px;cursor:pointer;line-height:1;padding:0 4px">×</button>
+    </div>
+  `;
+  Object.assign(toast.style, {
+    position: 'fixed',
+    bottom: '24px',
+    right: '24px',
+    zIndex: '99999',
+    background: '#1e2235',
+    border: '1px solid rgba(245,166,35,0.35)',
+    borderLeft: '4px solid #f5a623',
+    borderRadius: '12px',
+    padding: '16px 18px',
+    maxWidth: '340px',
+    boxShadow: '0 8px 40px rgba(0,0,0,0.5)',
+    animation: 'slideInToast 0.3s ease',
+    fontFamily: "'Inter', sans-serif",
+  });
+  // Inject keyframes once
+  if (!document.getElementById('__toast_kf')) {
+    const s = document.createElement('style');
+    s.id = '__toast_kf';
+    s.textContent = `@keyframes slideInToast { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }`;
+    document.head.appendChild(s);
+  }
+  document.body.appendChild(toast);
+  setTimeout(() => toast.remove(), 5000);
+}
+
+document.addEventListener('click', (e) => {
+  const target = (e.target as HTMLElement).closest('a');
+  if (!target) return;
+  const href = target.getAttribute('href') || '';
+  if (href.match(/\.php(\?|#|$)/i) && !href.startsWith('javascript')) {
+    e.preventDefault();
+    e.stopPropagation();
+    createPhpWarningToast();
+  }
+}, true);
 
 // Cross-tab theme sync: listen for theme changes broadcast by the main PHP platform
 // or any other React frontend. BroadcastChannel fires in ALL open same-origin tabs.
