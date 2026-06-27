@@ -277,11 +277,48 @@ class PayrollService
             // 5. Process Each Employee
             foreach ($employees as $emp) {
                 $empId = $emp['id'];
-                // Multiply base by prorate factor if schedule is semi-monthly, because `base_salary` in DB is Monthly
-                $cutoffBase = floatval($emp['base_salary']) * $prorateFactor;
-                
-                $warnings[] = "Employee #{$empId} has unchecked timesheets. Assumed perfect attendance for now.";
-                
+                // Timesheet-driven gross pay
+                $workingDays = $this->statutoryParams['working_days_per_year'] ?? 313.00;
+                $hoursPerDay = $this->statutoryParams['hours_per_day'] ?? 8.00;
+                $daily = (floatval($emp['base_salary']) * 12) / $workingDays;
+                $hourly = $daily / $hoursPerDay;
+
+                $tsStmt = $this->pdo->prepare("
+                    SELECT 
+                        SUM(regular_hours) as reg, 
+                        SUM(overtime_hours) as ot, 
+                        SUM(rest_day_hours) as rest, 
+                        SUM(special_day_hours) as spec, 
+                        SUM(regular_holiday_hours) as hol, 
+                        SUM(night_diff_hours) as nd 
+                    FROM timesheets 
+                    WHERE tenant_id = ? AND employee_id = ? 
+                    AND timesheet_date >= ? AND timesheet_date <= ? 
+                    AND status = 'Approved'
+                ");
+                $tsStmt->execute([$tenantId, $empId, $start, $end]);
+                $tsData = $tsStmt->fetch(PDO::FETCH_ASSOC);
+
+                $cutoffBase = 0;
+                $grossReg = 0;
+                $grossOt = 0;
+                $grossRest = 0;
+                $grossSpec = 0;
+                $grossHol = 0;
+                $grossNd = 0;
+
+                if ($tsData && $tsData['reg'] !== null) {
+                    $grossReg = floatval($tsData['reg']) * $hourly;
+                    $grossOt = floatval($tsData['ot']) * $hourly * ($this->statutoryParams['ordinary_ot_multiplier'] ?? 1.25);
+                    $grossRest = floatval($tsData['rest']) * $hourly * ($this->statutoryParams['rest_day_or_special_multiplier'] ?? 1.30);
+                    $grossSpec = floatval($tsData['spec']) * $hourly * ($this->statutoryParams['rest_day_or_special_multiplier'] ?? 1.30);
+                    $grossHol = floatval($tsData['hol']) * $hourly * ($this->statutoryParams['regular_holiday_multiplier'] ?? 2.00);
+                    $grossNd = floatval($tsData['nd']) * $hourly * ($this->statutoryParams['night_diff_multiplier'] ?? 0.10);
+
+                    $cutoffBase = $grossReg + $grossOt + $grossRest + $grossSpec + $grossHol + $grossNd;
+                } else {
+                    $warnings[] = "Employee #{$empId} has no approved timesheets. Gross pay computed as 0.";
+                }
                 $remaining90k = $this->getRemaining90kExemption($empId, $payDate);
 
                 $empExpenses = $expensesByEmployee[$empId] ?? [];
@@ -339,9 +376,12 @@ class PayrollService
                     }
                 }
                 
-                if ($cutoffBase > 0) {
-                    $earningStmt->execute([$runId, $empId, 'Basic Salary', round($cutoffBase, 2)]);
-                }
+                if ($grossReg > 0) $earningStmt->execute([$runId, $empId, 'Basic Pay (Hours)', round($grossReg, 2)]);
+                if ($grossOt > 0) $earningStmt->execute([$runId, $empId, 'Overtime Pay', round($grossOt, 2)]);
+                if ($grossRest > 0) $earningStmt->execute([$runId, $empId, 'Rest Day Pay', round($grossRest, 2)]);
+                if ($grossSpec > 0) $earningStmt->execute([$runId, $empId, 'Special Holiday Pay', round($grossSpec, 2)]);
+                if ($grossHol > 0) $earningStmt->execute([$runId, $empId, 'Regular Holiday Pay', round($grossHol, 2)]);
+                if ($grossNd > 0) $earningStmt->execute([$runId, $empId, 'Night Differential', round($grossNd, 2)]);
                 if ($thirteenthPayout > 0) {
                     $earningStmt->execute([$runId, $empId, '13th Month Pay (Included in Other Benefits)', round($thirteenthPayout, 2)]);
                 }
