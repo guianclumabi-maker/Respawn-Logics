@@ -25,7 +25,7 @@ class HealthController {
         $checks = [];
 
         // 1. Resume storage
-        $resumePath = $_ENV['RESUME_STORAGE_PATH'] ?? '';
+        $resumePath = getenv('RESUME_STORAGE_PATH') ?: ($_ENV['RESUME_STORAGE_PATH'] ?? '');
         $resumePass = !empty($resumePath) && file_exists($resumePath) && is_writable($resumePath);
         $checks[] = [
             'name' => 'Resume Storage',
@@ -34,7 +34,7 @@ class HealthController {
         ];
 
         // 2. File storage
-        $filePath = $_ENV['FILE_STORAGE_PATH'] ?? '';
+        $filePath = getenv('FILE_STORAGE_PATH') ?: ($_ENV['FILE_STORAGE_PATH'] ?? '');
         $filePass = !empty($filePath) && file_exists($filePath) && is_writable($filePath);
         $checks[] = [
             'name' => 'File Storage',
@@ -43,8 +43,9 @@ class HealthController {
         ];
 
         // 3. Email config
-        $resendSet = !empty($_ENV['RESEND_API_KEY']);
-        $mailFrom = $_ENV['MAIL_FROM'] ?? '';
+        $resendApi = getenv('RESEND_API_KEY') ?: ($_ENV['RESEND_API_KEY'] ?? '');
+        $resendSet = !empty($resendApi);
+        $mailFrom = getenv('MAIL_FROM') ?: ($_ENV['MAIL_FROM'] ?? '');
         $emailPass = $resendSet && !empty($mailFrom);
         $checks[] = [
             'name' => 'Email Configuration',
