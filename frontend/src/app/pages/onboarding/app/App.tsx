@@ -322,7 +322,6 @@ export default function App() {
 
         <div className="hidden md:flex items-center gap-[30px] text-[0.9rem] font-medium text-[#8b95a8]" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
           <a href={`${API_BASE}/index.php#overview`} className="hover:text-white transition-colors no-underline">Platform</a>
-          <a href={`${API_BASE}/deep_dive.php`} className="hover:text-white transition-colors no-underline">Deep Dive</a>
           <a href={`${API_BASE}/design.php`} className="hover:text-white transition-colors no-underline">Design</a>
           <a href={`${API_BASE}/index.php#why`} className="hover:text-white transition-colors no-underline">Why Us</a>
           <a href={`${API_BASE}/index.php#story`} className="hover:text-white transition-colors no-underline">The Story</a>

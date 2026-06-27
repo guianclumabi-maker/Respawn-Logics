@@ -104,12 +104,7 @@ const getSections = (hasPermission: (p: string) => boolean, hasRole: (r: string 
       ...(hasPermission("intelligence.view") ? [{ label: "Predictive AI", view: "Analytics", icon: <Brain size={19} />, color: "#f59e0b" }] : []),
       ...(hasPermission("ats.view") ? [{ label: "Recruitment / ATS", view: "ATS Dashboard", icon: <Crosshair size={19} /> }] : []),
       { label: "My HR Cases", view: "Employee Relations", icon: <ShieldHalf size={19} /> },
-      ...(tenantId !== null ? [{ 
-        label: "IT/HR Service Desk", 
-        view: "IT / HR Service Desk", 
-        icon: <Headphones size={19} />,
-        externalLink: hasPermission("esm.manage") ? "/pages/esm_admin.php" : "/pages/esm_employee.php"
-      }] : []),
+
     ],
   },
   {
@@ -143,16 +138,7 @@ const getSections = (hasPermission: (p: string) => boolean, hasRole: (r: string 
       }] : []),
     ]
   },
-  {
-    title: "Vendor Universe",
-    hide: isAtsContext || !hasRole(["Platform_Admin", "Support_Agent", "Implementation_Specialist"]),
-    items: [
-      { label: "SaaS Headquarters", view: "SaaS Headquarters", icon: <Globe size={19} />, externalLink: "/pages/saas_admin.php" },
-      ...(hasRole("Platform_Admin") ? [{ label: "Vendor Staff", view: "Vendor Staff", icon: <BadgeInfo size={19} />, externalLink: "/pages/saas_staff.php" }] : []),
-      { label: "Global Support Inbox", view: "Global Support Inbox", icon: <Inbox size={19} />, externalLink: "/pages/saas_support.php" },
-      { label: "Feedback Corner", view: "Feedback Corner", icon: <StarHalf size={19} />, externalLink: "/pages/saas_feedback.php" },
-    ]
-  },
+
   {
     title: "System",
     hide: isAtsContext || !hasPermission("audit.view"),
