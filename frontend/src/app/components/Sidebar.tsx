@@ -104,7 +104,7 @@ const getSections = (hasPermission: (p: string) => boolean, hasRole: (r: string 
       ...(hasPermission("intelligence.view") ? [{ label: "Predictive AI", view: "Analytics", icon: <Brain size={19} />, color: "#f59e0b" }] : []),
       ...(hasPermission("ats.view") ? [{ label: "Recruitment / ATS", view: "ATS Dashboard", icon: <Crosshair size={19} /> }] : []),
       { label: "My HR Cases", view: "Employee Relations", icon: <ShieldHalf size={19} /> },
-
+      { label: "IT / HR Service Desk", view: "IT / HR Service Desk", icon: <Headphones size={19} /> },
     ],
   },
   {
