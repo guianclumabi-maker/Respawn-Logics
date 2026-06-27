@@ -937,11 +937,11 @@ class CandidatesController
             // Send email notification based on new stage
             if (!empty($old['email']) && $old['stage'] !== $stage) {
                 if ($stage === 'Offer') {
-                    Mailer::send($old['email'], $old['name'], 'You have received an offer!', "<p>Hi {$old['name']},</p><p>We are thrilled to extend an offer for your recent application. Please check your portal for more details.</p>");
+                    try { Mailer::send($old['email'], $old['name'], 'You have received an offer!', "<p>Hi {$old['name']},</p><p>We are thrilled to extend an offer for your recent application. Please check your portal for more details.</p>"); } catch (\Exception $e) { error_log("Failed to send offer email: " . $e->getMessage()); }
                 } elseif ($stage === 'Hired') {
-                    Mailer::send($old['email'], $old['name'], 'Welcome to the team!', "<p>Hi {$old['name']},</p><p>Congratulations! We are excited to welcome you to the team.</p>");
+                    try { Mailer::send($old['email'], $old['name'], 'Welcome to the team!', "<p>Hi {$old['name']},</p><p>Congratulations! We are excited to welcome you to the team.</p>"); } catch (\Exception $e) { error_log("Failed to send hire email: " . $e->getMessage()); }
                 } elseif ($stage === 'Rejected') {
-                    Mailer::send($old['email'], $old['name'], 'Update on your application', "<p>Hi {$old['name']},</p><p>Thank you for taking the time to interview with us. Unfortunately, we have decided to move forward with other candidates at this time. We wish you the best in your job search.</p>");
+                    try { Mailer::send($old['email'], $old['name'], 'Update on your application', "<p>Hi {$old['name']},</p><p>Thank you for taking the time to interview with us. Unfortunately, we have decided to move forward with other candidates at this time. We wish you the best in your job search.</p>"); } catch (\Exception $e) { error_log("Failed to send reject email: " . $e->getMessage()); }
                 }
             }
         }
@@ -981,11 +981,11 @@ class CandidatesController
                 
                 if (!empty($a['email']) && $a['old_stage'] !== $stage) {
                     if ($stage === 'Offer') {
-                        Mailer::send($a['email'], $a['name'], 'You have received an offer!', "<p>Hi {$a['name']},</p><p>We are thrilled to extend an offer for your recent application. Please check your portal for more details.</p>");
+                        try { Mailer::send($a['email'], $a['name'], 'You have received an offer!', "<p>Hi {$a['name']},</p><p>We are thrilled to extend an offer for your recent application. Please check your portal for more details.</p>"); } catch (\Exception $e) { error_log("Failed to send offer email: " . $e->getMessage()); }
                     } elseif ($stage === 'Hired') {
-                        Mailer::send($a['email'], $a['name'], 'Welcome to the team!', "<p>Hi {$a['name']},</p><p>Congratulations! We are excited to welcome you to the team.</p>");
+                        try { Mailer::send($a['email'], $a['name'], 'Welcome to the team!', "<p>Hi {$a['name']},</p><p>Congratulations! We are excited to welcome you to the team.</p>"); } catch (\Exception $e) { error_log("Failed to send hire email: " . $e->getMessage()); }
                     } elseif ($stage === 'Rejected') {
-                        Mailer::send($a['email'], $a['name'], 'Update on your application', "<p>Hi {$a['name']},</p><p>Thank you for taking the time to interview with us. Unfortunately, we have decided to move forward with other candidates at this time. We wish you the best in your job search.</p>");
+                        try { Mailer::send($a['email'], $a['name'], 'Update on your application', "<p>Hi {$a['name']},</p><p>Thank you for taking the time to interview with us. Unfortunately, we have decided to move forward with other candidates at this time. We wish you the best in your job search.</p>"); } catch (\Exception $e) { error_log("Failed to send reject email: " . $e->getMessage()); }
                     }
                 }
             }
@@ -1004,7 +1004,7 @@ class CandidatesController
             if ($a) {
                 $this->logActivity('bulk_reject', "Bulk rejected", (int)$a['candidate_id'], (int)$a['job_id'], (int)$appId);
                 if (!empty($a['email']) && $a['old_stage'] !== 'Rejected') {
-                    Mailer::send($a['email'], $a['name'], 'Update on your application', "<p>Hi {$a['name']},</p><p>Thank you for taking the time to interview with us. Unfortunately, we have decided to move forward with other candidates at this time. We wish you the best in your job search.</p>");
+                    try { Mailer::send($a['email'], $a['name'], 'Update on your application', "<p>Hi {$a['name']},</p><p>Thank you for taking the time to interview with us. Unfortunately, we have decided to move forward with other candidates at this time. We wish you the best in your job search.</p>"); } catch (\Exception $e) { error_log("Failed to send reject email: " . $e->getMessage()); }
                 }
             }
         }
@@ -1127,7 +1127,7 @@ class CandidatesController
             $html .= "</ul>";
             $html .= "<p>Looking forward to speaking with you!</p>";
             
-            \App\Services\Mailer::send($p['email'], $p['name'], "Interview Scheduled: $type", $html);
+            try { \App\Services\Mailer::send($p['email'], $p['name'], "Interview Scheduled: $type", $html); } catch (\Exception $e) { error_log("Failed to send interview email: " . $e->getMessage()); }
         }
 
         echo json_encode(['success' => true, 'interview_id' => $interviewId]);

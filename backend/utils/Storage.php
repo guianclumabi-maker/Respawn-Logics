@@ -12,6 +12,12 @@ class Storage {
         $envVar = $isResume ? 'RESUME_STORAGE_PATH' : 'FILE_STORAGE_PATH';
         $path = getenv($envVar);
 
+        $isProd = (getenv('APP_ENV') === 'production' || getenv('RAILWAY_ENVIRONMENT'));
+
+        if ($isProd && empty($path)) {
+            throw new \RuntimeException("$envVar not configured or not writable — résumés cannot be stored.");
+        }
+
         if (!$path) {
             $path = __DIR__ . '/../../storage'; // Fallback
         }
@@ -21,6 +27,10 @@ class Storage {
             // Path might not exist yet, we will attempt to create it
             @mkdir($path, 0755, true);
             $realPath = realpath($path);
+        }
+
+        if ($isProd && (!is_dir($realPath ?: $path) || !is_writable($realPath ?: $path))) {
+            throw new \RuntimeException("$envVar not configured or not writable — résumés cannot be stored.");
         }
 
         // Get absolute document root
@@ -35,14 +45,6 @@ class Storage {
             // Fallback check if realpath fails
             if (strpos($path, 'storage') !== false && strpos($path, '..') !== false) {
                 $isInsideDocroot = true;
-            }
-        }
-
-        // FAIL LOUD GUARD - Disabled for Railway Demo
-        if ($isUpload && $isInsideDocroot) {
-            $appEnv = getenv('APP_ENV');
-            if ($appEnv !== 'local') {
-                error_log("Warning: Storage base '$realPath' is inside document root, but APP_ENV is '$appEnv' (not 'local'). Allowing for Railway demo.");
             }
         }
 
