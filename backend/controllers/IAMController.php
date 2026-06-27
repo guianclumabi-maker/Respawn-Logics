@@ -411,14 +411,15 @@ class IAMController
                     $this->pdo->commit();
                     
                     try {
-                        require_once __DIR__ . '/../utils/Mailer.php';
-                        \App\Utils\Mailer::send(
+                        require_once __DIR__ . '/../services/Mailer.php';
+                        Mailer::send(
                             $email,
+                            $full_name,
                             "You've been invited to Respawn Logics",
-                            "Hi {$full_name},\n\nYou've been invited to join. Your temporary password is: {$tempPassword}\n\nPlease log in and change your password."
+                            "<p>Hi {$full_name},</p><p>Your temporary password is: <b>{$tempPassword}</b></p><p>Please log in and change your password.</p>"
                         );
-                    } catch (\Exception $mailEx) {
-                        // Silently fail mailer
+                    } catch (\Throwable $mailEx) {
+                        error_log("Invite email failed: " . $mailEx->getMessage());
                     }
                     
                     logAction($this->currentUser['email'], 'User Invited', "Invited user {$email}");
