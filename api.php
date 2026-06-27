@@ -49,6 +49,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         $stmt->execute([$user['id']]);
         $roles = $stmt->fetchAll(PDO::FETCH_COLUMN);
 
+        require_once __DIR__ . '/backend/services/RoleSeederService.php';
+        $stmtTier = $pdo->prepare("SELECT setup_mode FROM tenants WHERE id = ?");
+        $stmtTier->execute([$user['tenant_id']]);
+        $setupMode = $stmtTier->fetchColumn() ?: 'Solo';
+        $tierConfig = RoleSeederService::getTierConfig($setupMode);
+
         // Generate CSRF if missing
         if (empty($_SESSION['csrf_token'])) {
             $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
@@ -64,7 +70,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                 'job_title' => $user['job_title'] ?? null,
                 'roles' => $roles,
                 'permissions' => $_SESSION['permissions'] ?? [],
-                'must_change_password' => !empty($_SESSION['must_change_password'])
+                'must_change_password' => !empty($_SESSION['must_change_password']),
+                'tier_config' => $tierConfig
             ]
         ]);
         exit;

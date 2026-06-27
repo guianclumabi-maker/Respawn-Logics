@@ -17,6 +17,12 @@ interface AuthUser {
   tenant_id?: number;
   tenant_setup_mode?: string;
   theme?: string;
+  tier_config?: {
+    default_scope: string;
+    org_units: boolean;
+    custom_roles?: boolean;
+    roles_limit?: number;
+  };
 }
 
 interface AuthContextType {

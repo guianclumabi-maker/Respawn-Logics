@@ -87,7 +87,7 @@ type NavSection = {
 
 // ── Navigation config ──────────────────────────────────────
 
-const getSections = (hasPermission: (p: string) => boolean, hasRole: (r: string | string[]) => boolean, tenantId: number | null, isAtsContext: boolean): NavSection[] => [
+const getSections = (hasPermission: (p: string) => boolean, hasRole: (r: string | string[]) => boolean, tenantId: number | null, isAtsContext: boolean, tierConfig: any): NavSection[] => [
   {
     title: "Workspace",
     hide: isAtsContext,
@@ -130,6 +130,7 @@ const getSections = (hasPermission: (p: string) => boolean, hasRole: (r: string 
         color: "#ef4444", 
       }] : []),
       ...(hasPermission("users.view") ? [{ label: "Users", view: "Admin Users", icon: <UserCog size={19} /> }] : []),
+      ...(tierConfig?.org_units && hasPermission("users.manage") ? [{ label: "Org Units", view: "Org Units", icon: <Network size={19} /> }] : []),
       ...(hasPermission("users.manage") ? [{ label: "Roles & Permissions", view: "Admin Roles", icon: <ShieldHalf size={19} /> }] : []),
       ...(hasPermission("settings.manage") ? [{ label: "Tenant Settings", view: "Tenant Settings", icon: <Settings size={19} /> }] : []),
       ...(hasPermission("settings.manage") ? [{ label: "Knowledge Base Review", view: "Knowledge Base", icon: <BookOpen size={19} /> }] : []),
@@ -213,7 +214,7 @@ export function Sidebar({ activeView, onViewChange, badges = {} }: SidebarProps)
   const location = useLocation();
   const isAtsContext = location.pathname.startsWith("/ats");
 
-  const sections = getSections(hasPermission, hasRole, user?.tenant_id || null, isAtsContext).filter(s => !s.hide);
+  const sections = getSections(hasPermission, hasRole, user?.tenant_id || null, isAtsContext, user?.tier_config || null).filter(s => !s.hide);
 
   const isActive = (view: string) => activeView.view === view;
 
