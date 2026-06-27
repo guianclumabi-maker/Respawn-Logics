@@ -4,7 +4,7 @@ require_once __DIR__ . '/backend/services/RoleSeederService.php';
 
 // If already logged in normally, redirect to dashboard
 if (isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESSION['must_change_password'] !== true)) {
-    header('Location: ' . url('/pages/dashboard.php'));
+    header('Location: ' . url('/frontend/dist/index.html?v=' . time() . '#/dashboard'));
     exit;
 }
 
@@ -90,7 +90,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
             $_SESSION['user_name'] = $fullName;
             $_SESSION['tenant_id'] = $tenantId;
 
-            header('Location: ' . url('/pages/dashboard.php'));
+            header('Location: ' . url('/frontend/dist/index.html?v=' . time() . '#/dashboard'));
             exit;
 
         } catch (Exception $e) {

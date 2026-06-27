@@ -4,7 +4,7 @@ require_once __DIR__ . '/services/TotpService.php';
 
 // If already logged in normally, redirect to dashboard
 if (isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESSION['must_change_password'] !== true)) {
-    header('Location: ' . url('/pages/dashboard.php'));
+    header('Location: ' . url('/frontend/dist/index.html?v=' . time() . '#/dashboard'));
     exit;
 }
 
@@ -134,7 +134,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                 $_SESSION['theme_preference']  = $user['theme_preference'] ?? 'light';
                 $_SESSION['must_change_password'] = !empty($user['must_change_password']);
 
-                header('Location: ' . url('/pages/dashboard.php'));
+                header('Location: ' . url('/frontend/dist/index.html?v=' . time() . '#/dashboard'));
                 exit;
             } else {
                 // Record failed attempt in DB
@@ -184,7 +184,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                 $_SESSION['user_name']        = $user['full_name'];
                 $_SESSION['tenant_id']        = $user['tenant_id'];
                 $_SESSION['theme_preference'] = $user['theme_preference'] ?? 'light';
-                header('Location: ' . url('/pages/dashboard.php'));
+                header('Location: ' . url('/frontend/dist/index.html?v=' . time() . '#/dashboard'));
                 exit;
             } else {
                 $error = 'Invalid authentication code. Please try again.';
@@ -230,7 +230,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                 $_SESSION['tenant_id'] = $user['tenant_id'];
                 $_SESSION['theme_preference'] = $user['theme_preference'] ?? 'light';
                 
-                header('Location: ' . url('/pages/dashboard.php'));
+                header('Location: ' . url('/frontend/dist/index.html?v=' . time() . '#/dashboard'));
                 exit;
             } catch (PDOException $e) {
                 if ($pdo->inTransaction()) $pdo->rollBack();
