@@ -105,19 +105,10 @@ export default function MainLayout() {
   }, []);
 
   return (
-    <div className="flex h-screen w-full overflow-hidden bg-slate-100 dark:bg-[#06070a] relative z-0">
-      {/* Global Background Glow Effects */}
-      <div className="absolute top-[-100px] left-[-100px] w-[500px] h-[500px] rounded-full bg-[#00e07a] blur-[120px] opacity-[0.05] dark:opacity-[0.06] pointer-events-none z-[-1]" />
-      <div className="absolute bottom-[-150px] right-[-100px] w-[600px] h-[600px] rounded-full bg-[#9b6dff] blur-[140px] opacity-[0.03] dark:opacity-[0.05] pointer-events-none z-[-1]" />
-      
-      <Sidebar
-        activeView={activeView}
-        onViewChange={handleViewChange}
-        badges={badges}
-      />
-      
-      {/* This renders whatever matched the current route! */}
-      <Outlet />
+    <div className="flex h-screen bg-background text-foreground overflow-hidden">
+      <main className="flex-1 flex flex-col min-w-0 overflow-hidden relative z-10 bg-[#0f1422]">
+        <Outlet context={{ setBadges }} />
+      </main>
     </div>
   );
 }

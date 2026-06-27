@@ -83,6 +83,7 @@ if ($now - $_SESSION['rate_limit']['start'] > 60) {
 
 // Map routes to Controller classes
 $controllers = [
+    'dashboard' => 'DashboardController',
     'auth' => 'AuthController',
     'core_hr' => 'CoreHRController',
     'ai_companion' => 'AICompanionController',
