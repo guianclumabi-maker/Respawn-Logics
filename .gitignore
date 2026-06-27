@@ -9,3 +9,4 @@ scratch/
 
 storage/tenant_*/
 !storage/.htaccess
+frontend/dist/
