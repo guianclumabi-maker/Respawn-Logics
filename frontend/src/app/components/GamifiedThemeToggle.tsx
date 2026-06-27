@@ -2,7 +2,7 @@ import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
 import { Sun, Moon, Gamepad2 } from "lucide-react";
 
-export function GamifiedThemeToggle() {
+export function GamifiedThemeToggle({ collapsed }: { collapsed?: boolean }) {
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
 
@@ -21,9 +21,11 @@ export function GamifiedThemeToggle() {
       
       <div className="relative z-10 flex items-center gap-2">
         <Gamepad2 size={16} className={isDark ? "text-[#00e07a]" : "text-cyan-600"} />
-        <span className="text-xs font-bold uppercase tracking-wider text-gray-800 dark:text-gray-300 font-mono">
-          {isDark ? "Night Ops" : "Day Cycle"}
-        </span>
+        {!collapsed && (
+          <span className="text-xs font-bold uppercase tracking-wider text-gray-800 dark:text-gray-300 font-mono">
+            {isDark ? "Night Ops" : "Day Cycle"}
+          </span>
+        )}
       </div>
 
       <button

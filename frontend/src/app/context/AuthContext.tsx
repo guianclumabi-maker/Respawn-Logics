@@ -24,7 +24,7 @@ interface AuthContextType {
   loading: boolean;
   hasPermission: (perm: string) => boolean;
   hasRole: (role: string | string[]) => boolean;
-  login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
+  login: (email: string, password: string) => Promise<{ success: boolean; error?: string; redirect?: string }>;
   logout: () => Promise<void>;
 }
 

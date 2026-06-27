@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { ThemeProvider } from "next-themes";
 import { useAuth } from "../context/AuthContext";
-import { Plus, X, Rocket, Edit, Check, Wand2, Trash2, Ghost } from "lucide-react";
+import { Plus, X, Rocket, Edit, Check, Wand2, Trash2, Ghost, EyeOff } from "lucide-react";
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || (window.location.origin + (window.location.hostname === "localhost" ? "/respawn-logics" : ""));
 const API = `${API_BASE}/api/index.php?route=surveys`;

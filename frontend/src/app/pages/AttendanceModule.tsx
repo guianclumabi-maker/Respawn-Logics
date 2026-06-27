@@ -7,7 +7,7 @@ export function AttendanceModule() {
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState("my_logs");
 
-  const isManager = user?.permissions?.includes("attendance.manage") || user?.role === "Super_Admin";
+  const isManager = user?.permissions?.includes("attendance.manage") || user?.roles?.includes("Super_Admin");
 
   return (
     <div className="flex flex-col h-full w-full bg-[#06070a]">
