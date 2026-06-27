@@ -34,7 +34,13 @@ import {
   Scroll,
   MessageCircle,
   Menu,
-  Layers
+  Layers,
+  ArrowLeft,
+  Briefcase,
+  GitBranch,
+  CheckCircle,
+  Database,
+  Search
 } from "lucide-react";
 
 // ── Types ──────────────────────────────────────────────────
@@ -80,9 +86,10 @@ type NavSection = {
 
 // ── Navigation config ──────────────────────────────────────
 
-const getSections = (hasPermission: (p: string) => boolean, hasRole: (r: string | string[]) => boolean, tenantId: number | null): NavSection[] => [
+const getSections = (hasPermission: (p: string) => boolean, hasRole: (r: string | string[]) => boolean, tenantId: number | null, isAtsContext: boolean): NavSection[] => [
   {
     title: "Workspace",
+    hide: isAtsContext,
     items: [
       { label: "Dashboard", view: "Dashboard", icon: <LayoutGrid size={19} /> },
       // Surveys
@@ -106,7 +113,7 @@ const getSections = (hasPermission: (p: string) => boolean, hasRole: (r: string 
   },
   {
     title: "Administration",
-    hide: !(hasPermission("users.view") || hasPermission("settings.manage")),
+    hide: isAtsContext || !(hasPermission("users.view") || hasPermission("settings.manage")),
     items: [
       ...(hasPermission("analytics.view") ? [{ label: "Workforce Analytics", view: "Analytics", icon: <PieChart size={19} /> }] : []),
       ...(hasPermission("users.manage") || hasPermission("shifts.manage") ? [{ label: "Employee Directory", view: "HR Directory", icon: <Users size={19} /> }] : []),
@@ -137,7 +144,7 @@ const getSections = (hasPermission: (p: string) => boolean, hasRole: (r: string 
   },
   {
     title: "Vendor Universe",
-    hide: !hasRole(["Platform_Admin", "Support_Agent", "Implementation_Specialist"]),
+    hide: isAtsContext || !hasRole(["Platform_Admin", "Support_Agent", "Implementation_Specialist"]),
     items: [
       { label: "SaaS Headquarters", view: "SaaS Headquarters", icon: <Globe size={19} />, externalLink: "/pages/saas_admin.php" },
       ...(hasRole("Platform_Admin") ? [{ label: "Vendor Staff", view: "Vendor Staff", icon: <BadgeInfo size={19} />, externalLink: "/pages/saas_staff.php" }] : []),
@@ -147,11 +154,27 @@ const getSections = (hasPermission: (p: string) => boolean, hasRole: (r: string 
   },
   {
     title: "System",
-    hide: !hasPermission("audit.view"),
+    hide: isAtsContext || !hasPermission("audit.view"),
     items: [
       { label: "Audit Trail", view: "Audit Logs", icon: <Scroll size={19} /> }
     ]
   },
+  ...(hasPermission("ats.view") || hasPermission("ats.edit") || hasPermission("ats.edit_job") || hasPermission("ats.create_job") ? [{
+    title: "Hiring (ATS)",
+    hide: !isAtsContext,
+    items: [
+      { label: "Back to Workspace", view: "Dashboard", icon: <ArrowLeft size={19} />, color: "#00b8ff" },
+      { label: "ATS Dashboard", view: "ATS Dashboard", icon: <LayoutGrid size={19} /> },
+      { label: "Jobs", view: "Jobs", icon: <Briefcase size={19} />, badgeKey: "urgentJobs" },
+      { label: "Pipeline", view: "Pipeline", icon: <GitBranch size={19} /> },
+      { label: "Interviews", view: "Interviews", icon: <Calendar size={19} />, badgeKey: "todayInterviews" },
+      { label: "Approvals", view: "Approvals", icon: <CheckCircle size={19} />, badgeKey: "pendingApprovals" },
+      { label: "Candidates", view: "Candidates", icon: <Users size={19} /> },
+      { label: "Talent Pools", view: "Talent Pools", icon: <Database size={19} /> },
+      { label: "Talent Search", view: "Talent Search", icon: <Search size={19} /> },
+      { label: "Insights", view: "Insights", icon: <BarChart2 size={19} /> },
+    ],
+  }] : []),
   {
     title: "Account",
     items: [
@@ -188,8 +211,9 @@ export function Sidebar({ activeView, onViewChange, badges = {} }: SidebarProps)
   const [collapsed, setCollapsed] = useState(false);
   const { user, hasPermission, hasRole } = useAuth();
   const location = useLocation();
+  const isAtsContext = location.pathname.startsWith("/ats");
 
-  const sections = getSections(hasPermission, hasRole, user?.tenant_id || null).filter(s => !s.hide);
+  const sections = getSections(hasPermission, hasRole, user?.tenant_id || null, isAtsContext).filter(s => !s.hide);
 
   const isActive = (view: string) => activeView.view === view;
 
