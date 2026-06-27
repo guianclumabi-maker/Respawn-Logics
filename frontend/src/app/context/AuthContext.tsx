@@ -68,6 +68,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // ── Login ──
   const login = useCallback(
     async (email: string, password: string): Promise<{ success: boolean; error?: string; redirect?: string }> => {
+      if (!(window as any).__CSRF_TOKEN__) {
+        try {
+          const tokenRes = await fetch(`${API_BASE}/api/index.php?route=auth&action=csrf`, { credentials: "include" });
+          const tokenData = await tokenRes.json();
+          if (tokenData.success && tokenData.csrf_token) {
+            (window as any).__CSRF_TOKEN__ = tokenData.csrf_token;
+          }
+        } catch (e) {
+          console.error("Failed to fetch initial CSRF token", e);
+        }
+      }
+
       try {
         const res = await fetch(
           `${API_BASE}/api/index.php?route=auth&action=login`,
