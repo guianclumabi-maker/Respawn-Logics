@@ -1,4 +1,4 @@
-import { createHashRouter, useNavigate, useParams, useSearchParams } from "react-router-dom";
+import { createHashRouter, Navigate, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import MainLayout from "./layouts/MainLayout";
 import { viewStateToPath } from "./lib/atsNav";
 
@@ -67,6 +67,7 @@ export const router = createHashRouter([
     path: "/",
     element: <MainLayout />,
     children: [
+      { index: true, element: <Navigate to="/dashboard" replace /> },
       { path: "dashboard", element: <HomeDashboard /> },
       { path: "employee-relations", element: <EmployeeRelations /> },
       { path: "hr-directory", element: <HRDirectory /> },
@@ -110,7 +111,8 @@ export const router = createHashRouter([
           { path: "settings", element: <TenantSettings /> },
           { path: "audit", element: <AuditLogs /> },
         ]
-      }
+      },
+      { path: "*", element: <Navigate to="/dashboard" replace /> }
     ]
   },
   { path: "/onboarding", element: <OnboardingManager /> }

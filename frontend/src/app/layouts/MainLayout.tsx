@@ -76,10 +76,6 @@ export default function MainLayout() {
     const viewState = typeof viewOrState === "string" ? { view: viewOrState } : viewOrState;
     setActiveView(viewState);
 
-    if (viewState.view === "Dashboard") {
-      window.location.href = `${API_BASE}/pages/dashboard.php`;
-      return;
-    }
 
     navigate(viewStateToPath(viewState));
   };
