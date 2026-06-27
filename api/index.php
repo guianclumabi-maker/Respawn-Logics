@@ -120,6 +120,7 @@ $controllers = [
     'surveys' => 'SurveyController',
     'audit' => 'AuditController',
     'onboarding' => 'OnboardingController',
+    'health' => 'HealthController',
 ];
 
 if (!array_key_exists($route, $controllers)) {
