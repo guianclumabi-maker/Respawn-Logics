@@ -155,7 +155,7 @@ class CandidatesController
 
     private function updateMatchScore($appId, $candidateId, $jobId) {
         require_once __DIR__ . '/../services/Scoring/ScoringProvider.php';
-        require_once __DIR__ . '/../services/Scoring/HeuristicScoringProvider.php';
+        require_once __DIR__ . '/../services/Scoring/LLMScoringProvider.php';
         
         $candidate = $this->pdo->prepare("SELECT * FROM `candidate_profiles` WHERE `id` = ?");
         $candidate->execute([$candidateId]);
@@ -165,7 +165,7 @@ class CandidatesController
         $job->execute([$jobId]);
         $j = $job->fetch();
         
-        $provider = new \Respawn\Services\Scoring\HeuristicScoringProvider();
+        $provider = new \Respawn\Services\Scoring\LLMScoringProvider();
         $match = $provider->score($c ?: [], $j ?: []);
         
         $stmt = $this->pdo->prepare("UPDATE `candidate_applications` SET `ai_match_score` = ?, `score_breakdown` = ?, `score_source` = ?, `scored_at` = NOW() WHERE `id` = ? AND `tenant_id` = ?");
@@ -1358,8 +1358,12 @@ class CandidatesController
             $relativePath = 'tenant_' . $this->tenantId . '/resumes/' . $secureFilename;
             $now = date('Y-m-d H:i:s');
 
-            $updateStmt = $this->pdo->prepare("UPDATE `candidate_profiles` SET `resume_file_path` = ?, `resume_filename` = ?, `resume_mime` = ?, `resume_uploaded_at` = ? WHERE `id` = ?");
-            $updateStmt->execute([$relativePath, $originalName, $mime, $now, $candidateId]);
+            // Parse text
+            require_once __DIR__ . '/../services/ResumeParser.php';
+            $extractedText = \Respawn\Services\ResumeParser::parseText($destPath, $mime);
+
+            $updateStmt = $this->pdo->prepare("UPDATE `candidate_profiles` SET `resume_file_path` = ?, `resume_filename` = ?, `resume_mime` = ?, `resume_uploaded_at` = ?, `resume_text` = ? WHERE `id` = ?");
+            $updateStmt->execute([$relativePath, $originalName, $mime, $now, $extractedText, $candidateId]);
 
             $this->logActivity('resume_uploaded', "Uploaded resume: $originalName", $candidateId);
 
