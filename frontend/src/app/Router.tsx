@@ -26,7 +26,7 @@ import { CandidateProfile } from "./components/CandidateProfile";
 import { PoolDetail } from "./components/PoolDetail";
 
 // Shell Components
-import { AttendanceDashboard } from "./pages/AttendanceDashboard";
+import { AttendanceModule } from "./pages/AttendanceModule";
 import { Scheduling } from "./pages/Scheduling";
 import { BenefitsAdmin } from "./pages/BenefitsAdmin";
 import { CompensationAdmin } from "./pages/CompensationAdmin";
@@ -72,7 +72,7 @@ export const router = createHashRouter([
       { path: "hr-directory", element: <HRDirectory /> },
       { path: "org-chart", element: <OrgChart /> },
       { path: "leaves", element: <LeavesDashboard /> },
-      { path: "attendance", element: <AttendanceDashboard /> },
+      { path: "attendance", element: <AttendanceModule /> },
       { path: "scheduling", element: <Scheduling /> },
       { path: "payroll", element: <PayrollManager /> },
       { path: "benefits", element: <BenefitsAdmin /> },
