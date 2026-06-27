@@ -63,7 +63,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   // ── Login ──
   const login = useCallback(
-    async (email: string, password: string): Promise<{ success: boolean; error?: string }> => {
+    async (email: string, password: string): Promise<{ success: boolean; error?: string; redirect?: string }> => {
       try {
         const res = await fetch(
           `${API_BASE}/api/index.php?route=auth&action=login`,
@@ -75,11 +75,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           }
         );
         const data = await res.json();
-        if (data.success && data.user) {
-          setUser(data.user);
-          if (data.user.theme) setTheme(data.user.theme);
-          return { success: true };
+        
+        if (data.success) {
+          if (data.redirect) {
+            return { success: true, redirect: data.redirect };
+          }
+          if (data.user) {
+            setUser(data.user);
+            if (data.user.theme) setTheme(data.user.theme);
+            return { success: true };
+          }
         }
+        
         return { success: false, error: data.error || "Invalid email or password." };
       } catch {
         return { success: false, error: "Unable to reach the server. Please try again." };

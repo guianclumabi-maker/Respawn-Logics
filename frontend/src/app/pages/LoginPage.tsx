@@ -25,7 +25,11 @@ export function LoginPage() {
     const result = await login(email.trim(), password);
     setSubmitting(false);
     if (result.success) {
-      navigate("/dashboard", { replace: true });
+      if (result.redirect) {
+        window.location.href = result.redirect;
+      } else {
+        navigate("/dashboard", { replace: true });
+      }
     } else {
       setError(result.error || "Login failed.");
     }

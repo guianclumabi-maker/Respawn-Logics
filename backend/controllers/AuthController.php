@@ -31,6 +31,35 @@ class AuthController
                     $user = $stmt->fetch();
 
                     if ($user && !empty($user['password_hash']) && password_verify($password, $user['password_hash'])) {
+                        // 1. Check for 2FA
+                        if (!empty($user['totp_enabled'])) {
+                            $_SESSION['2fa_pending_user_id'] = $user['id'];
+                            $_SESSION['2fa_pending_user_email'] = $user['email'];
+                            echo json_encode([
+                                'success' => true,
+                                'require_2fa' => true,
+                                'redirect' => url('/login.php?step=2fa')
+                            ]);
+                            return;
+                        }
+
+                        // 2. Check for must_change_password
+                        if (!empty($user['must_change_password'])) {
+                            $_SESSION['user_id']           = $user['id'];
+                            $_SESSION['user_email']        = $user['email'];
+                            $_SESSION['user_name']         = $user['full_name'];
+                            $_SESSION['tenant_id']         = $user['tenant_id'];
+                            $_SESSION['theme_preference']  = $user['theme_preference'] ?? 'dark';
+                            $_SESSION['must_change_password'] = true;
+                            
+                            echo json_encode([
+                                'success' => true,
+                                'must_change_password' => true,
+                                'redirect' => url('/login.php?step=set_password')
+                            ]);
+                            return;
+                        }
+
                         session_regenerate_id(true); // Prevent Session Fixation
                         
                         $_SESSION['user_id']           = $user['id'];
@@ -38,7 +67,7 @@ class AuthController
                         $_SESSION['user_name']         = $user['full_name'];
                         $_SESSION['tenant_id']         = $user['tenant_id'];
                         $_SESSION['theme_preference']  = $user['theme_preference'] ?? 'dark';
-                        $_SESSION['must_change_password'] = !empty($user['must_change_password']);
+                        $_SESSION['must_change_password'] = false;
 
                         echo json_encode([
                             'success' => true,
