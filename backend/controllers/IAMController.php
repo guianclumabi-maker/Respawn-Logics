@@ -44,6 +44,8 @@ class IAMController
             // Exception for grant_support_access which can be triggered by Super Admins/Tenant Admins
             if ($action === 'grant_support_access' && hasPermission('settings.manage')) {
                 // allowed
+            } elseif ($action === 'change_tier' && hasPermission('settings.manage')) {
+                // allowed
             } else {
                 http_response_code(403);
                 echo json_encode(['success' => false, 'error' => 'Forbidden']);
@@ -169,9 +171,90 @@ class IAMController
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $data = json_decode(file_get_contents('php://input'), true);
 
+            if ($action === 'change_tier') {
+                if (!hasPermission('settings.manage')) {
+                    http_response_code(403);
+                    echo json_encode(['success' => false, 'error' => 'settings.manage permission required']);
+                    return;
+                }
+                
+                $newMode = $data['setup_mode'] ?? null;
+                require_once __DIR__ . '/../services/RoleSeederService.php';
+                $config = require __DIR__ . '/../../config/rbac_tiers.php';
+                
+                if (!$newMode || !isset($config['tiers'][$newMode])) {
+                    http_response_code(400);
+                    echo json_encode(['success' => false, 'error' => 'Invalid tier setup mode']);
+                    return;
+                }
+
+                try {
+                    $this->pdo->beginTransaction();
+                    
+                    // Additive seeding
+                    $rolesToSeed = $config['tiers'][$newMode]['roles'];
+                    $roleDefinitions = $config['roles'];
+                    
+                    // Get existing roles
+                    $stmtExisting = $this->pdo->prepare("SELECT name FROM roles WHERE tenant_id = ?");
+                    $stmtExisting->execute([$this->tenantId]);
+                    $existingRoles = $stmtExisting->fetchAll(PDO::FETCH_COLUMN);
+
+                    // Get all permission IDs
+                    $stmtPerms = $this->pdo->query("SELECT id, permission_key FROM permissions");
+                    $allPerms = [];
+                    $allPermIds = [];
+                    while ($row = $stmtPerms->fetch(PDO::FETCH_ASSOC)) {
+                        $allPerms[$row['permission_key']] = $row['id'];
+                        $allPermIds[] = $row['id'];
+                    }
+
+                    $stmtAddRole = $this->pdo->prepare("INSERT INTO roles (tenant_id, name, description, is_system_role) VALUES (?, ?, ?, 1)");
+                    $stmtLinkPerm = $this->pdo->prepare("INSERT INTO role_permissions (role_id, permission_id) VALUES (?, ?)");
+
+                    foreach ($rolesToSeed as $roleName) {
+                        if (in_array($roleName, $existingRoles)) continue;
+                        
+                        $def = $roleDefinitions[$roleName];
+                        $stmtAddRole->execute([$this->tenantId, $roleName, $def['desc']]);
+                        $roleId = $this->pdo->lastInsertId();
+
+                        $permsToGrant = [];
+                        if (in_array('*', $def['perms'])) {
+                            $permsToGrant = $allPermIds;
+                        } else {
+                            foreach ($def['perms'] as $k) {
+                                if (isset($allPerms[$k])) {
+                                    $permsToGrant[] = $allPerms[$k];
+                                }
+                            }
+                        }
+
+                        foreach ($permsToGrant as $pid) {
+                            $stmtLinkPerm->execute([$roleId, $pid]);
+                        }
+                    }
+                    
+                    // Update tenant setup_mode
+                    $stmtUpdateTenant = $this->pdo->prepare("UPDATE tenants SET setup_mode = ?, permission_version = permission_version + 1 WHERE id = ?");
+                    $stmtUpdateTenant->execute([$newMode, $this->tenantId]);
+                    
+                    $this->pdo->commit();
+                    
+                    echo json_encode(['success' => true, 'tier_config' => $config['tiers'][$newMode]]);
+                } catch (Exception $e) {
+                    $this->pdo->rollBack();
+                    http_response_code(500);
+                    echo json_encode(['success' => false, 'error' => $e->getMessage()]);
+                }
+                return;
+            }
+
             if ($action === 'assign_role') {
                 $user_id = $data['user_id'] ?? null;
                 $role_id = $data['role_id'] ?? null;
+                $scope = $data['scope'] ?? null;
+                $org_unit_id = $data['org_unit_id'] ?? null;
 
                 if (!$user_id || !$role_id) {
                     http_response_code(400);
@@ -180,40 +263,10 @@ class IAMController
                 }
 
                 try {
-                    // Ensure both user and role belong to tenant
-                    $checkStmt = $this->pdo->prepare("
-                        SELECT 
-                            (SELECT COUNT(*) FROM users WHERE id = ? AND tenant_id = ?) as u_count,
-                            (SELECT COUNT(*) FROM roles WHERE id = ? AND tenant_id = ?) as r_count
-                    ");
-                    $checkStmt->execute([$user_id, $this->tenantId, $role_id, $this->tenantId]);
-                    $res = $checkStmt->fetch();
-                    if ($res['u_count'] == 0 || $res['r_count'] == 0) {
-                        throw new Exception("Invalid user or role for this tenant.");
-                    }
-
-                    $scope = $data['scope'] ?? 'tenant';
-                    $org_unit_id = $data['org_unit_id'] ?? null;
-
-                    $stmt = $this->pdo->prepare("
-                        INSERT INTO user_roles (user_id, role_id, scope, org_unit_id) 
-                        VALUES (?, ?, ?, ?)
-                        ON DUPLICATE KEY UPDATE scope = VALUES(scope), org_unit_id = VALUES(org_unit_id)
-                    ");
-                    $stmt->execute([$user_id, $role_id, $scope, $org_unit_id]);
-                    
-                    // Audit Log
-                    $emailStmt = $this->pdo->prepare("SELECT email FROM users WHERE id = ?");
-                    $emailStmt->execute([$user_id]);
-                    $uEmail = $emailStmt->fetchColumn();
-                    logAction($uEmail, 'Role Assigned/Updated', "Role ID {$role_id} assigned with scope {$scope}");
-
-                    // Increment permission_version to invalidate cache for this tenant
-                    $this->pdo->prepare("UPDATE tenants SET permission_version = permission_version + 1 WHERE id = ?")->execute([$this->tenantId]);
-
+                    $this->applyRoleAssignment($user_id, $role_id, $scope, $org_unit_id);
                     echo json_encode(['success' => true]);
                 } catch (Exception $e) {
-                    http_response_code(500);
+                    http_response_code(400); // Bad request for invalid scope/org unit
                     echo json_encode(['success' => false, 'error' => $e->getMessage()]);
                 }
                 return;
@@ -318,6 +371,9 @@ class IAMController
             if ($action === 'invite_user') {
                 $full_name = trim($data['full_name'] ?? '');
                 $email = trim($data['email'] ?? '');
+                $role_id = $data['role_id'] ?? null;
+                $scope = $data['scope'] ?? null;
+                $org_unit_id = $data['org_unit_id'] ?? null;
                 
                 if (empty($full_name) || empty($email)) {
                     http_response_code(400);
@@ -338,17 +394,29 @@ class IAMController
                     // Default password hash (password123)
                     $password_hash = password_hash('password123', PASSWORD_DEFAULT);
 
+                    $this->pdo->beginTransaction();
+
                     $stmt = $this->pdo->prepare("
                         INSERT INTO users (tenant_id, full_name, email, password_hash, employment_status, created_at) 
                         VALUES (?, ?, ?, ?, 'Active', NOW())
                     ");
                     $stmt->execute([$this->tenantId, $full_name, $email, $password_hash]);
+                    $newUserId = $this->pdo->lastInsertId();
+                    
+                    if ($role_id) {
+                        $this->applyRoleAssignment($newUserId, $role_id, $scope, $org_unit_id);
+                    }
+                    
+                    $this->pdo->commit();
                     
                     logAction($this->currentUser['email'], 'User Invited', "Invited user {$email}");
 
                     echo json_encode(['success' => true]);
                 } catch (Exception $e) {
-                    http_response_code(500);
+                    if ($this->pdo->inTransaction()) {
+                        $this->pdo->rollBack();
+                    }
+                    http_response_code(400);
                     echo json_encode(['success' => false, 'error' => $e->getMessage()]);
                 }
                 return;
@@ -438,4 +506,62 @@ class IAMController
         http_response_code(400);
         echo json_encode(['success' => false, 'error' => 'Invalid action']);
     }
+
+    private function applyRoleAssignment($userId, $roleId, $scope, $orgUnitId)
+    {
+        // Ensure both user and role belong to tenant
+        $checkStmt = $this->pdo->prepare("
+            SELECT 
+                (SELECT COUNT(*) FROM users WHERE id = ? AND tenant_id = ?) as u_count,
+                (SELECT COUNT(*) FROM roles WHERE id = ? AND tenant_id = ?) as r_count
+        ");
+        $checkStmt->execute([$userId, $this->tenantId, $roleId, $this->tenantId]);
+        $res = $checkStmt->fetch();
+        if ($res['u_count'] == 0 || $res['r_count'] == 0) {
+            throw new Exception("Invalid user or role for this tenant.");
+        }
+
+        $stmtTier = $this->pdo->prepare("SELECT setup_mode FROM tenants WHERE id = ?");
+        $stmtTier->execute([$this->tenantId]);
+        $setupMode = $stmtTier->fetchColumn() ?: 'Solo';
+        require_once __DIR__ . '/../services/RoleSeederService.php';
+        $tierConfig = RoleSeederService::getTierConfig($setupMode);
+
+        if (empty($scope)) {
+            $scope = $tierConfig['default_scope'];
+        }
+
+        $validScopes = ['self', 'team', 'department', 'branch', 'tenant'];
+        if (!in_array($scope, $validScopes)) {
+            throw new Exception("Invalid scope.");
+        }
+
+        if (in_array($scope, ['department', 'branch'])) {
+            if (empty($orgUnitId)) {
+                throw new Exception("org_unit_id is required for department or branch scope.");
+            }
+            $stmtCheckOrg = $this->pdo->prepare("SELECT id FROM org_units WHERE id = ? AND tenant_id = ?");
+            $stmtCheckOrg->execute([$orgUnitId, $this->tenantId]);
+            if (!$stmtCheckOrg->fetch()) {
+                throw new Exception("Invalid org unit for this tenant.");
+            }
+        }
+
+        $stmt = $this->pdo->prepare("
+            INSERT INTO user_roles (user_id, role_id, scope, org_unit_id) 
+            VALUES (?, ?, ?, ?)
+            ON DUPLICATE KEY UPDATE scope = VALUES(scope), org_unit_id = VALUES(org_unit_id)
+        ");
+        $stmt->execute([$userId, $roleId, $scope, !empty($orgUnitId) ? $orgUnitId : null]);
+
+        // Increment permission_version to invalidate cache for this tenant
+        $this->pdo->prepare("UPDATE tenants SET permission_version = permission_version + 1 WHERE id = ?")->execute([$this->tenantId]);
+        
+        // Audit Log
+        $emailStmt = $this->pdo->prepare("SELECT email FROM users WHERE id = ?");
+        $emailStmt->execute([$userId]);
+        $uEmail = $emailStmt->fetchColumn();
+        logAction($uEmail, 'Role Assigned/Updated', "Role ID {$roleId} assigned with scope {$scope}");
+    }
 }
+
