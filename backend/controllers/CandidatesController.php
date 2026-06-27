@@ -64,7 +64,8 @@ class CandidatesController
             requirePermission('ats.edit');
         } elseif (
             $action === 'delete_candidate' || $action === 'delete_pool' || 
-            $action === 'delete' || $action === 'resolve_approval' || $action === 'erase_candidate'
+            $action === 'delete' || $action === 'resolve_approval' || $action === 'erase_candidate' ||
+            $action === 'export_candidate'
         ) {
             requirePermission('ats.delete');
         } elseif ($action === 'upload_resume') {
@@ -1398,9 +1399,12 @@ class CandidatesController
         $dbPath = preg_replace('/^storage\//', '', $candidate['resume_file_path']);
         $fullPath = rtrim($storageBase, '/') . '/' . ltrim($dbPath, '/');
 
-        if (!file_exists($fullPath)) {
+        $realBase = realpath($storageBase);
+        $realPath = realpath($fullPath);
+
+        if (!$realBase || !$realPath || strpos($realPath, $realBase) !== 0 || !file_exists($realPath)) {
             http_response_code(404);
-            echo "File missing from storage";
+            echo "File missing from storage or access denied";
             exit;
         }
 
