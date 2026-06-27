@@ -12,8 +12,8 @@ export function OrgUnits() {
     const [selectedUnit, setSelectedUnit] = useState('');
 
     useEffect(() => {
-        if (user?.tenant_setup_mode === 'Solo' || user?.tenant_setup_mode === 'Small') {
-            return; // Hide for small tenants
+        if (!user?.tier_config?.org_units) {
+            return; // Hide if tier doesn't support org units
         }
         fetchData();
     }, [user]);
@@ -59,8 +59,8 @@ export function OrgUnits() {
         fetchData();
     };
 
-    if (user?.tenant_setup_mode === 'Solo' || user?.tenant_setup_mode === 'Small') {
-        return <div className="p-8 text-center text-gray-500">Org Units are only available for Enterprise plans.</div>;
+    if (!user?.tier_config?.org_units) {
+        return <div className="p-8 text-center text-gray-500">Org Units are not available on your current plan. Please upgrade to access this feature.</div>;
     }
 
     if (loading) return <div className="p-8 text-white">Loading...</div>;
