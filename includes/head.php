@@ -1,7 +1,7 @@
 <?php
 $page_title = $page_title ?? 'Respawn Logics';
-$userTheme = $_SESSION['theme_preference'] ?? 'light';
-if ($userTheme === 'system') $userTheme = 'light'; // Fallback to light if system
+$userTheme = $_SESSION['theme_preference'] ?? 'dark';
+if ($userTheme === 'system') $userTheme = 'dark'; // Fallback to dark if system
 ?>
 <!DOCTYPE html>
 <html lang="en" data-theme="<?= htmlspecialchars($userTheme) ?>">

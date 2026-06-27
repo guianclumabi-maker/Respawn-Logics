@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useEffect, useState, useCallback } from "react";
+import { useTheme } from "next-themes";
 
 const API_BASE =
   import.meta.env.VITE_API_BASE_URL ||
@@ -15,6 +16,7 @@ interface AuthUser {
   permissions: string[];
   tenant_id?: number;
   tenant_setup_mode?: string;
+  theme?: string;
 }
 
 interface AuthContextType {
@@ -40,6 +42,7 @@ export const useAuth = () => useContext(AuthContext);
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<AuthUser | null>(null);
   const [loading, setLoading] = useState(true);
+  const { setTheme } = useTheme();
 
   // ── Bootstrap: fetch current session ──
   useEffect(() => {
@@ -48,6 +51,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       .then((data) => {
         if (data.success && data.user) {
           setUser(data.user);
+          if (data.user.theme) setTheme(data.user.theme);
           if (data.csrf_token) (window as any).__CSRF_TOKEN__ = data.csrf_token;
         } else {
           setUser(null);
@@ -73,6 +77,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         const data = await res.json();
         if (data.success && data.user) {
           setUser(data.user);
+          if (data.user.theme) setTheme(data.user.theme);
           return { success: true };
         }
         return { success: false, error: data.error || "Invalid email or password." };
