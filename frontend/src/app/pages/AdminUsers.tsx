@@ -3,7 +3,7 @@ import { useAuth } from "../context/AuthContext";
 import { User, Mail, Shield, Circle, Edit, Trash2 } from "lucide-react";
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || (window.location.origin + (window.location.hostname === "localhost" ? "/respawn-logics" : ""));
-const API = `${API_BASE}/api.php?action=users_list`;
+const API = `${API_BASE}/api/index.php?route=iam&action=users`;
 
 type UserData = {
   id: number;
@@ -24,8 +24,8 @@ export function AdminUsers() {
         const res = await fetch(API, { credentials: "include" });
         if (res.ok) {
           const json = await res.json();
-          if (json.success && json.users) {
-            setUsers(json.users);
+          if (json.success && json.data) {
+            setUsers(json.data);
             return;
           }
         }
