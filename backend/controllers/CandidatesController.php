@@ -157,12 +157,12 @@ class CandidatesController
         require_once __DIR__ . '/../services/Scoring/ScoringProvider.php';
         require_once __DIR__ . '/../services/Scoring/LLMScoringProvider.php';
         
-        $candidate = $this->pdo->prepare("SELECT * FROM `candidate_profiles` WHERE `id` = ?");
-        $candidate->execute([$candidateId]);
+        $candidate = $this->pdo->prepare("SELECT * FROM `candidate_profiles` WHERE `id` = ? AND `tenant_id` = ?");
+        $candidate->execute([$candidateId, $this->tenantId]);
         $c = $candidate->fetch();
         
-        $job = $this->pdo->prepare("SELECT * FROM `jobs` WHERE `id` = ?");
-        $job->execute([$jobId]);
+        $job = $this->pdo->prepare("SELECT * FROM `jobs` WHERE `id` = ? AND `tenant_id` = ?");
+        $job->execute([$jobId, $this->tenantId]);
         $j = $job->fetch();
         
         $provider = new \Respawn\Services\Scoring\LLMScoringProvider();
@@ -641,6 +641,9 @@ class CandidatesController
         $jStmt->execute([$jobId, $this->tenantId]);
         $j = $jStmt->fetch();
 
+        // Note: This endpoint (legacy "Smart Match" button in old UI) still uses HeuristicScoringProvider directly
+        // to maintain consistent behavior for users not using the new LLM scoring engine.
+        // The main ATS pipeline uses LLMScoringProvider (which falls back to Heuristic if API fails).
         $provider = new \Respawn\Services\Scoring\HeuristicScoringProvider();
         $match = $provider->score($c ?: [], $j ?: []);
 
@@ -1308,8 +1311,9 @@ class CandidatesController
 
         $file = $_FILES['resume'];
 
-        // Size check (5MB)
+        // Size check (5MB) - strict cap before any parsing or moving to prevent memory exhaustion
         if ($file['size'] > 5 * 1024 * 1024) {
+            http_response_code(413);
             echo json_encode(['success' => false, 'error' => 'File exceeds 5MB limit']);
             exit;
         }
@@ -1406,7 +1410,7 @@ class CandidatesController
         $realBase = realpath($storageBase);
         $realPath = realpath($fullPath);
 
-        if (!$realBase || !$realPath || strpos($realPath, $realBase) !== 0 || !file_exists($realPath)) {
+        if (!$realBase || !$realPath || ($realPath !== $realBase && strpos($realPath, $realBase . DIRECTORY_SEPARATOR) !== 0) || !file_exists($realPath)) {
             http_response_code(404);
             echo "File missing from storage or access denied";
             exit;

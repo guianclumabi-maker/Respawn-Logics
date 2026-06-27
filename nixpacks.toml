@@ -2,7 +2,7 @@ providers = ["node", "php"]
 
 
 [phases.install]
-cmds = ["npm install", "cd frontend && npm install --include=dev"]
+cmds = ["npm install", "cd frontend && npm install --include=dev", "composer install --no-dev --optimize-autoloader --no-interaction"]
 
 [phases.build]
 cmds = ["cd frontend && npm run build"]

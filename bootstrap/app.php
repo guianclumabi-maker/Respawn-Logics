@@ -1,5 +1,9 @@
 <?php
 
+if (file_exists(__DIR__ . '/../vendor/autoload.php')) {
+    require_once __DIR__ . '/../vendor/autoload.php';
+}
+
 // 1. Load Environment Variables
 $envFile = __DIR__ . '/../.env';
 $localEnv = file_exists($envFile) ? parse_ini_file($envFile) : [];
