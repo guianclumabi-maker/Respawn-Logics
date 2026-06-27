@@ -50,13 +50,13 @@ if ($user) {
             <?php endif; ?> -->
 
             <?php if (tenantModuleEnabled('surveys')): ?>
-            <a href="<?= url('/pages/surveys.php') ?>" class="menu-item <?= $current_page === 'surveys.php' ? 'active' : '' ?>">
+            <a href="<?= url('/frontend/dist/index.html?v=' . time() . '#/surveys') ?>" class="menu-item <?= $current_page === 'surveys.php' ? 'active' : '' ?>">
                 <i data-lucide="bar-chart-2"></i>
                 <span>Engagement Surveys</span>
             </a>
             <?php endif; ?>
 
-            <a href="<?= url('/pages/ai_companion.php') ?>" class="menu-item <?= $current_page === 'ai_companion.php' ? 'active' : '' ?>">
+            <a href="<?= url('/frontend/dist/index.html?v=' . time() . '#/ai-companion') ?>" class="menu-item <?= $current_page === 'ai_companion.php' ? 'active' : '' ?>">
                 <i data-lucide="sparkles"></i>
                 <span>AI Companion</span>
             </a>
@@ -69,7 +69,7 @@ if ($user) {
             <?php endif; // end attendance ?>
 
             <?php if (hasPermission('shifts.manage') && tenantModuleEnabled('shifts')): ?>
-            <a href="<?= url('/pages/scheduling.php') ?>" class="menu-item <?= $current_page === 'scheduling.php' ? 'active' : '' ?>">
+            <a href="<?= url('/frontend/dist/index.html?v=' . time() . '#/scheduling') ?>" class="menu-item <?= $current_page === 'scheduling.php' ? 'active' : '' ?>">
                 <i data-lucide="calendar"></i>
                 <span>Shift Scheduler</span>
             </a>
@@ -82,7 +82,7 @@ if ($user) {
             </a>
             <?php endif; ?>
 
-            <a href="<?= url('/pages/org-chart.php') ?>" class="menu-item <?= $current_page === 'org-chart.php' ? 'active' : '' ?>">
+            <a href="<?= url('/frontend/dist/index.html?v=' . time() . '#/org-chart') ?>" class="menu-item <?= $current_page === 'org-chart.php' ? 'active' : '' ?>">
                 <i data-lucide="network"></i>
                 <span>Org Chart Directory</span>
             </a>
@@ -159,28 +159,28 @@ if ($user) {
             <?php endif; ?>
 
             <?php if (hasPermission('compensation.manage')): ?>
-            <a href="<?= url('/pages/compensation_admin.php') ?>" class="menu-item <?= $current_page === 'compensation_admin.php' ? 'active' : '' ?>">
+            <a href="<?= url('/frontend/dist/index.html?v=' . time() . '#/compensation') ?>" class="menu-item <?= $current_page === 'compensation_admin.php' ? 'active' : '' ?>">
                 <i data-lucide="scale"></i>
                 <span>Compensation &amp; Equity</span>
             </a>
             <?php endif; ?>
 
             <?php if (hasPermission('performance.manage') && tenantModuleEnabled('performance')): ?>
-            <a href="<?= url('/pages/performance_admin.php') ?>" class="menu-item <?= $current_page === 'performance_admin.php' ? 'active' : '' ?>">
+            <a href="<?= url('/frontend/dist/index.html?v=' . time() . '#/performance') ?>" class="menu-item <?= $current_page === 'performance_admin.php' ? 'active' : '' ?>">
                 <i data-lucide="star"></i>
                 <span>Performance</span>
             </a>
             <?php endif; ?>
 
             <?php if (hasPermission('expenses.manage') && tenantModuleEnabled('expenses')): ?>
-            <a href="<?= url('/pages/expenses_admin.php') ?>" class="menu-item <?= $current_page === 'expenses_admin.php' ? 'active' : '' ?>">
+            <a href="<?= url('/frontend/dist/index.html?v=' . time() . '#/expenses') ?>" class="menu-item <?= $current_page === 'expenses_admin.php' ? 'active' : '' ?>">
                 <i data-lucide="receipt"></i>
                 <span>Expenses &amp; Claims</span>
             </a>
             <?php endif; ?>
 
             <?php if (hasPermission('benefits.manage') && tenantModuleEnabled('benefits')): ?>
-            <a href="<?= url('/pages/benefits_admin.php') ?>" class="menu-item <?= $current_page === 'benefits_admin.php' ? 'active' : '' ?>">
+            <a href="<?= url('/frontend/dist/index.html?v=' . time() . '#/benefits') ?>" class="menu-item <?= $current_page === 'benefits_admin.php' ? 'active' : '' ?>">
                 <i data-lucide="gift"></i>
                 <span>Benefits &amp; HMO</span>
             </a>
@@ -194,28 +194,28 @@ if ($user) {
             <?php endif; ?>
 
             <?php if (hasPermission('users.view')): ?>
-            <a href="<?= url('/pages/admin_users.php') ?>" class="menu-item <?= $current_page === 'admin_users.php' ? 'active' : '' ?>">
+            <a href="<?= url('/frontend/dist/index.html?v=' . time() . '#/admin/users') ?>" class="menu-item <?= $current_page === 'admin_users.php' ? 'active' : '' ?>">
                 <i data-lucide="user-cog"></i>
                 <span>Users</span>
             </a>
             <?php endif; ?>
             
             <?php if (hasPermission('users.manage')): ?>
-            <a href="<?= url('/pages/admin_roles.php') ?>" class="menu-item <?= $current_page === 'admin_roles.php' ? 'active' : '' ?>">
+            <a href="<?= url('/frontend/dist/index.html?v=' . time() . '#/admin/roles') ?>" class="menu-item <?= $current_page === 'admin_roles.php' ? 'active' : '' ?>">
                 <i data-lucide="shield-half"></i>
                 <span>Roles &amp; Permissions</span>
             </a>
             <?php endif; ?>
             
             <?php if (hasPermission('settings.manage')): ?>
-            <a href="<?= url('/pages/tenant_settings.php') ?>" class="menu-item <?= $current_page === 'tenant_settings.php' ? 'active' : '' ?>">
+            <a href="<?= url('/frontend/dist/index.html?v=' . time() . '#/admin/settings') ?>" class="menu-item <?= $current_page === 'tenant_settings.php' ? 'active' : '' ?>">
                 <i data-lucide="settings"></i>
                 <span>Tenant Settings</span>
             </a>
             <?php endif; ?>
             
             <?php if (hasPermission('settings.manage')): ?>
-            <a href="<?= url('/pages/knowledge_admin.php') ?>" class="menu-item <?= $current_page === 'knowledge_admin.php' ? 'active' : '' ?>">
+            <a href="<?= url('/frontend/dist/index.html?v=' . time() . '#/knowledge') ?>" class="menu-item <?= $current_page === 'knowledge_admin.php' ? 'active' : '' ?>">
                 <i data-lucide="book-open"></i>
                 <span>Knowledge Base Review</span>
             </a>
@@ -261,7 +261,7 @@ if ($user) {
         <?php if (hasPermission('audit.view')): ?>
         <div class="menu-group">
             <div class="group-title">System</div>
-            <a href="<?= url('/pages/audit_logs.php') ?>" class="menu-item <?= $current_page === 'audit_logs.php' ? 'active' : '' ?>">
+            <a href="<?= url('/frontend/dist/index.html?v=' . time() . '#/admin/audit') ?>" class="menu-item <?= $current_page === 'audit_logs.php' ? 'active' : '' ?>">
                 <i data-lucide="scroll"></i>
                 <span>Audit Trail</span>
             </a>

@@ -93,12 +93,12 @@ const getSections = (hasPermission: (p: string) => boolean, hasRole: (r: string 
     items: [
       { label: "Dashboard", view: "Dashboard", icon: <LayoutGrid size={19} /> },
       // Surveys
-      { label: "Engagement Surveys", view: "Surveys", icon: <BarChart2 size={19} />, externalLink: "/pages/surveys.php" },
-      { label: "AI Companion", view: "AI Companion", icon: <Sparkles size={19} />, externalLink: "/pages/ai_companion.php" },
+      { label: "Engagement Surveys", view: "Surveys", icon: <BarChart2 size={19} /> },
+      { label: "AI Companion", view: "AI Companion", icon: <Sparkles size={19} /> },
       ...(hasPermission("attendance.view") ? [{ label: "Attendance Tracking", view: "Attendance", icon: <Clock size={19} /> }] : []),
-      ...(hasPermission("shifts.manage") ? [{ label: "Shift Scheduler", view: "Scheduling", icon: <Calendar size={19} />, externalLink: "/pages/scheduling.php" }] : []),
+      ...(hasPermission("shifts.manage") ? [{ label: "Shift Scheduler", view: "Scheduling", icon: <Calendar size={19} /> }] : []),
       ...(hasPermission("leave.view") || hasPermission("leave.request") ? [{ label: "Leave Requests", view: "Leaves", icon: <CalendarCheck size={19} /> }] : []),
-      { label: "Org Chart Directory", view: "Org Chart", icon: <Network size={19} />, externalLink: "/pages/org-chart.php" },
+      { label: "Org Chart Directory", view: "Org Chart", icon: <Network size={19} /> },
       ...(hasPermission("users.manage") ? [{ label: "Onboarding", view: "Onboarding", icon: <Zap size={19} /> }] : []),
       ...(hasPermission("intelligence.view") ? [{ label: "Predictive AI", view: "Analytics", icon: <Brain size={19} />, color: "#f59e0b" }] : []),
       ...(hasPermission("ats.view") ? [{ label: "Recruitment / ATS", view: "ATS Dashboard", icon: <Crosshair size={19} /> }] : []),
@@ -118,10 +118,10 @@ const getSections = (hasPermission: (p: string) => boolean, hasRole: (r: string 
       ...(hasPermission("analytics.view") ? [{ label: "Workforce Analytics", view: "Analytics", icon: <PieChart size={19} /> }] : []),
       ...(hasPermission("users.manage") || hasPermission("shifts.manage") ? [{ label: "Employee Directory", view: "HR Directory", icon: <Users size={19} /> }] : []),
       ...(hasPermission("payroll.manage") ? [{ label: "Payroll Engine", view: "Payroll Engine", icon: <Banknote size={19} /> }] : []),
-      ...(hasPermission("compensation.manage") ? [{ label: "Compensation & Equity", view: "Compensation", icon: <Scale size={19} />, externalLink: "/pages/compensation_admin.php" }] : []),
-      ...(hasPermission("performance.manage") ? [{ label: "Performance", view: "Performance", icon: <Star size={19} />, externalLink: "/pages/performance_admin.php" }] : []),
-      ...(hasPermission("expenses.manage") ? [{ label: "Expenses & Claims", view: "Expenses", icon: <Receipt size={19} />, externalLink: "/pages/expenses_admin.php" }] : []),
-      ...(hasPermission("benefits.manage") ? [{ label: "Benefits & HMO", view: "Benefits", icon: <Gift size={19} />, externalLink: "/pages/benefits_admin.php" }] : []),
+      ...(hasPermission("compensation.manage") ? [{ label: "Compensation & Equity", view: "Compensation", icon: <Scale size={19} /> }] : []),
+      ...(hasPermission("performance.manage") ? [{ label: "Performance", view: "Performance", icon: <Star size={19} /> }] : []),
+      ...(hasPermission("expenses.manage") ? [{ label: "Expenses & Claims", view: "Expenses", icon: <Receipt size={19} /> }] : []),
+      ...(hasPermission("benefits.manage") ? [{ label: "Benefits & HMO", view: "Benefits", icon: <Gift size={19} /> }] : []),
       ...(hasPermission("elr.view") ? [{ 
         label: "ELR Admin Console", 
         view: "ELR Admin Console", 
@@ -129,10 +129,10 @@ const getSections = (hasPermission: (p: string) => boolean, hasRole: (r: string 
         color: "#ef4444", 
         externalLink: "/employee-relations-dist/dist/index.html" 
       }] : []),
-      ...(hasPermission("users.view") ? [{ label: "Users", view: "Admin Users", icon: <UserCog size={19} />, externalLink: "/pages/admin_users.php" }] : []),
-      ...(hasPermission("users.manage") ? [{ label: "Roles & Permissions", view: "Admin Roles", icon: <ShieldHalf size={19} />, externalLink: "/pages/admin_roles.php" }] : []),
-      ...(hasPermission("settings.manage") ? [{ label: "Tenant Settings", view: "Tenant Settings", icon: <Settings size={19} />, externalLink: "/pages/tenant_settings.php" }] : []),
-      ...(hasPermission("settings.manage") ? [{ label: "Knowledge Base Review", view: "Knowledge Base", icon: <BookOpen size={19} />, externalLink: "/pages/knowledge_admin.php" }] : []),
+      ...(hasPermission("users.view") ? [{ label: "Users", view: "Admin Users", icon: <UserCog size={19} /> }] : []),
+      ...(hasPermission("users.manage") ? [{ label: "Roles & Permissions", view: "Admin Roles", icon: <ShieldHalf size={19} /> }] : []),
+      ...(hasPermission("settings.manage") ? [{ label: "Tenant Settings", view: "Tenant Settings", icon: <Settings size={19} /> }] : []),
+      ...(hasPermission("settings.manage") ? [{ label: "Knowledge Base Review", view: "Knowledge Base", icon: <BookOpen size={19} /> }] : []),
       ...(tenantId !== null ? [{ 
         label: "Platform Support", 
         view: "Platform Support", 
@@ -156,7 +156,7 @@ const getSections = (hasPermission: (p: string) => boolean, hasRole: (r: string 
     title: "System",
     hide: isAtsContext || !hasPermission("audit.view"),
     items: [
-      { label: "Audit Trail", view: "Audit Logs", icon: <Scroll size={19} />, externalLink: "/pages/audit_logs.php" }
+      { label: "Audit Trail", view: "Audit Logs", icon: <Scroll size={19} /> }
     ]
   },
   ...(hasPermission("ats.view") || hasPermission("ats.edit") || hasPermission("ats.edit_job") || hasPermission("ats.create_job") ? [{
