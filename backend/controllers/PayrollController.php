@@ -259,6 +259,21 @@ class PayrollController
                         $pStmt->execute([$activeRun['id']]);
                         $processed = $pStmt->fetchColumn();
                     }
+
+                    $prevStmt = $this->pdo->prepare("SELECT SUM(pre.gross_pay) as prev_total FROM payroll_runs pr JOIN payroll_run_employees pre ON pre.payroll_run_id = pr.id WHERE pr.tenant_id = ? AND pr.status IN ('Processed', 'Locked') ORDER BY pr.pay_date DESC LIMIT 1");
+                    $prevStmt->execute([$this->tenantId]);
+                    $prevTotal = (float)$prevStmt->fetchColumn();
+                    $currentCost = floatval($empData['total_base']);
+                    $costIncrease = 0;
+                    if ($prevTotal > 0) {
+                        $costIncrease = round((($currentCost - $prevTotal) / $prevTotal) * 100, 1);
+                    }
+
+                    $exStmt = $this->pdo->prepare("SELECT COUNT(*) FROM users WHERE tenant_id = ? AND employment_status = 'Active' AND (base_salary IS NULL OR base_salary <= 0)");
+                    $exStmt->execute([$this->tenantId]);
+                    $criticalExceptions = (int)$exStmt->fetchColumn();
+
+                    $readiness = ($activeRun && $criticalExceptions === 0) ? 'Ready' : 'Needs Attention';
                     
                     echo json_encode(['success' => true, 'data' => [
                         'themePreference' => $_SESSION['theme_preference'] ?? 'dark',
@@ -266,36 +281,75 @@ class PayrollController
                         'activeRunTotalEmployees' => intval($empData['cnt']),
                         'activeRunProcessed' => intval($processed),
                         'nextDate' => $activeRun ? $activeRun['pay_date'] : date('Y-m-t'),
-                        'estimatedCost' => floatval($empData['total_base']),
-                        'costIncrease' => 0,
-                        'criticalExceptions' => 0,
-                        'readiness' => 'Ready'
+                        'estimatedCost' => $currentCost,
+                        'costIncrease' => $costIncrease,
+                        'criticalExceptions' => $criticalExceptions,
+                        'readiness' => $readiness
                     ]]);
                     break;
 
                 case 'chart_data':
-                    echo json_encode(['success' => true, 'data' => [
-                        ['name' => 'Jan', 'cost' => 1250000],
-                        ['name' => 'Feb', 'cost' => 1280000],
-                        ['name' => 'Mar', 'cost' => 1310000],
-                        ['name' => 'Apr', 'cost' => 1315000],
-                        ['name' => 'May', 'cost' => 1340000],
-                        ['name' => 'Jun', 'cost' => 1380000]
-                    ]]);
+                    if (!$this->canManagePayroll()) { http_response_code(403); echo json_encode(['success' => false, 'error' => 'Denied']); return; }
+                    $stmt = $this->pdo->prepare("
+                        SELECT DATE_FORMAT(pr.pay_date,'%b') AS name, SUM(pre.gross_pay) AS cost
+                        FROM payroll_runs pr 
+                        JOIN payroll_run_employees pre ON pre.payroll_run_id = pr.id
+                        WHERE pr.tenant_id = ? AND pr.status IN ('Processed','Locked')
+                        GROUP BY YEAR(pr.pay_date), MONTH(pr.pay_date) 
+                        ORDER BY YEAR(pr.pay_date) ASC, MONTH(pr.pay_date) ASC 
+                        LIMIT 6
+                    ");
+                    $stmt->execute([$this->tenantId]);
+                    $chartData = [];
+                    while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                        $chartData[] = [
+                            'name' => $row['name'],
+                            'cost' => floatval($row['cost'])
+                        ];
+                    }
+                    echo json_encode(['success' => true, 'data' => $chartData]);
                     break;
 
                 case 'exceptions_list':
-                    echo json_encode(['success' => true, 'data' => []]);
+                    if (!$this->canManagePayroll()) { http_response_code(403); echo json_encode(['success' => false, 'error' => 'Denied']); return; }
+                    $exceptions = [];
+                    $exStmt = $this->pdo->prepare("SELECT full_name FROM users WHERE tenant_id = ? AND employment_status = 'Active' AND (base_salary IS NULL OR base_salary <= 0)");
+                    $exStmt->execute([$this->tenantId]);
+                    while ($row = $exStmt->fetch(PDO::FETCH_ASSOC)) {
+                        $exceptions[] = [
+                            'employee' => $row['full_name'],
+                            'issue' => 'Missing Base Salary',
+                            'severity' => 'Critical'
+                        ];
+                    }
+                    echo json_encode(['success' => true, 'data' => $exceptions]);
                     break;
 
                 case 'comp_history':
+                    $history = [];
+                    $stmt = $this->pdo->prepare("SELECT id, base_salary as base, pay_frequency as type, 'Active' as status, DATE_FORMAT(effective_date, '%b %e, %Y') as effective, 'System' as author FROM employee_compensation WHERE tenant_id = ? AND employee_id = ? ORDER BY effective_date DESC");
+                    $stmt->execute([$this->tenantId, $this->currentUser['id']]);
+                    while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                        $row['base'] = floatval($row['base']);
+                        $history[] = $row;
+                    }
+
+                    if (empty($history)) {
+                        $history[] = [
+                            'id' => 'current',
+                            'base' => floatval($this->currentUser['base_salary'] ?? 0),
+                            'type' => 'Monthly',
+                            'status' => 'Active',
+                            'effective' => 'Current',
+                            'author' => 'System'
+                        ];
+                    }
+
                     echo json_encode(['success' => true, 'data' => [
                         'employeeName' => $this->currentUser['full_name'],
                         'employeeId' => $this->currentUser['employee_number'] ?: 'EMP-' . $this->currentUser['id'],
                         'currentBase' => floatval($this->currentUser['base_salary'] ?? 0),
-                        'history' => [
-                            ['id' => 1, 'base' => floatval($this->currentUser['base_salary'] ?? 0), 'type' => 'Monthly', 'status' => 'Active', 'effective' => 'Jan 1, 2024', 'author' => 'System']
-                        ],
+                        'history' => $history,
                         'audits' => []
                     ]]);
                     break;
