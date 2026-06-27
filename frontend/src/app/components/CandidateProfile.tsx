@@ -441,7 +441,7 @@ export function CandidateProfile({ onViewChange, candidateId }: Props) {
     e.preventDefault();
     setHiring(true);
     try {
-      const res = await fetch(`${API}&action=hire`, {
+      const res = await fetch(`${API}&action=hire_candidate`, {
         method: 'POST',
         credentials: 'include',
         headers: {

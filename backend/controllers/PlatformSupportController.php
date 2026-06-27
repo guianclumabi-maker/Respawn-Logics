@@ -93,7 +93,7 @@ class PlatformSupportController
     }
 
     private function tenantCreate($input) {
-        if (!hasPermission('module.permission')) {
+        if (!hasPermission('settings.manage')) {
             http_response_code(403);
             echo json_encode(['success' => false, 'error' => 'Denied']);
             return;
@@ -139,7 +139,7 @@ class PlatformSupportController
     }
 
     private function submitFeedback($input) {
-        if (!hasPermission('module.permission')) {
+        if (!hasPermission('settings.manage')) {
             http_response_code(403);
             echo json_encode(['success' => false, 'error' => 'Denied']);
             return;
@@ -182,7 +182,7 @@ class PlatformSupportController
     }
 
     private function submitCSAT($input) {
-        if (!hasPermission('module.permission')) {
+        if (!hasPermission('settings.manage')) {
             http_response_code(403);
             echo json_encode(['success' => false, 'error' => 'Denied']);
             return;
@@ -358,7 +358,7 @@ class PlatformSupportController
     }
 
     private function addComment($input) {
-        if (!hasPermission('module.permission')) {
+        if (!hasPermission('settings.manage')) {
             http_response_code(403);
             echo json_encode(['success' => false, 'error' => 'Denied']);
             return;
@@ -407,7 +407,7 @@ class PlatformSupportController
     }
 
     private function updateStatus($input) {
-        if (!hasPermission('module.permission')) {
+        if (!hasPermission('settings.manage')) {
             http_response_code(403);
             echo json_encode(['success' => false, 'error' => 'Denied']);
             return;
@@ -424,7 +424,7 @@ class PlatformSupportController
     }
 
     private function updateTicket($input) {
-        if (!hasPermission('module.permission')) {
+        if (!hasPermission('settings.manage')) {
             http_response_code(403);
             echo json_encode(['success' => false, 'error' => 'Denied']);
             return;
@@ -515,7 +515,7 @@ class PlatformSupportController
     }
 
     private function addTicketTag($input) {
-        if (!hasPermission('module.permission')) {
+        if (!hasPermission('settings.manage')) {
             http_response_code(403);
             echo json_encode(['success' => false, 'error' => 'Denied']);
             return;
@@ -553,7 +553,7 @@ class PlatformSupportController
     }
 
     private function removeTicketTag($input) {
-        if (!hasPermission('module.permission')) {
+        if (!hasPermission('settings.manage')) {
             http_response_code(403);
             echo json_encode(['success' => false, 'error' => 'Denied']);
             return;
@@ -667,7 +667,7 @@ class PlatformSupportController
     }
 
     private function bulkAction($input) {
-        if (!hasPermission('module.permission')) {
+        if (!hasPermission('settings.manage')) {
             http_response_code(403);
             echo json_encode(['success' => false, 'error' => 'Denied']);
             return;
@@ -729,7 +729,7 @@ class PlatformSupportController
     }
 
     private function uploadAttachment() {
-        if (!hasPermission('module.permission')) {
+        if (!hasPermission('settings.manage')) {
             http_response_code(403);
             echo json_encode(['success' => false, 'error' => 'Denied']);
             return;

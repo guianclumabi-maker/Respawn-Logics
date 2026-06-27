@@ -1059,11 +1059,11 @@ class CandidatesController
         $notes->execute([$id, $this->tenantId]);
         $data['notes'] = $notes->fetchAll();
 
-        $pools = $this->pdo->prepare("SELECT * FROM `talent_pool_members` WHERE `candidate_id` = ? AND `tenant_id` = ?");
+        $pools = $this->pdo->prepare("SELECT * FROM `pool_members` WHERE `candidate_id` = ? AND `tenant_id` = ?");
         $pools->execute([$id, $this->tenantId]);
         $data['pool_memberships'] = $pools->fetchAll();
 
-        $activities = $this->pdo->prepare("SELECT * FROM `activity_logs` WHERE `candidate_id` = ? AND `tenant_id` = ?");
+        $activities = $this->pdo->prepare("SELECT * FROM `activities` WHERE `candidate_id` = ? AND `tenant_id` = ?");
         $activities->execute([$id, $this->tenantId]);
         $data['activities'] = $activities->fetchAll();
 
@@ -1428,7 +1428,7 @@ class CandidatesController
 
     private function hireCandidate($data) {
         // Enforce basic ATS edit and HR permission
-        if (!hasPermission('ats.edit') && !hasPermission('core_hr.create_employee')) {
+        if (!hasPermission('ats.edit')) {
             http_response_code(403);
             echo json_encode(['success' => false, 'error' => 'You do not have permission to hire candidates.']);
             exit;

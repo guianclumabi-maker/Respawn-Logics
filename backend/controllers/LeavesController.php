@@ -76,11 +76,11 @@ class LeavesController
             } else if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 switch ($action) {
                     case 'apply':
-                        if (!hasPermission('leaves.apply')) { http_response_code(403); echo json_encode(['success'=>false, 'error'=>'Denied']); return; }
+                        if (!hasPermission('leave.request')) { http_response_code(403); echo json_encode(['success'=>false, 'error'=>'Denied']); return; }
                         $this->applyLeave($input, $email);
                         break;
                     case 'approve_reject':
-                        if (!hasPermission('leaves.manage')) { http_response_code(403); echo json_encode(['success'=>false, 'error'=>'Denied']); return; }
+                        if (!hasPermission('leave.manage')) { http_response_code(403); echo json_encode(['success'=>false, 'error'=>'Denied']); return; }
                 $this->approveRejectLeave($input, $email);
                         break;
                     default:

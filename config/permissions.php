@@ -14,13 +14,15 @@ return [
         'employees.edit',
         'employees.delete',
         'employees.view_self',
-        'employees.view_team'
+        'employees.view_team',
+        'employees.manage'
     ],
     'Leave' => [
         'leave.view',
         'leave.request',
         'leave.approve',
-        'leave.approve_team'
+        'leave.approve_team',
+        'leave.manage'
     ],
     'Attendance' => [
         'attendance.view',
