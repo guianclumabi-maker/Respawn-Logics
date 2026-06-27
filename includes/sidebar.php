@@ -227,6 +227,13 @@ if ($user) {
                 <span style="font-weight:600;">Platform Support</span>
             </a>
             <?php endif; ?>
+
+            <?php if (hasPermission('settings.manage') || in_array('Super_Admin', $_SESSION['roles'] ?? [])): ?>
+            <a href="<?= url('/pages/admin_health.php') ?>" class="menu-item <?= $current_page === 'admin_health.php' ? 'active' : '' ?>">
+                <i data-lucide="activity"></i>
+                <span>System Health</span>
+            </a>
+            <?php endif; ?>
         </div>
         <?php endif; ?>
         
