@@ -9,7 +9,7 @@ export function CaseDetail({ caseId, onBack }: { caseId: number; onBack: () => v
 
   useEffect(() => {
     const basePath = window.location.hostname === 'localhost' ? '/respawn-logics' : '';
-    fetch(`${basePath}/elr_api.php?action=case&id=${caseId}`)
+    fetch(`${basePath}/api/index.php?route=elr&action=case&id=${caseId}`, { credentials: 'include' })
       .then((res) => res.json())
       .then((data) => {
         if (data.success) {

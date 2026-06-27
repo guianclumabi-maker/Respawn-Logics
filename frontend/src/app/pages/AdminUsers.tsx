@@ -9,8 +9,10 @@ type UserData = {
   id: number;
   full_name: string;
   email: string;
-  roles: string[];
+  roles: any[];
   status: string;
+  legacy_role?: string;
+  employment_status?: string;
 };
 
 export function AdminUsers() {
@@ -25,7 +27,11 @@ export function AdminUsers() {
         if (res.ok) {
           const json = await res.json();
           if (json.success && json.data) {
-            setUsers(json.data);
+            // Normalize: backend returns employment_status not status, and roles as objects
+            setUsers(json.data.map((u: any) => ({
+              ...u,
+              status: u.status || u.employment_status || 'Active'
+            })));
             return;
           }
         }
@@ -93,10 +99,10 @@ export function AdminUsers() {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex gap-2">
-                      {u.roles.map((role, i) => (
+                      {u.roles && u.roles.map((role: any, i: number) => (
                         <span key={i} className="bg-slate-100 text-slate-700 border border-slate-200 px-2 py-1 rounded text-xs font-medium flex items-center gap-1">
                           <Shield className="w-3 h-3" />
-                          {role}
+                          {typeof role === 'string' ? role : role.name}
                         </span>
                       ))}
                     </div>

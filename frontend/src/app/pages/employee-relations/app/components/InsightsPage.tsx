@@ -23,7 +23,7 @@ export function InsightsPage({ onViewChange }: InsightsPageProps) {
 
   useEffect(() => {
     const basePath = window.location.hostname === 'localhost' ? '/respawn-logics' : '';
-    fetch(`${basePath}/elr_api.php?action=analytics`)
+    fetch(`${basePath}/api/index.php?route=elr&action=analytics`, { credentials: 'include' })
       .then(res => res.json())
       .then(data => {
         if (data.success) {
