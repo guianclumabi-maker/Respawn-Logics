@@ -129,10 +129,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     window.location.hash = "#/login";
   }, []);
 
-  const hasPermission = (perm: string) => user?.permissions?.includes(perm) ?? false;
   const hasRole = (role: string | string[]) => {
     if (Array.isArray(role)) return role.some((r) => user?.roles?.includes(r));
     return user?.roles?.includes(role) ?? false;
+  };
+
+  const hasPermission = (perm: string) => {
+    if (hasRole("Super_Admin")) return true;
+    return user?.permissions?.includes(perm) ?? false;
   };
 
   return (
