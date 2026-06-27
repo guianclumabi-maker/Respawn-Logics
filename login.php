@@ -11,6 +11,14 @@ if (isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESSION['mus
 $error = '';
 $showChangePasswordModal = false;
 $activationToken = $_GET['activation_token'] ?? ($_POST['activation_token'] ?? null);
+$step = $_GET['step'] ?? null;
+
+// Redirect naked login.php visits to the new SPA login page
+if ($_SERVER['REQUEST_METHOD'] === 'GET' && !$activationToken && !in_array($step, ['set_password', '2fa']) && empty($_SESSION['must_change_password'])) {
+    header('Location: ' . url('/frontend/dist/index.html?v=' . time() . '#/login'));
+    exit;
+}
+
 $activatingUserId = null;
 
 if ($activationToken) {
