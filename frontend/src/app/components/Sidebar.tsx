@@ -214,7 +214,7 @@ export function Sidebar({ activeView, onViewChange, badges = {} }: SidebarProps)
                 className="font-bold text-primary text-[9px]"
                 style={{ fontFamily: "'JetBrains Mono', monospace" }}
               >
-                v2.0
+                v2.0-auto
               </span>
             </div>
           </div>
