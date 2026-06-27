@@ -2,10 +2,10 @@ providers = ["node", "php"]
 
 
 [phases.install]
-cmds = ["npm install"]
+cmds = ["npm install", "cd frontend && npm install --include=dev"]
 
 [phases.build]
-cmds = ["echo 'Skipping build, using pre-built dist'"]
+cmds = ["cd frontend && npm run build"]
 
 [start]
 cmd = "php backend/scripts/migrate.php && php-fpm -y /etc/php-fpm.conf && nginx -c /etc/nginx/nginx.conf"
