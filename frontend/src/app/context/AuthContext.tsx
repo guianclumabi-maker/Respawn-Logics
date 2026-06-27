@@ -85,7 +85,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           `${API_BASE}/api/index.php?route=auth&action=login`,
           {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: { 
+              "Content-Type": "application/json",
+              "X-CSRF-Token": (window as any).__CSRF_TOKEN__ || ""
+            },
             credentials: "include",
             body: JSON.stringify({ email, password }),
           }
