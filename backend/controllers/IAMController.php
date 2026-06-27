@@ -220,9 +220,30 @@ class IAMController
             }
 
             if ($action === 'save_org_unit') {
+                $stmtTier = $this->pdo->prepare("SELECT setup_mode FROM tenants WHERE id = ?");
+                $stmtTier->execute([$this->tenantId]);
+                $setupMode = $stmtTier->fetchColumn() ?: 'Solo';
+                require_once __DIR__ . '/../services/RoleSeederService.php';
+                $tierConfig = RoleSeederService::getTierConfig($setupMode);
+                if (!$tierConfig['org_units']) {
+                    http_response_code(403);
+                    echo json_encode(['success' => false, 'error' => "Org units aren't available on your current plan"]);
+                    return;
+                }
+
                 $id = $data['id'] ?? 0;
                 $name = $data['name'] ?? '';
-                $parentId = $data['parent_id'] ?? null;
+                $parentId = !empty($data['parent_id']) ? $data['parent_id'] : null;
+                
+                if ($parentId) {
+                    $stmtCheckParent = $this->pdo->prepare("SELECT id FROM org_units WHERE id = ? AND tenant_id = ?");
+                    $stmtCheckParent->execute([$parentId, $this->tenantId]);
+                    if (!$stmtCheckParent->fetch()) {
+                        http_response_code(400);
+                        echo json_encode(['success' => false, 'error' => "Invalid parent organization unit"]);
+                        return;
+                    }
+                }
                 
                 if ($id > 0) {
                     $stmt = $this->pdo->prepare("UPDATE org_units SET name = ?, parent_id = ? WHERE id = ? AND tenant_id = ?");
@@ -236,8 +257,19 @@ class IAMController
             }
 
             if ($action === 'assign_org_unit') {
+                $stmtTier = $this->pdo->prepare("SELECT setup_mode FROM tenants WHERE id = ?");
+                $stmtTier->execute([$this->tenantId]);
+                $setupMode = $stmtTier->fetchColumn() ?: 'Solo';
+                require_once __DIR__ . '/../services/RoleSeederService.php';
+                $tierConfig = RoleSeederService::getTierConfig($setupMode);
+                if (!$tierConfig['org_units']) {
+                    http_response_code(403);
+                    echo json_encode(['success' => false, 'error' => "Org units aren't available on your current plan"]);
+                    return;
+                }
+
                 $userId = $data['user_id'] ?? 0;
-                $orgUnitId = $data['org_unit_id'] ?? null;
+                $orgUnitId = !empty($data['org_unit_id']) ? $data['org_unit_id'] : null;
                 $stmt = $this->pdo->prepare("UPDATE users SET org_unit_id = ? WHERE id = ? AND tenant_id = ?");
                 $stmt->execute([$orgUnitId, $userId, $this->tenantId]);
                 
