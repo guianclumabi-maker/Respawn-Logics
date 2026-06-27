@@ -3,37 +3,38 @@ import { useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { GamifiedThemeToggle } from "./GamifiedThemeToggle";
 import {
-  LayoutDashboard,
-  Briefcase,
-  GitBranch,
-  Calendar,
-  CheckCircle,
-  Users,
-  Database,
-  Search,
-  BarChart3,
-  Bot,
-  Shield,
-  Settings,
-  ArrowLeft,
-  Menu,
-  Layers,
+  LayoutGrid,
+  BarChart2,
+  Sparkles,
   Clock,
-  Gamepad2,
-  Banknote,
+  Calendar,
+  CalendarCheck,
+  Network,
+  Zap,
+  Brain,
+  Crosshair,
+  ShieldHalf,
   Headphones,
-  UserPlus,
-  FileText,
-  HeartPulse,
-  DollarSign,
-  Wallet,
-  Activity,
-  GraduationCap,
-  ClipboardList,
+  PieChart,
+  Users,
+  Banknote,
+  Scale,
+  Star,
+  Receipt,
+  Gift,
+  Gavel,
+  UserCog,
+  Settings,
   BookOpen,
-  User,
-  Lock,
-  Key
+  Satellite,
+  Globe,
+  BadgeInfo,
+  Inbox,
+  StarHalf,
+  Scroll,
+  MessageCircle,
+  Menu,
+  Layers
 } from "lucide-react";
 
 // ── Types ──────────────────────────────────────────────────
@@ -55,7 +56,7 @@ export type SidebarBadges = {
 
 type SidebarProps = {
   activeView: ViewState;
-  onViewChange: (view: ViewState) => void;
+  onViewChange: (view: ViewState | string) => void;
   badges?: SidebarBadges;
 };
 
@@ -66,87 +67,108 @@ type NavEntry = {
   view: string;
   icon: React.ReactNode;
   badgeKey?: string | keyof SidebarBadges;
+  externalLink?: string; // If set, it will do a full page load
+  color?: string; // Custom text color
+  onClick?: () => void;
 };
 
 type NavSection = {
   title: string;
   items: NavEntry[];
+  hide?: boolean;
 };
 
 // ── Navigation config ──────────────────────────────────────
 
-// Config is now a function so we can pass useAuth checks
-const getSections = (hasPermission: (p: string) => boolean): NavSection[] => [
+const getSections = (hasPermission: (p: string) => boolean, hasRole: (r: string | string[]) => boolean, tenantId: number | null): NavSection[] => [
   {
     title: "Workspace",
     items: [
-      { label: "Dashboard", view: "Dashboard", icon: <LayoutDashboard size={19} />, badgeKey: "actions" as keyof SidebarBadges },
-      { label: "Onboarding", view: "Onboarding", icon: <UserPlus size={19} /> },
-      { label: "Employee Relations", view: "Employee Relations", icon: <Shield size={19} /> },
-      ...(hasPermission("leave.view") || hasPermission("leave.request") ? [
-        { label: "Leave Requests", view: "Leaves", icon: <Calendar size={19} /> }
-      ] : []),
-      { label: "IT / HR Service Desk", view: "IT / HR Service Desk", icon: <Headphones size={19} /> },
+      { label: "Dashboard", view: "Dashboard", icon: <LayoutGrid size={19} /> },
+      // Surveys
+      { label: "Engagement Surveys", view: "Surveys", icon: <BarChart2 size={19} /> },
+      { label: "AI Companion", view: "AI Companion", icon: <Sparkles size={19} /> },
+      ...(hasPermission("attendance.view") ? [{ label: "Attendance Tracking", view: "Attendance", icon: <Clock size={19} /> }] : []),
+      ...(hasPermission("shifts.manage") ? [{ label: "Shift Scheduler", view: "Scheduling", icon: <Calendar size={19} /> }] : []),
+      ...(hasPermission("leave.view") || hasPermission("leave.request") ? [{ label: "Leave Requests", view: "Leaves", icon: <CalendarCheck size={19} /> }] : []),
+      { label: "Org Chart Directory", view: "Org Chart", icon: <Network size={19} /> },
+      ...(hasPermission("users.manage") ? [{ label: "Onboarding", view: "Onboarding", icon: <Zap size={19} /> }] : []),
+      ...(hasPermission("intelligence.view") ? [{ label: "Predictive AI", view: "Analytics", icon: <Brain size={19} />, color: "#f59e0b" }] : []),
+      ...(hasPermission("ats.view") ? [{ label: "Recruitment / ATS", view: "ATS Dashboard", icon: <Crosshair size={19} /> }] : []),
+      { label: "My HR Cases", view: "Employee Relations", icon: <ShieldHalf size={19} /> },
+      ...(tenantId !== null ? [{ 
+        label: "IT/HR Service Desk", 
+        view: "IT / HR Service Desk", 
+        icon: <Headphones size={19} />,
+        externalLink: hasPermission("esm.manage") ? "/pages/esm_admin.php" : "/pages/esm_employee.php"
+      }] : []),
     ],
   },
   {
-    title: "Core HR",
-    items: [
-      { label: "HR Directory", view: "HR Directory", icon: <Users size={19} /> },
-      { label: "Org Chart", view: "Org Chart", icon: <GitBranch size={19} /> },
-      { label: "Time & Attendance", view: "Attendance", icon: <Clock size={19} /> },
-      { label: "Shifts & Scheduling", view: "Scheduling", icon: <Calendar size={19} /> },
-    ]
-  },
-  {
-    title: "Finance & Services",
-    items: [
-      ...(hasPermission("payroll.manage") ? [{ label: "Payroll Engine", view: "Payroll Engine", icon: <Banknote size={19} /> }] : []),
-      { label: "Benefits Admin", view: "Benefits", icon: <HeartPulse size={19} /> },
-      { label: "Compensation Admin", view: "Compensation", icon: <DollarSign size={19} /> },
-      { label: "Expenses Admin", view: "Expenses", icon: <Wallet size={19} /> },
-    ]
-  },
-  {
-    title: "Talent & Performance",
-    items: [
-      { label: "Performance Admin", view: "Performance", icon: <Activity size={19} /> },
-      { label: "Knowledge Base", view: "Knowledge Base", icon: <BookOpen size={19} /> },
-      { label: "Surveys", view: "Surveys", icon: <ClipboardList size={19} /> },
-    ]
-  },
-  ...(hasPermission("ats.view") || hasPermission("ats.edit") || hasPermission("ats.edit_job") || hasPermission("ats.create_job") ? [{
-    title: "Hiring (ATS)",
-    items: [
-      { label: "ATS Dashboard", view: "ATS Dashboard", icon: <LayoutDashboard size={19} /> },
-      { label: "Jobs", view: "Jobs", icon: <Briefcase size={19} />, badgeKey: "urgentJobs" },
-      { label: "Pipeline", view: "Pipeline", icon: <GitBranch size={19} /> },
-      { label: "Interviews", view: "Interviews", icon: <Calendar size={19} />, badgeKey: "todayInterviews" },
-      { label: "Approvals", view: "Approvals", icon: <CheckCircle size={19} />, badgeKey: "pendingApprovals" },
-      { label: "Candidates", view: "Candidates", icon: <Users size={19} /> },
-      { label: "Talent Pools", view: "Talent Pools", icon: <Database size={19} /> },
-      { label: "Talent Search", view: "Talent Search", icon: <Search size={19} /> },
-      { label: "Insights", view: "Insights", icon: <BarChart3 size={19} /> },
-    ],
-  }] : []),
-  ...(hasPermission("analytics.view") ? [{
-    title: "Intelligence",
-    items: [
-      { label: "Analytics", view: "Analytics", icon: <BarChart3 size={19} /> },
-      { label: "Recruiting Copilot", view: "Recruiting Copilot", icon: <Bot size={19} />, badgeKey: "copilotAlerts" },
-      { label: "AI Companion", view: "AI Companion", icon: <Bot size={19} /> },
-    ],
-  }] : []),
-  ...(hasPermission("users.manage") ? [{
     title: "Administration",
+    hide: !(hasPermission("users.view") || hasPermission("settings.manage")),
     items: [
-      { label: "Admin Users", view: "Admin Users", icon: <User size={19} /> },
-      { label: "Admin Roles", view: "Admin Roles", icon: <Key size={19} /> },
-      { label: "Org Units", view: "Org Units", icon: <Users size={19} /> },
-      { label: "Tenant Settings", view: "Tenant Settings", icon: <Settings size={19} /> },
-      { label: "Audit Logs", view: "Audit Logs", icon: <Lock size={19} /> },
-    ],
-  }] : []),
+      ...(hasPermission("analytics.view") ? [{ label: "Workforce Analytics", view: "Analytics", icon: <PieChart size={19} /> }] : []),
+      ...(hasPermission("users.manage") || hasPermission("shifts.manage") ? [{ label: "Employee Directory", view: "HR Directory", icon: <Users size={19} /> }] : []),
+      ...(hasPermission("payroll.manage") ? [{ label: "Payroll Engine", view: "Payroll Engine", icon: <Banknote size={19} /> }] : []),
+      ...(hasPermission("compensation.manage") ? [{ label: "Compensation & Equity", view: "Compensation", icon: <Scale size={19} /> }] : []),
+      ...(hasPermission("performance.manage") ? [{ label: "Performance", view: "Performance", icon: <Star size={19} /> }] : []),
+      ...(hasPermission("expenses.manage") ? [{ label: "Expenses & Claims", view: "Expenses", icon: <Receipt size={19} /> }] : []),
+      ...(hasPermission("benefits.manage") ? [{ label: "Benefits & HMO", view: "Benefits", icon: <Gift size={19} /> }] : []),
+      ...(hasPermission("elr.view") ? [{ 
+        label: "ELR Admin Console", 
+        view: "ELR Admin Console", 
+        icon: <Gavel size={19} />, 
+        color: "#ef4444", 
+        externalLink: "/employee-relations-dist/dist/index.html" 
+      }] : []),
+      ...(hasPermission("users.view") ? [{ label: "Users", view: "Admin Users", icon: <UserCog size={19} /> }] : []),
+      ...(hasPermission("users.manage") ? [{ label: "Roles & Permissions", view: "Admin Roles", icon: <ShieldHalf size={19} /> }] : []),
+      ...(hasPermission("settings.manage") ? [{ label: "Tenant Settings", view: "Tenant Settings", icon: <Settings size={19} /> }] : []),
+      ...(hasPermission("settings.manage") ? [{ label: "Knowledge Base Review", view: "Knowledge Base", icon: <BookOpen size={19} /> }] : []),
+      ...(tenantId !== null ? [{ 
+        label: "Platform Support", 
+        view: "Platform Support", 
+        icon: <Satellite size={19} />, 
+        color: "#00e07a", 
+        externalLink: "/pages/admin_platform_support.php" 
+      }] : []),
+    ]
+  },
+  {
+    title: "Vendor Universe",
+    hide: !hasRole(["Platform_Admin", "Support_Agent", "Implementation_Specialist"]),
+    items: [
+      { label: "SaaS Headquarters", view: "SaaS Headquarters", icon: <Globe size={19} />, externalLink: "/pages/saas_admin.php" },
+      ...(hasRole("Platform_Admin") ? [{ label: "Vendor Staff", view: "Vendor Staff", icon: <BadgeInfo size={19} />, externalLink: "/pages/saas_staff.php" }] : []),
+      { label: "Global Support Inbox", view: "Global Support Inbox", icon: <Inbox size={19} />, externalLink: "/pages/saas_support.php" },
+      { label: "Feedback Corner", view: "Feedback Corner", icon: <StarHalf size={19} />, externalLink: "/pages/saas_feedback.php" },
+    ]
+  },
+  {
+    title: "System",
+    hide: !hasPermission("audit.view"),
+    items: [
+      { label: "Audit Trail", view: "Audit Logs", icon: <Scroll size={19} /> }
+    ]
+  },
+  {
+    title: "Account",
+    items: [
+      ...(tenantId !== null ? [{
+        label: "Give us Feedback",
+        view: "Feedback",
+        icon: <MessageCircle size={19} />,
+        onClick: () => {
+          if (typeof window !== "undefined" && (window as any).openGlobalFeedbackModal) {
+            (window as any).openGlobalFeedbackModal();
+          } else {
+            alert("Feedback module is only available from within the legacy wrapper.");
+          }
+        }
+      }] : []),
+    ]
+  }
 ];
 
 // ── Badge component ────────────────────────────────────────
@@ -164,22 +186,12 @@ function Badge({ count }: { count: number }) {
 
 export function Sidebar({ activeView, onViewChange, badges = {} }: SidebarProps) {
   const [collapsed, setCollapsed] = useState(false);
-  const { user, hasPermission } = useAuth();
+  const { user, hasPermission, hasRole } = useAuth();
   const location = useLocation();
-  const isAtsContext = location.pathname.startsWith("/ats");
 
-  let sections = getSections(hasPermission);
-  if (isAtsContext) {
-    sections = sections.filter((s) => s.title === "Hiring (ATS)");
-  }
-
-
+  const sections = getSections(hasPermission, hasRole, user?.tenant_id || null).filter(s => !s.hide);
 
   const isActive = (view: string) => activeView.view === view;
-
-  const userInitials = user
-    ? user.name.split(" ").map(n => n[0]).join("").substring(0, 2).toUpperCase()
-    : "AU";
 
   return (
     <aside
@@ -214,7 +226,7 @@ export function Sidebar({ activeView, onViewChange, badges = {} }: SidebarProps)
                 className="font-bold text-primary text-[9px]"
                 style={{ fontFamily: "'JetBrains Mono', monospace" }}
               >
-                v2.0-auto
+                v2.0
               </span>
             </div>
           </div>
@@ -249,130 +261,58 @@ export function Sidebar({ activeView, onViewChange, badges = {} }: SidebarProps)
                 {section.title}
               </p>
             )}
-            {section.title && collapsed && (
-              <div className="mx-auto w-6 border-t border-gray-200 dark:border-border mb-3 mt-1" />
-            )}
 
-            <nav className="space-y-1">
+            <div className="space-y-0.5">
               {section.items.map((item) => {
                 const active = isActive(item.view);
-                const badgeCount = item.badgeKey ? badges[item.badgeKey as keyof SidebarBadges] : undefined;
-
+                const badgeCount = item.badgeKey ? (badges[item.badgeKey as keyof SidebarBadges] || 0) : 0;
+                
                 return (
                   <button
-                    key={item.view}
-                    onClick={() => onViewChange({ view: item.view })}
-                    title={collapsed ? item.label : undefined}
-                    className={`w-full flex items-center gap-3 px-[20px] py-[14px] rounded-[12px] border transition-all text-left group cursor-pointer ${
-                      active
-                        ? "bg-primary/10 border-primary/20 shadow-[0_0_12px_rgba(0,224,122,0.08)]"
-                        : "hover:bg-gray-100 dark:hover:bg-accent hover:text-accent-foreground border-transparent"
-                    }`}
+                    key={item.label}
+                    onClick={() => {
+                      if (item.onClick) {
+                        item.onClick();
+                      } else if (item.externalLink) {
+                        window.location.href = item.externalLink;
+                      } else {
+                        onViewChange({ view: item.view });
+                      }
+                    }}
+                    className={`
+                      w-full flex items-center gap-3 px-[12px] py-2.5 rounded-lg transition-all duration-200
+                      ${collapsed ? "justify-center" : "justify-start"}
+                      ${
+                        active
+                          ? "bg-primary/10 text-primary font-semibold dark:bg-[#00e07a]/10 dark:text-[#00e07a]"
+                          : "text-slate-600 dark:text-slate-400 hover:bg-slate-100 hover:text-slate-900 dark:hover:bg-white/5 dark:hover:text-white"
+                      }
+                    `}
                   >
-                    <span
-                      className={`flex-shrink-0 transition-colors ${
-                        active ? "text-primary" : "text-slate-500 dark:text-[#8b95a8] group-hover:text-slate-800 dark:group-hover:text-foreground"
-                      }`}
-                    >
+                    <div className="flex-shrink-0 transition-transform duration-200 group-hover:scale-110" style={{ color: item.color || (active ? 'inherit' : '') }}>
                       {item.icon}
-                    </span>
+                    </div>
 
                     {!collapsed && (
                       <>
-                        <span
-                          className={`text-[0.9rem] flex-1 truncate ${
-                            active ? "text-primary font-semibold" : "text-slate-600 dark:text-muted-foreground font-medium group-hover:text-slate-800 dark:group-hover:text-foreground"
-                          }`}
-                        >
+                        <span className="text-[13px] leading-tight truncate flex-1 text-left" style={{ color: item.color || (active ? 'inherit' : '') }}>
                           {item.label}
                         </span>
-                        {badgeCount !== undefined && <Badge count={badgeCount} />}
+                        {badgeCount > 0 && <Badge count={badgeCount} />}
                       </>
                     )}
                   </button>
                 );
               })}
-            </nav>
+            </div>
           </div>
         ))}
 
-        {/* ── Return to Core HRIS ─────────────────────── */}
-        <div className="px-1">
-          {!collapsed && (
-            <div className="mx-3 border-t border-gray-200 dark:border-border mb-3" />
-          )}
-          <button
-            onClick={() => { window.location.href = `${import.meta.env.VITE_API_BASE_URL || (window.location.origin + (window.location.hostname === "localhost" ? "/respawn-logics" : ""))}/pages/dashboard.php`; }}
-            className="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-lg border border-transparent hover:bg-gray-100 dark:hover:bg-accent hover:text-accent-foreground text-slate-500 dark:text-[#8b95a8] hover:text-slate-800 dark:hover:text-foreground transition-all group cursor-pointer font-mono text-xs uppercase tracking-wider"
-            title={collapsed ? "Return to Core HRIS" : undefined}
-          >
-            <span className="flex-shrink-0 text-slate-500 dark:text-[#8b95a8] group-hover:text-primary transition-colors">
-              <ArrowLeft size={15} />
-            </span>
-            {!collapsed && (
-              <span className="flex-1 truncate text-left">
-                [ return_core ]
-              </span>
-            )}
-          </button>
+        {/* ── Gamified Theme Toggle ─────────────────────── */}
+        <div className="mt-4 pt-4 border-t border-gray-200 dark:border-border">
+          <GamifiedThemeToggle collapsed={collapsed} />
         </div>
       </div>
-
-      {/* ── Gamified Theme Toggle ─────────────────────── */}
-      {!collapsed && (
-        <div className="px-4 pb-2 border-t border-gray-200 dark:border-border pt-4 flex-shrink-0">
-          <GamifiedThemeToggle />
-        </div>
-      )}
-
-      {/* ── User footer ───────────────────────────────── */}
-      {!collapsed && (
-        <div className="p-4 border-t border-gray-200 dark:border-border flex-shrink-0">
-          <div
-            onClick={() => { window.location.href = `${import.meta.env.VITE_API_BASE_URL || (window.location.origin + (window.location.hostname === "localhost" ? "/respawn-logics" : ""))}/pages/profile.php`; }}
-            className="flex items-center gap-3 p-2.5 border border-transparent rounded-lg cursor-pointer hover:bg-gray-100 dark:hover:bg-secondary transition-all"
-          >
-            {user?.profile_image ? (
-              <div className="w-10 h-10 rounded-full overflow-hidden flex-shrink-0 border border-gray-200 dark:border-[#00e07a]/20">
-                <img src={`${import.meta.env.VITE_API_BASE_URL || (window.location.origin + (window.location.hostname === "localhost" ? "/respawn-logics" : ""))}/api/index.php?route=auth&action=download_avatar&file=${user.profile_image}`} alt="Profile" className="w-full h-full object-cover" />
-              </div>
-            ) : (
-              <div className="w-10 h-10 rounded-full flex-shrink-0 bg-gray-100 dark:bg-background border border-gray-200 dark:border-[#00e07a]/20 flex items-center justify-center">
-                <span className="text-slate-600 dark:text-primary font-bold text-[0.95rem]">
-                  {userInitials}
-                </span>
-              </div>
-            )}
-            <div className="min-w-0 flex-1">
-              <div className="text-[0.85rem] font-semibold text-slate-800 dark:text-foreground truncate">
-                {user ? user.name : "Admin User"}
-              </div>
-              <div className="text-[0.75rem] font-mono text-muted-foreground uppercase tracking-wider truncate">
-                {user?.job_title || (user && user.roles.length > 0 ? user.roles.map(r => r.toLowerCase() === 'super_admin' ? 'Employee' : r).join(', ') : "Employee")}
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Collapsed user avatar */}
-      {collapsed && (
-        <div className="p-3 border-t border-gray-200 dark:border-border flex-shrink-0 flex justify-center">
-          <div
-            onClick={() => { window.location.href = `${import.meta.env.VITE_API_BASE_URL || (window.location.origin + (window.location.hostname === "localhost" ? "/respawn-logics" : ""))}/pages/profile.php`; }}
-            className="w-10 h-10 rounded-full flex-shrink-0 border border-gray-200 dark:border-[#00e07a]/20 bg-gray-100 dark:bg-background flex items-center justify-center cursor-pointer hover:bg-gray-200 dark:hover:bg-accent transition-all overflow-hidden font-mono text-xs"
-            title={user ? user.name : "Admin User"}
-          >
-            {user?.profile_image ? (
-              <img src={`${import.meta.env.VITE_API_BASE_URL || (window.location.origin + (window.location.hostname === "localhost" ? "/respawn-logics" : ""))}/api/index.php?route=auth&action=download_avatar&file=${user.profile_image}`} alt="Profile" className="w-full h-full object-cover" />
-            ) : (
-              <span className="text-slate-600 dark:text-primary font-bold text-[0.95rem]">
-                {userInitials}
-              </span>
-            )}
-          </div>
-        </div>
-      )}
     </aside>
   );
 }

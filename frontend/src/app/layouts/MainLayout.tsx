@@ -106,6 +106,11 @@ export default function MainLayout() {
 
   return (
     <div className="flex h-screen bg-background text-foreground overflow-hidden">
+      <Sidebar
+        activeView={activeView}
+        onViewChange={handleViewChange}
+        badges={badges}
+      />
       <main className="flex-1 flex flex-col min-w-0 overflow-hidden relative z-10 bg-[#0f1422]">
         <Outlet context={{ setBadges }} />
       </main>

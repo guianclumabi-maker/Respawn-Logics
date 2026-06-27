@@ -14,7 +14,7 @@ interface AuthContextType {
   user: AuthUser | null;
   loading: boolean;
   hasPermission: (perm: string) => boolean;
-  hasRole: (role: string) => boolean;
+  hasRole: (role: string | string[]) => boolean;
 }
 
 const AuthContext = createContext<AuthContextType>({
@@ -50,7 +50,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return user?.permissions.includes(perm) ?? false;
   };
 
-  const hasRole = (role: string) => {
+  const hasRole = (role: string | string[]) => {
+    if (Array.isArray(role)) {
+      return role.some(r => user?.roles.includes(r));
+    }
     return user?.roles.includes(role) ?? false;
   };
 
