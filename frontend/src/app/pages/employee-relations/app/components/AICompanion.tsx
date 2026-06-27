@@ -45,9 +45,10 @@ export function AICompanion() {
 
     try {
       const basePath = window.location.hostname === 'localhost' ? '/respawn-logics' : '';
-      const response = await fetch(`${basePath}/ai_companion_api.php?action=chat`, {
+      const response = await fetch(`${basePath}/api/index.php?route=ai_companion&action=chat`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: "include",
         body: JSON.stringify({ message: textToProcess })
       });
       const data = await response.json();

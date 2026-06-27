@@ -64,8 +64,7 @@ const navItems: NavItem[] = [
 const basePath = window.location.hostname === 'localhost' ? '/respawn-logics' : '';
 
 const bottomItems = [
-  { label: "Company Directory", icon: <Building2 size={20} />, path: `${basePath}/pages/org-chart.php` },
-  { label: "My Profile", icon: <Settings size={20} />, path: `${basePath}/pages/profile.php` },
+  { label: "Company Directory", icon: <Building2 size={20} />, path: `${basePath}/frontend/dist/index.html#/org-chart` },
   { label: "Return to Workspace", icon: <ArrowLeft size={20} />, path: `${basePath}/pages/dashboard.php`, highlight: true },
 ];
 
@@ -288,8 +287,7 @@ export function Sidebar({ activeView, onViewChange }: SidebarProps) {
       {!collapsed && (
         <div className="p-4 border-t border-gray-200 dark:border-white/[0.04] flex-shrink-0">
           <div 
-            onClick={() => { window.location.href = `${basePath}/pages/profile.php`; }}
-            className="flex items-center gap-3 p-2.5 bg-gray-50 dark:bg-[#8b5cf6]/5 border border-gray-200 dark:border-[#8b5cf6]/10 rounded-xl cursor-pointer hover:bg-gray-100 dark:hover:bg-[#8b5cf6]/10 transition-all"
+            className="flex items-center gap-3 p-2.5 bg-gray-50 dark:bg-[#8b5cf6]/5 border border-gray-200 dark:border-[#8b5cf6]/10 rounded-xl"
           >
             {/* User Initials Avatar */}
             <div className="w-10 h-10 rounded-full bg-gray-200 dark:bg-[#a855f7]/20 border border-gray-300 dark:border-[#a855f7]/30 flex items-center justify-center flex-shrink-0 overflow-hidden">
@@ -318,8 +316,7 @@ export function Sidebar({ activeView, onViewChange }: SidebarProps) {
       {collapsed && (
         <div className="p-3 border-t border-white/[0.04] flex-shrink-0 flex justify-center">
           <div
-            onClick={() => { window.location.href = `${basePath}/pages/profile.php`; }}
-            className="w-10 h-10 rounded-full bg-[#a855f7]/20 border border-[#a855f7]/30 flex items-center justify-center cursor-pointer hover:bg-[#a855f7]/30 transition-all overflow-hidden"
+            className="w-10 h-10 rounded-full bg-[#a855f7]/20 border border-[#a855f7]/30 flex items-center justify-center overflow-hidden"
             title={sessionUser ? sessionUser.full_name : "Jane Doe"}
           >
             {sessionUser?.profile_image ? (
