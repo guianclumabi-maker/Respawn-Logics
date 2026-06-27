@@ -4,7 +4,11 @@ class RoleSeederService
 {
     public static function seedTenantRoles(PDO $pdo, string $tenantId, string $setupMode, int $ownerUserId)
     {
-        $pdo->beginTransaction();
+        $startedTransaction = false;
+        if (!$pdo->inTransaction()) {
+            $pdo->beginTransaction();
+            $startedTransaction = true;
+        }
 
         try {
             // Define all possible base roles
@@ -71,9 +75,13 @@ class RoleSeederService
                 $stmtAssignUser->execute([$ownerUserId, $createdRoleIds['Account Owner']]);
             }
 
-            $pdo->commit();
+            if ($startedTransaction) {
+                $pdo->commit();
+            }
         } catch (Exception $e) {
-            $pdo->rollBack();
+            if ($startedTransaction) {
+                $pdo->rollBack();
+            }
             throw $e;
         }
     }
