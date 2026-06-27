@@ -75,10 +75,22 @@ if (!function_exists('loadPermissions')) {
         if (isset($_SESSION['user_id'])) {
             $tenantId = $_SESSION['tenant_id'] ?? null;
             
+            $checkAndSetSuper = function() use ($pdo) {
+                $stmt = $pdo->prepare("SELECT role FROM users WHERE id = ?");
+                $stmt->execute([(int)$_SESSION['user_id']]);
+                $userRole = $stmt->fetchColumn();
+                $_SESSION['is_super'] = ($userRole === 'Super_Admin' || $userRole === 'Platform_Admin');
+            };
+            
             if ($tenantId === null || $tenantId === '') {
-                if (!isset($_SESSION['permissions'])) {
+                if (!isset($_SESSION['permissions']) || empty($_SESSION['permissions'])) {
+                    $checkAndSetSuper();
                     $_SESSION['permissions'] = PermissionService::userPermissions($pdo, (int)$_SESSION['user_id'], 0);
                     $_SESSION['permission_version'] = 1;
+                    
+                    if (empty($_SESSION['permissions']) && empty($_SESSION['is_super'])) {
+                        error_log("Warning: Empty permissions loaded for NON-super user ID {$_SESSION['user_id']} (no tenant)");
+                    }
                 }
                 return;
             }
@@ -90,8 +102,13 @@ if (!function_exists('loadPermissions')) {
             $currentVersion = (int)$stmt->fetchColumn();
  
             if (!isset($_SESSION['permission_version']) || $_SESSION['permission_version'] !== $currentVersion || empty($_SESSION['permissions'])) {
+                $checkAndSetSuper();
                 $_SESSION['permissions'] = PermissionService::userPermissions($pdo, (int)$_SESSION['user_id'], $tenantIdInt);
                 $_SESSION['permission_version'] = $currentVersion;
+                
+                if (empty($_SESSION['permissions']) && empty($_SESSION['is_super'])) {
+                    error_log("Warning: Empty permissions loaded for NON-super user ID {$_SESSION['user_id']} on tenant {$tenantIdInt}");
+                }
             }
         }
     }
