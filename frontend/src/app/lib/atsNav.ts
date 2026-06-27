@@ -5,6 +5,8 @@ export function viewStateToPath(viewState: ViewState): string {
     // Apps
     case "Dashboard": return "/dashboard";
     case "Employee Relations": return "/employee-relations";
+    case "ELR Admin Console": return "/employee-relations";
+    case "My HR Cases": return "/employee-relations";
     case "Onboarding": return "/onboarding";
     
     // Core HR

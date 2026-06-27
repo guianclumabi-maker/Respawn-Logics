@@ -127,7 +127,6 @@ const getSections = (hasPermission: (p: string) => boolean, hasRole: (r: string 
         view: "ELR Admin Console", 
         icon: <Gavel size={19} />, 
         color: "#ef4444", 
-        externalLink: "/employee-relations-dist/dist/index.html" 
       }] : []),
       ...(hasPermission("users.view") ? [{ label: "Users", view: "Admin Users", icon: <UserCog size={19} /> }] : []),
       ...(hasPermission("users.manage") ? [{ label: "Roles & Permissions", view: "Admin Roles", icon: <ShieldHalf size={19} /> }] : []),
