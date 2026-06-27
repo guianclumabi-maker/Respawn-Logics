@@ -391,14 +391,15 @@ class IAMController
                         return;
                     }
 
-                    // Default password hash (password123)
-                    $password_hash = password_hash('password123', PASSWORD_DEFAULT);
+                    // Temporary password
+                    $tempPassword = bin2hex(random_bytes(6));
+                    $password_hash = password_hash($tempPassword, PASSWORD_DEFAULT);
 
                     $this->pdo->beginTransaction();
 
                     $stmt = $this->pdo->prepare("
-                        INSERT INTO users (tenant_id, full_name, email, password_hash, employment_status, created_at) 
-                        VALUES (?, ?, ?, ?, 'Active', NOW())
+                        INSERT INTO users (tenant_id, full_name, email, password_hash, employment_status, must_change_password, created_at) 
+                        VALUES (?, ?, ?, ?, 'Active', 1, NOW())
                     ");
                     $stmt->execute([$this->tenantId, $full_name, $email, $password_hash]);
                     $newUserId = $this->pdo->lastInsertId();
@@ -409,9 +410,20 @@ class IAMController
                     
                     $this->pdo->commit();
                     
+                    try {
+                        require_once __DIR__ . '/../utils/Mailer.php';
+                        \App\Utils\Mailer::send(
+                            $email,
+                            "You've been invited to Respawn Logics",
+                            "Hi {$full_name},\n\nYou've been invited to join. Your temporary password is: {$tempPassword}\n\nPlease log in and change your password."
+                        );
+                    } catch (\Exception $mailEx) {
+                        // Silently fail mailer
+                    }
+                    
                     logAction($this->currentUser['email'], 'User Invited', "Invited user {$email}");
 
-                    echo json_encode(['success' => true]);
+                    echo json_encode(['success' => true, 'temp_password' => $tempPassword]);
                 } catch (Exception $e) {
                     if ($this->pdo->inTransaction()) {
                         $this->pdo->rollBack();
