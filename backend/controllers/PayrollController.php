@@ -485,11 +485,19 @@ class PayrollController
                         echo json_encode(['success' => false, 'error' => 'Invalid agency']); return;
                     }
 
+                    $chk = $this->pdo->prepare("SELECT id FROM payroll_runs WHERE id = ? AND tenant_id = ?");
+                    $chk->execute([$runId, $this->tenantId]);
+                    if (!$chk->fetch()) { 
+                        http_response_code(404); 
+                        echo json_encode(['success' => false, 'error' => 'Run not found']); 
+                        return; 
+                    }
+
                     $runStmt = $this->pdo->prepare("SELECT * FROM payroll_runs WHERE id = ? AND tenant_id = ? AND status IN ('Processed', 'Locked')");
                     $runStmt->execute([$runId, $this->tenantId]);
                     $run = $runStmt->fetch(PDO::FETCH_ASSOC);
                     if (!$run) {
-                        echo json_encode(['success' => false, 'error' => 'Payroll run not found or not processed']); return;
+                        echo json_encode(['success' => false, 'error' => 'Payroll run not processed']); return;
                     }
 
                     $tenantStmt = $this->pdo->prepare("SELECT company_name FROM tenants WHERE id = ?");
@@ -523,12 +531,12 @@ class PayrollController
                             (SELECT SUM(amount) FROM payroll_earnings pe WHERE pe.payroll_run_id = pre.payroll_run_id AND pe.employee_id = pre.employee_id AND pe.earning_type LIKE '%Taxable%') as total_taxable_earnings
                         FROM payroll_run_employees pre
                         JOIN users u ON pre.employee_id = u.id
-                        WHERE pre.payroll_run_id = ?
+                        WHERE pre.payroll_run_id = ? AND u.tenant_id = ?
                         ORDER BY u.full_name ASC
                     ";
                     
                     $stmt = $this->pdo->prepare($sql);
-                    $stmt->execute([$runId]);
+                    $stmt->execute([$runId, $this->tenantId]);
                     $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
                     $reportData = [];
