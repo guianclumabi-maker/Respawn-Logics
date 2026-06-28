@@ -262,6 +262,7 @@ class IAMController
                     error_log('[' . __CLASS__ . '] ' . $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine());
             http_response_code(500);
             echo json_encode(['success' => false, 'error' => 'An internal error occurred. Please try again.']);
+
                 }
                 return;
             }
@@ -286,6 +287,7 @@ class IAMController
                     error_log('[' . __CLASS__ . '] ' . $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine());
             http_response_code(500);
             echo json_encode(['success' => false, 'error' => 'An internal error occurred. Please try again.']);
+
                 }
                 return;
             }
@@ -425,6 +427,8 @@ class IAMController
 
                     $this->pdo->beginTransaction();
 
+                    $this->pdo->beginTransaction();
+
                     $stmt = $this->pdo->prepare("
                         INSERT INTO users (tenant_id, full_name, email, password_hash, employment_status, must_change_password, created_at) 
                         VALUES (?, ?, ?, ?, 'Active', 1, NOW())
@@ -449,6 +453,7 @@ class IAMController
                     } catch (\Throwable $mailEx) {
                         error_log("Invite email failed: " . $mailEx->getMessage());
                     }
+
                     
                     logAction($this->currentUser['email'], 'User Invited', "Invited user {$email}");
 
@@ -461,6 +466,7 @@ class IAMController
                     error_log('[' . __CLASS__ . '] ' . $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine());
             http_response_code(500);
             echo json_encode(['success' => false, 'error' => 'An internal error occurred. Please try again.']);
+
                 }
                 return;
             }
@@ -611,3 +617,4 @@ class IAMController
         logAction($uEmail, 'Role Assigned/Updated', "Role ID {$roleId} assigned with scope {$scope}");
     }
 }
+
