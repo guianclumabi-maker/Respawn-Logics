@@ -26,8 +26,7 @@ class OnboardingController extends Controller {
         try {
             $tenantId = isset($_SESSION['tenant_id']) ? trim((string)$_SESSION['tenant_id']) : '';
             if (empty($tenantId)) {
-                $tenantId = 'default_tenant';
-                $_SESSION['tenant_id'] = $tenantId;
+                throw new Exception('Tenant ID is missing. Invalid or expired onboarding session.');
             }
 
             if (!isset($_FILES['file']) || $_FILES['file']['error'] !== UPLOAD_ERR_OK) {
@@ -305,8 +304,7 @@ class OnboardingController extends Controller {
             }
 
             $_SESSION['logged_in'] = true;
-            $_SESSION['role'] = 'admin';
-            $_SESSION['tenant_id'] = $tenantId;
+            // Removed $_SESSION['role'] = 'admin'; - do not auto-elevate privileges on import
 
             $this->jsonResponse([
                 'success' => true,
