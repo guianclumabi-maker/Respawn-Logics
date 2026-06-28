@@ -21,6 +21,54 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit(0);
 }
 
+// ── Public: exchange one-time login token (called by React right after registration) ──
+if ($_SERVER['REQUEST_METHOD'] === 'GET' && ($action ?? '') === 'exchange_token') {
+    $token = trim($_GET['token'] ?? '');
+    if (empty($token)) {
+        http_response_code(400);
+        echo json_encode(['success' => false, 'error' => 'Token required']);
+        exit;
+    }
+
+    $stmt = $pdo->prepare(
+        "SELECT t.user_id, t.expires_at, t.used_at, u.email, u.full_name, u.tenant_id
+         FROM user_activation_tokens t
+         JOIN users u ON u.id = t.user_id
+         WHERE t.token = ? LIMIT 1"
+    );
+    $stmt->execute([$token]);
+    $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if (!$row) {
+        http_response_code(401);
+        echo json_encode(['success' => false, 'error' => 'Invalid token']);
+        exit;
+    }
+    if ($row['used_at'] !== null) {
+        http_response_code(401);
+        echo json_encode(['success' => false, 'error' => 'Token already used']);
+        exit;
+    }
+    if (strtotime($row['expires_at']) < time()) {
+        http_response_code(401);
+        echo json_encode(['success' => false, 'error' => 'Token expired']);
+        exit;
+    }
+
+    // Mark token as used
+    $pdo->prepare("UPDATE user_activation_tokens SET used_at = NOW() WHERE token = ?")
+        ->execute([$token]);
+
+    // Establish the session
+    $_SESSION['user_id']    = $row['user_id'];
+    $_SESSION['user_email'] = $row['email'];
+    $_SESSION['user_name']  = $row['full_name'];
+    $_SESSION['tenant_id']  = $row['tenant_id'];
+
+    echo json_encode(['success' => true, 'message' => 'Session established']);
+    exit;
+}
+
 // Enforce Auth
 if (!isLoggedIn()) {
     http_response_code(401);

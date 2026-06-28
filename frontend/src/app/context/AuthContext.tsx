@@ -52,9 +52,29 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   // ── Bootstrap: fetch current session ──
   useEffect(() => {
-    fetch(`${API_BASE}/api.php?action=current_user`, { credentials: "include" })
-      .then((res) => res.json())
-      .then((data) => {
+    const bootstrap = async () => {
+      try {
+        // Check if we just registered — a one-time login_token may be in the URL hash query string
+        // e.g. #/onboarding?login_token=abc123 or #/dashboard?login_token=abc123
+        const hashPart = window.location.hash; // e.g. "#/onboarding?login_token=abc123"
+        const queryStart = hashPart.indexOf('?');
+        if (queryStart !== -1) {
+          const hashQuery = new URLSearchParams(hashPart.slice(queryStart));
+          const loginToken = hashQuery.get('login_token');
+          if (loginToken) {
+            // Exchange the one-time token for a proper session
+            await fetch(`${API_BASE}/api.php?action=exchange_token&token=${encodeURIComponent(loginToken)}`, {
+              credentials: 'include'
+            });
+            // Clean the token out of the URL so it can't be reused via browser history
+            const cleanHash = hashPart.slice(0, queryStart);
+            window.history.replaceState(null, '', window.location.pathname + window.location.search + cleanHash);
+          }
+        }
+
+        // Now do the normal session check
+        const res = await fetch(`${API_BASE}/api.php?action=current_user`, { credentials: 'include' });
+        const data = await res.json();
         if (data.success && data.user) {
           if (data.user.must_change_password) {
             window.location.href = `${API_BASE}/login.php?step=set_password`;
@@ -66,9 +86,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         } else {
           setUser(null);
         }
-      })
-      .catch(() => setUser(null))
-      .finally(() => setLoading(false));
+      } catch {
+        setUser(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+    bootstrap();
   }, []);
 
   // ── Login ──
