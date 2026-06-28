@@ -426,7 +426,7 @@ export default function App() {
             </div>
 
             <div className="flex justify-between items-center mt-8">
-              <button onClick={() => setCurrentView("setup_mode")} className="px-6 py-2.5 rounded-sm text-[#c8d0e0] font-['JetBrains_Mono'] hover:text-white transition-colors flex items-center gap-2">
+              <button onClick={() => window.location.href = `${API_BASE}/logout.php`} className="px-6 py-2.5 rounded-sm text-[#c8d0e0] font-['JetBrains_Mono'] hover:text-white transition-colors flex items-center gap-2">
                 <ArrowRight className="w-4 h-4 rotate-180" /> [ ABORT ]
               </button>
               <button onClick={handleDownloadTemplate} className="flex items-center gap-2 px-6 py-2.5 text-xs rounded-sm text-[#00e07a] font-['JetBrains_Mono'] font-bold border border-[#00e07a] bg-[#00e07a]/10 hover:bg-[#00e07a]/20 transition-all uppercase tracking-wider">
