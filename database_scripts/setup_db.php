@@ -28,11 +28,21 @@ try {
         row_num INT NOT NULL,
         error_message TEXT NOT NULL
     );');
-    $cols = ['organization_unit_1', 'organization_unit_2', 'organization_unit_3', 'organization_unit_4'];
-    foreach ($cols as $col) {
+    $cols = [
+        'organization_unit_1' => "VARCHAR(150) DEFAULT NULL",
+        'organization_unit_2' => "VARCHAR(150) DEFAULT NULL",
+        'organization_unit_3' => "VARCHAR(150) DEFAULT NULL",
+        'organization_unit_4' => "VARCHAR(150) DEFAULT NULL",
+        'emergency_name'      => "VARCHAR(150) DEFAULT NULL",
+        'emergency_phone'     => "VARCHAR(50) DEFAULT NULL",
+        'phone'               => "VARCHAR(50) DEFAULT NULL",
+        'bio'                 => "TEXT DEFAULT NULL",
+        'is_mwe'              => "TINYINT(1) NOT NULL DEFAULT 0"
+    ];
+    foreach ($cols as $col => $defn) {
         $check = $pdo->query("SHOW COLUMNS FROM `users` LIKE '$col'");
         if (!$check->fetch()) {
-            $pdo->exec("ALTER TABLE `users` ADD COLUMN `$col` VARCHAR(150) DEFAULT NULL;");
+            $pdo->exec("ALTER TABLE `users` ADD COLUMN `$col` $defn;");
         }
     }
     $pdo->exec('CREATE TABLE IF NOT EXISTS `attendance` (
