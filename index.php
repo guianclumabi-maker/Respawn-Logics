@@ -1205,7 +1205,7 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
 
     <div class="hero-badge">
         <div class="ping"></div>
-        BETA SERVERS ONLINE &nbsp;·&nbsp; RESPAWN-PH
+        BETA SERVERS ONLINE &nbsp;·&nbsp; RESPAWN-PH &nbsp;·&nbsp; POWERED BY GEMINI
     </div>
 
     <h1 class="hero-h1">
@@ -1812,7 +1812,7 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
         
         <div class="footer-bottom">
             <div class="footer-copy">
-                © <?= date('Y') ?> Respawn Logics Inc. &nbsp;·&nbsp; Built in the Philippines <img src="https://flagcdn.com/ph.svg" width="16" alt="PH" style="vertical-align: middle; margin-left: 2px; margin-top: -2px; border-radius: 2px;">
+                © <?= date('Y') ?> Respawn Logics Inc. &nbsp;·&nbsp; Built in the Philippines <img src="https://flagcdn.com/ph.svg" width="16" alt="PH" style="vertical-align: middle; margin-left: 2px; margin-top: -2px; border-radius: 2px;"> &nbsp;·&nbsp; Powered by Gemini
             </div>
             <div class="footer-socials">
                 <a href="#"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect width="4" height="12" x="2" y="9"/><circle cx="4" cy="4" r="2"/></svg></a>
