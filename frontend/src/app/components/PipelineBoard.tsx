@@ -1,3 +1,4 @@
+import { apiFetch } from "../lib/apiClient";
 import { useState, useEffect, useCallback } from "react";
 import {
   Search, Plus, Star, ChevronDown, ChevronUp, X, Check, Trash2,
@@ -126,9 +127,9 @@ function AddCandidateModal({ jobId, onClose, onSuccess }: { jobId: number; onClo
     if (!form.name.trim()) return;
     setSaving(true);
     try {
-      const res = await fetch(API, { credentials: "include", method: "POST", headers: { 
+      const res = await apiFetch(API.replace(API_BASE, ""), { method: "POST", headers: { 
         "Content-Type": "application/json",
-        "X-CSRF-Token": (window as any).__CSRF_TOKEN__ || ""
+
       },
         body: JSON.stringify({ action: "add_candidate", job_id: jobId, ...form, experience_years: parseInt(form.experience_years) || 0, salary_expectation: parseFloat(form.salary_expectation) || 0 }) });
       const data = await res.json();
@@ -354,7 +355,7 @@ export function PipelineBoard({ onViewChange, jobId }: Props) {
   // Fetch job list if no jobId
   useEffect(() => {
     if (!jobId) {
-      fetch(`${API}&action=jobs`, { credentials: "include" }).then(r => r.json()).then(d => {
+      apiFetch(`${API.replace(API_BASE, "")}&action=jobs`, { }).then(r => r.json()).then(d => {
         if (d.success && d.jobs?.length) {
           setJobs(d.jobs);
           // Do NOT auto-select the first job, let the user choose from the list
@@ -370,7 +371,7 @@ export function PipelineBoard({ onViewChange, jobId }: Props) {
     if (!id) return;
     setLoading(true);
     try {
-      const res = await fetch(`${API}&action=job&id=${id}&t=${Date.now()}`, { credentials: "include" });
+      const res = await apiFetch(`${API.replace(API_BASE, "")}&action=job&id=${id}&t=${Date.now()}`, { });
       const data = await res.json();
       if (data.success) setJob(data.job);
     } catch (e) { console.error(e); }
@@ -413,10 +414,10 @@ export function PipelineBoard({ onViewChange, jobId }: Props) {
   // ── API mutations ──
   const updateStage = async (appId: number, stage: string) => {
     try {
-      const res = await fetch(API, { method: "POST", headers: { 
+      const res = await apiFetch(API.replace(API_BASE, ""), { method: "POST", headers: { 
         "Content-Type": "application/json",
-        "X-CSRF-Token": (window as any).__CSRF_TOKEN__ || ""
-      }, body: JSON.stringify({ action: "update_stage", id: appId, stage }), credentials: "include" });
+
+      }, body: JSON.stringify({ action: "update_stage", id: appId, stage }), });
       if (!res.ok) {
         const text = await res.text();
         showToast(`Failed: ${res.status} ${text}`);
@@ -430,9 +431,9 @@ export function PipelineBoard({ onViewChange, jobId }: Props) {
   const updateRating = async (appId: number, rating: number) => {
     setJob(prev => prev ? { ...prev, applications: prev.applications.map(a => a.id === appId ? { ...a, rating } : a) } : prev);
     try {
-      await fetch(API, { credentials: "include", method: "POST", headers: { 
+      await apiFetch(API.replace(API_BASE, ""), { method: "POST", headers: { 
         "Content-Type": "application/json",
-        "X-CSRF-Token": (window as any).__CSRF_TOKEN__ || ""
+
       }, body: JSON.stringify({ action: "update_rating", id: appId, rating }) });
     } catch (err) {
       console.error(err);
@@ -442,10 +443,10 @@ export function PipelineBoard({ onViewChange, jobId }: Props) {
   const bulkAdvance = async (stage: string) => {
     const ids = Array.from(selected);
     try {
-      const res = await fetch(API, { method: "POST", headers: { 
+      const res = await apiFetch(API.replace(API_BASE, ""), { method: "POST", headers: { 
         "Content-Type": "application/json",
-        "X-CSRF-Token": (window as any).__CSRF_TOKEN__ || ""
-      }, body: JSON.stringify({ action: "bulk_advance", ids, stage }), credentials: "include" });
+
+      }, body: JSON.stringify({ action: "bulk_advance", ids, stage }), });
       if (!res.ok) {
         const text = await res.text();
         showToast(`Failed: ${res.status} ${text}`);
@@ -460,9 +461,9 @@ export function PipelineBoard({ onViewChange, jobId }: Props) {
     const ids = Array.from(selected);
     if (!confirm(`Reject ${ids.length} candidate(s)?`)) return;
     try {
-      await fetch(API, { credentials: "include", method: "POST", headers: { 
+      await apiFetch(API.replace(API_BASE, ""), { method: "POST", headers: { 
         "Content-Type": "application/json",
-        "X-CSRF-Token": (window as any).__CSRF_TOKEN__ || ""
+
       }, body: JSON.stringify({ action: "bulk_reject", ids }) });
       setSelected(new Set()); showToast(`${ids.length} candidate(s) rejected`); loadJob();
     } catch (err) { console.error(err); }
@@ -472,9 +473,9 @@ export function PipelineBoard({ onViewChange, jobId }: Props) {
     const ids = Array.from(selected);
     if (!confirm(`Archive ${ids.length} candidate(s)? This cannot be undone.`)) return;
     try {
-      await fetch(API, { credentials: "include", method: "POST", headers: { 
+      await apiFetch(API.replace(API_BASE, ""), { method: "POST", headers: { 
         "Content-Type": "application/json",
-        "X-CSRF-Token": (window as any).__CSRF_TOKEN__ || ""
+
       }, body: JSON.stringify({ action: "bulk_delete", ids }) });
       setSelected(new Set()); showToast(`${ids.length} candidate(s) archived`); loadJob();
     } catch (err) { console.error(err); }

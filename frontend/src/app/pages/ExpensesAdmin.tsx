@@ -1,3 +1,4 @@
+import { apiFetch } from "../lib/apiClient";
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { Navigate } from 'react-router-dom';
@@ -24,7 +25,7 @@ export function ExpensesAdmin() {
     setIsLoading(true);
     try {
       const action = tab === 'manager' ? 'manager_pending' : 'finance_pending';
-      const res = await fetch(`${API_BASE}/api/index.php?route=expenses&action=${action}`);
+      const res = await apiFetch(`/api/index.php?route=expenses&action=${action}`);
       const data = await res.json();
       if (data.success) {
         setClaims(data.data);
@@ -52,10 +53,10 @@ export function ExpensesAdmin() {
     if (comments === null) return; // Cancelled
     
     try {
-      const token = (window as any).__CSRF_TOKEN__ || '';
-      const res = await fetch(`${API_BASE}/api/index.php?route=expenses&action=approve_claim`, {
+      
+      const res = await apiFetch(`/api/index.php?route=expenses&action=approve_claim`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': token },
+        headers: { 'Content-Type': 'application/json', },
         body: JSON.stringify({ claim_id: id, decision: decision, comments: comments })
       });
       const data = await res.json();

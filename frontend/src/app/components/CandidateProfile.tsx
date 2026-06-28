@@ -1,3 +1,4 @@
+import { apiFetch } from "../lib/apiClient";
 import React, { useState, useEffect, useCallback } from "react";
 import {
   AlertTriangle,
@@ -258,7 +259,7 @@ function AddToPoolModal({
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch(`${API}&action=talent_pools`, { credentials: "include" })
+    apiFetch(`${API.replace(API_BASE, "")}&action=talent_pools`, { })
       .then((r) => r.json())
       .then((d) => {
         if (d.pools) setPools(d.pools.filter((p: Pool) => !existingPools.includes(p.id)));
@@ -441,12 +442,12 @@ export function CandidateProfile({ onViewChange, candidateId }: Props) {
     e.preventDefault();
     setHiring(true);
     try {
-      const res = await fetch(`${API}&action=hire_candidate`, {
+      const res = await apiFetch(`${API.replace(API_BASE, "")}&action=hire_candidate`, {
         method: 'POST',
-        credentials: 'include',
+
         headers: {
           'Content-Type': 'application/json',
-          'X-CSRF-Token': (window as any).__CSRF_TOKEN__ || ''
+
         },
         body: JSON.stringify({
           candidate_id: candidateId,
@@ -483,12 +484,12 @@ export function CandidateProfile({ onViewChange, candidateId }: Props) {
     if (anonymizeConfirmText !== 'ANONYMIZE') return;
     setIsAnonymizing(true);
     try {
-      const res = await fetch(`${API}&action=erase_candidate`, {
+      const res = await apiFetch(`${API.replace(API_BASE, "")}&action=erase_candidate`, {
         method: 'POST',
-        credentials: 'include',
+
         headers: {
           'Content-Type': 'application/json',
-          'X-CSRF-Token': (window as any).__CSRF_TOKEN__ || ''
+
         },
         body: JSON.stringify({ id: candidateId })
       });
@@ -510,7 +511,7 @@ export function CandidateProfile({ onViewChange, candidateId }: Props) {
   const fetchCandidate = useCallback(() => {
     setLoading(true);
     setError(null);
-    fetch(`${API}&action=candidate&id=${candidateId}`, { credentials: "include" })
+    apiFetch(`${API.replace(API_BASE, "")}&action=candidate&id=${candidateId}`, { })
       .then((r) => {
         if (!r.ok) throw new Error("Failed to fetch candidate");
         return r.json();
@@ -546,12 +547,10 @@ export function CandidateProfile({ onViewChange, candidateId }: Props) {
     formData.append("resume", file);
 
     try {
-      const r = await fetch(API, {
+      const r = await apiFetch(API.replace(API_BASE, ""), {
         method: "POST",
-        credentials: "include",
-        headers: {
-          "X-CSRF-Token": (window as any).__CSRF_TOKEN__ || "",
-        },
+
+
         body: formData,
       });
       const d = await r.json();
@@ -571,11 +570,11 @@ export function CandidateProfile({ onViewChange, candidateId }: Props) {
   };
 
   const handleAddNote = (content: string, noteType: string) => {
-    fetch(API, { credentials: "include",
+    apiFetch(API.replace(API_BASE, ""), {
       method: "POST",
       headers: { 
         "Content-Type": "application/json",
-        "X-CSRF-Token": (window as any).__CSRF_TOKEN__ || ""
+
       },
       body: JSON.stringify({
         action: "add_note",
@@ -590,11 +589,11 @@ export function CandidateProfile({ onViewChange, candidateId }: Props) {
   };
 
   const handleAddToPool = (poolId: number) => {
-    fetch(API, { credentials: "include",
+    apiFetch(API.replace(API_BASE, ""), {
       method: "POST",
       headers: { 
         "Content-Type": "application/json",
-        "X-CSRF-Token": (window as any).__CSRF_TOKEN__ || ""
+
       },
       body: JSON.stringify({
         action: "add_to_pool",

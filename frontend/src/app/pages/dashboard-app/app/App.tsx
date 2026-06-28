@@ -1,3 +1,4 @@
+import { apiFetch } from "../../../lib/apiClient";
 import { useState } from "react";
 import { TicketList } from "./components/tickets/TicketList";
 import { TicketDetail } from "./components/tickets/TicketDetail";
@@ -48,7 +49,7 @@ export default function App() {
     setTickets(prev => prev.map(t => t.id === id ? { ...t, status, updated: new Date().toISOString() } : t));
     const ticketId = id.replace("TKT-", "");
     await fetch(`../api/index.php?route=${apiRoute}&action=update_ticket`, {
-      method: "POST", headers: { "Content-Type": "application/json", "X-CSRF-Token": window.__CSRF_TOKEN__ || "" },
+      method: "POST", headers: { "Content-Type": "application/json", },
       body: JSON.stringify({ ticket_id: ticketId, status })
     });
   };
@@ -57,7 +58,7 @@ export default function App() {
     setTickets(prev => prev.map(t => t.id === id ? { ...t, priority, updated: new Date().toISOString() } : t));
     const ticketId = id.replace("TKT-", "");
     await fetch(`../api/index.php?route=${apiRoute}&action=update_ticket`, {
-      method: "POST", headers: { "Content-Type": "application/json", "X-CSRF-Token": window.__CSRF_TOKEN__ || "" },
+      method: "POST", headers: { "Content-Type": "application/json", },
       body: JSON.stringify({ ticket_id: ticketId, priority })
     });
   };
@@ -74,7 +75,7 @@ export default function App() {
     
     const ticketId = id.replace("TKT-", "");
     await fetch(`../api/index.php?route=${apiRoute}&action=update_ticket`, {
-      method: "POST", headers: { "Content-Type": "application/json", "X-CSRF-Token": window.__CSRF_TOKEN__ || "" },
+      method: "POST", headers: { "Content-Type": "application/json", },
       body: JSON.stringify({ ticket_id: ticketId, assigned_to: assigneeId })
     });
   };
@@ -89,7 +90,7 @@ export default function App() {
     
     const ticketId = id.replace("TKT-", "");
     await fetch(`../api/index.php?route=${apiRoute}&action=add_ticket_tag`, {
-      method: "POST", headers: { "Content-Type": "application/json", "X-CSRF-Token": window.__CSRF_TOKEN__ || "" },
+      method: "POST", headers: { "Content-Type": "application/json", },
       body: JSON.stringify({ ticket_id: ticketId, tag })
     });
   };
@@ -104,7 +105,7 @@ export default function App() {
     
     const ticketId = id.replace("TKT-", "");
     await fetch(`../api/index.php?route=${apiRoute}&action=remove_ticket_tag`, {
-      method: "POST", headers: { "Content-Type": "application/json", "X-CSRF-Token": window.__CSRF_TOKEN__ || "" },
+      method: "POST", headers: { "Content-Type": "application/json", },
       body: JSON.stringify({ ticket_id: ticketId, tag })
     });
   };
@@ -114,7 +115,7 @@ export default function App() {
 
     const rawIds = selectedTicketIds.map(id => id.replace("TKT-", ""));
     await fetch(`../api/index.php?route=${apiRoute}&action=bulk_action`, {
-      method: "POST", headers: { "Content-Type": "application/json", "X-CSRF-Token": window.__CSRF_TOKEN__ || "" },
+      method: "POST", headers: { "Content-Type": "application/json", },
       body: JSON.stringify({ ticket_ids: rawIds, action, value })
     });
 
@@ -135,7 +136,7 @@ export default function App() {
 
   const handleCSAT = async (ticketId: string, score: number, comment: string) => {
     await fetch(`../api/index.php?route=${apiRoute}&action=submit_csat`, {
-      method: "POST", headers: { "Content-Type": "application/json", "X-CSRF-Token": window.__CSRF_TOKEN__ || "" },
+      method: "POST", headers: { "Content-Type": "application/json", },
       body: JSON.stringify({ ticket_id: ticketId, score, comment })
     });
   };
