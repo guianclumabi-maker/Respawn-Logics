@@ -92,10 +92,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
             $_SESSION['tenant_id'] = $tenantId;
 
             if ($setupMode === 'Solo') {
-                header('Location: ' . url('/frontend/dist/index.html?v=' . time() . '#/dashboard'));
+                $redirectUrl = url('/frontend/dist/index.html?v=' . time() . '#/dashboard');
             } else {
-                header('Location: ' . url('/frontend/dist/index.html?v=' . time() . '#/onboarding'));
+                $redirectUrl = url('/frontend/dist/index.html?v=' . time() . '#/onboarding');
             }
+            
+            // Output a 200 OK with a JS redirect to ensure Set-Cookie is processed before navigating
+            echo "<!DOCTYPE html><html><head><title>Redirecting...</title>";
+            echo "<script>window.location.href = '" . addslashes($redirectUrl) . "';</script>";
+            echo "</head><body>Redirecting to workspace...</body></html>";
             exit;
 
         } catch (Exception $e) {
