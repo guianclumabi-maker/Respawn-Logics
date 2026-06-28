@@ -125,8 +125,8 @@ export const router = createHashRouter([
           { path: "audit", element: <AuditLogs /> },
         ]
       },
+      { path: "onboarding", element: <OnboardingManager /> },
       { path: "*", element: <Navigate to="/dashboard" replace /> }
     ]
-  },
-  { path: "/onboarding", element: <OnboardingManager /> }
+  }
 ]);
