@@ -84,22 +84,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
 
             $pdo->commit();
 
-            // 5. Auto-login
-            // Do NOT regenerate session ID here. If the browser has multiple PHPSESSID cookies 
-            // (e.g. from previous domain changes) or drops the Set-Cookie on redirect, 
-            // regenerating will destroy the only valid session file on the server.
-            $_SESSION['user_id'] = $userId;
-            $_SESSION['user_email'] = $email;
-            $_SESSION['user_name'] = $fullName;
-            $_SESSION['tenant_id'] = $tenantId;
+            // 5. Generate a one-time login token (bypasses session cookie race conditions on Railway)
+            // The token is stored in the DB and React exchanges it for a real session via the API.
+            $loginToken = bin2hex(random_bytes(32));
+            $tokenExpiry = date('Y-m-d H:i:s', time() + 300); // 5 minutes
+            $stmtToken = $pdo->prepare(
+                "INSERT INTO user_activation_tokens (user_id, token, expires_at, created_at) VALUES (?, ?, ?, NOW())"
+            );
+            $stmtToken->execute([$userId, $loginToken, $tokenExpiry]);
 
-            if ($setupMode === 'Solo') {
-                $redirectUrl = url('/frontend/dist/index.html?v=' . time() . '#/dashboard');
-            } else {
-                $redirectUrl = url('/frontend/dist/index.html?v=' . time() . '#/onboarding');
-            }
-            
-            // Output a 200 OK with a JS redirect to ensure Set-Cookie is processed before navigating
+            $hashPath = ($setupMode === 'Solo') ? '/dashboard' : '/onboarding';
+            $redirectUrl = url('/frontend/dist/index.html?v=' . time() . '#' . $hashPath . '?login_token=' . $loginToken);
+
+            // Output the JS redirect — token is in the URL, no session cookie needed
             echo "<!DOCTYPE html><html><head><title>Redirecting...</title>";
             echo "<script>window.location.href = '" . addslashes($redirectUrl) . "';</script>";
             echo "</head><body>Redirecting to workspace...</body></html>";
