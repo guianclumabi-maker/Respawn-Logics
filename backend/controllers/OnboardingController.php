@@ -133,7 +133,7 @@ class OnboardingController extends Controller {
                 $email = filter_var($row['email'], FILTER_VALIDATE_EMAIL);
                 if (!$email) {
                     $validationWarnings[] = "Row {$row['line']}: Invalid or missing email. Skipping row.";
-                    $this->pdo->prepare("INSERT INTO import_batch_errors (batch_id, row_number, error_message) VALUES (?, ?, ?)")
+                    $this->pdo->prepare("INSERT INTO import_batch_errors (batch_id, row_num, error_message) VALUES (?, ?, ?)")
                         ->execute([$batchId, $row['line'], "Invalid or missing email"]);
                     $skippedCount++;
                     continue;
@@ -185,16 +185,16 @@ class OnboardingController extends Controller {
             $this->pdo->beginTransaction();
 
             $stmt = $this->pdo->prepare("INSERT INTO `users` 
-                (`tenant_id`, `employee_id`, `first_name`, `last_name`, `work_email`, `department`, `job_title`, `manager_id`, `hire_date`, `full_name`, `email`, `role`, `immediate_supervisor`, `department_manager`, `organization_unit_1`, `organization_unit_2`, `organization_unit_3`, `organization_unit_4`, `password_hash`, `profile_image`) 
+                (`tenant_id`, `employee_id`, `first_name`, `last_name`, `work_email`, `department`, `job_title`, `manager_supervisor_id`, `hire_date`, `full_name`, `email`, `role`, `immediate_supervisor`, `department_manager`, `organization_unit_1`, `organization_unit_2`, `organization_unit_3`, `organization_unit_4`, `password_hash`, `profile_image`, `manager_id`) 
                 VALUES 
-                (:tenant_id, :employee_id, :first_name, :last_name, :email, :department, :job_title, :manager_id, :hire_date, :full_name, :email2, :role, :immediate_supervisor, :department_manager, :ou1, :ou2, :ou3, :ou4, '', '')
+                (:tenant_id, :employee_id, :first_name, :last_name, :email, :department, :job_title, :manager_supervisor_id, :hire_date, :full_name, :email2, :role, :immediate_supervisor, :department_manager, :ou1, :ou2, :ou3, :ou4, '', '', NULL)
                 ON DUPLICATE KEY UPDATE
                 `first_name` = VALUES(`first_name`),
                 `last_name` = VALUES(`last_name`),
                 `work_email` = VALUES(`work_email`),
                 `department` = VALUES(`department`),
                 `job_title` = VALUES(`job_title`),
-                `manager_id` = VALUES(`manager_id`),
+                `manager_supervisor_id` = VALUES(`manager_supervisor_id`),
                 `hire_date` = VALUES(`hire_date`),
                 `full_name` = VALUES(`full_name`),
                 `email` = VALUES(`email`),
@@ -205,7 +205,8 @@ class OnboardingController extends Controller {
                 `organization_unit_2` = VALUES(`organization_unit_2`),
                 `organization_unit_3` = VALUES(`organization_unit_3`),
                 `organization_unit_4` = VALUES(`organization_unit_4`),
-                `profile_image` = VALUES(`profile_image`)");
+                `profile_image` = VALUES(`profile_image`),
+                `manager_id` = NULL");
 
             $stmtToken = $this->pdo->prepare("INSERT INTO user_activation_tokens (user_id, token, expires_at, created_at) VALUES (?, ?, DATE_ADD(NOW(), INTERVAL 7 DAY), NOW())");
 
@@ -247,7 +248,7 @@ class OnboardingController extends Controller {
                     ':email' => $emp['email'],
                     ':department' => $emp['department'],
                     ':job_title' => $emp['job_title'],
-                    ':manager_id' => $managerId,
+                    ':manager_supervisor_id' => !empty($managerId) ? $managerId : null,
                     ':hire_date' => $emp['hire_date'] ?: null,
                     ':full_name' => $fullName,
                     ':email2' => $emp['email'],
@@ -287,6 +288,18 @@ class OnboardingController extends Controller {
                 ->execute([count($rows), $processedCount, $skippedCount, $batchId]);
 
             $this->pdo->commit();
+
+            // 5. Post-commit: resolve manager_id integers using string manager_supervisor_id
+            try {
+                $this->pdo->prepare("
+                    UPDATE users u
+                    JOIN users mgr ON u.manager_supervisor_id = mgr.employee_id AND u.tenant_id = mgr.tenant_id
+                    SET u.manager_id = mgr.id
+                    WHERE u.tenant_id = ?
+                ")->execute([$tenantId]);
+            } catch (PDOException $ex) {
+                error_log('[OnboardingController] Failed resolving manager_ids: ' . $ex->getMessage());
+            }
 
             $suggestedAdmins = array_filter($accounts, function($a) {
                 $title = $a['job_title'] ?? '';
