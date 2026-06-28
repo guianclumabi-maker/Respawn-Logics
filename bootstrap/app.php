@@ -22,11 +22,18 @@ $config = require __DIR__ . '/../config/config.php';
 
 // 3. Configure and Start Session
 if (session_status() === PHP_SESSION_NONE) {
+    // Auto-detect HTTPS: Railway terminates SSL at the proxy level and forwards via X-Forwarded-Proto
+    $isHttps = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
+        || ($_SERVER['SERVER_PORT'] ?? 80) == 443
+        || ($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '') === 'https';
+
+    $sessionSecure = filter_var($config['session']['secure'], FILTER_VALIDATE_BOOLEAN) || $isHttps;
+
     session_set_cookie_params([
         'lifetime' => $config['session']['timeout'],
         'path' => '/',
-        'domain' => '', // Empty string lets the browser automatically use the current host (avoids proxy issues)
-        'secure' => $config['session']['secure'],
+        'domain' => '', // Empty string lets the browser automatically use the current host
+        'secure' => $sessionSecure,
         'httponly' => $config['session']['httponly'],
         'samesite' => $config['session']['samesite']
     ]);

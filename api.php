@@ -4,13 +4,14 @@ header('Content-Type: application/json');
 require_once __DIR__ . '/bootstrap/app.php';
 global $config;
 
-// Define CORS
-$allowed_origins = array_map('trim', explode(',', $config['cors']['allowed_origins']));
-
+// Define CORS — only needed for cross-origin requests (Origin header present)
 $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
-if (in_array($origin, $allowed_origins)) {
-    header("Access-Control-Allow-Origin: $origin");
-    header('Access-Control-Allow-Credentials: true');
+if ($origin !== '') {
+    $allowed_origins = array_filter(array_map('trim', explode(',', $config['cors']['allowed_origins'])));
+    if (in_array($origin, $allowed_origins) || empty($allowed_origins)) {
+        header("Access-Control-Allow-Origin: $origin");
+        header('Access-Control-Allow-Credentials: true');
+    }
 }
 header('Access-Control-Allow-Headers: Content-Type, Authorization');
 header('Access-Control-Allow-Methods: GET, POST, OPTIONS');
