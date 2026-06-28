@@ -3,9 +3,6 @@ if (!defined('MIGRATION_SAFE')) die('Forbidden');
 require_once __DIR__ . '/../bootstrap/app.php';
 
 try {
-    // Clean recreate these seed-based reference tables to ensure correct schema version
-    $pdo->exec("DROP TABLE IF EXISTS `labor_references`, `elr_precedents`;");
-
     // 1. labor_references (For DOLE, Statutory Compliance)
     $pdo->exec("CREATE TABLE IF NOT EXISTS `labor_references` (
         `id` BIGINT PRIMARY KEY AUTO_INCREMENT,
@@ -23,6 +20,34 @@ try {
         FULLTEXT INDEX `ft_compliance` (`title`, `summary`)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;");
 
+    // Guarded column additions for labor_references
+    $laborRefCols = [
+        'country_code'   => "VARCHAR(5) DEFAULT 'PH'",
+        'category'       => "VARCHAR(100) NOT NULL",
+        'title'          => "VARCHAR(255) NOT NULL",
+        'summary'        => "TEXT NOT NULL",
+        'source_type'    => "VARCHAR(100) NOT NULL",
+        'official_url'   => "VARCHAR(255) NULL",
+        'effective_date' => "DATE NULL",
+        'reviewed_by'    => "VARCHAR(100) NULL",
+        'status'         => "ENUM('Pending', 'Approved', 'Rejected') DEFAULT 'Pending'",
+        'created_at'     => "DATETIME DEFAULT CURRENT_TIMESTAMP",
+        'updated_at'     => "DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"
+    ];
+    foreach ($laborRefCols as $col => $defn) {
+        $exists = $pdo->query("SELECT COUNT(*) FROM information_schema.COLUMNS WHERE table_schema = DATABASE() AND table_name = 'labor_references' AND column_name = '$col'")->fetchColumn();
+        if ((int)$exists === 0) {
+            $pdo->exec("ALTER TABLE `labor_references` ADD COLUMN `$col` $defn");
+        }
+    }
+    // Ensure FT index exists
+    $ftCompliance = $pdo->query("SELECT COUNT(*) FROM information_schema.STATISTICS WHERE table_schema = DATABASE() AND table_name = 'labor_references' AND index_name = 'ft_compliance'")->fetchColumn();
+    if ((int)$ftCompliance === 0) {
+        try {
+            $pdo->exec("ALTER TABLE `labor_references` ADD FULLTEXT INDEX `ft_compliance` (`title`, `summary`)");
+        } catch (PDOException $e) {}
+    }
+
     // 2. elr_precedents (For Supreme Court Jurisprudence / Internal Discipline)
     $pdo->exec("CREATE TABLE IF NOT EXISTS `elr_precedents` (
         `id` BIGINT PRIMARY KEY AUTO_INCREMENT,
@@ -37,6 +62,32 @@ try {
         `updated_at` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         FULLTEXT INDEX `ft_precedents` (`case_type`, `title`, `summary`, `key_principles`)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;");
+
+    // Guarded column additions for elr_precedents
+    $elrPrecedentCols = [
+        'case_type'           => "VARCHAR(100) NOT NULL",
+        'title'               => "VARCHAR(255) NOT NULL",
+        'summary'             => "TEXT NOT NULL",
+        'key_principles'      => "TEXT NOT NULL",
+        'source_reference'    => "VARCHAR(255) NOT NULL",
+        'risk_level'          => "ENUM('Low', 'Medium', 'High', 'Critical') DEFAULT 'Medium'",
+        'recommended_process' => "TEXT NOT NULL",
+        'created_at'          => "DATETIME DEFAULT CURRENT_TIMESTAMP",
+        'updated_at'          => "DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"
+    ];
+    foreach ($elrPrecedentCols as $col => $defn) {
+        $exists = $pdo->query("SELECT COUNT(*) FROM information_schema.COLUMNS WHERE table_schema = DATABASE() AND table_name = 'elr_precedents' AND column_name = '$col'")->fetchColumn();
+        if ((int)$exists === 0) {
+            $pdo->exec("ALTER TABLE `elr_precedents` ADD COLUMN `$col` $defn");
+        }
+    }
+    // Ensure FT index exists
+    $ftPrecedents = $pdo->query("SELECT COUNT(*) FROM information_schema.STATISTICS WHERE table_schema = DATABASE() AND table_name = 'elr_precedents' AND index_name = 'ft_precedents'")->fetchColumn();
+    if ((int)$ftPrecedents === 0) {
+        try {
+            $pdo->exec("ALTER TABLE `elr_precedents` ADD FULLTEXT INDEX `ft_precedents` (`case_type`, `title`, `summary`, `key_principles`)");
+        } catch (PDOException $e) {}
+    }
 
     echo "New database schemas (labor_references, elr_precedents) verified successfully.\n";
 
