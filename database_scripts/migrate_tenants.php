@@ -3,10 +3,8 @@ if (!defined('MIGRATION_SAFE')) die('Forbidden');
 require_once __DIR__ . '/../bootstrap/app.php';
 
 try {
-    // Drop existing if it exists to cleanly recreate for the prototype
-    $pdo->exec("DROP TABLE IF EXISTS `tenants`");
-
-    $pdo->exec("CREATE TABLE `tenants` (
+    // Ensure the table exists
+    $pdo->exec("CREATE TABLE IF NOT EXISTS `tenants` (
         `id` VARCHAR(50) PRIMARY KEY,
         `company_name` VARCHAR(255) NOT NULL,
         `contact_email` VARCHAR(150) NOT NULL,
@@ -30,7 +28,7 @@ try {
     echo "Tenant Modules table created successfully.\n";
 
     // Seed mock tenants
-    $stmt = $pdo->prepare("INSERT INTO `tenants` (`id`, `company_name`, `contact_email`, `subscription_tier`, `status`, `foot_traffic_score`, `ai_api_calls`) VALUES (?, ?, ?, ?, ?, ?, ?)");
+    $stmt = $pdo->prepare("INSERT IGNORE INTO `tenants` (`id`, `company_name`, `contact_email`, `subscription_tier`, `status`, `foot_traffic_score`, `ai_api_calls`) VALUES (?, ?, ?, ?, ?, ?, ?)");
     
     $seedData = [
         ['1', 'Respawn Logic (Internal)', 'admin@respawnlogic.com', 'Enterprise', 'Active', 1542, 8500],

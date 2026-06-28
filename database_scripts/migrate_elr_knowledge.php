@@ -3,9 +3,6 @@ if (!defined('MIGRATION_SAFE')) die('Forbidden');
 require_once __DIR__ . '/../bootstrap/app.php';
 
 try {
-    // Drop the old generic knowledge base
-    $pdo->exec("DROP TABLE IF EXISTS `hr_knowledge_base`;");
-
     // 1. labor_references (For DOLE, Statutory Compliance)
     $pdo->exec("CREATE TABLE IF NOT EXISTS `labor_references` (
         `id` BIGINT PRIMARY KEY AUTO_INCREMENT,
@@ -38,11 +35,13 @@ try {
         FULLTEXT INDEX `ft_precedents` (`case_type`, `title`, `summary`, `key_principles`)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;");
 
-    echo "New database schemas (labor_references, elr_precedents) created successfully.\n";
+    echo "New database schemas (labor_references, elr_precedents) verified successfully.\n";
 
     // --- SEED AUTHENTIC LEGAL DATA ---
     
     // Seed DOLE Advisories (labor_references)
+    // Use INSERT IGNORE by modifying the statement, but since there's no unique key on title, we will check if exists
+    $stmtCheckDole = $pdo->prepare("SELECT COUNT(*) FROM `labor_references` WHERE `title` = ?");
     $stmtDole = $pdo->prepare("INSERT INTO `labor_references` (`category`, `title`, `summary`, `source_type`, `status`) VALUES (?, ?, ?, ?, 'Approved')");
     $doleData = [
         [
@@ -59,11 +58,15 @@ try {
         ]
     ];
     foreach ($doleData as $d) {
-        $stmtDole->execute($d);
+        $stmtCheckDole->execute([$d[1]]);
+        if ($stmtCheckDole->fetchColumn() == 0) {
+            $stmtDole->execute($d);
+        }
     }
     echo "Seeded authentic DOLE Labor Advisories.\n";
 
     // Seed Supreme Court Jurisprudence (elr_precedents)
+    $stmtCheckSc = $pdo->prepare("SELECT COUNT(*) FROM `elr_precedents` WHERE `title` = ?");
     $stmtSc = $pdo->prepare("INSERT INTO `elr_precedents` (`case_type`, `title`, `summary`, `key_principles`, `source_reference`, `risk_level`, `recommended_process`) VALUES (?, ?, ?, ?, ?, ?, ?)");
     $scData = [
         [
@@ -77,7 +80,10 @@ try {
         ]
     ];
     foreach ($scData as $s) {
-        $stmtSc->execute($s);
+        $stmtCheckSc->execute([$s[1]]);
+        if ($stmtCheckSc->fetchColumn() == 0) {
+            $stmtSc->execute($s);
+        }
     }
     echo "Seeded authentic Supreme Court Jurisprudence.\n";
 
