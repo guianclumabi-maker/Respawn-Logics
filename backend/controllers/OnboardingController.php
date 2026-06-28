@@ -325,10 +325,10 @@ class OnboardingController extends Controller {
                 'accounts' => $accounts
             ]);
 
-        } catch (Exception $e) {
+        } catch (Throwable $e) {
             if ($this->pdo->inTransaction()) $this->pdo->rollBack();
             error_log('[' . __CLASS__ . '] ' . $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine());
-            $this->jsonResponse(['success' => false, 'error' => 'An internal error occurred. Please try again.'], 400);
+            $this->jsonResponse(['success' => false, 'error' => $e->getMessage()], 400);
         }
     }
 
