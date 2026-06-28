@@ -10,7 +10,7 @@ function renderLogo($variant = 'centered') {
             </div>
             <div style="display: flex; align-items: baseline; gap: 8px;">
                 <span style="font-family: \'JetBrains Mono\', monospace; font-size: 24px; font-weight: 700; color: var(--text-primary); letter-spacing: -0.5px; margin: 0;">Respawn Logics</span>
-                <span style="font-family: \'JetBrains Mono\', monospace; font-size: 10px; font-weight: 700; color: #00e07a;">v2.0</span>
+                <span style="font-family: \'JetBrains Mono\', monospace; font-size: 10px; font-weight: 700; color: #00e07a;">v2.1</span>
             </div>
         </div>
         ';
@@ -22,7 +22,7 @@ function renderLogo($variant = 'centered') {
             </div>
             <div style="display:flex; align-items:baseline; gap:5px;">
                 <span class="brand-text" style="font-family:\'JetBrains Mono\', monospace; font-weight:700; font-size:15px; letter-spacing:-0.5px; white-space:nowrap; color:var(--text-primary);">Respawn Logics</span>
-                <span style="font-family:\'JetBrains Mono\', monospace; font-size:9px; font-weight:700; color:#00e07a;">v2.0</span>
+                <span style="font-family:\'JetBrains Mono\', monospace; font-size:9px; font-weight:700; color:#00e07a;">v2.1</span>
             </div>
         </div>
         ';
@@ -34,7 +34,7 @@ function renderLogo($variant = 'centered') {
             </div>
             <div style="display:flex; align-items:baseline; gap:5px;">
                 <span>Respawn Logics</span>
-                <span class="version-pill">v2.0</span>
+                <span class="version-pill">v2.1</span>
             </div>
         </a>
         ';

@@ -24,7 +24,7 @@ export function SetupModeCards() {
           </div>
           <span className="hidden sm:flex items-center gap-1">
             Respawn Logics
-            <span className="text-[9px] text-[#00e07a] border border-[#00e07a]/20 bg-[#00e07a]/10 px-1 py-0.5 rounded ml-1 tracking-[0.1em] font-bold">v2.0</span>
+            <span className="text-[9px] text-[#00e07a] border border-[#00e07a]/20 bg-[#00e07a]/10 px-1 py-0.5 rounded ml-1 tracking-[0.1em] font-bold">v2.1</span>
           </span>
         </a>
 
