@@ -1,11 +1,30 @@
 <?php
 
-require_once __DIR__ . '/../core/Controller.php';
+class OnboardingController {
 
-class OnboardingController extends Controller {
+    private $pdo;
 
     public function __construct($pdo) {
-        parent::__construct($pdo);
+        $this->pdo = $pdo;
+    }
+
+    public function handleRequest($action) {
+        switch ($action) {
+            case 'import':
+                $this->import();
+                break;
+            case 'update_roles':
+                $this->updateRoles();
+                break;
+            default:
+                $this->jsonResponse(['success' => false, 'error' => 'Invalid action'], 400);
+        }
+    }
+
+    private function jsonResponse($data, $status = 200) {
+        http_response_code($status);
+        echo json_encode($data);
+        exit;
     }
 
     public function import() {
