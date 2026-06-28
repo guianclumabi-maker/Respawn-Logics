@@ -38,8 +38,9 @@ if (session_status() === PHP_SESSION_NONE) {
         'samesite' => $config['session']['samesite']
     ]);
     ini_set('session.gc_maxlifetime', $config['session']['timeout']);
-    
-    session_start();
+
+    // NOTE: We load the database FIRST (below), then register the MySQL session handler.
+    // Session is started after DB is ready. See "Start Session with MySQL Handler" block below.
 }
 
 // Generate CSRF Token
@@ -74,6 +75,28 @@ if (!function_exists('url')) {
 
 // 5. Load Database
 require_once __DIR__ . '/../config/db.php';
+
+// 5b. Start Session with MySQL Handler (must come AFTER db.php so $pdo is available)
+// This ensures sessions are shared across all Railway container replicas.
+if (session_status() === PHP_SESSION_NONE) {
+    require_once __DIR__ . '/../services/MySQLSessionHandler.php';
+    try {
+        // Ensure the sessions table exists (idempotent)
+        $pdo->exec("CREATE TABLE IF NOT EXISTS `php_sessions` (
+            `id`         VARCHAR(128) NOT NULL PRIMARY KEY,
+            `data`       MEDIUMTEXT   NOT NULL,
+            `expires_at` DATETIME     NOT NULL,
+            INDEX `idx_expires` (`expires_at`)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;");
+
+        $sessionHandler = new MySQLSessionHandler($pdo, (int)($config['session']['timeout'] ?? 3600));
+        session_set_save_handler($sessionHandler, true);
+    } catch (PDOException $e) {
+        // If DB session handler fails, fall back to file-based sessions gracefully
+        error_log('MySQLSessionHandler setup failed, falling back to files: ' . $e->getMessage());
+    }
+    session_start();
+}
 
 // 6. Load Permissions & Auth Helpers
 require_once __DIR__ . '/../services/PermissionService.php';
