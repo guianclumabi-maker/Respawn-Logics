@@ -22,6 +22,8 @@ try {
         PDO::ATTR_EMULATE_PREPARES => false,
         PDO::ATTR_PERSISTENT => true,
     ]);
+    // Force MySQL session to UTC to align with PHP's timezone
+    $pdo->exec("SET time_zone = '+00:00';");
 } catch (PDOException $e) {
     // Attempt local database creation if it's missing
     if ($e->getCode() == 1049 && $dbConfig['host'] === 'localhost') {
