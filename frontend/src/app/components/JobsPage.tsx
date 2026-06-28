@@ -1,3 +1,4 @@
+import { apiFetch } from "../lib/apiClient";
 import { useState, useEffect, useCallback } from "react";
 import {
   AlertTriangle,
@@ -347,7 +348,7 @@ export function JobsPage({ onViewChange }: Props) {
     if (selectedStatus) params.set("status", selectedStatus);
     if (selectedPriority) params.set("priority", selectedPriority);
 
-    fetch(`${API}&${params.toString()}`, { credentials: "include" })
+    apiFetch(`${API.replace(API_BASE, "")}&${params.toString()}`, { })
       .then((r) => r.json())
       .then((data) => {
         if (data.success) {
@@ -382,11 +383,11 @@ export function JobsPage({ onViewChange }: Props) {
     if (!jobForm.title.trim()) return;
     setSubmitting(true);
 
-    fetch(API, { credentials: "include",
+    apiFetch(API.replace(API_BASE, ""), {
       method: "POST",
       headers: { 
         "Content-Type": "application/json",
-        "X-CSRF-Token": (window as any).__CSRF_TOKEN__ || ""
+
       },
       body: JSON.stringify({
         action: "add_job",
@@ -426,11 +427,11 @@ export function JobsPage({ onViewChange }: Props) {
   };
 
   const handleDuplicate = (jobId: number) => {
-    fetch(API, { credentials: "include",
+    apiFetch(API.replace(API_BASE, ""), {
       method: "POST",
       headers: { 
         "Content-Type": "application/json",
-        "X-CSRF-Token": (window as any).__CSRF_TOKEN__ || ""
+
       },
       body: JSON.stringify({ action: "duplicate_job", id: jobId }),
     })
@@ -443,11 +444,11 @@ export function JobsPage({ onViewChange }: Props) {
 
   const handleTogglePause = (job: Job) => {
     const newStatus = job.status === "Paused" ? "Open" : "Paused";
-    fetch(API, { credentials: "include",
+    apiFetch(API.replace(API_BASE, ""), {
       method: "POST",
       headers: { 
         "Content-Type": "application/json",
-        "X-CSRF-Token": (window as any).__CSRF_TOKEN__ || ""
+
       },
       body: JSON.stringify({
         action: "update_job",
@@ -466,11 +467,11 @@ export function JobsPage({ onViewChange }: Props) {
     if (!candidateForm.name.trim() || !activeJobId) return;
     setSubmitting(true);
 
-    fetch(API, { credentials: "include",
+    apiFetch(API.replace(API_BASE, ""), {
       method: "POST",
       headers: { 
         "Content-Type": "application/json",
-        "X-CSRF-Token": (window as any).__CSRF_TOKEN__ || ""
+
       },
       body: JSON.stringify({
         action: "add_candidate",

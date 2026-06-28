@@ -1,3 +1,4 @@
+import { apiFetch } from "../lib/apiClient";
 import { useState } from "react";
 import { ShieldAlert } from "lucide-react";
 
@@ -9,13 +10,10 @@ export function TenantSettings() {
     setLoading(true);
     try {
       const API_BASE = import.meta.env.VITE_API_BASE_URL || (window.location.origin + (window.location.hostname === 'localhost' ? '/respawn-logics' : ''));
-      const csrfToken = (window as any).__CSRF_TOKEN__ || '';
-      const res = await fetch(`${API_BASE}/api/index.php?route=iam&action=grant_support_access`, {
+      
+      const res = await apiFetch(`/api/index.php?route=iam&action=grant_support_access`, {
         method: 'POST',
-        headers: {
-          'X-CSRF-Token': csrfToken,
-          'Content-Type': 'application/json'
-        }
+
       });
       const data = await res.json();
       if (data.success) {
