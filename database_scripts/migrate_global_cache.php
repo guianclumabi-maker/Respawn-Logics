@@ -3,6 +3,9 @@ if (!defined('MIGRATION_SAFE')) die('Forbidden');
 require_once __DIR__ . '/../bootstrap/app.php';
 
 try {
+    // Drop old table version if it exists to cleanly apply correct columns and fulltext indexes
+    $pdo->exec("DROP TABLE IF EXISTS `global_intelligence_cache`;");
+
     $pdo->exec("CREATE TABLE IF NOT EXISTS `global_intelligence_cache` (
         `id` BIGINT PRIMARY KEY AUTO_INCREMENT,
         `tenant_id` VARCHAR(50) NOT NULL DEFAULT 'SYSTEM',

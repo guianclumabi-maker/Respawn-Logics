@@ -3,6 +3,9 @@ if (!defined('MIGRATION_SAFE')) die('Forbidden');
 require_once __DIR__ . '/../bootstrap/app.php';
 
 try {
+    // Clean recreate these seed-based reference tables to ensure correct schema version
+    $pdo->exec("DROP TABLE IF EXISTS `labor_references`, `elr_precedents`;");
+
     // 1. labor_references (For DOLE, Statutory Compliance)
     $pdo->exec("CREATE TABLE IF NOT EXISTS `labor_references` (
         `id` BIGINT PRIMARY KEY AUTO_INCREMENT,
