@@ -2,16 +2,27 @@
 require_once __DIR__ . '/bootstrap/app.php';
 header('Content-Type: application/json');
 
-if (!isset($_SESSION['test_counter'])) {
-    $_SESSION['test_counter'] = 0;
-}
-$_SESSION['test_counter']++;
+try {
+    $tablesStmt = $pdo->query("SHOW TABLES");
+    $tables = $tablesStmt->fetchAll(PDO::FETCH_COLUMN);
 
-echo json_encode([
-    'session_id' => session_id(),
-    'hostname' => gethostname(),
-    'session_save_path' => session_save_path(),
-    'session_data' => $_SESSION,
-    'cookies' => $_COOKIE,
-    'headers' => getallheaders()
-]);
+    $columns = [];
+    if (in_array('users', $tables)) {
+        $colsStmt = $pdo->query("SHOW COLUMNS FROM users");
+        $columns = $colsStmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    echo json_encode([
+        'success' => true,
+        'hostname' => gethostname(),
+        'tables' => $tables,
+        'users_columns' => $columns,
+        'cookies' => $_COOKIE,
+        'session' => $_SESSION
+    ]);
+} catch (PDOException $e) {
+    echo json_encode([
+        'success' => false,
+        'error' => $e->getMessage()
+    ]);
+}
