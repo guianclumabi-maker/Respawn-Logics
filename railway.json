@@ -1,0 +1,6 @@
+{
+  "$schema": "https://railway.com/railway.schema.json",
+  "deploy": {
+    "preDeployCommand": "php -r \"define('MIGRATION_SAFE', true); require __DIR__ . '/database_scripts/migrate_all.php';\""
+  }
+}
