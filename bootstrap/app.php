@@ -261,6 +261,7 @@ if (!function_exists('getCurrentUser')) {
             }
             return $cachedUser;
         } catch (PDOException $e) {
+            error_log('getCurrentUser failed: ' . $e->getMessage());
             return null;
         }
     }
