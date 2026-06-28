@@ -259,10 +259,16 @@ class SurveyController
 
         $this->pdo->beginTransaction();
         try {
+            $validQs = $this->pdo->prepare("SELECT id FROM survey_questions WHERE survey_id = ?");
+            $validQs->execute([$surveyId]);
+            $validQuestionIds = $validQs->fetchAll(PDO::FETCH_COLUMN);
+
             // Save answers completely anonymously (NO user_id stored)
             $ansStmt = $this->pdo->prepare("INSERT INTO survey_responses (survey_id, question_id, response_value) VALUES (?, ?, ?)");
             foreach ($answers as $a) {
-                $ansStmt->execute([$surveyId, $a['question_id'], $a['value']]);
+                if (in_array($a['question_id'], $validQuestionIds)) {
+                    $ansStmt->execute([$surveyId, $a['question_id'], $a['value']]);
+                }
             }
 
             // Mark participant as completed

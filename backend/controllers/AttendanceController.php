@@ -102,7 +102,7 @@ class AttendanceController
         $today = date('Y-m-d');
         $email = $this->currentUser['email'];
 
-        $stmt = $this->pdo->prepare("SELECT * FROM attendance WHERE employee_email = ? AND tenant_id = ? AND DATE(time_in) = ? ORDER BY id DESC LIMIT 1");
+        $stmt = $this->pdo->prepare("SELECT `id`, `employee_email`, `time_in`, `time_out`, `status`, `tenant_id` FROM attendance WHERE employee_email = ? AND tenant_id = ? AND DATE(time_in) = ? ORDER BY id DESC LIMIT 1");
         $stmt->execute([$email, $this->tenantId, $today]);
         $current_log = $stmt->fetch();
 
@@ -122,7 +122,7 @@ class AttendanceController
     private function timesheet()
     {
         $email = $this->currentUser['email'];
-        $stmt = $this->pdo->prepare("SELECT * FROM attendance WHERE employee_email = ? AND tenant_id = ? ORDER BY time_in DESC LIMIT 30");
+        $stmt = $this->pdo->prepare("SELECT `id`, `employee_email`, `time_in`, `time_out`, `status`, `tenant_id` FROM attendance WHERE employee_email = ? AND tenant_id = ? ORDER BY time_in DESC LIMIT 30");
         $stmt->execute([$email, $this->tenantId]);
         $logs = $stmt->fetchAll();
         

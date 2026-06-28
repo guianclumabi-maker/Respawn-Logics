@@ -48,7 +48,7 @@ class LeavesController
                         break;
 
                     case 'my_requests':
-                        $stmt = $this->pdo->prepare("SELECT * FROM `leave_requests` WHERE `employee_email` = ? AND `tenant_id` = ? ORDER BY `created_at` DESC");
+                        $stmt = $this->pdo->prepare("SELECT `id`, `employee_email`, `leave_type`, `start_date`, `end_date`, `reason`, `status`, `created_at`, `tenant_id` FROM `leave_requests` WHERE `employee_email` = ? AND `tenant_id` = ? ORDER BY `created_at` DESC");
                         $stmt->execute([$email, $this->tenantId]);
                         echo json_encode(['success' => true, 'data' => $stmt->fetchAll(PDO::FETCH_ASSOC)]);
                         break;
@@ -183,8 +183,31 @@ class LeavesController
         }
 
         // Determine if acting as TL or Manager based on current state
-        $isSupervisor = ($req['tl_decision'] === 'Pending');
-        $isManager = ($req['tl_decision'] === 'Approved' && $req['manager_decision'] === 'Pending');
+        $isSupervisorStage = ($req['tl_decision'] === 'Pending');
+        $isManagerStage = ($req['tl_decision'] === 'Approved' && $req['manager_decision'] === 'Pending');
+
+        $isSupervisor = false;
+        $isManager = false;
+
+        if ($isSupervisorStage) {
+            if ($email !== $req['immediate_supervisor']) {
+                http_response_code(403);
+                echo json_encode(['success' => false, 'error' => 'Denied: You are not the immediate supervisor for this employee']);
+                return;
+            }
+            $isSupervisor = true;
+        } elseif ($isManagerStage) {
+            if ($email !== $req['department_manager'] || $email === $req['tl_decided_by']) {
+                http_response_code(403);
+                echo json_encode(['success' => false, 'error' => 'Denied: You are not the department manager, or you already approved as TL']);
+                return;
+            }
+            $isManager = true;
+        } else {
+            http_response_code(400);
+            echo json_encode(['success' => false, 'error' => 'No pending approvals for this request']);
+            return;
+        }
 
         try {
             $this->pdo->beginTransaction();

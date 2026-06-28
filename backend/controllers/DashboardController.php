@@ -78,7 +78,7 @@ class DashboardController {
             $todo_list = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         } catch (PDOException $e) {
-            // Ignore DB errors and return 0s
+            error_log("Dashboard getStats DB Error: " . $e->getMessage());
         }
 
         echo json_encode([
