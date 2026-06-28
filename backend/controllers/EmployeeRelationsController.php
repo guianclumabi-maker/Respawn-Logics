@@ -130,7 +130,9 @@ class EmployeeRelationsController
             ]);
         } catch (PDOException $e) {
             http_response_code(500);
-            echo json_encode(['success' => false, 'error' => 'Database error: ' . $e->getMessage()]);
+            error_log('[' . __CLASS__ . '] ' . $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine());
+            http_response_code(500);
+            echo json_encode(['success' => false, 'error' => 'An internal error occurred. Please try again.']);
         }
     }
 
@@ -152,7 +154,9 @@ class EmployeeRelationsController
             echo json_encode(['success' => true, 'cases' => $cases]);
         } catch (PDOException $e) {
             http_response_code(500);
-            echo json_encode(['success' => false, 'error' => 'Database error: ' . $e->getMessage()]);
+            error_log('[' . __CLASS__ . '] ' . $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine());
+            http_response_code(500);
+            echo json_encode(['success' => false, 'error' => 'An internal error occurred. Please try again.']);
         }
     }
 
@@ -188,7 +192,9 @@ class EmployeeRelationsController
             ]);
         } catch (PDOException $e) {
             http_response_code(500);
-            echo json_encode(['success' => false, 'error' => 'Database error: ' . $e->getMessage()]);
+            error_log('[' . __CLASS__ . '] ' . $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine());
+            http_response_code(500);
+            echo json_encode(['success' => false, 'error' => 'An internal error occurred. Please try again.']);
         }
     }
 
@@ -210,7 +216,9 @@ class EmployeeRelationsController
             echo json_encode(['success' => true]);
         } catch (PDOException $e) {
             http_response_code(500);
-            echo json_encode(['success' => false, 'error' => 'Database error: ' . $e->getMessage()]);
+            error_log('[' . __CLASS__ . '] ' . $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine());
+            http_response_code(500);
+            echo json_encode(['success' => false, 'error' => 'An internal error occurred. Please try again.']);
         }
     }
 
@@ -232,7 +240,9 @@ class EmployeeRelationsController
             echo json_encode(['success' => true]);
         } catch (PDOException $e) {
             http_response_code(500);
-            echo json_encode(['success' => false, 'error' => 'Database error: ' . $e->getMessage()]);
+            error_log('[' . __CLASS__ . '] ' . $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine());
+            http_response_code(500);
+            echo json_encode(['success' => false, 'error' => 'An internal error occurred. Please try again.']);
         }
     }
 
@@ -253,7 +263,9 @@ class EmployeeRelationsController
             echo json_encode(['success' => true]);
         } catch (PDOException $e) {
             http_response_code(500);
-            echo json_encode(['success' => false, 'error' => 'Database error: ' . $e->getMessage()]);
+            error_log('[' . __CLASS__ . '] ' . $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine());
+            http_response_code(500);
+            echo json_encode(['success' => false, 'error' => 'An internal error occurred. Please try again.']);
         }
     }
 }

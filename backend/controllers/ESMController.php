@@ -182,7 +182,9 @@ class ESMController
             echo json_encode(['success' => true, 'ticket_id' => $ticketId]);
         } catch (Exception $e) {
             $this->pdo->rollBack();
-            echo json_encode(['success' => false, 'error' => $e->getMessage()]);
+            error_log('[' . __CLASS__ . '] ' . $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine());
+            http_response_code(500);
+            echo json_encode(['success' => false, 'error' => 'An internal error occurred. Please try again.']);
         }
     }
 

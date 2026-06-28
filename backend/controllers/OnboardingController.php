@@ -319,7 +319,8 @@ class OnboardingController extends Controller {
 
         } catch (Exception $e) {
             if ($this->pdo->inTransaction()) $this->pdo->rollBack();
-            $this->jsonResponse(['success' => false, 'error' => $e->getMessage()], 400);
+            error_log('[' . __CLASS__ . '] ' . $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine());
+            $this->jsonResponse(['success' => false, 'error' => 'An internal error occurred. Please try again.'], 400);
         }
     }
 
@@ -387,7 +388,8 @@ class OnboardingController extends Controller {
             if ($this->pdo->inTransaction()) {
                 $this->pdo->rollBack();
             }
-            $this->jsonResponse(['error' => 'Database update error: ' . $e->getMessage()], 500);
+            error_log('[' . __CLASS__ . '] ' . $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine());
+            $this->jsonResponse(['success' => false, 'error' => 'An internal error occurred. Please try again.'], 500);
         }
     }
 }
