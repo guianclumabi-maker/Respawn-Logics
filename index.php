@@ -1193,7 +1193,7 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
         <a href="#story">The Story</a>
         <a href="#beta">Beta</a>
         <?php if ($loggedIn): ?>
-            <a href="<?= url('/pages/dashboard.php') ?>" class="nav-cta">[ RESUME ]</a>
+            <a href="<?= url('/frontend/dist/index.html?v=<?= time() ?>#/dashboard') ?>" class="nav-cta">[ RESUME ]</a>
         <?php else: ?>
             <a href="<?= url('/login.php') ?>" class="nav-cta">[ LOGIN ]</a>
         <?php endif; ?>
@@ -1218,7 +1218,7 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
 
     <div class="hero-actions">
         <?php if ($loggedIn): ?>
-            <a href="<?= url('/pages/dashboard.php') ?>" class="btn-primary">
+            <a href="<?= url('/frontend/dist/index.html?v=<?= time() ?>#/dashboard') ?>" class="btn-primary">
                 <i data-lucide="play"></i> Resume Session
             </a>
         <?php else: ?>
@@ -1571,7 +1571,7 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
                         <div class="window-dot minimize"></div>
                         <div class="window-dot maximize"></div>
                     </div>
-                    <div class="window-url">http://localhost/respawn-logics/pages/dashboard.php</div>
+                    <div class="window-url">http://localhost/respawn-logics/frontend/dist/index.html?v=<?= time() ?>#/dashboard</div>
                 </div>
                 <div class="window-body">
                     <img src="assets/images/dashboard.png" alt="Employee Dashboard UI Screenshot" class="window-screenshot">
@@ -1716,7 +1716,7 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
                 <div class="price-num">₱0</div>
                 <div class="price-tag">FOREVER FREE</div>
                 <?php if ($loggedIn): ?>
-                    <a href="<?= url('/pages/dashboard.php') ?>" class="btn-primary" style="width:100%; justify-content:center;">
+                    <a href="<?= url('/frontend/dist/index.html?v=<?= time() ?>#/dashboard') ?>" class="btn-primary" style="width:100%; justify-content:center;">
                         <i data-lucide="play"></i> Go to Dashboard
                     </a>
                 <?php else: ?>
@@ -1747,7 +1747,7 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
                 <div class="price-num">₱0</div>
                 <div class="price-tag">DURING BETA PERIOD</div>
                 <?php if ($loggedIn): ?>
-                    <a href="<?= url('/pages/dashboard.php') ?>" class="btn-primary" style="width:100%; justify-content:center;">
+                    <a href="<?= url('/frontend/dist/index.html?v=<?= time() ?>#/dashboard') ?>" class="btn-primary" style="width:100%; justify-content:center;">
                         <i data-lucide="play"></i> Go to Dashboard
                     </a>
                 <?php else: ?>
