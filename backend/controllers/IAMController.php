@@ -34,7 +34,9 @@ class IAMController
                 echo json_encode(['success' => true, 'theme' => $theme]);
             } catch (Exception $e) {
                 http_response_code(500);
-                echo json_encode(['success' => false, 'error' => $e->getMessage()]);
+                error_log('[' . __CLASS__ . '] ' . $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine());
+            http_response_code(500);
+            echo json_encode(['success' => false, 'error' => 'An internal error occurred. Please try again.']);
             }
             return;
         }
@@ -61,7 +63,9 @@ class IAMController
                 echo json_encode(['success' => true]);
             } catch (Exception $e) {
                 http_response_code(500);
-                echo json_encode(['success' => false, 'error' => $e->getMessage()]);
+                error_log('[' . __CLASS__ . '] ' . $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine());
+            http_response_code(500);
+            echo json_encode(['success' => false, 'error' => 'An internal error occurred. Please try again.']);
             }
             return;
         }
@@ -92,7 +96,9 @@ class IAMController
                     echo json_encode(['success' => true, 'data' => $users]);
                 } catch (Exception $e) {
                     http_response_code(500);
-                    echo json_encode(['success' => false, 'error' => $e->getMessage()]);
+                    error_log('[' . __CLASS__ . '] ' . $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine());
+            http_response_code(500);
+            echo json_encode(['success' => false, 'error' => 'An internal error occurred. Please try again.']);
                 }
                 return;
             }
@@ -105,7 +111,9 @@ class IAMController
                     echo json_encode(['success' => true, 'data' => $stmt->fetchAll()]);
                 } catch (Exception $e) {
                     http_response_code(500);
-                    echo json_encode(['success' => false, 'error' => $e->getMessage()]);
+                    error_log('[' . __CLASS__ . '] ' . $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine());
+            http_response_code(500);
+            echo json_encode(['success' => false, 'error' => 'An internal error occurred. Please try again.']);
                 }
                 return;
             }
@@ -116,7 +124,9 @@ class IAMController
                     echo json_encode(['success' => true, 'data' => $stmt->fetchAll(PDO::FETCH_ASSOC)]);
                 } catch (Exception $e) {
                     http_response_code(500);
-                    echo json_encode(['success' => false, 'error' => $e->getMessage()]);
+                    error_log('[' . __CLASS__ . '] ' . $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine());
+            http_response_code(500);
+            echo json_encode(['success' => false, 'error' => 'An internal error occurred. Please try again.']);
                 }
                 return;
             }
@@ -127,7 +137,9 @@ class IAMController
                     echo json_encode(['success' => true, 'data' => $stmt->fetchAll(PDO::FETCH_ASSOC)]);
                 } catch (Exception $e) {
                     http_response_code(500);
-                    echo json_encode(['success' => false, 'error' => $e->getMessage()]);
+                    error_log('[' . __CLASS__ . '] ' . $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine());
+            http_response_code(500);
+            echo json_encode(['success' => false, 'error' => 'An internal error occurred. Please try again.']);
                 }
                 return;
             }
@@ -153,7 +165,9 @@ class IAMController
                     echo json_encode(['success' => true, 'data' => $perms]);
                 } catch (Exception $e) {
                     http_response_code(500);
-                    echo json_encode(['success' => false, 'error' => $e->getMessage()]);
+                    error_log('[' . __CLASS__ . '] ' . $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine());
+            http_response_code(500);
+            echo json_encode(['success' => false, 'error' => 'An internal error occurred. Please try again.']);
                 }
                 return;
             }
@@ -245,7 +259,9 @@ class IAMController
                 } catch (Exception $e) {
                     $this->pdo->rollBack();
                     http_response_code(500);
-                    echo json_encode(['success' => false, 'error' => $e->getMessage()]);
+                    error_log('[' . __CLASS__ . '] ' . $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine());
+            http_response_code(500);
+            echo json_encode(['success' => false, 'error' => 'An internal error occurred. Please try again.']);
                 }
                 return;
             }
@@ -267,7 +283,9 @@ class IAMController
                     echo json_encode(['success' => true]);
                 } catch (Exception $e) {
                     http_response_code(400); // Bad request for invalid scope/org unit
-                    echo json_encode(['success' => false, 'error' => $e->getMessage()]);
+                    error_log('[' . __CLASS__ . '] ' . $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine());
+            http_response_code(500);
+            echo json_encode(['success' => false, 'error' => 'An internal error occurred. Please try again.']);
                 }
                 return;
             }
@@ -371,7 +389,9 @@ class IAMController
                     echo json_encode(['success' => true]);
                 } catch (Exception $e) {
                     http_response_code(500);
-                    echo json_encode(['success' => false, 'error' => $e->getMessage()]);
+                    error_log('[' . __CLASS__ . '] ' . $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine());
+            http_response_code(500);
+            echo json_encode(['success' => false, 'error' => 'An internal error occurred. Please try again.']);
                 }
                 return;
             }
@@ -438,7 +458,9 @@ class IAMController
                         $this->pdo->rollBack();
                     }
                     http_response_code(400);
-                    echo json_encode(['success' => false, 'error' => $e->getMessage()]);
+                    error_log('[' . __CLASS__ . '] ' . $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine());
+            http_response_code(500);
+            echo json_encode(['success' => false, 'error' => 'An internal error occurred. Please try again.']);
                 }
                 return;
             }
@@ -473,7 +495,9 @@ class IAMController
                     echo json_encode(['success' => true, 'role_id' => $newRoleId]);
                 } catch (Exception $e) {
                     $this->pdo->rollBack();
-                    echo json_encode(['success' => false, 'error' => $e->getMessage()]);
+                    error_log('[' . __CLASS__ . '] ' . $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine());
+            http_response_code(500);
+            echo json_encode(['success' => false, 'error' => 'An internal error occurred. Please try again.']);
                 }
                 return;
             }
@@ -518,7 +542,9 @@ class IAMController
                     echo json_encode(['success' => true]);
                 } catch (Exception $e) {
                     $this->pdo->rollBack();
-                    echo json_encode(['success' => false, 'error' => $e->getMessage()]);
+                    error_log('[' . __CLASS__ . '] ' . $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine());
+            http_response_code(500);
+            echo json_encode(['success' => false, 'error' => 'An internal error occurred. Please try again.']);
                 }
                 return;
             }
