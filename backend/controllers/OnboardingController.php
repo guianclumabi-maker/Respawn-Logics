@@ -13,15 +13,11 @@ class OnboardingController extends Controller {
             $this->jsonResponse(['error' => 'Method not allowed'], 405);
         }
 
-        // 1. Session & CSRF Verification
-        if (empty($_SESSION['onboarding_active'])) {
-            $this->jsonResponse(['error' => 'No active onboarding session.'], 403);
+        // 1. Permission Verification
+        if (!hasPermission('users.create') && empty($_SESSION['is_super'])) {
+            $this->jsonResponse(['error' => 'Denied'], 403);
         }
 
-        $clientCsrf = $_SERVER['HTTP_X_CSRF_TOKEN'] ?? '';
-        if (!hash_equals($_SESSION['csrf_token'] ?? '', $clientCsrf)) {
-            $this->jsonResponse(['error' => 'Invalid CSRF token.'], 403);
-        }
 
         try {
             $tenantId = isset($_SESSION['tenant_id']) ? trim((string)$_SESSION['tenant_id']) : '';
@@ -303,8 +299,7 @@ class OnboardingController extends Controller {
                 });
             }
 
-            $_SESSION['logged_in'] = true;
-            // Removed $_SESSION['role'] = 'admin'; - do not auto-elevate privileges on import
+            // Removed $_SESSION['logged_in'] = true; and $_SESSION['role'] = 'admin'; - do not grant sessions on import
 
             $this->jsonResponse([
                 'success' => true,
@@ -334,16 +329,15 @@ class OnboardingController extends Controller {
             $this->jsonResponse(['error' => 'Invalid or missing roles mapping payload.'], 400);
         }
 
-        if (empty($_SESSION['onboarding_active'])) {
-            $this->jsonResponse(['error' => 'No active onboarding session.'], 403);
+        // 1. Permission Verification
+        if (!hasPermission('users.create') && empty($_SESSION['is_super'])) {
+            $this->jsonResponse(['error' => 'Denied'], 403);
         }
 
-        $clientCsrf = $_SERVER['HTTP_X_CSRF_TOKEN'] ?? '';
-        if (!hash_equals($_SESSION['csrf_token'] ?? '', $clientCsrf)) {
-            $this->jsonResponse(['error' => 'Invalid CSRF token.'], 403);
+        $tenantId = $_SESSION['tenant_id'] ?? null;
+        if (empty($tenantId)) {
+            $this->jsonResponse(['error' => 'No tenant context'], 403);
         }
-
-        $tenantId = $_SESSION['tenant_id'] ?? 1;
         $allowedRoles = ['admin', 'hr', 'hr manager', 'recruiter', 'employee', 'manager', 'supervisor'];
 
         try {

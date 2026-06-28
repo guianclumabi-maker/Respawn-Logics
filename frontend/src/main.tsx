@@ -28,7 +28,7 @@ window.fetch = async (...args) => {
   if (response.status === 401) {
     const url = typeof args[0] === 'string' ? args[0] : (args[0] instanceof Request ? args[0].url : '');
     // Ignore 401s for initial auth/csrf checks to prevent immediate lockout
-    if (!url.includes('action=current_user') && !url.includes('action=csrf') && !url.includes('get_csrf.php') && !url.includes('action=login')) {
+    if (!url.includes('action=current_user') && !url.includes('action=csrf') && !url.includes('action=login')) {
       window.location.hash = '#/login';
     }
   }

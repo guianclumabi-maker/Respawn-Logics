@@ -40,14 +40,18 @@ export default function App() {
   const API_BASE = window.location.origin + (window.location.hostname === 'localhost' ? '/respawn-logics' : '');
   
   useEffect(() => {
-    fetch(`${API_BASE}/get_csrf.php`, { credentials: "same-origin" })
-      .then(res => res.json())
-      .then(data => {
-        if (data.success) {
-          setCsrfToken(data.csrf_token);
-        }
-      })
-      .catch(console.error);
+    if ((window as any).__CSRF_TOKEN__) {
+      setCsrfToken((window as any).__CSRF_TOKEN__);
+    } else {
+      fetch(`${API_BASE}/api/index.php?route=auth&action=csrf`, { credentials: "include" })
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            setCsrfToken(data.csrf_token);
+          }
+        })
+        .catch(console.error);
+    }
   }, []);
 
   const showToast = (message: string, type: 'error' | 'success' = 'error') => {
@@ -183,7 +187,7 @@ export default function App() {
 
     fetch(`${API_BASE}/api/index.php?route=onboarding&action=import`, {
       method: "POST",
-      credentials: "same-origin",
+      credentials: "include",
       headers: {
         "X-CSRF-Token": csrfToken
       },
@@ -235,7 +239,7 @@ export default function App() {
 
       const response = await fetch(`${API_BASE}/api/index.php?route=onboarding&action=update_roles`, {
         method: "POST",
-        credentials: "same-origin",
+        credentials: "include",
         headers: { 
           "Content-Type": "application/json",
           "X-CSRF-Token": csrfToken

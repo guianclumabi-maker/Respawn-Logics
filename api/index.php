@@ -14,7 +14,7 @@ $route = isset($_GET['route']) ? $_GET['route'] : '';
 $action = isset($_GET['action']) ? $_GET['action'] : '';
 
 // Middleware: Verify Authentication before ANY controller logic runs
-if (!isLoggedIn() && $route !== 'auth' && $route !== 'onboarding') {
+if (!isLoggedIn() && $route !== 'auth') {
     http_response_code(401);
     echo json_encode(['success' => false, 'error' => 'Unauthorized']);
     exit;
