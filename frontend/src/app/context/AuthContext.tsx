@@ -70,10 +70,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             console.log("Token exchange response:", exchangeData);
             if (!exchangeData.success) {
               console.error("Token exchange failed:", exchangeData.error);
+            } else {
+              // Clean the token out of the URL so it can't be reused via browser history
+              const cleanHash = hashPart.slice(0, queryStart);
+              window.history.replaceState(null, '', window.location.pathname + window.location.search + cleanHash);
             }
-            // Clean the token out of the URL so it can't be reused via browser history
-            const cleanHash = hashPart.slice(0, queryStart);
-            window.history.replaceState(null, '', window.location.pathname + window.location.search + cleanHash);
           }
         }
 
