@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { Upload, Download, CheckCircle, AlertTriangle, FileSpreadsheet, ArrowRight, Settings, Users, Briefcase, Zap, Shield, Database, Gamepad2, User, Globe } from "lucide-react";
 
 type ViewState = "setup_mode" | "upload" | "mapping" | "processing" | "admin_selection" | "results";
-type SetupMode = "Solo" | "Quick" | "Standard" | "Enterprise";
+type SetupMode = "Solo" | "Small" | "Mid" | "Enterprise";
 
 const ROLE_DESCRIPTIONS: Record<string, string> = {
   "admin": "Full system access, configuration, and security controls.",
@@ -12,8 +12,8 @@ const ROLE_DESCRIPTIONS: Record<string, string> = {
 };
 
 export default function App() {
-  const [currentView, setCurrentView] = useState<ViewState>("setup_mode");
-  const [setupMode, setSetupMode] = useState<SetupMode>("Quick");
+  const [currentView, setCurrentView] = useState<ViewState>("upload");
+  const [setupMode, setSetupMode] = useState<SetupMode>("Small");
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [file, setFile] = useState<File | null>(null);
@@ -270,13 +270,13 @@ export default function App() {
   const handleDownloadTemplate = () => {
     let csvContent = "";
     
-    if (setupMode === "Quick") {
+    if (setupMode === "Small") {
       csvContent = 
         "employee_id,first_name,last_name,email\n" +
         "EMP-001,Jane,Doe,jane@company.com\n" +
         "EMP-002,John,Smith,john@company.com\n" +
         "EMP-003,Alice,Johnson,alice@company.com\n";
-    } else if (setupMode === "Standard") {
+    } else if (setupMode === "Mid") {
       csvContent = 
         "employee_id,first_name,last_name,email,department,job_title,manager_id,hire_date\n" +
         "EMP-001,Jane,Doe,jane@company.com,Executive,Chief Executive Officer,,2024-01-15\n" +
@@ -354,8 +354,8 @@ export default function App() {
             
             <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
               {[
-                { title: "Co-op Mode", desc: "1-100 employees. Minimal mapping, automatic suggestions.", icon: Users, mode: "Quick", color: "text-[#c8d0e0]", bg: "bg-[#0f1422]", border: "hover:border-[#00e07a]/50" },
-                { title: "Multiplayer Guild", desc: "100-500 employees. Department structures and multiple admins.", icon: Shield, mode: "Standard", color: "text-[#c8d0e0]", bg: "bg-[#0f1422]", border: "hover:border-[#4f8ef7]/50" },
+                { title: "Co-op Mode", desc: "1-100 employees. Minimal mapping, automatic suggestions.", icon: Users, mode: "Small", color: "text-[#c8d0e0]", bg: "bg-[#0f1422]", border: "hover:border-[#00e07a]/50" },
+                { title: "Multiplayer Guild", desc: "100-500 employees. Department structures and multiple admins.", icon: Shield, mode: "Mid", color: "text-[#c8d0e0]", bg: "bg-[#0f1422]", border: "hover:border-[#4f8ef7]/50" },
                 { title: "MMO Server", desc: "500+ employees. Advanced org units and exact RBAC mapping.", icon: Globe, mode: "Enterprise", color: "text-[#00e07a]", bg: "bg-[#00e07a]/10 border border-[#00e07a]/30 shadow-[0_0_30px_rgba(0,224,122,0.15)]", border: "border-[#00e07a]" }
               ].map((s, i) => (
                 <div key={i} onClick={() => handleModeSelect(s.mode as SetupMode)} className={`group bg-[#0f1422] border border-white/[0.05] ${s.border} rounded-xl p-8 cursor-pointer transition-all hover:-translate-y-2 hover:shadow-[0_8px_30px_rgba(0,0,0,0.5)] flex flex-col items-center text-center relative overflow-hidden`}>

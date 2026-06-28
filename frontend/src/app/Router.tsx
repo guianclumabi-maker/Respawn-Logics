@@ -22,6 +22,7 @@ import { HRDirectory } from "./pages/HRDirectory";
 import { LeavesDashboard } from "./pages/LeavesDashboard";
 import { PayrollManager } from "./pages/PayrollManager";
 import { ServiceDesk } from "./pages/ServiceDesk";
+import { SetupModeCards } from "./pages/SetupModeCards";
 
 // ATS Components
 import { ATSDashboard } from "./components/ATSDashboard";
@@ -128,5 +129,6 @@ export const router = createHashRouter([
       { path: "onboarding", element: <OnboardingManager /> },
       { path: "*", element: <Navigate to="/dashboard" replace /> }
     ]
-  }
+  },
+  { path: "/setup", element: <SetupModeCards /> }
 ]);
