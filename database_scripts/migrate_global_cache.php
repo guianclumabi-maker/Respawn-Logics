@@ -10,11 +10,23 @@ try {
         `ai_response` TEXT NOT NULL,
         `category` VARCHAR(100) DEFAULT 'General',
         `status` ENUM('Raw', 'Anonymized', 'Approved') DEFAULT 'Anonymized',
+        `confidence_score` DECIMAL(5,2) DEFAULT 0.00,
         `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP,
         FULLTEXT INDEX `ft_global_cache` (`anonymized_prompt`, `ai_response`)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;");
 
-    echo "Global Intelligence Cache table created successfully.\n";
+    // Guarded column additions to preserve existing production data
+    $colCategory = $pdo->query("SELECT COUNT(*) FROM information_schema.COLUMNS WHERE table_schema = DATABASE() AND table_name = 'global_intelligence_cache' AND column_name = 'category'")->fetchColumn();
+    if ((int)$colCategory === 0) {
+        $pdo->exec("ALTER TABLE `global_intelligence_cache` ADD COLUMN `category` VARCHAR(100) DEFAULT 'General'");
+    }
+
+    $colConfidence = $pdo->query("SELECT COUNT(*) FROM information_schema.COLUMNS WHERE table_schema = DATABASE() AND table_name = 'global_intelligence_cache' AND column_name = 'confidence_score'")->fetchColumn();
+    if ((int)$colConfidence === 0) {
+        $pdo->exec("ALTER TABLE `global_intelligence_cache` ADD COLUMN `confidence_score` DECIMAL(5,2) DEFAULT 0.00");
+    }
+
+    echo "Global Intelligence Cache table verified successfully.\n";
 
     // Seed a couple of cross-tenant examples
     $count = (int)$pdo->query("SELECT COUNT(*) FROM `global_intelligence_cache`")->fetchColumn();
