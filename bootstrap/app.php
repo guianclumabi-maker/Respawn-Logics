@@ -22,9 +22,14 @@ $config = require __DIR__ . '/../config/config.php';
 
 // 3. Configure and Start Session
 if (session_status() === PHP_SESSION_NONE) {
-    ini_set('session.cookie_httponly', $config['session']['httponly'] ? 1 : 0);
-    ini_set('session.cookie_secure', $config['session']['secure'] ? 1 : 0);
-    ini_set('session.cookie_samesite', $config['session']['samesite']);
+    session_set_cookie_params([
+        'lifetime' => $config['session']['timeout'],
+        'path' => '/',
+        'domain' => '', // Empty string lets the browser automatically use the current host (avoids proxy issues)
+        'secure' => $config['session']['secure'],
+        'httponly' => $config['session']['httponly'],
+        'samesite' => $config['session']['samesite']
+    ]);
     ini_set('session.gc_maxlifetime', $config['session']['timeout']);
     
     session_start();
@@ -137,11 +142,18 @@ if (!function_exists('loadTenantModules')) {
             
             // Re-use permission_version to invalidate cache if needed, or simply cache once per login
             if (!isset($_SESSION['tenant_modules'])) {
-                $stmt = $pdo->prepare("SELECT module_key, is_enabled FROM tenant_modules WHERE tenant_id = ?");
-                $stmt->execute([$tenantId]);
-                $_SESSION['tenant_modules'] = [];
-                while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-                    $_SESSION['tenant_modules'][$row['module_key']] = (bool)$row['is_enabled'];
+                try {
+                    $stmt = $pdo->prepare("SELECT module_key, is_enabled FROM tenant_modules WHERE tenant_id = ?");
+                    $stmt->execute([$tenantId]);
+                    $modules = [];
+                    while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                        $modules[$row['module_key']] = (bool)$row['is_enabled'];
+                    }
+                    $_SESSION['tenant_modules'] = $modules;
+                } catch (PDOException $e) {
+                    // Fail silently if table doesn't exist yet, avoiding fatal auth crash
+                    $_SESSION['tenant_modules'] = [];
+                    error_log("loadTenantModules failed: " . $e->getMessage());
                 }
             }
         }
