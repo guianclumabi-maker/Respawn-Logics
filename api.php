@@ -65,6 +65,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && ($action ?? '') === 'exchange_token'
     $_SESSION['user_name']  = $row['full_name'];
     $_SESSION['tenant_id']  = $row['tenant_id'];
 
+    // Force the session to persist to the DB now, while the connection is alive,
+    // so the very next request (current_user) can read it back.
+    session_write_close();
+
     echo json_encode(['success' => true, 'message' => 'Session established']);
     exit;
 }
