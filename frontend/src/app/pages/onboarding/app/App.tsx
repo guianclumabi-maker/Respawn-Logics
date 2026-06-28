@@ -310,7 +310,7 @@ export default function App() {
 
       {/* HEADER */}
       <nav className="border-b border-white/[0.07] bg-[#0b0f1a]/90 backdrop-blur-[20px] fixed top-0 left-0 right-0 z-50 h-[62px] flex items-center justify-between px-6 md:px-12">
-        <a href={`${API_BASE}/index.php`} className="flex items-center gap-[10px] no-underline font-['JetBrains_Mono'] text-[0.9375rem] font-bold text-white">
+        <a href="#/" className="flex items-center gap-[10px] no-underline font-['JetBrains_Mono'] text-[0.9375rem] font-bold text-white">
           <div className="w-[40px] h-[40px] rounded-[10px] bg-gradient-to-br from-[#00e07a] to-[#00b8ff] flex items-center justify-center shadow-[0_8px_20px_rgba(0,224,122,0.25)]">
             <i className="fa-solid fa-gamepad" style={{fontSize: "20px", color: "#000"}}></i>
           </div>
@@ -321,19 +321,19 @@ export default function App() {
         </a>
 
         <div className="hidden md:flex items-center gap-[30px] text-[0.9rem] font-medium text-[#8b95a8]" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
-          <a href={`${API_BASE}/index.php#overview`} className="hover:text-white transition-colors no-underline">Platform</a>
-          <a href={`${API_BASE}/design.php`} className="hover:text-white transition-colors no-underline">Design</a>
-          <a href={`${API_BASE}/index.php#why`} className="hover:text-white transition-colors no-underline">Why Us</a>
-          <a href={`${API_BASE}/index.php#story`} className="hover:text-white transition-colors no-underline">The Story</a>
-          <a href={`${API_BASE}/index.php#beta`} className="hover:text-white transition-colors no-underline">Beta</a>
+          <a href="#/overview" className="hover:text-white transition-colors no-underline">Platform</a>
+          <a href="#/design" className="hover:text-white transition-colors no-underline">Design</a>
+          <a href="#/why" className="hover:text-white transition-colors no-underline">Why Us</a>
+          <a href="#/story" className="hover:text-white transition-colors no-underline">The Story</a>
+          <a href="#/beta" className="hover:text-white transition-colors no-underline">Beta</a>
           
           <div className="w-[1px] h-[24px] bg-white/[0.07] mx-1"></div>
           
-          <a href={`${API_BASE}/index.php`} className="flex items-center gap-2 hover:text-white transition-colors no-underline text-sm px-3 py-1.5 rounded-md hover:bg-white/5">
+          <a href="#/" className="flex items-center gap-2 hover:text-white transition-colors no-underline text-sm px-3 py-1.5 rounded-md hover:bg-white/5">
             <i className="fa-solid fa-arrow-left"></i> Back to Home
           </a>
           
-          <a href={`${API_BASE}/login.php`} className="font-['JetBrains_Mono'] text-[0.8rem] font-bold tracking-[0.04em] text-black bg-[#00e07a] px-[20px] py-[9px] rounded-[5px] no-underline transition-all hover:bg-white hover:-translate-y-[1px] hover:shadow-[0_4px_16px_rgba(0,224,122,0.3)] ml-2">
+          <a href="#/login" className="font-['JetBrains_Mono'] text-[0.8rem] font-bold tracking-[0.04em] text-black bg-[#00e07a] px-[20px] py-[9px] rounded-[5px] no-underline transition-all hover:bg-white hover:-translate-y-[1px] hover:shadow-[0_4px_16px_rgba(0,224,122,0.3)] ml-2">
             [ LOGIN ]
           </a>
         </div>
