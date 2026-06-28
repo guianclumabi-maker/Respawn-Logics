@@ -1,3 +1,4 @@
+import { apiFetch } from "../lib/apiClient";
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { Settings, Send, ChevronLeft, ChevronRight, Info, X } from 'lucide-react';
@@ -63,7 +64,7 @@ export function Scheduling() {
 
   const loadShiftTypes = async () => {
     try {
-      const res = await fetch(`${API_BASE}/api/index.php?route=shifts&action=fetch_shift_types`);
+      const res = await apiFetch(`/api/index.php?route=shifts&action=fetch_shift_types`);
       const data = await res.json();
       if (data.success) {
         setShiftTypes(data.data);
@@ -80,7 +81,7 @@ export function Scheduling() {
     const endDateStr = formatDateYMD(dates[6]);
     
     try {
-      const res = await fetch(`${API_BASE}/api/index.php?route=shifts&action=fetch_roster&start_date=${startDateStr}&end_date=${endDateStr}`);
+      const res = await apiFetch(`/api/index.php?route=shifts&action=fetch_roster&start_date=${startDateStr}&end_date=${endDateStr}`);
       const data = await res.json();
       if (data.success) {
         setEmployees(data.data);
@@ -144,10 +145,10 @@ export function Scheduling() {
     }
 
     try {
-      const token = (window as any).__CSRF_TOKEN__ || '';
-      const res = await fetch(`${API_BASE}/api/index.php?route=shifts&action=publish_roster`, {
+      
+      const res = await apiFetch(`/api/index.php?route=shifts&action=publish_roster`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': token },
+        headers: { 'Content-Type': 'application/json', },
         body: JSON.stringify({ assignments: changes })
       });
       const data = await res.json();
@@ -168,10 +169,10 @@ export function Scheduling() {
     if (!newShiftName || !newShiftStart || !newShiftEnd) return alert('Fill all fields');
 
     try {
-      const token = (window as any).__CSRF_TOKEN__ || '';
-      const res = await fetch(`${API_BASE}/api/index.php?route=shifts&action=create_shift_type`, {
+      
+      const res = await apiFetch(`/api/index.php?route=shifts&action=create_shift_type`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': token },
+        headers: { 'Content-Type': 'application/json', },
         body: JSON.stringify({ name: newShiftName, start_time: newShiftStart, end_time: newShiftEnd })
       });
       const data = await res.json();

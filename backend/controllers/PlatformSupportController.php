@@ -24,6 +24,11 @@ class PlatformSupportController
 
     public function handleRequest($action)
     {
+        if (!hasRole('Super_Admin') && !hasRole('Platform_Admin')) {
+            http_response_code(403);
+            echo json_encode(['success' => false, 'error' => 'Forbidden: Platform access required']);
+            return;
+        }
         if ($_SERVER['REQUEST_METHOD'] === 'POST' && strpos($_SERVER['CONTENT_TYPE'] ?? '', 'application/json') !== false) {
             $input = json_decode(file_get_contents('php://input'), true) ?? [];
         } else {

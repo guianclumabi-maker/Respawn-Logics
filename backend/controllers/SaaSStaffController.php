@@ -4,11 +4,13 @@ class SaaSStaffController
 {
     private $pdo;
     private $currentUser;
+    private $tenantId;
 
     public function __construct($pdo)
     {
         $this->pdo = $pdo;
         $this->currentUser = getCurrentUser();
+        $this->tenantId = is_array($this->currentUser) && isset($this->currentUser['tenant_id']) ? $this->currentUser['tenant_id'] : ($_SESSION['tenant_id'] ?? null);
     }
 
     public function handleRequest($action)
@@ -38,7 +40,9 @@ class SaaSStaffController
                     echo json_encode(['success' => true, 'data' => $stmt->fetchAll(PDO::FETCH_ASSOC)]);
                 } catch (Exception $e) {
                     http_response_code(500);
-                    echo json_encode(['success' => false, 'error' => $e->getMessage()]);
+                    error_log('[' . __CLASS__ . '] ' . $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine());
+            http_response_code(500);
+            echo json_encode(['success' => false, 'error' => 'An internal error occurred. Please try again.']);
                 }
                 return;
             }
@@ -90,7 +94,9 @@ class SaaSStaffController
                     echo json_encode(['success' => true, 'message' => 'Internal staff created successfully.']);
                 } catch (Exception $e) {
                     http_response_code(500);
-                    echo json_encode(['success' => false, 'error' => $e->getMessage()]);
+                    error_log('[' . __CLASS__ . '] ' . $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine());
+            http_response_code(500);
+            echo json_encode(['success' => false, 'error' => 'An internal error occurred. Please try again.']);
                 }
                 return;
             }
@@ -132,7 +138,9 @@ class SaaSStaffController
                     echo json_encode(['success' => true]);
                 } catch (Exception $e) {
                     http_response_code(500);
-                    echo json_encode(['success' => false, 'error' => $e->getMessage()]);
+                    error_log('[' . __CLASS__ . '] ' . $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine());
+            http_response_code(500);
+            echo json_encode(['success' => false, 'error' => 'An internal error occurred. Please try again.']);
                 }
                 return;
             }

@@ -1,3 +1,4 @@
+import { apiFetch } from "../lib/apiClient";
 import { useState, useEffect } from "react";
 import { CheckCircle, AlertCircle, Clock } from "lucide-react";
 
@@ -10,7 +11,7 @@ export function ManagerApprovals() {
 
   const fetchPending = async () => {
     try {
-      const res = await fetch(`${API}&action=pending_approvals`, { credentials: "include" });
+      const res = await apiFetch(`${API.replace(API_BASE, "")}&action=pending_approvals`, { });
       const data = await res.json();
       if (data.success) {
         setLogs(data.data);
@@ -28,11 +29,11 @@ export function ManagerApprovals() {
 
   const handleApprove = async (id: number) => {
     try {
-      const res = await fetch(`${API}&action=approve_timesheet`, { credentials: "include",
+      const res = await apiFetch(`${API.replace(API_BASE, "")}&action=approve_timesheet`, {
         method: "POST",
         headers: { 
           "Content-Type": "application/json",
-          "X-CSRF-Token": (window as any).__CSRF_TOKEN__ || ""
+
         },
         body: JSON.stringify({ record_id: id })
       });

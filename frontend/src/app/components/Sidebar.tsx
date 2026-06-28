@@ -87,7 +87,7 @@ type NavSection = {
 
 // ── Navigation config ──────────────────────────────────────
 
-const getSections = (hasPermission: (p: string) => boolean, hasRole: (r: string | string[]) => boolean, tenantId: number | null, isAtsContext: boolean): NavSection[] => [
+const getSections = (hasPermission: (p: string) => boolean, hasRole: (r: string | string[]) => boolean, tenantId: number | null, isAtsContext: boolean, tierConfig: any): NavSection[] => [
   {
     title: "Workspace",
     hide: isAtsContext,
@@ -104,12 +104,7 @@ const getSections = (hasPermission: (p: string) => boolean, hasRole: (r: string 
       ...(hasPermission("intelligence.view") ? [{ label: "Predictive AI", view: "Analytics", icon: <Brain size={19} />, color: "#f59e0b" }] : []),
       ...(hasPermission("ats.view") ? [{ label: "Recruitment / ATS", view: "ATS Dashboard", icon: <Crosshair size={19} /> }] : []),
       { label: "My HR Cases", view: "Employee Relations", icon: <ShieldHalf size={19} /> },
-      ...(tenantId !== null ? [{ 
-        label: "IT/HR Service Desk", 
-        view: "IT / HR Service Desk", 
-        icon: <Headphones size={19} />,
-        externalLink: hasPermission("esm.manage") ? "/pages/esm_admin.php" : "/pages/esm_employee.php"
-      }] : []),
+      { label: "IT / HR Service Desk", view: "IT / HR Service Desk", icon: <Headphones size={19} /> },
     ],
   },
   {
@@ -130,6 +125,7 @@ const getSections = (hasPermission: (p: string) => boolean, hasRole: (r: string 
         color: "#ef4444", 
       }] : []),
       ...(hasPermission("users.view") ? [{ label: "Users", view: "Admin Users", icon: <UserCog size={19} /> }] : []),
+      ...(tierConfig?.org_units && hasPermission("users.manage") ? [{ label: "Org Units", view: "Org Units", icon: <Network size={19} /> }] : []),
       ...(hasPermission("users.manage") ? [{ label: "Roles & Permissions", view: "Admin Roles", icon: <ShieldHalf size={19} /> }] : []),
       ...(hasPermission("settings.manage") ? [{ label: "Tenant Settings", view: "Tenant Settings", icon: <Settings size={19} /> }] : []),
       ...(hasPermission("settings.manage") ? [{ label: "Knowledge Base Review", view: "Knowledge Base", icon: <BookOpen size={19} /> }] : []),
@@ -142,16 +138,7 @@ const getSections = (hasPermission: (p: string) => boolean, hasRole: (r: string 
       }] : []),
     ]
   },
-  {
-    title: "Vendor Universe",
-    hide: isAtsContext || !hasRole(["Platform_Admin", "Support_Agent", "Implementation_Specialist"]),
-    items: [
-      { label: "SaaS Headquarters", view: "SaaS Headquarters", icon: <Globe size={19} />, externalLink: "/pages/saas_admin.php" },
-      ...(hasRole("Platform_Admin") ? [{ label: "Vendor Staff", view: "Vendor Staff", icon: <BadgeInfo size={19} />, externalLink: "/pages/saas_staff.php" }] : []),
-      { label: "Global Support Inbox", view: "Global Support Inbox", icon: <Inbox size={19} />, externalLink: "/pages/saas_support.php" },
-      { label: "Feedback Corner", view: "Feedback Corner", icon: <StarHalf size={19} />, externalLink: "/pages/saas_feedback.php" },
-    ]
-  },
+
   {
     title: "System",
     hide: isAtsContext || !hasPermission("audit.view"),
@@ -213,7 +200,7 @@ export function Sidebar({ activeView, onViewChange, badges = {} }: SidebarProps)
   const location = useLocation();
   const isAtsContext = location.pathname.startsWith("/ats");
 
-  const sections = getSections(hasPermission, hasRole, user?.tenant_id || null, isAtsContext).filter(s => !s.hide);
+  const sections = getSections(hasPermission, hasRole, user?.tenant_id || null, isAtsContext, user?.tier_config || null).filter(s => !s.hide);
 
   const isActive = (view: string) => activeView.view === view;
 

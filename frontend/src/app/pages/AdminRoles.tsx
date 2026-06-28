@@ -103,35 +103,39 @@ export function AdminRoles() {
                             ))}
                         </select>
                     </div>
-                    <div>
-                        <label className="block text-sm mb-1">Scope</label>
-                        <select 
-                            value={selectedScope} 
-                            onChange={e => setSelectedScope(e.target.value)} 
-                            className="w-full bg-[#0b0f19] border border-white/10 rounded px-3 py-2 text-white"
-                            required
-                        >
-                            <option value="tenant">Tenant (All)</option>
-                            <option value="department">Department</option>
-                            <option value="team">Team (Direct Reports)</option>
-                            <option value="self">Self</option>
-                        </select>
-                    </div>
-                    {(selectedScope === 'department' || selectedScope === 'team') && (
-                        <div>
-                            <label className="block text-sm mb-1">Org Unit</label>
-                            <select 
-                                value={selectedOrgUnit} 
-                                onChange={e => setSelectedOrgUnit(e.target.value)} 
-                                className="w-full bg-[#0b0f19] border border-white/10 rounded px-3 py-2 text-white"
-                                required
-                            >
-                                <option value="">-- Select Org Unit --</option>
-                                {orgUnits.map(u => (
-                                    <option key={u.id} value={u.id}>{u.name}</option>
-                                ))}
-                            </select>
-                        </div>
+                    {user?.tier_config?.org_units && (
+                        <>
+                            <div>
+                                <label className="block text-sm mb-1">Scope</label>
+                                <select 
+                                    value={selectedScope} 
+                                    onChange={e => setSelectedScope(e.target.value)} 
+                                    className="w-full bg-[#0b0f19] border border-white/10 rounded px-3 py-2 text-white"
+                                    required
+                                >
+                                    <option value="tenant">Tenant (All)</option>
+                                    <option value="department">Department</option>
+                                    <option value="team">Team (Direct Reports)</option>
+                                    <option value="self">Self</option>
+                                </select>
+                            </div>
+                            {(selectedScope === 'department' || selectedScope === 'team') && (
+                                <div>
+                                    <label className="block text-sm mb-1">Org Unit</label>
+                                    <select 
+                                        value={selectedOrgUnit} 
+                                        onChange={e => setSelectedOrgUnit(e.target.value)} 
+                                        className="w-full bg-[#0b0f19] border border-white/10 rounded px-3 py-2 text-white"
+                                        required
+                                    >
+                                        <option value="">-- Select Org Unit --</option>
+                                        {orgUnits.map(u => (
+                                            <option key={u.id} value={u.id}>{u.name}</option>
+                                        ))}
+                                    </select>
+                                </div>
+                            )}
+                        </>
                     )}
                     <div className="md:col-span-2 pt-2">
                         <button type="submit" className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">

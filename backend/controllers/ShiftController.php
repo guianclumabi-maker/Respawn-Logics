@@ -36,6 +36,7 @@ class ShiftController
                 $this->createShiftType();
                     break;
                 case 'fetch_roster':
+                    if (!hasPermission('shifts.manage') && !hasPermission('shifts.view')) { http_response_code(403); echo json_encode(['success'=>false, 'error'=>'Denied']); return; }
                     $this->fetchRoster();
                     break;
                 case 'publish_roster':
@@ -83,6 +84,12 @@ class ShiftController
     {
         $start_date = $_GET['start_date'] ?? date('Y-m-d');
         $end_date = $_GET['end_date'] ?? date('Y-m-d', strtotime('+6 days'));
+
+        if (strtotime($end_date) - strtotime($start_date) > 90 * 86400) {
+            http_response_code(400);
+            echo json_encode(['success' => false, 'error' => 'Date range cannot exceed 90 days']);
+            return;
+        }
 
         require_once __DIR__ . '/../services/ScopeResolver.php';
         $scopeClause = ScopeResolver::getScopeWhereClause($this->pdo, $this->currentUser, 'users');
@@ -142,6 +149,7 @@ class ShiftController
     private function publishRoster()
     {
         if (!hasPermission('shifts.manage')) {
+            http_response_code(403);
             echo json_encode(['success' => false, 'error' => 'Permission denied']);
             return;
         }

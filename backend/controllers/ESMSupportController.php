@@ -355,6 +355,11 @@ class ESMSupportController
         $id = (int)($input['ticket_id'] ?? 0);
         $tag = trim($input['tag'] ?? '');
         if (empty($tag)) { http_response_code(400); return; }
+        
+        $chk = $this->pdo->prepare("SELECT id FROM esm_tickets WHERE id = ? AND tenant_id = ?");
+        $chk->execute([$id, $this->tenantId]);
+        if (!$chk->fetch()) { http_response_code(404); echo json_encode(['success' => false, 'error' => 'Ticket not found']); return; }
+
         try {
             $this->pdo->prepare("INSERT INTO `esm_ticket_tags` (`ticket_id`, `tag`) VALUES (?, ?)")->execute([$id, $tag]);
             $uName = ($this->currentUser['first_name'] || $this->currentUser['last_name']) ? trim($this->currentUser['first_name'] . ' ' . $this->currentUser['last_name']) : 'Agent';
@@ -368,6 +373,10 @@ class ESMSupportController
         if (!$this->isESMAgent()) { http_response_code(403); echo json_encode(['success' => false, 'error' => 'Denied']); return; }
         $id = (int)($input['ticket_id'] ?? 0);
         $tag = trim($input['tag'] ?? '');
+
+        $chk = $this->pdo->prepare("SELECT id FROM esm_tickets WHERE id = ? AND tenant_id = ?");
+        $chk->execute([$id, $this->tenantId]);
+        if (!$chk->fetch()) { http_response_code(404); echo json_encode(['success' => false, 'error' => 'Ticket not found']); return; }
         $stmt = $this->pdo->prepare("DELETE FROM `esm_ticket_tags` WHERE `ticket_id` = ? AND `tag` = ?");
         $stmt->execute([$id, $tag]);
         if ($stmt->rowCount() > 0) {

@@ -124,20 +124,6 @@ class ESMController
                     $stmt->execute([$this->tenantId]);
                     echo json_encode(['success' => true, 'data' => $stmt->fetchAll()]);
                     break;
-                case 'update_ticket':
-                    if (!$this->isAgent()) { echo json_encode(['success' => false, 'error' => 'Denied']); return; }
-                    $stmt = $this->pdo->prepare("
-                        SELECT st.*, tt.name as type_name, tm.name as team_name, u.full_name as employee_name
-                        FROM `service_tickets` st
-                        JOIN `service_ticket_types` tt ON st.ticket_type_id = tt.id
-                        JOIN `users` u ON st.employee_id = u.id
-                        LEFT JOIN `service_teams` tm ON st.assigned_team_id = tm.id
-                        WHERE st.tenant_id = ?
-                        ORDER BY st.created_at DESC
-                    ");
-                    $stmt->execute([$this->tenantId]);
-                    echo json_encode(['success' => true, 'data' => $stmt->fetchAll()]);
-                    break;
 
                 case 'update_ticket':
                     $this->updateTicket($input);
@@ -196,7 +182,9 @@ class ESMController
             echo json_encode(['success' => true, 'ticket_id' => $ticketId]);
         } catch (Exception $e) {
             $this->pdo->rollBack();
-            echo json_encode(['success' => false, 'error' => $e->getMessage()]);
+            error_log('[' . __CLASS__ . '] ' . $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine());
+            http_response_code(500);
+            echo json_encode(['success' => false, 'error' => 'An internal error occurred. Please try again.']);
         }
     }
 
