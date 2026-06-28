@@ -1222,7 +1222,7 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
                 <i data-lucide="play"></i> Resume Session
             </a>
         <?php else: ?>
-            <a href="<?= url('/register.php') ?>" class="btn-primary">
+            <a href="<?= url('/frontend/dist/index.html#/setup') ?>" class="btn-primary">
                 <i data-lucide="play"></i> Initialize Setup
             </a>
             <a href="<?= url('/login.php') ?>" class="btn-ghost">
@@ -1751,7 +1751,7 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
                         <i data-lucide="play"></i> Go to Dashboard
                     </a>
                 <?php else: ?>
-                    <a href="<?= url('/onboarding/') ?>" class="btn-primary" style="width:100%; justify-content:center;">
+                    <a href="<?= url('/frontend/dist/index.html#/setup') ?>" class="btn-primary" style="width:100%; justify-content:center;">
                         <i data-lucide="building"></i> Claim Enterprise Slot
                     </a>
                     <a href="<?= url('/login.php') ?>" class="btn-ghost" style="width:100%; justify-content:center; margin-top: 10px;">
@@ -1784,7 +1784,7 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
                 <ul>
                     <li><a href="<?= url('/login.php') ?>">Employee Login</a></li>
                     <li><a href="<?= url('/register.php') ?>">Create Workspace</a></li>
-                    <li><a href="<?= url('/frontend/dist/index.html#/onboarding') ?>">Enterprise Onboarding</a></li>
+                    <li><a href="<?= url('/frontend/dist/index.html#/setup') ?>">Enterprise Onboarding</a></li>
                 </ul>
             </div>
             <div class="footer-col">

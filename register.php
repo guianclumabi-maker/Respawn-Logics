@@ -90,7 +90,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
             $_SESSION['user_name'] = $fullName;
             $_SESSION['tenant_id'] = $tenantId;
 
-            header('Location: ' . url('/frontend/dist/index.html?v=' . time() . '#/dashboard'));
+            if ($setupMode === 'Solo') {
+                header('Location: ' . url('/frontend/dist/index.html?v=' . time() . '#/dashboard'));
+            } else {
+                header('Location: ' . url('/frontend/dist/index.html?v=' . time() . '#/onboarding'));
+            }
             exit;
 
         } catch (Exception $e) {
@@ -189,11 +193,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                         <label for="setup_mode">Company Setup Mode</label>
                         <div class="input-wrapper" style="position: relative;">
                             <i class="fa-solid fa-layer-group input-icon" style="position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: var(--text-secondary); pointer-events: none; z-index: 2;"></i>
+                            <?php $getMode = isset($_GET['setup_mode']) ? $_GET['setup_mode'] : ''; ?>
                             <select id="setup_mode" name="setup_mode" required class="form-control" style="width: 100%; padding: 12px 15px 12px 40px; border-radius: 6px; border: 1px solid var(--border); background: var(--bg-alt); color: var(--text); font-family: inherit; font-size: 14px; appearance: none; position: relative; z-index: 1;">
-                                <option value="Solo">Solo (Just me)</option>
-                                <option value="Small">Small Team (< 10 employees)</option>
-                                <option value="Mid">Growing Business (10 - 500 employees)</option>
-                                <option value="Enterprise">Enterprise (500+ employees)</option>
+                                <option value="Solo" <?= $getMode === 'Solo' ? 'selected' : '' ?>>Single Player (Just me)</option>
+                                <option value="Small" <?= $getMode === 'Small' ? 'selected' : '' ?>>Co-op Mode (1 - 100 employees)</option>
+                                <option value="Mid" <?= $getMode === 'Mid' ? 'selected' : '' ?>>Multiplayer Guild (100 - 500 employees)</option>
+                                <option value="Enterprise" <?= $getMode === 'Enterprise' ? 'selected' : '' ?>>MMO Server (500+ employees)</option>
                             </select>
                             <i class="fa-solid fa-chevron-down" style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); color: var(--text-secondary); pointer-events: none; z-index: 2; font-size: 12px;"></i>
                         </div>
