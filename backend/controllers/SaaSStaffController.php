@@ -4,11 +4,13 @@ class SaaSStaffController
 {
     private $pdo;
     private $currentUser;
+    private $tenantId;
 
     public function __construct($pdo)
     {
         $this->pdo = $pdo;
         $this->currentUser = getCurrentUser();
+        $this->tenantId = is_array($this->currentUser) && isset($this->currentUser['tenant_id']) ? $this->currentUser['tenant_id'] : ($_SESSION['tenant_id'] ?? null);
     }
 
     public function handleRequest($action)

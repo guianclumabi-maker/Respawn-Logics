@@ -112,24 +112,6 @@ class LeavesController
 
         $requested_days = $this->getBusinessDays($start_date, $end_date);
         
-        // Verify balance
-        $bal_stmt = $this->pdo->prepare("SELECT leave_type, total_allowance, used_balance FROM `leave_balances` WHERE `employee_email` = ? AND `tenant_id` = ?");
-        $bal_stmt->execute([$email, $this->tenantId]);
-        $leave_balances = $bal_stmt->fetchAll(PDO::FETCH_ASSOC);
-
-        $available_balance = 0;
-        foreach ($leave_balances as $lb) {
-            if ($lb['leave_type'] === $leave_type) {
-                $available_balance = $lb['total_allowance'] - $lb['used_balance'];
-                break;
-            }
-        }
-        
-        if ($requested_days > $available_balance) {
-            echo json_encode(['success' => false, 'error' => "Insufficient balance. You requested {$requested_days} day(s), but only have {$available_balance} day(s) available for {$leave_type}."]);
-            return;
-        }
-
         $supervisor_email = trim($this->currentUser['immediate_supervisor'] ?? '');
         $manager_email    = trim($this->currentUser['department_manager'] ?? '');
         
@@ -140,6 +122,22 @@ class LeavesController
         
         try {
             $this->pdo->beginTransaction();
+
+            // Verify balance inside transaction with FOR UPDATE to prevent race conditions
+            $bal_stmt = $this->pdo->prepare("SELECT total_allowance, used_balance FROM `leave_balances` WHERE `employee_email` = ? AND `leave_type` = ? AND `tenant_id` = ? FOR UPDATE");
+            $bal_stmt->execute([$email, $leave_type, $this->tenantId]);
+            $lb = $bal_stmt->fetch(PDO::FETCH_ASSOC);
+
+            $available_balance = 0;
+            if ($lb) {
+                $available_balance = $lb['total_allowance'] - $lb['used_balance'];
+            }
+            
+            if ($requested_days > $available_balance) {
+                $this->pdo->rollBack();
+                echo json_encode(['success' => false, 'error' => "Insufficient balance. You requested {$requested_days} day(s), but only have {$available_balance} day(s) available for {$leave_type}."]);
+                return;
+            }
 
             $stmt = $this->pdo->prepare("INSERT INTO `leave_requests` (`tenant_id`, `employee_email`, `leave_type`, `start_date`, `end_date`, `reason`, `status`, `tl_decision`, `manager_decision`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
             $stmt->execute([$this->tenantId, $email, $leave_type, $start_date, $end_date, $reason, $initial_status, $tl_decision_default, $mgr_decision_default]);

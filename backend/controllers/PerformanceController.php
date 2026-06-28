@@ -50,6 +50,14 @@ class PerformanceController
                     if (!hasPermission('performance.manage')) { echo json_encode(['success' => false, 'error' => 'Denied']); return; }
                     $cycleId = $input['cycle_id'] ?? 0;
                     
+                    $chk = $this->pdo->prepare("SELECT id FROM performance_cycles WHERE id = ? AND tenant_id = ?");
+                    $chk->execute([$cycleId, $this->tenantId]);
+                    if (!$chk->fetch()) {
+                        http_response_code(404);
+                        echo json_encode(['success' => false, 'error' => 'Cycle not found']);
+                        return;
+                    }
+                    
                     $empStmt = $this->pdo->prepare("SELECT id, manager_id FROM `users` WHERE `tenant_id` = ? AND `employment_status` = 'Active' AND `manager_id` IS NOT NULL");
                     $empStmt->execute([$this->tenantId]);
                     $employees = $empStmt->fetchAll();
@@ -154,6 +162,14 @@ class PerformanceController
                 case 'nine_box_data':
                     if (!hasPermission('performance.manage')) { echo json_encode(['success' => false, 'error' => 'Denied']); return; }
                     $cycleId = intval($_GET['cycle_id'] ?? 0);
+                    
+                    $chk = $this->pdo->prepare("SELECT id FROM performance_cycles WHERE id = ? AND tenant_id = ?");
+                    $chk->execute([$cycleId, $this->tenantId]);
+                    if (!$chk->fetch()) {
+                        http_response_code(404);
+                        echo json_encode(['success' => false, 'error' => 'Cycle not found']);
+                        return;
+                    }
                     
                     $stmt = $this->pdo->prepare("
                         SELECT pr.id, pr.employee_id, u.full_name, u.profile_image, pr.nine_box_performance as perf, pr.nine_box_potential as pot, pr.overall_score_1_to_5

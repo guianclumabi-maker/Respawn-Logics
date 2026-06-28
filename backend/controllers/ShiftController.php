@@ -36,6 +36,7 @@ class ShiftController
                 $this->createShiftType();
                     break;
                 case 'fetch_roster':
+                    if (!hasPermission('shifts.manage') && !hasPermission('shifts.view')) { http_response_code(403); echo json_encode(['success'=>false, 'error'=>'Denied']); return; }
                     $this->fetchRoster();
                     break;
                 case 'publish_roster':
@@ -142,6 +143,7 @@ class ShiftController
     private function publishRoster()
     {
         if (!hasPermission('shifts.manage')) {
+            http_response_code(403);
             echo json_encode(['success' => false, 'error' => 'Permission denied']);
             return;
         }

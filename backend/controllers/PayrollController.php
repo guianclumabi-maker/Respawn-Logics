@@ -24,6 +24,11 @@ class PayrollController
         return hasPermission('payroll.view') || hasPermission('payroll.manage');
     }
 
+    private function canManagePayroll()
+    {
+        return hasPermission('payroll.manage');
+    }
+
     private function canRunPayroll()
     {
         return hasPermission('payroll.run') || hasPermission('payroll.manage');
@@ -526,6 +531,10 @@ class PayrollController
                     } else {
                         echo json_encode(['success' => false, 'error' => 'Not found']);
                     }
+                    break;
+
+                case 'download_payslip':
+                    $this->downloadPayslip();
                     break;
 
                 default:
