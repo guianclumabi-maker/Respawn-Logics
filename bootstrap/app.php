@@ -95,19 +95,19 @@ if (!function_exists('loadPermissions')) {
                 return;
             }
             
-            $tenantIdInt = (int)$tenantId;
+            $tenantIdStr = (string)$tenantId;
             
             $stmt = $pdo->prepare("SELECT permission_version FROM tenants WHERE id = ?");
-            $stmt->execute([$tenantIdInt]);
+            $stmt->execute([$tenantIdStr]);
             $currentVersion = (int)$stmt->fetchColumn();
  
             if (!isset($_SESSION['permission_version']) || $_SESSION['permission_version'] !== $currentVersion || empty($_SESSION['permissions'])) {
                 $checkAndSetSuper();
-                $_SESSION['permissions'] = PermissionService::userPermissions($pdo, (int)$_SESSION['user_id'], $tenantIdInt);
+                $_SESSION['permissions'] = PermissionService::userPermissions($pdo, (int)$_SESSION['user_id'], $tenantIdStr);
                 $_SESSION['permission_version'] = $currentVersion;
                 
                 if (empty($_SESSION['permissions']) && empty($_SESSION['is_super'])) {
-                    error_log("Warning: Empty permissions loaded for NON-super user ID {$_SESSION['user_id']} on tenant {$tenantIdInt}");
+                    error_log("Warning: Empty permissions loaded for NON-super user ID {$_SESSION['user_id']} on tenant {$tenantIdStr}");
                 }
             }
         }
