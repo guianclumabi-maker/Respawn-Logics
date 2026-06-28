@@ -85,6 +85,12 @@ class ShiftController
         $start_date = $_GET['start_date'] ?? date('Y-m-d');
         $end_date = $_GET['end_date'] ?? date('Y-m-d', strtotime('+6 days'));
 
+        if (strtotime($end_date) - strtotime($start_date) > 90 * 86400) {
+            http_response_code(400);
+            echo json_encode(['success' => false, 'error' => 'Date range cannot exceed 90 days']);
+            return;
+        }
+
         require_once __DIR__ . '/../services/ScopeResolver.php';
         $scopeClause = ScopeResolver::getScopeWhereClause($this->pdo, $this->currentUser, 'users');
 

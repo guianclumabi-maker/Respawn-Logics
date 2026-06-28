@@ -51,7 +51,9 @@ class AnnouncementsController
     private function fetchPosts()
     {
         $stmt = $this->pdo->prepare("
-            SELECT cp.*, u.full_name, u.job_title, u.profile_image 
+            SELECT cp.id, cp.caption, cp.posted_by, cp.created_at, cp.tenant_id, 
+                   (cp.image_path IS NOT NULL AND cp.image_path != '') as has_image,
+                   u.full_name, u.job_title, u.profile_image 
             FROM company_posts cp
             JOIN users u ON cp.posted_by = u.email
             WHERE cp.tenant_id = ?
@@ -62,9 +64,10 @@ class AnnouncementsController
         $posts = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         foreach ($posts as &$post) {
-            if (!empty($post['image_path'])) {
+            if ($post['has_image']) {
                 $post['image_url'] = '../api/index.php?route=announcements&action=download_attachment&id=' . $post['id'];
             }
+            unset($post['has_image']);
         }
 
         echo json_encode(['success' => true, 'data' => $posts]);
