@@ -89,11 +89,10 @@ class AICompanionController
             }
         }
 
-        // Simulate AI thinking effect
-        sleep(1);
-        
         // Auto-Anonymize and Log to Global Intelligence Cache
-        $anonymizedPrompt = preg_replace('/[A-Z][a-z]+\s[A-Z][a-z]+/', '[Employee Name]', $message);
+        $anonymizedPrompt = preg_replace('/\b[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}\b/', '[Email]', $message);
+        $anonymizedPrompt = preg_replace('/\b(?:\+?\d{1,3}[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}\b/', '[Phone]', $anonymizedPrompt);
+        $anonymizedPrompt = preg_replace('/\b[A-Z][a-zA-Z-]+\s+[A-Z][a-zA-Z-]+\b/', '[Employee Name]', $anonymizedPrompt);
         
         $stmtLog = $this->pdo->prepare("INSERT INTO global_intelligence_cache (tenant_id, anonymized_prompt, ai_response, status) VALUES (?, ?, ?, 'Anonymized')");
         $stmtLog->execute([$this->tenantId, $anonymizedPrompt, $reply]);
@@ -117,7 +116,7 @@ class AICompanionController
             return "⚠️ **SYSTEM ALERT:** The Google Gemini API key has not been configured yet. Please insert your API key in `backend/controllers/AICompanionController.php` on line 104 to enable the AI Companion's reasoning engine.\n\n**Synthesized Context:**\n" . $context;
         }
 
-        $apiUrl = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=" . $apiKey;
+        $apiUrl = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent";
 
         // System prompt to instruct the LLM on its role
         $systemPrompt = "You are an expert HR and Employee Relations AI Companion for Philippine Labor Law and company policies. 
@@ -144,7 +143,8 @@ class AICompanionController
         curl_setopt($ch, CURLOPT_POST, true);
         curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
         curl_setopt($ch, CURLOPT_HTTPHEADER, [
-            "Content-Type: application/json"
+            "Content-Type: application/json",
+            "x-goog-api-key: " . $apiKey
         ]);
 
         $response = curl_exec($ch);

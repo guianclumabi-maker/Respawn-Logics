@@ -45,7 +45,7 @@ class AuditController
     private function fetchLogs()
     {
         $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
-        $limit = isset($_GET['limit']) ? (int)$_GET['limit'] : 50;
+        $limit = min(200, max(1, (int)($_GET['limit'] ?? 50)));
         $offset = ($page - 1) * $limit;
 
         $search = $_GET['search'] ?? '';

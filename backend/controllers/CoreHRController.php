@@ -95,7 +95,7 @@ class CoreHRController
         }
         
         // Fetch user basic
-        $stmt = $this->pdo->prepare("SELECT * FROM `users` WHERE `id` = ? AND `tenant_id` = ?");
+        $stmt = $this->pdo->prepare("SELECT `id`, `employee_number`, `full_name`, `email`, `role`, `employment_status`, `department`, `org_unit_id`, `work_location`, `immediate_supervisor`, `department_manager`, `profile_image`, `job_title`, `base_salary`, `payroll_schedule_id`, `emergency_name`, `emergency_phone`, `phone`, `bio`, `tier`, `employee_id`, `first_name`, `last_name`, `work_email`, `manager_id`, `hire_date`, `tenant_id`, `organization_unit_1`, `organization_unit_2`, `organization_unit_3`, `organization_unit_4`, `totp_enabled`, `is_mwe`, `must_change_password` FROM `users` WHERE `id` = ? AND `tenant_id` = ?");
         $stmt->execute([$userId, $this->tenantId]);
         $user = $stmt->fetch();
         
@@ -171,7 +171,7 @@ class CoreHRController
         $notes = $input['notes'] ?? '';
 
         // Current record
-        $stmt = $this->pdo->prepare("SELECT * FROM `users` WHERE `id` = ? AND `tenant_id` = ?");
+        $stmt = $this->pdo->prepare("SELECT `id`, `employee_number`, `full_name`, `email`, `role`, `employment_status`, `department`, `org_unit_id`, `work_location`, `immediate_supervisor`, `department_manager`, `profile_image`, `job_title`, `base_salary`, `payroll_schedule_id`, `emergency_name`, `emergency_phone`, `phone`, `bio`, `tier`, `employee_id`, `first_name`, `last_name`, `work_email`, `manager_id`, `hire_date`, `tenant_id`, `organization_unit_1`, `organization_unit_2`, `organization_unit_3`, `organization_unit_4`, `totp_enabled`, `is_mwe`, `must_change_password` FROM `users` WHERE `id` = ? AND `tenant_id` = ?");
         $stmt->execute([$userId, $this->tenantId]);
         $oldUser = $stmt->fetch();
 
