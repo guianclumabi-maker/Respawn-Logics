@@ -120,6 +120,7 @@ $controllers = [
     'surveys' => 'SurveyController',
     'audit' => 'AuditController',
     'onboarding' => 'OnboardingController',
+    'health' => 'HealthController',
 ];
 
 if (!array_key_exists($route, $controllers)) {
@@ -145,17 +146,17 @@ try {
         echo json_encode(['success' => false, 'error' => "Controller file for route '{$route}' not found."]);
     }
 } catch (PDOException $e) {
+    error_log('[API FrontController] Database error: ' . $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine());
     http_response_code(500);
     echo json_encode([
         'success' => false, 
-        'error' => 'A database error occurred: ' . $e->getMessage()
+        'error' => 'An internal error occurred. Please try again.'
     ]);
 } catch (Throwable $e) {
+    error_log('[API FrontController] Internal server error: ' . $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine());
     http_response_code(500);
     echo json_encode([
         'success' => false, 
-        'error' => 'An internal server error occurred: ' . $e->getMessage(),
-        'file' => $e->getFile(),
-        'line' => $e->getLine()
+        'error' => 'An internal error occurred. Please try again.'
     ]);
 }

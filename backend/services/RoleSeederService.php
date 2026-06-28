@@ -2,6 +2,18 @@
 
 class RoleSeederService
 {
+    /**
+     * Get the resolved tier configuration
+     */
+    public static function getTierConfig(string $mode): array
+    {
+        $config = require __DIR__ . '/../../config/rbac_tiers.php';
+        if (!isset($config['tiers'][$mode])) {
+            $mode = 'Solo'; // Default fallback
+        }
+        return $config['tiers'][$mode];
+    }
+
     public static function seedTenantRoles(PDO $pdo, string $tenantId, string $setupMode, int $ownerUserId)
     {
         $startedTransaction = false;
@@ -11,27 +23,12 @@ class RoleSeederService
         }
 
         try {
-            // Define all possible base roles
-            $roleDefinitions = [
-                'Account Owner' => ['desc' => 'Ultimate tenant owner. Full access.', 'perms' => ['*']],
-                'Admin' => ['desc' => 'Administrative access to system settings.', 'perms' => ['users.manage', 'settings.manage', 'audit.view', 'employees.view', 'employees.edit']],
-                'Manager' => ['desc' => 'Can manage their department/team.', 'perms' => ['employees.view_team', 'leave.approve_team', 'performance.manage_team']],
-                'Employee' => ['desc' => 'Base access for standard employees.', 'perms' => ['employees.view_self', 'leave.view', 'leave.request', 'attendance.view']],
-                'HR Manager' => ['desc' => 'Can manage HR records, ELR, and ATS.', 'perms' => ['employees.manage', 'leave.manage', 'elr.view', 'elr.investigate', 'ats.view', 'ats.edit']],
-                'Recruiter' => ['desc' => 'Focused on ATS pipeline.', 'perms' => ['ats.view', 'ats.create_job', 'ats.edit_job']],
-                'Payroll Manager' => ['desc' => 'Can process payroll runs.', 'perms' => ['payroll.view', 'payroll.run', 'benefits.manage']],
-                'Payroll Approver' => ['desc' => 'Can approve and finalize payroll.', 'perms' => ['payroll.view', 'payroll.approve', 'benefits.approve']]
-            ];
-
-            // Determine which roles to seed based on tier
-            $rolesToSeed = ['Account Owner']; // Solo gets only this
+            // Load configuration
+            $config = require __DIR__ . '/../../config/rbac_tiers.php';
+            $roleDefinitions = $config['roles'];
             
-            if (in_array($setupMode, ['Small', 'Mid', 'Enterprise'])) {
-                $rolesToSeed = array_merge($rolesToSeed, ['Admin', 'Manager', 'Employee']);
-            }
-            if (in_array($setupMode, ['Mid', 'Enterprise'])) {
-                $rolesToSeed = array_merge($rolesToSeed, ['HR Manager', 'Recruiter', 'Payroll Manager', 'Payroll Approver']);
-            }
+            $tierConfig = self::getTierConfig($setupMode);
+            $rolesToSeed = $tierConfig['roles'];
 
             // Get all permission IDs
             $stmtPerms = $pdo->query("SELECT id, permission_key FROM permissions");
@@ -48,6 +45,7 @@ class RoleSeederService
             $createdRoleIds = [];
 
             foreach ($rolesToSeed as $roleName) {
+                if (!isset($roleDefinitions[$roleName])) continue;
                 $def = $roleDefinitions[$roleName];
                 $stmtAddRole->execute([$tenantId, $roleName, $def['desc']]);
                 $roleId = $pdo->lastInsertId();

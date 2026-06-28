@@ -1,3 +1,4 @@
+import { apiFetch } from "../lib/apiClient";
 import { useState, useEffect } from "react";
 import { Clock, CheckCircle, AlertCircle } from "lucide-react";
 
@@ -12,8 +13,8 @@ export function AttendanceDashboard() {
   const fetchData = async () => {
     try {
       const [statusRes, logsRes] = await Promise.all([
-        fetch(`${API}&action=status`, { credentials: "include" }),
-        fetch(`${API}&action=timesheet`, { credentials: "include" })
+        apiFetch(`${API.replace(API_BASE, "")}&action=status`, { }),
+        apiFetch(`${API.replace(API_BASE, "")}&action=timesheet`, { })
       ]);
       const statusData = await statusRes.json();
       const logsData = await logsRes.json();
@@ -33,11 +34,9 @@ export function AttendanceDashboard() {
   const handleClockAction = async (action: "clock_in" | "clock_out") => {
     try {
       setLoading(true);
-      const res = await fetch(`${API}&action=${action}`, { credentials: "include",
+      const res = await apiFetch(`${API.replace(API_BASE, "")}&action=${action}`, {
         method: "POST",
-        headers: {
-          "X-CSRF-Token": (window as any).__CSRF_TOKEN__ || ""
-        }
+
       });
       const data = await res.json();
       if (data.success) {

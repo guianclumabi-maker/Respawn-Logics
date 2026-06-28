@@ -48,7 +48,7 @@ class LeavesController
                         break;
 
                     case 'my_requests':
-                        $stmt = $this->pdo->prepare("SELECT * FROM `leave_requests` WHERE `employee_email` = ? AND `tenant_id` = ? ORDER BY `created_at` DESC");
+                        $stmt = $this->pdo->prepare("SELECT `id`, `employee_email`, `leave_type`, `start_date`, `end_date`, `reason`, `status`, `created_at`, `tenant_id` FROM `leave_requests` WHERE `employee_email` = ? AND `tenant_id` = ? ORDER BY `created_at` DESC");
                         $stmt->execute([$email, $this->tenantId]);
                         echo json_encode(['success' => true, 'data' => $stmt->fetchAll(PDO::FETCH_ASSOC)]);
                         break;
@@ -76,11 +76,11 @@ class LeavesController
             } else if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 switch ($action) {
                     case 'apply':
-                        if (!hasPermission('leaves.apply')) { http_response_code(403); echo json_encode(['success'=>false, 'error'=>'Denied']); return; }
+                        if (!hasPermission('leave.request')) { http_response_code(403); echo json_encode(['success'=>false, 'error'=>'Denied']); return; }
                         $this->applyLeave($input, $email);
                         break;
                     case 'approve_reject':
-                        if (!hasPermission('leaves.manage')) { http_response_code(403); echo json_encode(['success'=>false, 'error'=>'Denied']); return; }
+                        if (!hasPermission('leave.manage')) { http_response_code(403); echo json_encode(['success'=>false, 'error'=>'Denied']); return; }
                 $this->approveRejectLeave($input, $email);
                         break;
                     default:
@@ -112,24 +112,6 @@ class LeavesController
 
         $requested_days = $this->getBusinessDays($start_date, $end_date);
         
-        // Verify balance
-        $bal_stmt = $this->pdo->prepare("SELECT leave_type, total_allowance, used_balance FROM `leave_balances` WHERE `employee_email` = ? AND `tenant_id` = ?");
-        $bal_stmt->execute([$email, $this->tenantId]);
-        $leave_balances = $bal_stmt->fetchAll(PDO::FETCH_ASSOC);
-
-        $available_balance = 0;
-        foreach ($leave_balances as $lb) {
-            if ($lb['leave_type'] === $leave_type) {
-                $available_balance = $lb['total_allowance'] - $lb['used_balance'];
-                break;
-            }
-        }
-        
-        if ($requested_days > $available_balance) {
-            echo json_encode(['success' => false, 'error' => "Insufficient balance. You requested {$requested_days} day(s), but only have {$available_balance} day(s) available for {$leave_type}."]);
-            return;
-        }
-
         $supervisor_email = trim($this->currentUser['immediate_supervisor'] ?? '');
         $manager_email    = trim($this->currentUser['department_manager'] ?? '');
         
@@ -140,6 +122,22 @@ class LeavesController
         
         try {
             $this->pdo->beginTransaction();
+
+            // Verify balance inside transaction with FOR UPDATE to prevent race conditions
+            $bal_stmt = $this->pdo->prepare("SELECT total_allowance, used_balance FROM `leave_balances` WHERE `employee_email` = ? AND `leave_type` = ? AND `tenant_id` = ? FOR UPDATE");
+            $bal_stmt->execute([$email, $leave_type, $this->tenantId]);
+            $lb = $bal_stmt->fetch(PDO::FETCH_ASSOC);
+
+            $available_balance = 0;
+            if ($lb) {
+                $available_balance = $lb['total_allowance'] - $lb['used_balance'];
+            }
+            
+            if ($requested_days > $available_balance) {
+                $this->pdo->rollBack();
+                echo json_encode(['success' => false, 'error' => "Insufficient balance. You requested {$requested_days} day(s), but only have {$available_balance} day(s) available for {$leave_type}."]);
+                return;
+            }
 
             $stmt = $this->pdo->prepare("INSERT INTO `leave_requests` (`tenant_id`, `employee_email`, `leave_type`, `start_date`, `end_date`, `reason`, `status`, `tl_decision`, `manager_decision`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
             $stmt->execute([$this->tenantId, $email, $leave_type, $start_date, $end_date, $reason, $initial_status, $tl_decision_default, $mgr_decision_default]);
@@ -185,8 +183,31 @@ class LeavesController
         }
 
         // Determine if acting as TL or Manager based on current state
-        $isSupervisor = ($req['tl_decision'] === 'Pending');
-        $isManager = ($req['tl_decision'] === 'Approved' && $req['manager_decision'] === 'Pending');
+        $isSupervisorStage = ($req['tl_decision'] === 'Pending');
+        $isManagerStage = ($req['tl_decision'] === 'Approved' && $req['manager_decision'] === 'Pending');
+
+        $isSupervisor = false;
+        $isManager = false;
+
+        if ($isSupervisorStage) {
+            if ($email !== $req['immediate_supervisor']) {
+                http_response_code(403);
+                echo json_encode(['success' => false, 'error' => 'Denied: You are not the immediate supervisor for this employee']);
+                return;
+            }
+            $isSupervisor = true;
+        } elseif ($isManagerStage) {
+            if ($email !== $req['department_manager'] || $email === $req['tl_decided_by']) {
+                http_response_code(403);
+                echo json_encode(['success' => false, 'error' => 'Denied: You are not the department manager, or you already approved as TL']);
+                return;
+            }
+            $isManager = true;
+        } else {
+            http_response_code(400);
+            echo json_encode(['success' => false, 'error' => 'No pending approvals for this request']);
+            return;
+        }
 
         try {
             $this->pdo->beginTransaction();

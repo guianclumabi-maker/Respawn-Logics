@@ -1,3 +1,4 @@
+import { apiFetch } from "../lib/apiClient";
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
 import { Sun, Moon, Gamepad2 } from "lucide-react";
@@ -33,12 +34,12 @@ export function GamifiedThemeToggle({ collapsed }: { collapsed?: boolean }) {
           const newTheme = isDark ? "light" : "dark";
           setTheme(newTheme);
           // Sync with the main PHP backend session
-          fetch("/api/index.php?route=iam&action=update_theme", { credentials: "include", 
+          apiFetch("/api/index.php?route=iam&action=update_theme", { 
               method: "POST",
-              headers: { "Content-Type": "application/json" },
+
               body: JSON.stringify({ 
                   theme: newTheme,
-                  csrf_token: (window as any).__CSRF_TOKEN__ || ""
+
               })
           }).catch(err => console.error("Failed to sync theme with backend:", err));
         }}

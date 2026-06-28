@@ -730,17 +730,12 @@ class CandidatesController
             unset($userPayload['password_hash']); 
             echo json_encode(['success' => true, 'user' => $userPayload]); 
         } else { 
-            // Fallback for development/beta if database lookup fails but session exists
             if (isset($_SESSION['user_name'])) {
-                echo json_encode([
-                    'success' => true, 
-                    'user' => [
-                        'full_name' => $_SESSION['user_name'], 
-                        'role' => 'Employee', 
-                        'department' => 'Operations'
-                    ]
-                ]);
+                error_log('[' . __CLASS__ . '] User session exists but database lookup failed for user: ' . $_SESSION['user_name']);
+                http_response_code(403);
+                echo json_encode(['success' => false, 'error' => 'Not authorized']);
             } else {
+                http_response_code(401);
                 echo json_encode(['success' => false, 'error' => 'Not logged in']);
             }
         }
@@ -1059,11 +1054,11 @@ class CandidatesController
         $notes->execute([$id, $this->tenantId]);
         $data['notes'] = $notes->fetchAll();
 
-        $pools = $this->pdo->prepare("SELECT * FROM `talent_pool_members` WHERE `candidate_id` = ? AND `tenant_id` = ?");
+        $pools = $this->pdo->prepare("SELECT * FROM `pool_members` WHERE `candidate_id` = ? AND `tenant_id` = ?");
         $pools->execute([$id, $this->tenantId]);
         $data['pool_memberships'] = $pools->fetchAll();
 
-        $activities = $this->pdo->prepare("SELECT * FROM `activity_logs` WHERE `candidate_id` = ? AND `tenant_id` = ?");
+        $activities = $this->pdo->prepare("SELECT * FROM `activities` WHERE `candidate_id` = ? AND `tenant_id` = ?");
         $activities->execute([$id, $this->tenantId]);
         $data['activities'] = $activities->fetchAll();
 
@@ -1428,7 +1423,7 @@ class CandidatesController
 
     private function hireCandidate($data) {
         // Enforce basic ATS edit and HR permission
-        if (!hasPermission('ats.edit') && !hasPermission('core_hr.create_employee')) {
+        if (!hasPermission('ats.edit')) {
             http_response_code(403);
             echo json_encode(['success' => false, 'error' => 'You do not have permission to hire candidates.']);
             exit;

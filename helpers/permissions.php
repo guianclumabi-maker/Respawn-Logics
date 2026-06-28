@@ -4,6 +4,7 @@
  * Checks if the current user has a specific permission.
  */
 function hasPermission(string $permission) {
+    if (!empty($_SESSION['is_super'])) return true;
     if (!isLoggedIn()) return false;
     return in_array($permission, $_SESSION['permissions'] ?? []);
 }

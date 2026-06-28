@@ -1,3 +1,4 @@
+import { apiFetch } from "../lib/apiClient";
 import { useState, useEffect, useCallback } from "react";
 import {
   Calendar,
@@ -120,14 +121,14 @@ function ScheduleModal({
   const selectedCandidate = candidates.find((c) => c.id === form.candidate_id);
 
   useEffect(() => {
-    fetch(`${API}&action=candidates&limit=200`, { credentials: "include" })
+    apiFetch(`${API.replace(API_BASE, "")}&action=candidates&limit=200`, { })
       .then((r) => r.json())
       .then((d) => {
         if (d.success) setCandidates(d.candidates.map((c: any) => ({ id: c.id, name: c.name, email: c.email })));
       })
       .catch(() => {});
 
-    fetch(`${API}&action=jobs`, { credentials: "include" })
+    apiFetch(`${API.replace(API_BASE, "")}&action=jobs`, { })
       .then((r) => r.json())
       .then((d) => {
         if (d.success) setJobs(d.jobs.map((j: any) => ({ id: j.id, title: j.title })));
@@ -146,18 +147,18 @@ function ScheduleModal({
 
     let applicationId = 0;
     try {
-      const jobRes = await fetch(`${API}&action=job&id=${form.job_id}`, { credentials: "include" });
+      const jobRes = await apiFetch(`${API.replace(API_BASE, "")}&action=job&id=${form.job_id}`, { });
       const jobData = await jobRes.json();
       if (jobData.success) {
         const existing = jobData.job.applications?.find((a: any) => a.candidate_id === form.candidate_id);
         if (existing) {
           applicationId = existing.id;
         } else {
-          const appRes = await fetch(API, { credentials: "include",
+          const appRes = await apiFetch(API.replace(API_BASE, ""), {
             method: "POST",
             headers: { 
               "Content-Type": "application/json",
-              "X-CSRF-Token": (window as any).__CSRF_TOKEN__ || ""
+
             },
             body: JSON.stringify({ action: "add_application", candidate_id: form.candidate_id, job_id: form.job_id }),
           });
@@ -171,11 +172,11 @@ function ScheduleModal({
 
     const scheduled_at = `${form.date} ${form.time}:00`;
     try {
-      await fetch(API, { credentials: "include",
+      await apiFetch(API.replace(API_BASE, ""), {
         method: "POST",
         headers: { 
           "Content-Type": "application/json",
-          "X-CSRF-Token": (window as any).__CSRF_TOKEN__ || ""
+
         },
         body: JSON.stringify({
           action: "add_interview",
@@ -326,11 +327,11 @@ function ScorecardModal({
   const handleSubmit = async () => {
     setSaving(true);
     try {
-      await fetch(API, { credentials: "include",
+      await apiFetch(API.replace(API_BASE, ""), {
         method: "POST",
         headers: { 
           "Content-Type": "application/json",
-          "X-CSRF-Token": (window as any).__CSRF_TOKEN__ || ""
+
         },
         body: JSON.stringify({ action: "add_scorecard", interview_id: interview.id, ...form }),
       });
@@ -508,7 +509,7 @@ export function InterviewsPage({ onViewChange }: Props) {
       const params = new URLSearchParams({ action: "interviews" });
       if (statusFilter) params.set("status", statusFilter);
       if (jobFilter) params.set("job_id", String(jobFilter));
-      const res = await fetch(`${API}&${params}`, { credentials: "include" });
+      const res = await apiFetch(`${API.replace(API_BASE, "")}&${params}`, { });
       const data = await res.json();
       if (data.success) setInterviews(data.interviews);
     } catch { /* silent */ }
@@ -520,7 +521,7 @@ export function InterviewsPage({ onViewChange }: Props) {
   }, [fetchInterviews]);
 
   useEffect(() => {
-    fetch(`${API}&action=jobs`, { credentials: "include" })
+    apiFetch(`${API.replace(API_BASE, "")}&action=jobs`, { })
       .then((r) => r.json())
       .then((d) => { if (d.success) setJobs(d.jobs.map((j: any) => ({ id: j.id, title: j.title }))); })
       .catch(() => {});

@@ -118,6 +118,14 @@ class ExpensesController
             return;
         }
 
+        $chk = $this->pdo->prepare("SELECT id FROM expense_categories WHERE id = ? AND tenant_id = ?");
+        $chk->execute([$categoryId, $this->tenantId]);
+        if (!$chk->fetchColumn()) {
+            http_response_code(400);
+            echo json_encode(['success' => false, 'error' => 'Invalid category.']);
+            return;
+        }
+
         // File Upload Handling
         $receiptPath = null;
         if (isset($_FILES['receipt']) && $_FILES['receipt']['error'] == UPLOAD_ERR_OK) {

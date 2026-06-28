@@ -1,3 +1,4 @@
+import { apiFetch } from "../../../../../lib/apiClient";
 import { useState, useEffect, useRef } from "react";
 import { Ticket, STATUS_META, PRIORITY_META, Status, Priority } from "./data";
 import { Tag as TagIcon, Clock, User, Send, Lock, ArrowLeft, CheckCircle2, CircleDot, Hourglass, XCircle, RefreshCw, ChevronDown, Plus, X, Zap, Paperclip, Star, Loader2, FileText } from "lucide-react";
@@ -114,7 +115,7 @@ export function TicketDetail({ ticket, onBack, onStatusChange, onPriorityChange,
       try {
         const res = await fetch("../api/index.php?route=platform_support&action=upload_attachment", {
           method: "POST",
-          headers: { "X-CSRF-Token": window.__CSRF_TOKEN__ || "" },
+
           body: formData
         });
         const data = await res.json();
@@ -136,7 +137,7 @@ export function TicketDetail({ ticket, onBack, onStatusChange, onPriorityChange,
     
     const ticketIdStr = ticket.id.replace("TKT-", "");
     await fetch("../api/index.php?route=platform_support&action=add_comment", {
-      method: "POST", headers: { "Content-Type": "application/json", "X-CSRF-Token": window.__CSRF_TOKEN__ || "" },
+      method: "POST", headers: { "Content-Type": "application/json", },
       body: JSON.stringify({ ticket_id: ticketIdStr, comment: bodyText, attachments: pendingAttachments })
     });
     

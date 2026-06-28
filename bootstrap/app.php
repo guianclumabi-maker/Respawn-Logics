@@ -75,10 +75,22 @@ if (!function_exists('loadPermissions')) {
         if (isset($_SESSION['user_id'])) {
             $tenantId = $_SESSION['tenant_id'] ?? null;
             
+            $checkAndSetSuper = function() use ($pdo) {
+                $stmt = $pdo->prepare("SELECT role FROM users WHERE id = ?");
+                $stmt->execute([(int)$_SESSION['user_id']]);
+                $userRole = $stmt->fetchColumn();
+                $_SESSION['is_super'] = ($userRole === 'Super_Admin' || $userRole === 'Platform_Admin');
+            };
+            
             if ($tenantId === null || $tenantId === '') {
-                if (!isset($_SESSION['permissions'])) {
+                if (!isset($_SESSION['permissions']) || empty($_SESSION['permissions'])) {
+                    $checkAndSetSuper();
                     $_SESSION['permissions'] = PermissionService::userPermissions($pdo, (int)$_SESSION['user_id'], 0);
                     $_SESSION['permission_version'] = 1;
+                    
+                    if (empty($_SESSION['permissions']) && empty($_SESSION['is_super'])) {
+                        error_log("Warning: Empty permissions loaded for NON-super user ID {$_SESSION['user_id']} (no tenant)");
+                    }
                 }
                 return;
             }
@@ -90,8 +102,13 @@ if (!function_exists('loadPermissions')) {
             $currentVersion = (int)$stmt->fetchColumn();
  
             if (!isset($_SESSION['permission_version']) || $_SESSION['permission_version'] !== $currentVersion || empty($_SESSION['permissions'])) {
+                $checkAndSetSuper();
                 $_SESSION['permissions'] = PermissionService::userPermissions($pdo, (int)$_SESSION['user_id'], $tenantIdInt);
                 $_SESSION['permission_version'] = $currentVersion;
+                
+                if (empty($_SESSION['permissions']) && empty($_SESSION['is_super'])) {
+                    error_log("Warning: Empty permissions loaded for NON-super user ID {$_SESSION['user_id']} on tenant {$tenantIdInt}");
+                }
             }
         }
     }
@@ -189,14 +206,14 @@ if (!function_exists('getCurrentUser')) {
         $tenantId = $_SESSION['tenant_id'] ?? null;
         try {
             if ($tenantId === null || $tenantId === '') {
-                $stmt = $pdo->prepare("SELECT * FROM `users` WHERE `email` = ?");
+                $stmt = $pdo->prepare("SELECT `id`, `employee_number`, `full_name`, `email`, `role`, `employment_status`, `department`, `org_unit_id`, `work_location`, `immediate_supervisor`, `department_manager`, `profile_image`, `job_title`, `base_salary`, `payroll_schedule_id`, `emergency_name`, `emergency_phone`, `phone`, `bio`, `tier`, `employee_id`, `first_name`, `last_name`, `work_email`, `manager_id`, `hire_date`, `tenant_id`, `organization_unit_1`, `organization_unit_2`, `organization_unit_3`, `organization_unit_4`, `totp_enabled`, `is_mwe`, `must_change_password` FROM `users` WHERE `email` = ?");
                 $stmt->execute([$_SESSION['user_email']]);
                 $cachedUser = $stmt->fetch();
                 if ($cachedUser && $cachedUser['tenant_id']) {
                     $_SESSION['tenant_id'] = $cachedUser['tenant_id']; // Auto-heal session
                 }
             } else {
-                $stmt = $pdo->prepare("SELECT * FROM `users` WHERE `email` = ? AND `tenant_id` = ?");
+                $stmt = $pdo->prepare("SELECT `id`, `employee_number`, `full_name`, `email`, `role`, `employment_status`, `department`, `org_unit_id`, `work_location`, `immediate_supervisor`, `department_manager`, `profile_image`, `job_title`, `base_salary`, `payroll_schedule_id`, `emergency_name`, `emergency_phone`, `phone`, `bio`, `tier`, `employee_id`, `first_name`, `last_name`, `work_email`, `manager_id`, `hire_date`, `tenant_id`, `organization_unit_1`, `organization_unit_2`, `organization_unit_3`, `organization_unit_4`, `totp_enabled`, `is_mwe`, `must_change_password` FROM `users` WHERE `email` = ? AND `tenant_id` = ?");
                 $stmt->execute([$_SESSION['user_email'], $tenantId]);
                 $cachedUser = $stmt->fetch();
             }

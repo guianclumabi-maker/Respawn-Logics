@@ -17,6 +17,12 @@ interface AuthUser {
   tenant_id?: number;
   tenant_setup_mode?: string;
   theme?: string;
+  tier_config?: {
+    default_scope: string;
+    org_units: boolean;
+    custom_roles?: boolean;
+    roles_limit?: number;
+  };
 }
 
 interface AuthContextType {
@@ -68,6 +74,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // ── Login ──
   const login = useCallback(
     async (email: string, password: string): Promise<{ success: boolean; error?: string; redirect?: string }> => {
+      if (!(window as any).__CSRF_TOKEN__) {
+        try {
+          const tokenRes = await fetch(`${API_BASE}/api/index.php?route=auth&action=csrf`, { credentials: "include" });
+          const tokenData = await tokenRes.json();
+          if (tokenData.success && tokenData.csrf_token) {
+            (window as any).__CSRF_TOKEN__ = tokenData.csrf_token;
+          }
+        } catch (e) {
+          console.error("Failed to fetch initial CSRF token", e);
+        }
+      }
+
       try {
         const res = await fetch(
           `${API_BASE}/api/index.php?route=auth&action=login`,
@@ -120,10 +138,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     window.location.hash = "#/login";
   }, []);
 
-  const hasPermission = (perm: string) => user?.permissions?.includes(perm) ?? false;
   const hasRole = (role: string | string[]) => {
     if (Array.isArray(role)) return role.some((r) => user?.roles?.includes(r));
     return user?.roles?.includes(role) ?? false;
+  };
+
+  const hasPermission = (perm: string) => {
+    if (hasRole("Super_Admin")) return true;
+    return user?.permissions?.includes(perm) ?? false;
   };
 
   return (
