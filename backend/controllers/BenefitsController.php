@@ -91,7 +91,7 @@ class BenefitsController
     {
         $planId = intval($input['plan_id'] ?? 0);
         $depCount = intval($input['dependent_count'] ?? 0);
-        $status = $input['status'] ?? 'Enrolled';
+        $status = in_array($input['status'] ?? '', ['Enrolled', 'Waived', 'Pending']) ? $input['status'] : 'Enrolled';
         
         if (!$planId) {
             echo json_encode(['success' => false, 'error' => 'Invalid plan']);

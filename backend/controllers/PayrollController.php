@@ -63,7 +63,7 @@ class PayrollController
                     break;
 
                 case 'assign_schedule':
-                    if (!$this->canRunPayroll()) { echo json_encode(['success' => false, 'error' => 'Denied']); return; }
+                    if (!$this->canRunPayroll()) { http_response_code(403); echo json_encode(['success' => false, 'error' => 'Denied']); return; }
                     $userId = $input['user_id'] ?? 0;
                     $schedId = $input['schedule_id'] ?? 0;
                     
@@ -80,7 +80,7 @@ class PayrollController
                     break;
 
                 case 'generate_run':
-                    if (!$this->canRunPayroll()) { echo json_encode(['success' => false, 'error' => 'Denied']); return; }
+                    if (!$this->canRunPayroll()) { http_response_code(403); echo json_encode(['success' => false, 'error' => 'Denied']); return; }
                     
                     $scheduleId = $input['schedule_id'] ?? 0;
                     $start = $input['start_date'] ?? '';
@@ -106,7 +106,7 @@ class PayrollController
                     break;
 
                 case 'run_details':
-                    if (!$this->canViewPayroll()) { echo json_encode(['success' => false, 'error' => 'Denied']); return; }
+                    if (!$this->canViewPayroll()) { http_response_code(403); echo json_encode(['success' => false, 'error' => 'Denied']); return; }
                     $runId = intval($_GET['id'] ?? 0);
 
                     $runStmt = $this->pdo->prepare("SELECT * FROM `payroll_runs` WHERE `id` = ? AND `tenant_id` = ?");
@@ -141,6 +141,10 @@ class PayrollController
                 case 'update_run_status':
                     $runId = $input['run_id'] ?? 0;
                     $status = $input['status'] ?? ''; 
+
+                    if (!in_array($status, ['Draft', 'Processing', 'Approved', 'Processed', 'Locked', 'Rejected'])) {
+                        http_response_code(400); echo json_encode(['success' => false, 'error' => 'Invalid status provided']); return;
+                    }
 
                     if (in_array($status, ['Approved', 'Processed'])) {
                         if (!$this->canApprovePayroll()) {

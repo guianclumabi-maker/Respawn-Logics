@@ -323,6 +323,14 @@ class IAMController
 
                 $userId = $data['user_id'] ?? 0;
                 $orgUnitId = !empty($data['org_unit_id']) ? $data['org_unit_id'] : null;
+                
+                if ($orgUnitId) {
+                    $chk = $this->pdo->prepare("SELECT id FROM org_units WHERE id = ? AND tenant_id = ?");
+                    $chk->execute([$orgUnitId, $this->tenantId]);
+                    if (!$chk->fetchColumn()) {
+                        http_response_code(400); echo json_encode(['success' => false, 'error' => 'Invalid org unit']); return;
+                    }
+                }
                 $stmt = $this->pdo->prepare("UPDATE users SET org_unit_id = ? WHERE id = ? AND tenant_id = ?");
                 $stmt->execute([$orgUnitId, $userId, $this->tenantId]);
                 
