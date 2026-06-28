@@ -63,9 +63,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           const loginToken = hashQuery.get('login_token');
           if (loginToken) {
             // Exchange the one-time token for a proper session
-            await fetch(`${API_BASE}/api.php?action=exchange_token&token=${encodeURIComponent(loginToken)}`, {
+            const exchangeRes = await fetch(`${API_BASE}/api.php?action=exchange_token&token=${encodeURIComponent(loginToken)}`, {
               credentials: 'include'
             });
+            const exchangeData = await exchangeRes.json();
+            console.log("Token exchange response:", exchangeData);
+            if (!exchangeData.success) {
+              console.error("Token exchange failed:", exchangeData.error);
+            }
             // Clean the token out of the URL so it can't be reused via browser history
             const cleanHash = hashPart.slice(0, queryStart);
             window.history.replaceState(null, '', window.location.pathname + window.location.search + cleanHash);

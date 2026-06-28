@@ -4,6 +4,9 @@ if (file_exists(__DIR__ . '/../vendor/autoload.php')) {
     require_once __DIR__ . '/../vendor/autoload.php';
 }
 
+// Force all date/time operations to UTC to prevent timezone offset bugs with tokens
+date_default_timezone_set('UTC');
+
 // 1. Load Environment Variables
 $envFile = __DIR__ . '/../.env';
 $localEnv = file_exists($envFile) ? parse_ini_file($envFile) : [];
