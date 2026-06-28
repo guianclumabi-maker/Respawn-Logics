@@ -21,8 +21,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit(0);
 }
 
+$action = $_GET['action'] ?? '';
+
 // ── Public: exchange one-time login token (called by React right after registration) ──
-if ($_SERVER['REQUEST_METHOD'] === 'GET' && ($action ?? '') === 'exchange_token') {
+if ($_SERVER['REQUEST_METHOD'] === 'GET' && $action === 'exchange_token') {
     $token = trim($_GET['token'] ?? '');
     if (empty($token)) {
         http_response_code(400);
@@ -80,8 +82,6 @@ if (!isLoggedIn()) {
     exit;
 }
 
-$action = $_GET['action'] ?? '';
-
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     if ($action === 'current_user') {
         global $pdo;
@@ -94,7 +94,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 
         // Fetch User Roles Names
         $stmt = $pdo->prepare("
-            SELECT r.name 
+            SELECT r.name
             FROM roles r
             JOIN user_roles ur ON r.id = ur.role_id
             WHERE ur.user_id = ?
