@@ -125,6 +125,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       await fetch(`${API_BASE}/api/index.php?route=auth&action=logout`, {
         method: "POST",
+        headers: {
+          "X-CSRF-Token": (window as any).__CSRF_TOKEN__ || ""
+        },
         credentials: "include",
       });
     } catch {
