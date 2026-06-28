@@ -88,6 +88,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
             // The token is stored in the DB and React exchanges it for a real session via the API.
             $loginToken = bin2hex(random_bytes(32));
             $tokenExpiry = date('Y-m-d H:i:s', time() + 300); // 5 minutes
+
+            // Ensure the table exists (self-healing — no separate migration needed)
+            $pdo->exec("CREATE TABLE IF NOT EXISTS `user_activation_tokens` (
+                `id`         INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+                `user_id`    INT UNSIGNED NOT NULL,
+                `token`      VARCHAR(128) NOT NULL UNIQUE,
+                `expires_at` DATETIME     NOT NULL,
+                `used_at`    DATETIME     NULL DEFAULT NULL,
+                `created_at` DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                INDEX `idx_token` (`token`),
+                INDEX `idx_user`  (`user_id`)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;");
+
             $stmtToken = $pdo->prepare(
                 "INSERT INTO user_activation_tokens (user_id, token, expires_at, created_at) VALUES (?, ?, ?, NOW())"
             );
