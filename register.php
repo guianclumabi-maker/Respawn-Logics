@@ -85,6 +85,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
             $pdo->commit();
 
             // 5. Auto-login
+            session_regenerate_id(true);
             $_SESSION['user_id'] = $userId;
             $_SESSION['user_email'] = $email;
             $_SESSION['user_name'] = $fullName;
