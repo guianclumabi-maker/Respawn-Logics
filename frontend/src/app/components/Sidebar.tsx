@@ -108,6 +108,16 @@ const getSections = (hasPermission: (p: string) => boolean, hasRole: (r: string 
     ],
   },
   {
+    title: "My Space",
+    hide: isAtsContext,
+    items: [
+      { label: "My Profile", view: "My Profile", icon: <UserCog size={19} /> },
+      { label: "My Leave", view: "My Leave", icon: <CalendarCheck size={19} /> },
+      { label: "My Payslips", view: "My Payslips", icon: <Banknote size={19} /> },
+      { label: "My Compensation", view: "My Compensation", icon: <Scale size={19} /> },
+    ]
+  },
+  {
     title: "Administration",
     hide: isAtsContext || !(hasPermission("users.view") || hasPermission("settings.manage")),
     items: [

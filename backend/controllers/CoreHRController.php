@@ -32,6 +32,14 @@ class CoreHRController
                 case 'directory':
                     $this->directory();
                     break;
+                case 'my_profile':
+                    // Self-service: return the current user's own profile (safe fields only).
+                    $this->myProfile();
+                    break;
+                case 'update_my_profile':
+                    // Self-service: any authenticated user may edit their OWN profile (whitelisted fields only).
+                    $this->updateMyProfile($input);
+                    break;
                 case 'update_master_record':
                     if (!hasPermission('employees.manage')) { http_response_code(403); echo json_encode(['success'=>false, 'error'=>'Denied']); return; }
                 $this->updateMasterRecord($input);
@@ -82,6 +90,67 @@ class CoreHRController
         $employees = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         echo json_encode(['success' => true, 'data' => $employees]);
+    }
+
+    /**
+     * Self-service profile read — returns the current user's own profile (safe, non-sensitive fields only).
+     */
+    private function myProfile()
+    {
+        $userId = is_array($this->currentUser) && isset($this->currentUser['id']) ? (int)$this->currentUser['id'] : 0;
+        if ($userId <= 0) {
+            http_response_code(403);
+            echo json_encode(['success' => false, 'error' => 'No user context']);
+            return;
+        }
+        $stmt = $this->pdo->prepare("SELECT `id`, `employee_id`, `full_name`, `email`, `work_email`, `job_title`, `department`, `phone`, `emergency_name`, `emergency_phone`, `bio`, `profile_image` FROM `users` WHERE `id` = ? AND `tenant_id` = ? LIMIT 1");
+        $stmt->execute([$userId, $this->tenantId]);
+        $profile = $stmt->fetch(PDO::FETCH_ASSOC);
+        if (!$profile) {
+            echo json_encode(['success' => false, 'error' => 'Profile not found']);
+            return;
+        }
+        echo json_encode(['success' => true, 'data' => $profile]);
+    }
+
+    /**
+     * Self-service profile update. The logged-in user may edit ONLY their own
+     * row and ONLY a whitelisted set of non-sensitive fields. Role, salary,
+     * email, employment status, tenant, and org fields can never be changed here.
+     */
+    private function updateMyProfile($input)
+    {
+        $userId = is_array($this->currentUser) && isset($this->currentUser['id']) ? (int)$this->currentUser['id'] : 0;
+        if ($userId <= 0) {
+            http_response_code(403);
+            echo json_encode(['success' => false, 'error' => 'No user context']);
+            return;
+        }
+
+        // Hardcoded whitelist — column names are never taken from user input.
+        $allowed = ['phone', 'emergency_name', 'emergency_phone', 'bio'];
+        $sets = [];
+        $params = [];
+        foreach ($allowed as $field) {
+            if (array_key_exists($field, $input)) {
+                $sets[] = "`$field` = ?";
+                $params[] = is_string($input[$field]) ? trim($input[$field]) : $input[$field];
+            }
+        }
+
+        if (empty($sets)) {
+            echo json_encode(['success' => false, 'error' => 'No editable fields provided']);
+            return;
+        }
+
+        // Scope the update to the current user's own row within their tenant (fail closed).
+        $params[] = $userId;
+        $params[] = $this->tenantId;
+        $sql = "UPDATE `users` SET " . implode(', ', $sets) . " WHERE `id` = ? AND `tenant_id` = ?";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute($params);
+
+        echo json_encode(['success' => true, 'message' => 'Profile updated']);
     }
 
     private function masterRecord()

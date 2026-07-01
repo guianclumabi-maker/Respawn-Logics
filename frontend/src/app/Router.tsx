@@ -24,6 +24,12 @@ import { PayrollManager } from "./pages/PayrollManager";
 import { ServiceDesk } from "./pages/ServiceDesk";
 import { SetupModeCards } from "./pages/SetupModeCards";
 
+// Self-Service (ESS)
+import { MyPayslips } from "./pages/my/MyPayslips";
+import { MyLeave } from "./pages/my/MyLeave";
+import { MyCompensation } from "./pages/my/MyCompensation";
+import { MyProfile } from "./pages/my/MyProfile";
+
 // ATS Components
 import { ATSDashboard } from "./components/ATSDashboard";
 import { PipelineBoard } from "./components/PipelineBoard";
@@ -97,6 +103,12 @@ export const router = createHashRouter([
       { path: "performance", element: <PerformanceAdmin /> },
       { path: "knowledge", element: <KnowledgeAdmin /> },
       { path: "surveys", element: <Surveys /> },
+      
+      // Self-Service Routes
+      { path: "my/payslips", element: <MyPayslips /> },
+      { path: "my/leave", element: <MyLeave /> },
+      { path: "my/compensation", element: <MyCompensation /> },
+      { path: "my/profile", element: <MyProfile /> },
       {
         path: "ats",
         children: [

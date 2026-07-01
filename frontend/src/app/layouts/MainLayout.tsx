@@ -20,6 +20,12 @@ export default function MainLayout() {
     if (path.includes("/employee-relations")) return { view: "Employee Relations" };
     if (path.includes("/onboarding")) return { view: "Onboarding" };
     
+    // Self-Service (ESS)
+    if (path.includes("/my/payslips")) return { view: "My Payslips" };
+    if (path.includes("/my/leave")) return { view: "My Leave" };
+    if (path.includes("/my/compensation")) return { view: "My Compensation" };
+    if (path.includes("/my/profile")) return { view: "My Profile" };
+    
     // Core HR
     if (path.includes("/hr-directory")) return { view: "HR Directory" };
     if (path.includes("/org-chart")) return { view: "Org Chart" };
