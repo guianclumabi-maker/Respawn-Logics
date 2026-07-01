@@ -153,6 +153,15 @@ export function LoginPage() {
               )}
             </button>
           </form>
+
+          <div className="mt-5 text-center">
+            <a
+              href={`${window.location.origin}${window.location.hostname === "localhost" ? "/respawn-logics" : ""}/forgot-password.php`}
+              className="text-xs text-slate-400 hover:text-[#00e07a] transition-colors"
+            >
+              Forgot your password?
+            </a>
+          </div>
         </div>
 
         <p className="text-center text-xs text-slate-600 mt-6">
