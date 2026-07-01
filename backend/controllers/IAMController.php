@@ -48,6 +48,8 @@ class IAMController
                 // allowed
             } elseif ($action === 'change_tier' && hasPermission('settings.manage')) {
                 // allowed
+            } elseif (in_array($action, ['tenant_settings', 'update_tenant_settings']) && hasPermission('settings.manage')) {
+                // allowed — tenant admins manage their own workspace settings
             } else {
                 http_response_code(403);
                 echo json_encode(['success' => false, 'error' => 'Forbidden']);
@@ -66,6 +68,76 @@ class IAMController
                 error_log('[' . __CLASS__ . '] ' . $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine());
             http_response_code(500);
             echo json_encode(['success' => false, 'error' => 'An internal error occurred. Please try again.']);
+            }
+            return;
+        }
+
+        // ── Tenant Settings: read the current workspace settings ──
+        if ($action === 'tenant_settings' && $_SERVER['REQUEST_METHOD'] === 'GET') {
+            try {
+                $stmt = $this->pdo->prepare("SELECT `id`, `company_name`, `contact_email`, `subscription_tier`, `status`, `setup_mode`, `logo`, `timezone`, `locale`, `enforce_2fa`, `notification_prefs` FROM `tenants` WHERE `id` = ? LIMIT 1");
+                $stmt->execute([$this->tenantId]);
+                $t = $stmt->fetch(PDO::FETCH_ASSOC);
+                if (!$t) {
+                    http_response_code(404);
+                    echo json_encode(['success' => false, 'error' => 'Tenant not found']);
+                    return;
+                }
+                $t['enforce_2fa'] = (int)($t['enforce_2fa'] ?? 0);
+                $t['notification_prefs'] = !empty($t['notification_prefs']) ? json_decode($t['notification_prefs'], true) : new stdClass();
+                echo json_encode(['success' => true, 'data' => $t]);
+            } catch (Exception $e) {
+                http_response_code(500);
+                error_log('[' . __CLASS__ . '] ' . $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine());
+                echo json_encode(['success' => false, 'error' => 'An internal error occurred. Please try again.']);
+            }
+            return;
+        }
+
+        // ── Tenant Settings: update workspace settings (whitelisted, own tenant only) ──
+        if ($action === 'update_tenant_settings' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+            try {
+                $input = json_decode(file_get_contents('php://input'), true) ?? [];
+                $sets = [];
+                $params = [];
+
+                // Plain text/URL fields
+                foreach (['company_name', 'contact_email', 'logo', 'timezone', 'locale'] as $f) {
+                    if (array_key_exists($f, $input)) {
+                        $val = is_string($input[$f]) ? trim($input[$f]) : $input[$f];
+                        if ($f === 'contact_email' && $val !== '' && !filter_var($val, FILTER_VALIDATE_EMAIL)) {
+                            echo json_encode(['success' => false, 'error' => 'Invalid contact email']);
+                            return;
+                        }
+                        $sets[] = "`$f` = ?";
+                        $params[] = $val;
+                    }
+                }
+                // Boolean toggle
+                if (array_key_exists('enforce_2fa', $input)) {
+                    $sets[] = "`enforce_2fa` = ?";
+                    $params[] = !empty($input['enforce_2fa']) ? 1 : 0;
+                }
+                // JSON blob
+                if (array_key_exists('notification_prefs', $input)) {
+                    $sets[] = "`notification_prefs` = ?";
+                    $params[] = json_encode($input['notification_prefs']);
+                }
+
+                if (empty($sets)) {
+                    echo json_encode(['success' => false, 'error' => 'No settings provided']);
+                    return;
+                }
+
+                // Never allow changing id / subscription_tier / status / setup_mode here (tier has its own gated action).
+                $params[] = $this->tenantId;
+                $sql = "UPDATE `tenants` SET " . implode(', ', $sets) . " WHERE `id` = ?";
+                $this->pdo->prepare($sql)->execute($params);
+                echo json_encode(['success' => true, 'message' => 'Settings updated']);
+            } catch (Exception $e) {
+                http_response_code(500);
+                error_log('[' . __CLASS__ . '] ' . $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine());
+                echo json_encode(['success' => false, 'error' => 'An internal error occurred. Please try again.']);
             }
             return;
         }
