@@ -56,6 +56,22 @@ class ELRController
                         echo json_encode(['success' => false, 'error' => 'Invalid method']);
                     }
                     break;
+                case 'copilot':
+                    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+                        $this->copilot($input);
+                    } else {
+                        echo json_encode(['success' => false, 'error' => 'Invalid method']);
+                    }
+                    break;
+                case 'kb_list':
+                    $this->kbList();
+                    break;
+                case 'kb_add':
+                    $this->kbAdd($input);
+                    break;
+                case 'kb_approve':
+                    $this->kbApprove($input);
+                    break;
                 default:
                     http_response_code(400);
                     echo json_encode(['success' => false, 'error' => 'Invalid action']);
@@ -64,6 +80,184 @@ class ELRController
         } catch (\Exception $e) {
             echo json_encode(['success' => false, 'error' => 'Database error']);
         }
+    }
+
+    /**
+     * ELR Copilot — Retrieval-Augmented Generation over the labor-law corpus.
+     * Full-text searches the (global, provider-curated) labor_references + elr_precedents,
+     * then asks Gemini to answer STRICTLY from those retrieved sources, with citations.
+     */
+    private function copilot($input)
+    {
+        $question = trim($input['question'] ?? '');
+        if ($question === '') {
+            echo json_encode(['success' => false, 'error' => 'A question is required.']);
+            return;
+        }
+
+        $sources = [];
+        $contextParts = [];
+
+        // 1a. Retrieve DOLE/statutory references (only Approved entries are used for grounding)
+        $stmtRef = $this->pdo->prepare(
+            "SELECT `id`, `category`, `title`, `summary`, `source_type`, `official_url`
+             FROM `labor_references`
+             WHERE `status` = 'Approved' AND MATCH(`title`, `summary`) AGAINST (? IN NATURAL LANGUAGE MODE)
+             LIMIT 4"
+        );
+        $stmtRef->execute([$question]);
+        while ($r = $stmtRef->fetch(PDO::FETCH_ASSOC)) {
+            $contextParts[] = "[DOLE / Statutory Reference] {$r['title']} ({$r['category']}): {$r['summary']}";
+            $sources[] = ['type' => 'reference', 'title' => $r['title'], 'reference' => $r['source_type'], 'url' => $r['official_url']];
+        }
+
+        // 1b. Retrieve Supreme Court jurisprudence / internal precedents
+        $stmtPre = $this->pdo->prepare(
+            "SELECT `id`, `case_type`, `title`, `summary`, `key_principles`, `source_reference`, `risk_level`, `recommended_process`
+             FROM `elr_precedents`
+             WHERE MATCH(`case_type`, `title`, `summary`, `key_principles`) AGAINST (? IN NATURAL LANGUAGE MODE)
+             LIMIT 4"
+        );
+        $stmtPre->execute([$question]);
+        while ($p = $stmtPre->fetch(PDO::FETCH_ASSOC)) {
+            $contextParts[] = "[Jurisprudence] {$p['title']} ({$p['case_type']}, Risk: {$p['risk_level']}). Key principles: {$p['key_principles']}. Recommended process: {$p['recommended_process']}. Source: {$p['source_reference']}";
+            $sources[] = ['type' => 'precedent', 'title' => $p['title'], 'reference' => $p['source_reference'], 'risk_level' => $p['risk_level']];
+        }
+
+        $context = empty($contextParts)
+            ? "NO MATCHING SOURCES FOUND IN THE KNOWLEDGE BASE."
+            : implode("\n\n", $contextParts);
+
+        // 2. Ask Gemini, grounded strictly on the retrieved sources
+        $answer = $this->askGeminiGrounded($question, $context);
+
+        echo json_encode([
+            'success'  => true,
+            'answer'   => $answer,
+            'sources'  => $sources,
+            'grounded' => !empty($contextParts)
+        ]);
+    }
+
+    /**
+     * Calls Gemini, instructing it to answer only from the supplied labor-law context.
+     * Reuses the same integration approach as the AI Companion.
+     */
+    private function askGeminiGrounded($question, $context)
+    {
+        $apiKey = getenv('GEMINI_API_KEY');
+        if (empty($apiKey) || $apiKey === 'YOUR_GEMINI_API_KEY_HERE') {
+            return "⚠️ The AI engine is not configured (GEMINI_API_KEY missing). The matching sources are listed below for manual review.";
+        }
+
+        $systemPrompt = "You are a Philippine Employee & Labor Relations legal assistant. "
+            . "Answer the user's question STRICTLY based on the provided SOURCES (DOLE advisories and Supreme Court jurisprudence). "
+            . "Cite the specific source titles you rely on. If the SOURCES do not cover the question, say so plainly and advise consulting a labor lawyer or DOLE — never invent legal rules or cite laws not in the sources. "
+            . "Be practical and process-oriented (e.g., due-process steps). End with a brief note that this is guidance, not legal advice.";
+
+        $fullPrompt = "SYSTEM: {$systemPrompt}\n\nSOURCES:\n{$context}\n\nQUESTION:\n{$question}";
+
+        $data = [
+            "contents" => [["parts" => [["text" => $fullPrompt]]]],
+            "generationConfig" => ["temperature" => 0.2]
+        ];
+
+        $ch = curl_init("https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent");
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
+        curl_setopt($ch, CURLOPT_HTTPHEADER, ["Content-Type: application/json", "x-goog-api-key: " . $apiKey]);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 30);
+        $response = curl_exec($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
+
+        if ($httpCode === 200) {
+            $rd = json_decode($response, true);
+            if (isset($rd['candidates'][0]['content']['parts'][0]['text'])) {
+                return $rd['candidates'][0]['content']['parts'][0]['text'];
+            }
+        }
+        error_log('[ELRController] Gemini call failed: HTTP ' . $httpCode);
+        return "The AI engine could not generate a response right now. Please review the matching sources below, or try again shortly.";
+    }
+
+    /**
+     * List the labor-law corpus (global, provider-curated). Readable by any ELR user.
+     */
+    private function kbList()
+    {
+        $refs = $this->pdo->query(
+            "SELECT `id`, `category`, `title`, `summary`, `source_type`, `official_url`, `effective_date`, `status`, `created_at`
+             FROM `labor_references` ORDER BY `created_at` DESC"
+        )->fetchAll(PDO::FETCH_ASSOC);
+        $precs = $this->pdo->query(
+            "SELECT `id`, `case_type`, `title`, `summary`, `key_principles`, `source_reference`, `risk_level`, `recommended_process`, `created_at`
+             FROM `elr_precedents` ORDER BY `created_at` DESC"
+        )->fetchAll(PDO::FETCH_ASSOC);
+        echo json_encode(['success' => true, 'labor_references' => $refs, 'precedents' => $precs]);
+    }
+
+    /**
+     * Add a corpus entry. Corpus is global/shared across tenants (the law is the same for
+     * everyone), so writes are restricted to platform admins (Super_Admin) to keep quality high.
+     */
+    private function kbAdd($input)
+    {
+        if (empty($_SESSION['is_super'])) {
+            http_response_code(403);
+            echo json_encode(['success' => false, 'error' => 'Only platform administrators can edit the labor-law corpus.']);
+            return;
+        }
+        $type = $input['type'] ?? 'reference';
+        if ($type === 'precedent') {
+            $stmt = $this->pdo->prepare(
+                "INSERT INTO `elr_precedents` (`case_type`, `title`, `summary`, `key_principles`, `source_reference`, `risk_level`, `recommended_process`)
+                 VALUES (?, ?, ?, ?, ?, ?, ?)"
+            );
+            $stmt->execute([
+                trim($input['case_type'] ?? ''),
+                trim($input['title'] ?? ''),
+                trim($input['summary'] ?? ''),
+                trim($input['key_principles'] ?? ''),
+                trim($input['source_reference'] ?? ''),
+                in_array($input['risk_level'] ?? 'Medium', ['Low', 'Medium', 'High', 'Critical'], true) ? $input['risk_level'] : 'Medium',
+                trim($input['recommended_process'] ?? '')
+            ]);
+        } else {
+            // Labor references start as 'Pending' — only 'Approved' entries are used for RAG grounding.
+            $stmt = $this->pdo->prepare(
+                "INSERT INTO `labor_references` (`category`, `title`, `summary`, `source_type`, `official_url`, `effective_date`, `status`)
+                 VALUES (?, ?, ?, ?, ?, ?, 'Pending')"
+            );
+            $stmt->execute([
+                trim($input['category'] ?? ''),
+                trim($input['title'] ?? ''),
+                trim($input['summary'] ?? ''),
+                trim($input['source_type'] ?? 'Manual Entry'),
+                trim($input['official_url'] ?? '') ?: null,
+                !empty($input['effective_date']) ? $input['effective_date'] : null
+            ]);
+        }
+        echo json_encode(['success' => true, 'message' => 'Corpus entry added.']);
+    }
+
+    /**
+     * Approve / reject a labor reference so it becomes (in)eligible for RAG grounding. Platform admins only.
+     */
+    private function kbApprove($input)
+    {
+        if (empty($_SESSION['is_super'])) {
+            http_response_code(403);
+            echo json_encode(['success' => false, 'error' => 'Only platform administrators can review the corpus.']);
+            return;
+        }
+        $id = (int)($input['id'] ?? 0);
+        $status = in_array($input['status'] ?? 'Approved', ['Pending', 'Approved', 'Rejected'], true) ? $input['status'] : 'Approved';
+        $reviewer = is_array($this->currentUser) ? ($this->currentUser['full_name'] ?? 'Admin') : 'Admin';
+        $stmt = $this->pdo->prepare("UPDATE `labor_references` SET `status` = ?, `reviewed_by` = ? WHERE `id` = ?");
+        $stmt->execute([$status, $reviewer, $id]);
+        echo json_encode(['success' => true, 'message' => 'Corpus entry updated.']);
     }
 
     private function addTimelineEvent($caseId, $eventType, $description, $actor = null, $oldValue = null, $newValue = null) {
