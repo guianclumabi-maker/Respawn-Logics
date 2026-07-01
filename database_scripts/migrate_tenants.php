@@ -18,6 +18,27 @@ try {
 
     echo "Tenants table created successfully.\n";
 
+    // Add settings columns idempotently (safe to re-run on every deploy)
+    $tenantCols = [
+        'setup_mode'                => "VARCHAR(20) DEFAULT 'Solo'",
+        'logo'                      => "VARCHAR(255) DEFAULT NULL",
+        'timezone'                  => "VARCHAR(64) DEFAULT 'Asia/Manila'",
+        'locale'                    => "VARCHAR(20) DEFAULT 'en-PH'",
+        'enforce_2fa'               => "TINYINT(1) NOT NULL DEFAULT 0",
+        'notification_prefs'        => "TEXT DEFAULT NULL",
+        'support_access_expires_at' => "DATETIME NULL DEFAULT NULL",
+    ];
+    foreach ($tenantCols as $col => $def) {
+        $exists = (int)$pdo->query(
+            "SELECT COUNT(*) FROM information_schema.COLUMNS
+             WHERE table_schema = DATABASE() AND table_name = 'tenants' AND column_name = " . $pdo->quote($col)
+        )->fetchColumn();
+        if ($exists === 0) {
+            $pdo->exec("ALTER TABLE `tenants` ADD COLUMN `$col` $def");
+            echo "Added tenants.$col\n";
+        }
+    }
+
     $pdo->exec("CREATE TABLE IF NOT EXISTS `tenant_modules` (
         `tenant_id` VARCHAR(50) NOT NULL,
         `module_key` VARCHAR(50) NOT NULL,
