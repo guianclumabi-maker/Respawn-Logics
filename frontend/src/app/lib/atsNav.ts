@@ -9,6 +9,12 @@ export function viewStateToPath(viewState: ViewState): string {
     case "My HR Cases": return "/employee-relations";
     case "Onboarding": return "/onboarding";
     
+    // Self-Service (ESS)
+    case "My Payslips": return "/my/payslips";
+    case "My Leave": return "/my/leave";
+    case "My Compensation": return "/my/compensation";
+    case "My Profile": return "/my/profile";
+    
     // Core HR
     case "HR Directory": return "/hr-directory";
     case "Org Chart": return "/org-chart";
