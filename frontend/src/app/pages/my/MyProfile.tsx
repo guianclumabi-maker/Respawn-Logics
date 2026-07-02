@@ -254,6 +254,32 @@ export function MyProfile() {
               </div>
             </div>
 
+            {/* Security Policy */}
+            <div className="bg-[#161922]/70 border border-white/5 rounded-xl p-6 shadow-lg space-y-4">
+              <h3 className="text-sm font-bold text-white uppercase tracking-wider border-b border-white/5 pb-2 flex items-center gap-2">
+                <ShieldAlert size={16} className="text-red-500" /> Security & Authentication
+              </h3>
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div className="space-y-1">
+                  <span className="block text-xs text-gray-400 font-semibold uppercase tracking-wider">Two-Factor Authentication (2FA)</span>
+                  <p className="text-xs text-gray-500 font-sans leading-relaxed">
+                    Protect your account with an extra layer of security. Enforcing 2FA requires entering a dynamic verification code from your authenticator app upon logging in.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const isLocal = window.location.hostname === "localhost";
+                    const basePath = isLocal ? "/respawn-logics" : "";
+                    window.location.href = `${window.location.origin}${basePath}/setup_2fa.php`;
+                  }}
+                  className="px-4 py-2.5 bg-white/5 hover:bg-white/10 border border-white/10 text-white rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 self-start sm:self-center cursor-pointer"
+                >
+                  Enable / Manage Two-Factor Authentication
+                </button>
+              </div>
+            </div>
+
             {/* Save Button */}
             <div className="flex justify-end pt-2">
               <button 

@@ -137,6 +137,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                     exit;
                 }
 
+                // ── 2FA ENFORCEMENT (tenant requires 2FA, user not yet enrolled) ──
+                $enforce2fa = false;
+                try {
+                    $tstmt = $pdo->prepare("SELECT `enforce_2fa` FROM `tenants` WHERE `id` = ? LIMIT 1");
+                    $tstmt->execute([$user['tenant_id']]);
+                    $enforce2fa = ((int)$tstmt->fetchColumn() === 1);
+                } catch (\Throwable $e) {
+                    $enforce2fa = false; // fail open — never lock users out on a schema hiccup
+                }
+                if ($enforce2fa) {
+                    session_regenerate_id(true);
+                    $_SESSION['2fa_setup_user_id'] = $user['id'];
+                    unset($_SESSION['2fa_setup_secret']);
+                    header('Location: ' . url('/setup_2fa.php'));
+                    exit;
+                }
+
                 // ── Normal Login (no 2FA) ─────────────────────────────────────
                 session_regenerate_id(true); // Prevent Session Fixation (OWASP A07)
                 try { clearRateLimit($pdo, $clientIp); } catch (PDOException $e) {}
