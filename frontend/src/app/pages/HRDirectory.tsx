@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useAuth } from "../context/AuthContext";
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || (window.location.origin + (window.location.hostname === "localhost" ? "/respawn-logics" : ""));
 const API = `${API_BASE}/api/index.php?route=core_hr`;
@@ -14,6 +15,7 @@ interface Employee {
 }
 
 export function HRDirectory() {
+  const { hasPermission } = useAuth();
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
@@ -63,6 +65,12 @@ export function HRDirectory() {
     return name.split(" ").map(n => n[0]).join("").substring(0, 2).toUpperCase();
   };
 
+  const handleExport = () => {
+    const isLocal = window.location.hostname === "localhost";
+    const basePath = isLocal ? "/respawn-logics" : "";
+    window.open(`${window.location.origin}${basePath}/api/index.php?route=export&action=employees`, '_blank');
+  };
+
   return (
     <div className="flex-1 flex flex-col h-full overflow-hidden">
       {/* Header */}
@@ -74,10 +82,21 @@ export function HRDirectory() {
             </h1>
             <p className="text-sm text-gray-400">Core HR &bull; Manage personnel records</p>
           </div>
-          <button className="px-4 py-2 bg-[#00e07a]/10 text-[#00e07a] border border-[#00e07a]/20 rounded-lg text-sm font-medium hover:bg-[#00e07a]/20 transition-all shadow-[0_0_15px_rgba(0,224,122,0.15)] flex items-center gap-2">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
-            Add Employee
-          </button>
+          <div className="flex gap-3">
+            {hasPermission("employees.view") && (
+              <button 
+                onClick={handleExport}
+                className="px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/10 text-white rounded-lg text-sm font-medium transition-all flex items-center gap-2 cursor-pointer"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                Export CSV
+              </button>
+            )}
+            <button className="px-4 py-2 bg-[#00e07a]/10 text-[#00e07a] border border-[#00e07a]/20 rounded-lg text-sm font-medium hover:bg-[#00e07a]/20 transition-all shadow-[0_0_15px_rgba(0,224,122,0.15)] flex items-center gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
+              Add Employee
+            </button>
+          </div>
         </div>
       </div>
 
