@@ -43,6 +43,27 @@ class AuthController
                             return;
                         }
 
+                        // 1b. 2FA ENFORCEMENT — tenant requires 2FA but this user has not enrolled yet.
+                        $enforce2fa = false;
+                        try {
+                            $tstmt = $this->pdo->prepare("SELECT `enforce_2fa` FROM `tenants` WHERE `id` = ? LIMIT 1");
+                            $tstmt->execute([$user['tenant_id']]);
+                            $enforce2fa = ((int)$tstmt->fetchColumn() === 1);
+                        } catch (\Throwable $e) {
+                            $enforce2fa = false; // fail OPEN: never lock users out on a DB/schema hiccup
+                        }
+                        if ($enforce2fa) {
+                            // Partial state only — the user is NOT fully logged in until enrollment completes.
+                            $_SESSION['2fa_setup_user_id'] = $user['id'];
+                            unset($_SESSION['2fa_setup_secret']);
+                            echo json_encode([
+                                'success' => true,
+                                'require_2fa_setup' => true,
+                                'redirect' => url('/setup_2fa.php')
+                            ]);
+                            return;
+                        }
+
                         // 2. Check for must_change_password
                         if (!empty($user['must_change_password'])) {
                             $_SESSION['user_id']           = $user['id'];
