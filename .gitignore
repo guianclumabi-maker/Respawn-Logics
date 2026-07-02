@@ -9,4 +9,4 @@ scratch/
 
 storage/tenant_*/
 !storage/.htaccess
-v e n d o r /  
+vendor/
