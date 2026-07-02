@@ -57,6 +57,10 @@ class AttendanceController
                         if (!hasPermission('attendance.manage')) { http_response_code(403); echo json_encode(['success'=>false, 'error'=>'Denied']); return; }
                 $this->approveTimesheet($data);
                         break;
+                    case 'import_punches':
+                        if (!hasPermission('attendance.manage') && empty($_SESSION['is_super'])) { http_response_code(403); echo json_encode(['success'=>false, 'error'=>'Denied']); return; }
+                        $this->importPunches();
+                        break;
                     default:
                         http_response_code(400);
                         echo json_encode(['success' => false, 'error' => 'Invalid action']);
@@ -66,6 +70,125 @@ class AttendanceController
         } catch (\Exception $e) {
             echo json_encode(['success' => false, 'error' => 'Database error']);
         }
+    }
+
+    /**
+     * Bulk-import attendance punches from a CSV (e.g. a biometric-device export).
+     * Matches employees by `employee_id` (biometric ID) or email within the tenant.
+     * Accepts columns: employee_id | email, time_in, time_out (optional), date (optional).
+     */
+    private function importPunches()
+    {
+        if (!isset($_FILES['file']) || $_FILES['file']['error'] !== UPLOAD_ERR_OK) {
+            echo json_encode(['success' => false, 'error' => 'No file uploaded or upload error occurred.']);
+            return;
+        }
+
+        $handle = fopen($_FILES['file']['tmp_name'], 'r');
+        if ($handle === false) {
+            echo json_encode(['success' => false, 'error' => 'Could not read the uploaded file.']);
+            return;
+        }
+
+        $headers = fgetcsv($handle, 0, ',');
+        if (!$headers) {
+            fclose($handle);
+            echo json_encode(['success' => false, 'error' => 'The CSV file appears to be empty.']);
+            return;
+        }
+
+        // Map normalized header name -> column index
+        $idx = [];
+        foreach ($headers as $i => $h) {
+            $key = strtolower(trim(str_replace([' ', '_', '-'], '', (string)$h)));
+            if ($key !== '') $idx[$key] = $i;
+        }
+        $get = function ($row, array $names) use ($idx) {
+            foreach ($names as $n) {
+                if (isset($idx[$n], $row[$idx[$n]])) return trim((string)$row[$idx[$n]]);
+            }
+            return '';
+        };
+
+        // Pre-load this tenant's employees: employee_id -> email, and a valid-email set.
+        $byEmpId = [];
+        $validEmails = [];
+        $ustmt = $this->pdo->prepare("SELECT `employee_id`, `email`, `work_email` FROM `users` WHERE `tenant_id` = ?");
+        $ustmt->execute([$this->tenantId]);
+        while ($u = $ustmt->fetch(PDO::FETCH_ASSOC)) {
+            $mail = $u['email'] ?: ($u['work_email'] ?? '');
+            if ($mail === '') continue;
+            if (!empty($u['employee_id'])) $byEmpId[strtolower((string)$u['employee_id'])] = $mail;
+            $validEmails[strtolower($mail)] = true;
+        }
+
+        $insert = $this->pdo->prepare(
+            "INSERT INTO `attendance` (`tenant_id`, `employee_email`, `time_in`, `time_out`, `status`) VALUES (?, ?, ?, ?, 'Present')"
+        );
+
+        $processed = 0;
+        $skipped = 0;
+        $warnings = [];
+        $line = 1;
+
+        while (($row = fgetcsv($handle, 0, ',')) !== false) {
+            $line++;
+            if (count(array_filter($row, fn($v) => trim((string)$v) !== '')) === 0) continue;
+
+            $empId   = $get($row, ['employeeid', 'biometricid', 'empid', 'employeenumber']);
+            $email   = strtolower($get($row, ['email', 'employeeemail', 'workemail']));
+            $timeIn  = $get($row, ['timein', 'clockin', 'checkin', 'in']);
+            $timeOut = $get($row, ['timeout', 'clockout', 'checkout', 'out']);
+            $date    = $get($row, ['date', 'workdate']);
+
+            // Resolve to a real tenant employee email
+            $resolved = '';
+            if ($email !== '' && isset($validEmails[$email])) {
+                $resolved = $email;
+            } elseif ($empId !== '' && isset($byEmpId[strtolower($empId)])) {
+                $resolved = $byEmpId[strtolower($empId)];
+            }
+            if ($resolved === '') {
+                $skipped++;
+                if (count($warnings) < 50) $warnings[] = "Row {$line}: no matching employee (" . ($empId ?: $email ?: 'blank') . ").";
+                continue;
+            }
+
+            $ti = $this->normalizeDateTime($timeIn, $date);
+            $to = $this->normalizeDateTime($timeOut, $date);
+            if ($ti === null && $to === null) {
+                $skipped++;
+                if (count($warnings) < 50) $warnings[] = "Row {$line}: no valid time_in/time_out value.";
+                continue;
+            }
+
+            $insert->execute([$this->tenantId, $resolved, $ti, $to]);
+            $processed++;
+        }
+        fclose($handle);
+
+        echo json_encode([
+            'success'   => true,
+            'processed' => $processed,
+            'skipped'   => $skipped,
+            'warnings'  => $warnings
+        ]);
+    }
+
+    /** Parse a time value (optionally combined with a separate date column) into 'Y-m-d H:i:s', or null. */
+    private function normalizeDateTime($time, $date = '')
+    {
+        $time = trim((string)$time);
+        if ($time === '') return null;
+        $date = trim((string)$date);
+        $candidates = [];
+        if ($date !== '') $candidates[] = $date . ' ' . $time;
+        $candidates[] = $time;
+        foreach ($candidates as $c) {
+            $ts = strtotime($c);
+            if ($ts !== false) return date('Y-m-d H:i:s', $ts);
+        }
+        return null;
     }
 
     private function calculateStatus($userId, $timeInStr)

@@ -31,6 +31,7 @@ export default function MainLayout() {
     if (path.includes("/hr-directory")) return { view: "HR Directory" };
     if (path.includes("/org-chart")) return { view: "Org Chart" };
     if (path.includes("/leaves")) return { view: "Leaves" };
+    if (path.includes("/attendance/import")) return { view: "Import Attendance" };
     if (path.includes("/attendance")) return { view: "Attendance" };
     if (path.includes("/scheduling")) return { view: "Scheduling" };
     
