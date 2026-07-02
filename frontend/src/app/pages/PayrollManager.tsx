@@ -38,6 +38,7 @@ import {
   Tooltip,
   ResponsiveContainer
 } from 'recharts';
+import { useAuth } from '../context/AuthContext';
 import './PayrollManager.css';
 
 const API_BASE = window.location.origin + (window.location.hostname === 'localhost' ? '/respawn-logics' : '') + '/api/index.php?route=payroll_engine';
@@ -77,6 +78,7 @@ const API = {
 };
 
 export function PayrollManager() {
+  const { hasPermission } = useAuth();
   const [activeTab, setActiveTab] = useState('dashboard');
   const [isLoading, setIsLoading] = useState(true);
   
@@ -1001,6 +1003,12 @@ export function PayrollManager() {
     </div>
   );
 
+  const handleExport = () => {
+    const isLocal = window.location.hostname === 'localhost';
+    const basePath = isLocal ? '/respawn-logics' : '';
+    window.open(`${window.location.origin}${basePath}/api/index.php?route=export&action=payroll`, '_blank');
+  };
+
   return (
     <div className="flex-1 flex flex-col h-full overflow-hidden bg-[#0f172a] relative z-0">
       {/* Global Background Glow Effects */}
@@ -1021,9 +1029,20 @@ export function PayrollManager() {
               <button className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${activeTab === 'govreports' ? 'bg-[#00e07a]/20 text-[#00e07a]' : 'text-gray-400 hover:text-white'}`} onClick={() => setActiveTab('govreports')}>Reports</button>
               <button className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${activeTab === 'settings' ? 'bg-[#00e07a]/20 text-[#00e07a]' : 'text-gray-400 hover:text-white'}`} onClick={() => setActiveTab('settings')}>Settings</button>
             </div>
-            <button className="px-4 py-2 bg-[#00e07a] text-black font-bold rounded-lg text-sm shadow-[0_0_10px_rgba(0,224,122,0.3)] flex items-center gap-2">
-              <PlayCircle size={16} /> New Run
-            </button>
+            <div className="flex gap-3">
+              {hasPermission("payroll.view") && (
+                <button 
+                  onClick={handleExport}
+                  className="px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/10 text-white rounded-lg text-sm font-semibold transition-all flex items-center gap-2 cursor-pointer"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                  Export CSV
+                </button>
+              )}
+              <button className="px-4 py-2 bg-[#00e07a] text-black font-bold rounded-lg text-sm shadow-[0_0_10px_rgba(0,224,122,0.3)] flex items-center gap-2">
+                <PlayCircle size={16} /> New Run
+              </button>
+            </div>
           </div>
         </header>
 

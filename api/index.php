@@ -120,6 +120,7 @@ $controllers = [
     'announcements' => 'AnnouncementsController',
     'surveys' => 'SurveyController',
     'audit' => 'AuditController',
+    'export' => 'ExportController',
     'onboarding' => 'OnboardingController',
     'health' => 'HealthController',
 ];
