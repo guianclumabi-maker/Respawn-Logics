@@ -18,6 +18,7 @@ export default function MainLayout() {
     // Apps
     if (path === "/dashboard" || path === "/") return { view: "Dashboard" };
     if (path.includes("/employee-relations")) return { view: "Employee Relations" };
+    if (path.includes("/elr-copilot")) return { view: "ELR Copilot" };
     if (path.includes("/onboarding")) return { view: "Onboarding" };
     
     // Self-Service (ESS)
