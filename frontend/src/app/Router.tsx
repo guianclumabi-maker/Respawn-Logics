@@ -46,7 +46,6 @@ import { PoolDetail } from "./components/PoolDetail";
 
 // Shell Components
 import { AttendanceModule } from "./pages/AttendanceModule";
-import { AttendanceImport } from "./pages/AttendanceImport";
 import { Scheduling } from "./pages/Scheduling";
 import { BenefitsAdmin } from "./pages/BenefitsAdmin";
 import { CompensationAdmin } from "./pages/CompensationAdmin";
@@ -96,7 +95,6 @@ export const router = createHashRouter([
       { path: "org-chart", element: <OrgChart /> },
       { path: "leaves", element: <LeavesDashboard /> },
       { path: "attendance", element: <AttendanceModule /> },
-      { path: "attendance/import", element: <AttendanceImport /> },
       { path: "scheduling", element: <Scheduling /> },
       { path: "payroll", element: <PayrollManager /> },
       { path: "benefits", element: <BenefitsAdmin /> },

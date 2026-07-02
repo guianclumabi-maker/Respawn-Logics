@@ -8,9 +8,10 @@ import { AICompanion } from "./components/AICompanion";
 import { TasksPipeline } from "./components/TasksPipeline";
 import { Approvals } from "./components/Approvals";
 import { DailyReports } from "./components/DailyReports";
+import { AttendanceReport } from "./components/AttendanceReport";
 
 export default function App() {
-  const [activeView, setActiveView] = useState<"Dashboard" | "AICompanion" | "Cases" | "Incident Reports" | "Investigations" | "Tasks" | "Approvals" | "Daily Reports" | "Analytics" | "Case Types" | "Settings">("Dashboard");
+  const [activeView, setActiveView] = useState<"Dashboard" | "AICompanion" | "Cases" | "Incident Reports" | "Investigations" | "Tasks" | "Approvals" | "Daily Reports" | "Analytics" | "Case Types" | "Settings" | "Attendance">("Dashboard");
 
   const handleViewChange = (v: string) => setActiveView(v as any);
 
@@ -53,6 +54,10 @@ export default function App() {
 
       {activeView === "Analytics" && (
         <InsightsPage onViewChange={handleViewChange} />
+      )}
+      
+      {activeView === "Attendance" && (
+        <AttendanceReport />
       )}
     </div>
   );
