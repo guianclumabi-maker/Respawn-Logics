@@ -108,6 +108,7 @@ $controllers = [
     'employee_relations' => 'EmployeeRelationsController',
     'esm' => 'ESMController',
     'expenses' => 'ExpensesController',
+    'compensation' => 'CompensationController',
     'iam' => 'IAMController',
     'payroll_engine' => 'PayrollController',
     'performance' => 'PerformanceController',
