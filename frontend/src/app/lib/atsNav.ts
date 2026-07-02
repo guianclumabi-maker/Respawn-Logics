@@ -21,7 +21,6 @@ export function viewStateToPath(viewState: ViewState): string {
     case "Org Chart": return "/org-chart";
     case "Leaves": return "/leaves";
     case "Attendance": return "/attendance";
-    case "Import Attendance": return "/attendance/import";
     case "Scheduling": return "/scheduling";
     
     // Finance & Services
