@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useAuth } from "../../../../context/AuthContext";
 import { apiFetch } from "../../../../lib/apiClient";
 import { 
   Calendar, 
@@ -45,6 +46,8 @@ interface ReportResponse {
 }
 
 export function AttendanceReport() {
+  const { hasPermission } = useAuth();
+  
   // Last 7 days helper
   const getPastDateStr = (daysAgo: number) => {
     const d = new Date();
@@ -107,6 +110,13 @@ export function AttendanceReport() {
     }
   };
 
+  const handleExport = () => {
+    const isLocal = window.location.hostname === "localhost";
+    const basePath = isLocal ? "/respawn-logics" : "";
+    const url = `${window.location.origin}${basePath}/api/index.php?route=export&action=attendance&start_date=${encodeURIComponent(startDate)}&end_date=${encodeURIComponent(endDate)}`;
+    window.open(url, '_blank');
+  };
+
   return (
     <main className="flex-1 flex flex-col h-full bg-[#f4f6f8] dark:bg-[#0b0f1a] text-slate-900 dark:text-white overflow-hidden transition-colors duration-300">
       
@@ -119,14 +129,25 @@ export function AttendanceReport() {
             </h1>
             <p className="text-slate-500 dark:text-slate-400 text-sm">Consolidated organizational attendance audit log for Employee Relations analysis.</p>
           </div>
-          <button 
-            onClick={fetchReport}
-            disabled={loading}
-            className="px-4 py-2 bg-white dark:bg-[#1a2035] border border-gray-200 dark:border-white/[0.06] hover:bg-gray-50 dark:hover:bg-white/[0.04] rounded-lg font-bold text-sm text-slate-700 dark:text-white transition-all shadow-sm flex items-center gap-2 cursor-pointer disabled:opacity-50"
-          >
-            {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Activity className="w-4 h-4" />}
-            Refresh Report
-          </button>
+          <div className="flex gap-3">
+            {hasPermission("attendance.view") && (
+              <button 
+                onClick={handleExport}
+                className="px-4 py-2 bg-white dark:bg-[#1a2035] border border-gray-200 dark:border-white/[0.06] hover:bg-gray-50 dark:hover:bg-white/[0.04] rounded-lg font-bold text-sm text-slate-700 dark:text-white transition-all shadow-sm flex items-center gap-2 cursor-pointer"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                Export CSV
+              </button>
+            )}
+            <button 
+              onClick={fetchReport}
+              disabled={loading}
+              className="px-4 py-2 bg-white dark:bg-[#1a2035] border border-gray-200 dark:border-white/[0.06] hover:bg-gray-50 dark:hover:bg-white/[0.04] rounded-lg font-bold text-sm text-slate-700 dark:text-white transition-all shadow-sm flex items-center gap-2 cursor-pointer disabled:opacity-50"
+            >
+              {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Activity className="w-4 h-4" />}
+              Refresh Report
+            </button>
+          </div>
         </div>
 
         {/* Filter Controls */}
