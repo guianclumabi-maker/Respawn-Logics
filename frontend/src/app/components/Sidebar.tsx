@@ -97,6 +97,7 @@ const getSections = (hasPermission: (p: string) => boolean, hasRole: (r: string 
       { label: "Engagement Surveys", view: "Surveys", icon: <BarChart2 size={19} /> },
       { label: "AI Companion", view: "AI Companion", icon: <Sparkles size={19} /> },
       ...(hasPermission("attendance.view") ? [{ label: "Attendance Tracking", view: "Attendance", icon: <Clock size={19} /> }] : []),
+      ...(hasPermission("attendance.manage") ? [{ label: "Import Attendance", view: "Import Attendance", icon: <Database size={19} /> }] : []),
       ...(hasPermission("shifts.manage") ? [{ label: "Shift Scheduler", view: "Scheduling", icon: <Calendar size={19} /> }] : []),
       ...(hasPermission("leave.view") || hasPermission("leave.request") ? [{ label: "Leave Requests", view: "Leaves", icon: <CalendarCheck size={19} /> }] : []),
       { label: "Org Chart Directory", view: "Org Chart", icon: <Network size={19} /> },
