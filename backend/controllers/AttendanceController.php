@@ -40,6 +40,9 @@ class AttendanceController
                     case 'shifts':
                         $this->shifts();
                         break;
+                    case 'report':
+                        $this->report();
+                        break;
                     default:
                         http_response_code(400);
                         echo json_encode(['success' => false, 'error' => 'Invalid action']);
@@ -66,6 +69,133 @@ class AttendanceController
         } catch (\Exception $e) {
             echo json_encode(['success' => false, 'error' => 'Database error']);
         }
+    }
+
+    /**
+     * Consolidated attendance report: per employee, per day in the range, fuses
+     * attendance (time in/out), approved leaves, and derives absences.
+     * Filters: start_date, end_date, department, search (name). Range capped at 31 days.
+     */
+    private function report()
+    {
+        if (!hasPermission('attendance.view') && !hasPermission('attendance.manage') && empty($_SESSION['is_super'])) {
+            http_response_code(403);
+            echo json_encode(['success' => false, 'error' => 'Denied']);
+            return;
+        }
+
+        $start  = $_GET['start_date'] ?? date('Y-m-d', strtotime('-6 days'));
+        $end    = $_GET['end_date'] ?? date('Y-m-d');
+        $dept   = trim($_GET['department'] ?? '');
+        $search = trim($_GET['search'] ?? '');
+
+        $s = strtotime($start);
+        $e = strtotime($end);
+        if ($s === false || $e === false) {
+            echo json_encode(['success' => false, 'error' => 'Invalid date range.']);
+            return;
+        }
+        if ($e < $s) { $t = $s; $s = $e; $e = $t; }
+        if (($e - $s) / 86400 > 31) { $e = $s + 31 * 86400; } // cap the window
+        $start = date('Y-m-d', $s);
+        $end   = date('Y-m-d', $e);
+
+        // Employees (with optional department / name filters)
+        $sql = "SELECT `id`, `employee_id`, `full_name`, `email`, `department` FROM `users` WHERE `tenant_id` = ?";
+        $params = [$this->tenantId];
+        if ($dept !== '')   { $sql .= " AND `department` = ?";   $params[] = $dept; }
+        if ($search !== '') { $sql .= " AND `full_name` LIKE ?"; $params[] = '%' . $search . '%'; }
+        $sql .= " ORDER BY `full_name` ASC";
+        $ustmt = $this->pdo->prepare($sql);
+        $ustmt->execute($params);
+        $employees = $ustmt->fetchAll(PDO::FETCH_ASSOC);
+
+        // Attendance in range: email -> date -> record
+        $att = [];
+        $astmt = $this->pdo->prepare(
+            "SELECT `employee_email`, DATE(`time_in`) AS d, `time_in`, `time_out`, `status`
+             FROM `attendance` WHERE `tenant_id` = ? AND DATE(`time_in`) BETWEEN ? AND ?"
+        );
+        $astmt->execute([$this->tenantId, $start, $end]);
+        while ($r = $astmt->fetch(PDO::FETCH_ASSOC)) {
+            $att[strtolower($r['employee_email'])][$r['d']] = $r;
+        }
+
+        // Approved leaves overlapping the range: email -> date -> leave_type
+        $leaveByDay = [];
+        $lstmt = $this->pdo->prepare(
+            "SELECT `employee_email`, `leave_type`, `start_date`, `end_date`
+             FROM `leave_requests` WHERE `tenant_id` = ? AND `status` = 'Approved'
+             AND `start_date` <= ? AND `end_date` >= ?"
+        );
+        $lstmt->execute([$this->tenantId, $end, $start]);
+        while ($lr = $lstmt->fetch(PDO::FETCH_ASSOC)) {
+            $ls = max(strtotime($lr['start_date']), $s);
+            $le = min(strtotime($lr['end_date']), $e);
+            for ($d = $ls; $d <= $le; $d += 86400) {
+                $leaveByDay[strtolower($lr['employee_email'])][date('Y-m-d', $d)] = $lr['leave_type'];
+            }
+        }
+
+        // Build the per-employee-per-day grid
+        $rows = [];
+        $summary = ['present' => 0, 'late' => 0, 'on_leave' => 0, 'absent' => 0, 'rest_day' => 0];
+        foreach ($employees as $emp) {
+            $mail = strtolower((string)$emp['email']);
+            for ($d = $s; $d <= $e; $d += 86400) {
+                $date   = date('Y-m-d', $d);
+                $dow    = (int)date('N', $d); // 1=Mon .. 7=Sun
+                $status = '';
+                $timeIn = null;
+                $timeOut = null;
+                $detail = null;
+
+                if (isset($att[$mail][$date])) {
+                    $rec     = $att[$mail][$date];
+                    $timeIn  = $rec['time_in'] ? date('H:i', strtotime($rec['time_in'])) : null;
+                    $timeOut = $rec['time_out'] ? date('H:i', strtotime($rec['time_out'])) : null;
+                    $isLate  = stripos((string)($rec['status'] ?? ''), 'late') !== false;
+                    $status  = $isLate ? 'Late' : 'Present';
+                    $isLate ? $summary['late']++ : $summary['present']++;
+                } elseif (isset($leaveByDay[$mail][$date])) {
+                    $status = 'On Leave';
+                    $detail = $leaveByDay[$mail][$date];
+                    $summary['on_leave']++;
+                } elseif ($dow >= 6) { // Sat/Sun treated as rest day (default; refine with shifts later)
+                    $status = 'Rest Day';
+                    $summary['rest_day']++;
+                } else {
+                    $status = 'Absent';
+                    $summary['absent']++;
+                }
+
+                $rows[] = [
+                    'employee_id' => $emp['employee_id'],
+                    'name'        => $emp['full_name'],
+                    'department'  => $emp['department'],
+                    'date'        => $date,
+                    'status'      => $status,
+                    'time_in'     => $timeIn,
+                    'time_out'    => $timeOut,
+                    'detail'      => $detail,
+                ];
+            }
+        }
+
+        // Distinct departments for the filter dropdown
+        $dstmt = $this->pdo->prepare(
+            "SELECT DISTINCT `department` FROM `users` WHERE `tenant_id` = ? AND `department` IS NOT NULL AND `department` <> '' ORDER BY `department`"
+        );
+        $dstmt->execute([$this->tenantId]);
+
+        echo json_encode([
+            'success'     => true,
+            'start_date'  => $start,
+            'end_date'    => $end,
+            'departments' => $dstmt->fetchAll(PDO::FETCH_COLUMN),
+            'summary'     => $summary,
+            'rows'        => $rows,
+        ]);
     }
 
     private function calculateStatus($userId, $timeInStr)

@@ -48,7 +48,7 @@ const navItems: NavItem[] = [
   {
     label: "REPORTS",
     icon: <BarChart2 size={20} />,
-    children: ["Daily Reports", "Monthly Reports", "Analytics"],
+    children: ["Daily Reports", "Monthly Reports", "Attendance", "Analytics"],
     hasChevron: true,
   },
   
