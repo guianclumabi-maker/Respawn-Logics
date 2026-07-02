@@ -52,6 +52,7 @@ import { CompensationAdmin } from "./pages/CompensationAdmin";
 import { ExpensesAdmin } from "./pages/ExpensesAdmin";
 import { PerformanceAdmin } from "./pages/PerformanceAdmin";
 import { KnowledgeAdmin } from "./pages/KnowledgeAdmin";
+import { ElrCopilot } from "./pages/ElrCopilot";
 import { Surveys } from "./pages/Surveys";
 import { OrgChart } from "./pages/OrgChart";
 import { AdminUsers } from "./pages/AdminUsers";
@@ -102,6 +103,7 @@ export const router = createHashRouter([
       { path: "service-desk", element: <ServiceDesk /> },
       { path: "performance", element: <PerformanceAdmin /> },
       { path: "knowledge", element: <KnowledgeAdmin /> },
+      { path: "elr-copilot", element: <ElrCopilot /> },
       { path: "surveys", element: <Surveys /> },
       
       // Self-Service Routes

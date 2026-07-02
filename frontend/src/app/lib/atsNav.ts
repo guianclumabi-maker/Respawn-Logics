@@ -7,6 +7,7 @@ export function viewStateToPath(viewState: ViewState): string {
     case "Employee Relations": return "/employee-relations";
     case "ELR Admin Console": return "/employee-relations";
     case "My HR Cases": return "/employee-relations";
+    case "ELR Copilot": return "/elr-copilot";
     case "Onboarding": return "/onboarding";
     
     // Self-Service (ESS)
