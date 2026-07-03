@@ -128,7 +128,7 @@ class ELRController
         $sources = [];
         $contextParts = [];
 
-        // 1a. Retrieve DOLE/statutory references (only Approved entries are used for grounding)
+        // 1a. Approved DOLE / statutory references (full-text)
         $stmtRef = $this->pdo->prepare(
             "SELECT `id`, `category`, `title`, `summary`, `source_type`, `official_url`
              FROM `labor_references`
@@ -141,7 +141,7 @@ class ELRController
             $sources[] = ['type' => 'reference', 'title' => $r['title'], 'reference' => $r['source_type'], 'url' => $r['official_url']];
         }
 
-        // 1b. Retrieve Supreme Court jurisprudence / internal precedents
+        // 1b. Jurisprudence / precedents (full-text)
         $stmtPre = $this->pdo->prepare(
             "SELECT `id`, `case_type`, `title`, `summary`, `key_principles`, `source_reference`, `risk_level`, `recommended_process`
              FROM `elr_precedents`
@@ -154,17 +154,59 @@ class ELRController
             $sources[] = ['type' => 'precedent', 'title' => $p['title'], 'reference' => $p['source_reference'], 'risk_level' => $p['risk_level']];
         }
 
-        // 2. If the curated corpus has nothing, fall back to a live, domain-filtered web search
-        //    (opt-in via allow_web, default on). Clearly flagged as unverified so the UI can label it.
+        // 1c. LIKE fallback for small-corpus full-text misses
+        if (empty($contextParts)) {
+            $stop = ['the','and','for','are','was','what','when','how','why','who','does','can','with','from','that','this','you','your','our','into','about','which','has','have','a','an','of','to','in','is','on','or','be','it','as','at','by','my'];
+            $words = preg_split('/[^a-zA-Z]+/', strtolower($question), -1, PREG_SPLIT_NO_EMPTY);
+            $keywords = array_values(array_unique(array_filter($words, function ($w) use ($stop) {
+                return strlen($w) >= 3 && !in_array($w, $stop, true);
+            })));
+            if (!empty($keywords)) {
+                $likeConds = [];
+                $likeParams = [];
+                foreach ($keywords as $kw) {
+                    $likeConds[] = "(`title` LIKE ? OR `summary` LIKE ? OR `category` LIKE ?)";
+                    $likeParams[] = "%$kw%"; $likeParams[] = "%$kw%"; $likeParams[] = "%$kw%";
+                }
+                $sqlRef = "SELECT `id`, `category`, `title`, `summary`, `source_type`, `official_url`
+                           FROM `labor_references`
+                           WHERE `status` = 'Approved' AND (" . implode(' OR ', $likeConds) . ")
+                           LIMIT 4";
+                $stmt = $this->pdo->prepare($sqlRef);
+                $stmt->execute($likeParams);
+                while ($r = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                    $contextParts[] = "[DOLE / Statutory Reference] {$r['title']} ({$r['category']}): {$r['summary']}";
+                    $sources[] = ['type' => 'reference', 'title' => $r['title'], 'reference' => $r['source_type'], 'url' => $r['official_url']];
+                }
+                $likeCondsP = [];
+                $likeParamsP = [];
+                foreach ($keywords as $kw) {
+                    $likeCondsP[] = "(`title` LIKE ? OR `summary` LIKE ? OR `case_type` LIKE ? OR `key_principles` LIKE ?)";
+                    $likeParamsP[] = "%$kw%"; $likeParamsP[] = "%$kw%"; $likeParamsP[] = "%$kw%"; $likeParamsP[] = "%$kw%";
+                }
+                $sqlPre = "SELECT `id`, `case_type`, `title`, `summary`, `key_principles`, `source_reference`, `risk_level`, `recommended_process`
+                           FROM `elr_precedents`
+                           WHERE (" . implode(' OR ', $likeCondsP) . ")
+                           LIMIT 4";
+                $stmt = $this->pdo->prepare($sqlPre);
+                $stmt->execute($likeParamsP);
+                while ($p = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                    $contextParts[] = "[Jurisprudence] {$p['title']} ({$p['case_type']}, Risk: {$p['risk_level']}). Key principles: {$p['key_principles']}. Recommended process: {$p['recommended_process']}. Source: {$p['source_reference']}";
+                    $sources[] = ['type' => 'precedent', 'title' => $p['title'], 'reference' => $p['source_reference'], 'risk_level' => $p['risk_level']];
+                }
+            }
+        }
+
+        // 2. Live web fallback when the corpus still has nothing (opt-in via allow_web, default on)
         $allowWeb = !array_key_exists('allow_web', $input) || !empty($input['allow_web']);
         if (empty($contextParts) && $allowWeb) {
             $domains = $this->resolveDomains($input['sources'] ?? []);
             list($webAnswer, $webSources) = $this->askGeminiWithWebSearch($question, $domains);
             echo json_encode([
-                'success'     => true,
-                'answer'      => $webAnswer,
-                'sources'     => $webSources,
-                'grounded'    => false,
+                'success'      => true,
+                'answer'       => $webAnswer,
+                'sources'      => $webSources,
+                'grounded'     => false,
                 'web_fallback' => true
             ]);
             return;
@@ -174,14 +216,13 @@ class ELRController
             ? "NO MATCHING SOURCES FOUND IN THE KNOWLEDGE BASE."
             : implode("\n\n", $contextParts);
 
-        // 3. Ask Gemini, grounded strictly on the retrieved (approved) corpus sources
         $answer = $this->askGeminiGrounded($question, $context);
 
         echo json_encode([
-            'success'  => true,
-            'answer'   => $answer,
-            'sources'  => $sources,
-            'grounded' => !empty($contextParts),
+            'success'      => true,
+            'answer'       => $answer,
+            'sources'      => $sources,
+            'grounded'     => !empty($contextParts),
             'web_fallback' => false
         ]);
     }
