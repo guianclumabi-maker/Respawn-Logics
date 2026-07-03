@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 
-export function SpinningDonut() {
+export function SpinningDonut({ data }: { data?: any[] } = {}) {
   const [frame, setFrame] = useState('');
   const requestRef = useRef<number>();
 

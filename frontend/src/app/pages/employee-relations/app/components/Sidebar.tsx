@@ -12,7 +12,8 @@ import {
   Layers,
   ArrowLeft,
   BotMessageSquare,
-  Gamepad2
+  Gamepad2,
+  Clock
 } from "lucide-react";
 import { GamifiedThemeToggle } from "./GamifiedThemeToggle";
 
@@ -26,39 +27,11 @@ type NavItem = {
 
 const navItems: NavItem[] = [
   { label: "Dashboard", viewName: "Dashboard", icon: <LayoutDashboard size={20} /> },
+  { label: "Cases", viewName: "Cases", icon: <Users size={20} /> },
   { label: "AI Companion", viewName: "AICompanion", icon: <BotMessageSquare size={20} className="text-cyan-400" /> },
-  
-  // CASES
-  {
-    label: "CASES",
-    icon: <Users size={20} />,
-    children: ["Cases List", "Incident Reports", "Investigations"],
-    hasChevron: true,
-  },
-  
-  // WORKFLOW
-  {
-    label: "WORKFLOW",
-    icon: <Briefcase size={20} />,
-    children: ["Tasks", "Approvals"],
-    hasChevron: true,
-  },
-  
-  // REPORTS
-  {
-    label: "REPORTS",
-    icon: <BarChart2 size={20} />,
-    children: ["Daily Reports", "Monthly Reports", "Attendance", "Analytics"],
-    hasChevron: true,
-  },
-  
-  // ADMIN
-  {
-    label: "ADMIN",
-    icon: <Settings size={20} />,
-    children: ["Case Types", "Settings"],
-    hasChevron: true,
-  },
+  { label: "Knowledge Base", viewName: "Knowledge Base", icon: <Settings size={20} /> },
+  { label: "Attendance", viewName: "Attendance", icon: <Clock size={20} /> },
+  { label: "Analytics", viewName: "Analytics", icon: <BarChart2 size={20} /> },
 ];
 
 const basePath = window.location.hostname === 'localhost' ? '/respawn-logics' : '';
