@@ -6,6 +6,19 @@ class ELRController
     private $currentUser;
     private $tenantId;
 
+    /**
+     * Whitelist of authoritative PH labor-law sources. All internet ingestion and the
+     * Copilot's live web fallback are restricted to these domains so we only ground on /
+     * cite official material. Keyed by a short filter id the UI can toggle.
+     */
+    private $sourceWhitelist = [
+        'lawphil'   => ['label' => 'LawPhil (Labor Code & Jurisprudence)', 'domain' => 'lawphil.net'],
+        'sc'        => ['label' => 'Supreme Court E-Library',              'domain' => 'elibrary.judiciary.gov.ph'],
+        'dole'      => ['label' => 'DOLE',                                 'domain' => 'dole.gov.ph'],
+        'nlrc'      => ['label' => 'NLRC',                                 'domain' => 'nlrc.dole.gov.ph'],
+        'gazette'   => ['label' => 'Official Gazette',                     'domain' => 'officialgazette.gov.ph'],
+    ];
+
     public function __construct($pdo)
     {
         $this->pdo = $pdo;
@@ -72,6 +85,23 @@ class ELRController
                 case 'kb_approve':
                     $this->kbApprove($input);
                     break;
+                case 'kb_sources':
+                    $this->kbSources();
+                    break;
+                case 'kb_search':
+                    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+                        $this->kbSearch($input);
+                    } else {
+                        echo json_encode(['success' => false, 'error' => 'Invalid method']);
+                    }
+                    break;
+                case 'kb_ingest':
+                    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+                        $this->kbIngest($input);
+                    } else {
+                        echo json_encode(['success' => false, 'error' => 'Invalid method']);
+                    }
+                    break;
                 default:
                     http_response_code(400);
                     echo json_encode(['success' => false, 'error' => 'Invalid action']);
@@ -124,18 +154,35 @@ class ELRController
             $sources[] = ['type' => 'precedent', 'title' => $p['title'], 'reference' => $p['source_reference'], 'risk_level' => $p['risk_level']];
         }
 
+        // 2. If the curated corpus has nothing, fall back to a live, domain-filtered web search
+        //    (opt-in via allow_web, default on). Clearly flagged as unverified so the UI can label it.
+        $allowWeb = !array_key_exists('allow_web', $input) || !empty($input['allow_web']);
+        if (empty($contextParts) && $allowWeb) {
+            $domains = $this->resolveDomains($input['sources'] ?? []);
+            list($webAnswer, $webSources) = $this->askGeminiWithWebSearch($question, $domains);
+            echo json_encode([
+                'success'     => true,
+                'answer'      => $webAnswer,
+                'sources'     => $webSources,
+                'grounded'    => false,
+                'web_fallback' => true
+            ]);
+            return;
+        }
+
         $context = empty($contextParts)
             ? "NO MATCHING SOURCES FOUND IN THE KNOWLEDGE BASE."
             : implode("\n\n", $contextParts);
 
-        // 2. Ask Gemini, grounded strictly on the retrieved sources
+        // 3. Ask Gemini, grounded strictly on the retrieved (approved) corpus sources
         $answer = $this->askGeminiGrounded($question, $context);
 
         echo json_encode([
             'success'  => true,
             'answer'   => $answer,
             'sources'  => $sources,
-            'grounded' => !empty($contextParts)
+            'grounded' => !empty($contextParts),
+            'web_fallback' => false
         ]);
     }
 
@@ -162,7 +209,7 @@ class ELRController
             "generationConfig" => ["temperature" => 0.2]
         ];
 
-        $ch = curl_init("https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent");
+        $ch = curl_init("https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent");
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_POST, true);
         curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
@@ -258,6 +305,200 @@ class ELRController
         $stmt = $this->pdo->prepare("UPDATE `labor_references` SET `status` = ?, `reviewed_by` = ? WHERE `id` = ?");
         $stmt->execute([$status, $reviewer, $id]);
         echo json_encode(['success' => true, 'message' => 'Corpus entry updated.']);
+    }
+
+    /**
+     * Return the list of allowed labor-law sources so the SPA can render filter toggles.
+     */
+    private function kbSources()
+    {
+        $out = [];
+        foreach ($this->sourceWhitelist as $id => $s) {
+            $out[] = ['id' => $id, 'label' => $s['label'], 'domain' => $s['domain']];
+        }
+        echo json_encode(['success' => true, 'sources' => $out]);
+    }
+
+    /**
+     * Resolve a caller-supplied filter list of source ids into concrete whitelisted domains.
+     * Empty / unknown selection defaults to the full whitelist (never an open web search).
+     */
+    private function resolveDomains($sourceIds)
+    {
+        $domains = [];
+        if (is_array($sourceIds)) {
+            foreach ($sourceIds as $sid) {
+                if (isset($this->sourceWhitelist[$sid])) {
+                    $domains[] = $this->sourceWhitelist[$sid]['domain'];
+                }
+            }
+        }
+        if (empty($domains)) {
+            foreach ($this->sourceWhitelist as $s) { $domains[] = $s['domain']; }
+        }
+        return array_values(array_unique($domains));
+    }
+
+    /**
+     * Calls gemini-2.5-flash with the built-in google_search grounding tool, restricted by
+     * prompt to the supplied authoritative domains. Returns [answerText, sources[]].
+     * Sources come from the model's groundingMetadata (real URLs it actually used).
+     */
+    private function askGeminiWithWebSearch($question, array $domains, $extraInstruction = '')
+    {
+        $apiKey = getenv('GEMINI_API_KEY');
+        if (empty($apiKey) || $apiKey === 'YOUR_GEMINI_API_KEY_HERE') {
+            return ["⚠️ The AI engine is not configured (GEMINI_API_KEY missing).", []];
+        }
+
+        $siteFilter = implode(' OR ', array_map(function ($d) { return "site:$d"; }, $domains));
+        $prompt = "You are a Philippine Employee & Labor Relations legal research assistant. "
+            . "Answer the QUESTION using ONLY authoritative Philippine sources — prefer these official domains: {$siteFilter}. "
+            . "Cite the specific issuance (e.g., Labor Code article, DOLE advisory number, or Supreme Court G.R. number) and include the source URL. "
+            . "If you cannot find an authoritative source, say so plainly and advise consulting DOLE or a labor lawyer — never invent rules. "
+            . "End with: 'This is general guidance, not legal advice.' "
+            . $extraInstruction
+            . "\n\nQUESTION:\n{$question}";
+
+        $data = [
+            "contents" => [["parts" => [["text" => $prompt]]]],
+            "tools" => [["google_search" => new \stdClass()]],
+            "generationConfig" => ["temperature" => 0.2]
+        ];
+
+        $ch = curl_init("https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent");
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
+        curl_setopt($ch, CURLOPT_HTTPHEADER, ["Content-Type: application/json", "x-goog-api-key: " . $apiKey]);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 45);
+        $response = curl_exec($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
+
+        if ($httpCode !== 200) {
+            error_log('[ELRController] Gemini web-search failed: HTTP ' . $httpCode . ' ' . substr((string)$response, 0, 500));
+            return ["The live web lookup could not run right now. Please try again shortly.", []];
+        }
+
+        $rd = json_decode($response, true);
+        $text = $rd['candidates'][0]['content']['parts'][0]['text'] ?? '';
+        if ($text === '') {
+            // Parts may be split; concatenate any text parts.
+            foreach (($rd['candidates'][0]['content']['parts'] ?? []) as $part) {
+                if (isset($part['text'])) { $text .= $part['text']; }
+            }
+        }
+
+        // Extract the real sources the model grounded on.
+        $sources = [];
+        $chunks = $rd['candidates'][0]['groundingMetadata']['groundingChunks'] ?? [];
+        foreach ($chunks as $c) {
+            if (isset($c['web']['uri'])) {
+                $sources[] = [
+                    'type'  => 'web',
+                    'title' => $c['web']['title'] ?? $c['web']['uri'],
+                    'url'   => $c['web']['uri'],
+                ];
+            }
+        }
+        return [$text !== '' ? $text : "No authoritative source was found for this question.", $sources];
+    }
+
+    /**
+     * kb_search — domain-filtered internet search for official labor-law material.
+     * Returns CANDIDATE documents (not stored). Platform admins only, since results feed the
+     * shared, cross-tenant corpus. The admin reviews candidates and calls kb_ingest to stage one.
+     */
+    private function kbSearch($input)
+    {
+        if (empty($_SESSION['is_super'])) {
+            http_response_code(403);
+            echo json_encode(['success' => false, 'error' => 'Only platform administrators can search external sources.']);
+            return;
+        }
+        $query = trim($input['query'] ?? '');
+        if ($query === '') {
+            echo json_encode(['success' => false, 'error' => 'A search query is required.']);
+            return;
+        }
+        $domains = $this->resolveDomains($input['sources'] ?? []);
+        $category = trim($input['category'] ?? '');
+
+        $instruction = "Return a JSON array (and nothing else) of up to 5 relevant official documents you find, "
+            . "each an object with keys: title, official_url, source_type (e.g. 'Labor Code', 'DOLE Advisory', 'Supreme Court', 'Republic Act'), "
+            . "suggested_category, summary (2-4 sentences), and entry_type ('reference' for statutes/advisories, 'precedent' for court rulings). "
+            . ($category !== '' ? "Focus on the category: {$category}. " : '');
+
+        list($raw, $webSources) = $this->askGeminiWithWebSearch($query, $domains, $instruction);
+
+        // The model may wrap JSON in prose or ```json fences — extract the array leniently.
+        $candidates = [];
+        if (preg_match('/\[.*\]/s', $raw, $m)) {
+            $decoded = json_decode($m[0], true);
+            if (is_array($decoded)) { $candidates = $decoded; }
+        }
+
+        echo json_encode([
+            'success'      => true,
+            'candidates'   => $candidates,
+            'web_sources'  => $webSources,
+            'raw'          => $candidates ? null : $raw, // surface prose only if JSON parse failed
+        ]);
+    }
+
+    /**
+     * kb_ingest — stage a chosen candidate into the corpus as PENDING for human approval.
+     * Never auto-approves: ingested material is not used for grounding until kb_approve.
+     * Platform admins only.
+     */
+    private function kbIngest($input)
+    {
+        if (empty($_SESSION['is_super'])) {
+            http_response_code(403);
+            echo json_encode(['success' => false, 'error' => 'Only platform administrators can ingest sources.']);
+            return;
+        }
+        $entryType = ($input['entry_type'] ?? 'reference') === 'precedent' ? 'precedent' : 'reference';
+        $title = trim($input['title'] ?? '');
+        $summary = trim($input['summary'] ?? '');
+        if ($title === '' || $summary === '') {
+            echo json_encode(['success' => false, 'error' => 'Title and summary are required.']);
+            return;
+        }
+
+        if ($entryType === 'precedent') {
+            // Precedents have no status column; flag provenance in source_reference for reviewer visibility.
+            $stmt = $this->pdo->prepare(
+                "INSERT INTO `elr_precedents` (`case_type`, `title`, `summary`, `key_principles`, `source_reference`, `risk_level`, `recommended_process`)
+                 VALUES (?, ?, ?, ?, ?, ?, ?)"
+            );
+            $stmt->execute([
+                trim($input['suggested_category'] ?? $input['case_type'] ?? 'Jurisprudence'),
+                $title,
+                $summary,
+                trim($input['key_principles'] ?? $summary),
+                trim(($input['source_type'] ?? 'Supreme Court') . ' — ' . ($input['official_url'] ?? '')),
+                in_array($input['risk_level'] ?? 'Medium', ['Low', 'Medium', 'High', 'Critical'], true) ? $input['risk_level'] : 'Medium',
+                trim($input['recommended_process'] ?? 'Review the cited ruling and observe due process.')
+            ]);
+            echo json_encode(['success' => true, 'message' => 'Precedent ingested. Review it in the corpus list.']);
+            return;
+        }
+
+        // Reference — stage as Pending so it is NOT used for grounding until approved.
+        $stmt = $this->pdo->prepare(
+            "INSERT INTO `labor_references` (`category`, `title`, `summary`, `source_type`, `official_url`, `status`)
+             VALUES (?, ?, ?, ?, ?, 'Pending')"
+        );
+        $stmt->execute([
+            trim($input['suggested_category'] ?? $input['category'] ?? 'General'),
+            $title,
+            $summary,
+            trim(($input['source_type'] ?? 'Web Ingest')),
+            trim($input['official_url'] ?? '') ?: null,
+        ]);
+        echo json_encode(['success' => true, 'message' => 'Reference staged as Pending. Approve it to add it to the AI corpus.']);
     }
 
     private function addTimelineEvent($caseId, $eventType, $description, $actor = null, $oldValue = null, $newValue = null) {
