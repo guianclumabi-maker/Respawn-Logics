@@ -90,7 +90,8 @@ export const router = createHashRouter([
     children: [
       { index: true, element: <Navigate to="/dashboard" replace /> },
       { path: "dashboard", element: <HomeDashboard /> },
-      { path: "employee-relations", element: <EmployeeRelations /> },
+      { path: "employee-relations", element: <EmployeeRelations mode="admin" /> },
+      { path: "my-hr-cases", element: <EmployeeRelations mode="employee" /> },
       { path: "hr-directory", element: <HRDirectory /> },
       { path: "org-chart", element: <OrgChart /> },
       { path: "leaves", element: <LeavesDashboard /> },

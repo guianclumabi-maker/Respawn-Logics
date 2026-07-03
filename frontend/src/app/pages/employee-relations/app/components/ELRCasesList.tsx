@@ -36,9 +36,10 @@ interface ELRCase {
 interface ELRCasesListProps {
   onViewChange: (view: string) => void;
   onSelectCase: (id: number) => void;
+  mine?: boolean;
 }
 
-export function ELRCasesList({ onViewChange, onSelectCase }: ELRCasesListProps) {
+export function ELRCasesList({ onViewChange, onSelectCase, mine = false }: ELRCasesListProps) {
   const { hasPermission } = useAuth();
   const canInvestigate = hasPermission("elr.investigate");
 
@@ -72,7 +73,7 @@ export function ELRCasesList({ onViewChange, onSelectCase }: ELRCasesListProps) 
     setError(null);
     try {
       const [casesRes, typesRes] = await Promise.all([
-        apiFetch("/api/index.php?route=elr&action=cases"),
+        apiFetch(`/api/index.php?route=elr&action=cases${mine ? "&mine=1" : ""}`),
         apiFetch("/api/index.php?route=elr&action=case_types")
       ]);
 

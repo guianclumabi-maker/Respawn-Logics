@@ -47,7 +47,6 @@ interface ReportResponse {
 
 export function AttendanceReport() {
   const { hasPermission } = useAuth();
-  
   // Last 7 days helper
   const getPastDateStr = (daysAgo: number) => {
     const d = new Date();
@@ -116,7 +115,6 @@ export function AttendanceReport() {
     const url = `${window.location.origin}${basePath}/api/index.php?route=export&action=attendance&start_date=${encodeURIComponent(startDate)}&end_date=${encodeURIComponent(endDate)}`;
     window.open(url, '_blank');
   };
-
   return (
     <main className="flex-1 flex flex-col h-full bg-[#f4f6f8] dark:bg-[#0b0f1a] text-slate-900 dark:text-white overflow-hidden transition-colors duration-300">
       

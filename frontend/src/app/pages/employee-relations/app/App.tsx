@@ -8,8 +8,8 @@ import { AICompanion } from "./components/AICompanion";
 import { KnowledgeAdmin } from "../../KnowledgeAdmin";
 import { AttendanceReport } from "./components/AttendanceReport";
 
-export default function App() {
-  const [activeView, setActiveView] = useState<string>("Dashboard");
+export default function App({ mode = "admin" }: { mode?: "employee" | "admin" }) {
+  const [activeView, setActiveView] = useState<string>(mode === "employee" ? "Cases" : "Dashboard");
   const [selectedCaseId, setSelectedCaseId] = useState<number | null>(null);
 
   const handleViewChange = (v: string) => {
@@ -20,7 +20,7 @@ export default function App() {
   return (
     <div className="flex h-full w-full bg-[#06070a] text-[#c8d0e0] overflow-hidden relative">
       {/* ELR Left-Nav Sidebar */}
-      <Sidebar activeView={activeView} onViewChange={handleViewChange} />
+      <Sidebar mode={mode} activeView={activeView} onViewChange={handleViewChange} />
 
       {/* Main Content Pane */}
       <div className="flex-1 flex flex-col h-full overflow-hidden relative">
@@ -33,7 +33,7 @@ export default function App() {
         )}
         
         {activeView === "Cases" && !selectedCaseId && (
-          <ELRCasesList onViewChange={handleViewChange} onSelectCase={setSelectedCaseId} />
+          <ELRCasesList mine={mode === "employee"} onViewChange={handleViewChange} onSelectCase={setSelectedCaseId} />
         )}
 
         {activeView === "Cases" && selectedCaseId !== null && (
