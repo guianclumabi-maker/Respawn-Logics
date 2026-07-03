@@ -28,6 +28,7 @@ interface QAPair {
   answer: string;
   grounded: boolean;
   sources: Source[];
+  web_fallback?: boolean;
 }
 
 const SUGGESTIONS = [
@@ -70,7 +71,8 @@ export function ElrCopilotContent() {
           question: query,
           answer: data.answer,
           grounded: data.grounded,
-          sources: data.sources || []
+          sources: data.sources || [],
+          web_fallback: data.web_fallback || false
         };
         setTranscript(prev => [...prev, newQA]);
         setQuestion("");
@@ -193,6 +195,12 @@ export function ElrCopilotContent() {
                   {/* Sources cited */}
                   {qa.sources.length > 0 && (
                     <div className="border-t border-white/5 pt-3 mt-3">
+                      {qa.web_fallback && (
+                        <div className="mb-3 p-3 bg-amber-500/10 border border-amber-500/20 text-amber-500 text-[10px] font-bold rounded-lg uppercase tracking-wide inline-flex items-center gap-1.5 font-sans">
+                          <AlertTriangle size={12} className="flex-shrink-0" />
+                          Live web result — not yet in the reviewed knowledge base.
+                        </div>
+                      )}
                       <span className="text-[10px] font-bold text-gray-500 uppercase tracking-wider block mb-2">Sources Cited:</span>
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         {qa.sources.map((src, srcIdx) => (
