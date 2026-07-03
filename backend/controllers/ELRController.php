@@ -168,6 +168,53 @@ class ELRController
                 'web_fallback' => true
             ]);
             return;
+        // 1c. Fallback: MySQL NATURAL LANGUAGE MODE returns nothing on a small corpus
+        // (words in >50% of rows are ignored, and words < 4 chars like "due" are dropped).
+        // If full-text found nothing, retry with a keyword LIKE search so we still surface sources.
+        if (empty($contextParts)) {
+            $stop = ['the','and','for','are','was','what','when','how','why','who','does','can','with','from','that','this','you','your','our','into','about','which','has','have','a','an','of','to','in','is','on','or','be','it','as','at','by','my'];
+            $words = preg_split('/[^a-zA-Z]+/', strtolower($question), -1, PREG_SPLIT_NO_EMPTY);
+            $keywords = array_values(array_unique(array_filter($words, function ($w) use ($stop) {
+                return strlen($w) >= 3 && !in_array($w, $stop, true);
+            })));
+
+            if (!empty($keywords)) {
+                // References
+                $likeConds = [];
+                $likeParams = [];
+                foreach ($keywords as $kw) {
+                    $likeConds[] = "(`title` LIKE ? OR `summary` LIKE ? OR `category` LIKE ?)";
+                    $likeParams[] = "%$kw%"; $likeParams[] = "%$kw%"; $likeParams[] = "%$kw%";
+                }
+                $sqlRef = "SELECT `id`, `category`, `title`, `summary`, `source_type`, `official_url`
+                           FROM `labor_references`
+                           WHERE `status` = 'Approved' AND (" . implode(' OR ', $likeConds) . ")
+                           LIMIT 4";
+                $stmt = $this->pdo->prepare($sqlRef);
+                $stmt->execute($likeParams);
+                while ($r = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                    $contextParts[] = "[DOLE / Statutory Reference] {$r['title']} ({$r['category']}): {$r['summary']}";
+                    $sources[] = ['type' => 'reference', 'title' => $r['title'], 'reference' => $r['source_type'], 'url' => $r['official_url']];
+                }
+
+                // Precedents
+                $likeCondsP = [];
+                $likeParamsP = [];
+                foreach ($keywords as $kw) {
+                    $likeCondsP[] = "(`title` LIKE ? OR `summary` LIKE ? OR `case_type` LIKE ? OR `key_principles` LIKE ?)";
+                    $likeParamsP[] = "%$kw%"; $likeParamsP[] = "%$kw%"; $likeParamsP[] = "%$kw%"; $likeParamsP[] = "%$kw%";
+                }
+                $sqlPre = "SELECT `id`, `case_type`, `title`, `summary`, `key_principles`, `source_reference`, `risk_level`, `recommended_process`
+                           FROM `elr_precedents`
+                           WHERE (" . implode(' OR ', $likeCondsP) . ")
+                           LIMIT 4";
+                $stmt = $this->pdo->prepare($sqlPre);
+                $stmt->execute($likeParamsP);
+                while ($p = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                    $contextParts[] = "[Jurisprudence] {$p['title']} ({$p['case_type']}, Risk: {$p['risk_level']}). Key principles: {$p['key_principles']}. Recommended process: {$p['recommended_process']}. Source: {$p['source_reference']}";
+                    $sources[] = ['type' => 'precedent', 'title' => $p['title'], 'reference' => $p['source_reference'], 'risk_level' => $p['risk_level']];
+                }
+            }
         }
 
         $context = empty($contextParts)
