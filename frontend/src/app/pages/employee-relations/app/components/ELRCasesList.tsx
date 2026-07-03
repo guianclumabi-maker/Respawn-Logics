@@ -296,7 +296,7 @@ export function ELRCasesList({ onViewChange, onSelectCase }: ELRCasesListProps) 
                         <div className="flex items-center gap-2">
                           <span className="font-semibold text-white">{c.case_number}</span>
                           {c.is_confidential === 1 && (
-                            <Lock size={12} className="text-red-400" title="Confidential" />
+                            <span title="Confidential"><Lock size={12} className="text-red-400" /></span>
                           )}
                         </div>
                       </td>
