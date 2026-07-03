@@ -46,10 +46,7 @@ if (session_status() === PHP_SESSION_NONE) {
     // Session is started after DB is ready. See "Start Session with MySQL Handler" block below.
 }
 
-// Generate CSRF Token
-if (empty($_SESSION['csrf_token'])) {
-    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
-}
+
 
 // 4. Global URL Helper
 if (!function_exists('url')) {
@@ -99,6 +96,11 @@ if (session_status() === PHP_SESSION_NONE) {
         error_log('MySQLSessionHandler setup failed, falling back to files: ' . $e->getMessage());
     }
     session_start();
+}
+
+// Generate CSRF Token
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }
 
 // 6. Load Permissions & Auth Helpers
