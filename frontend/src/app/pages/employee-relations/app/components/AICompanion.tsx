@@ -27,6 +27,7 @@ interface CopilotResponse {
   answer: string;
   sources: Source[];
   grounded: boolean;
+  web_fallback?: boolean;
 }
 
 const SUGGESTIONS = [
@@ -214,6 +215,13 @@ export function AICompanion() {
                 <div className="border-b border-white/5 pb-2">
                   <span className="text-xs font-bold text-gray-400 uppercase tracking-wider block">Grounded Sources</span>
                 </div>
+
+                {result.web_fallback && (
+                  <div className="p-3 bg-amber-500/10 border border-amber-500/20 text-amber-500 text-[10px] font-bold rounded-lg uppercase tracking-wide flex items-center gap-1.5 font-sans leading-snug">
+                    <AlertTriangle size={12} className="flex-shrink-0" />
+                    Live web result — not yet in the reviewed knowledge base.
+                  </div>
+                )}
 
                 <div className="space-y-3">
                   {result.sources.map((src, i) => (

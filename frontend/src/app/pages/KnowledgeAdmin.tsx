@@ -12,7 +12,10 @@ import {
   AlertCircle, 
   ExternalLink,
   Lock,
-  Compass
+  Compass,
+  Globe,
+  Search,
+  Sparkles
 } from "lucide-react";
 
 interface LaborReference {
@@ -41,7 +44,7 @@ export function KnowledgeAdmin() {
   const { user } = useAuth();
   const isSuperAdmin = user?.roles?.includes("Super_Admin") || false;
 
-  const [activeTab, setActiveTab] = useState<"references" | "precedents">("references");
+  const [activeTab, setActiveTab] = useState<"references" | "precedents" | "search_sources">("references");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -71,6 +74,17 @@ export function KnowledgeAdmin() {
   const [riskLevel, setRiskLevel] = useState<"Low" | "Medium" | "High" | "Critical">("Medium");
   const [recommendedProcess, setRecommendedProcess] = useState("");
 
+  // External Search States
+  const [sourcesList, setSourcesList] = useState<{ id: string; label: string; domain: string }[]>([]);
+  const [selectedSources, setSelectedSources] = useState<string[]>([]);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchCategory, setSearchCategory] = useState("");
+  const [searching, setSearching] = useState(false);
+  const [candidates, setCandidates] = useState<any[]>([]);
+  const [searchError, setSearchError] = useState<string | null>(null);
+  const [searchSuccess, setSearchSuccess] = useState<string | null>(null);
+  const [ingestingIndex, setIngestingIndex] = useState<number | null>(null);
+
   const fetchData = async () => {
     setLoading(true);
     setError(null);
@@ -92,9 +106,27 @@ export function KnowledgeAdmin() {
     }
   };
 
+  const fetchSources = async () => {
+    try {
+      const res = await apiFetch("/api/index.php?route=elr&action=kb_sources");
+      if (res.ok) {
+        const data = await res.json();
+        if (data.success) {
+          setSourcesList(data.sources || []);
+          setSelectedSources((data.sources || []).map((s: any) => s.id));
+        }
+      }
+    } catch (err) {
+      console.error("Failed to load sources whitelist:", err);
+    }
+  };
+
   useEffect(() => {
     fetchData();
-  }, []);
+    if (isSuperAdmin) {
+      fetchSources();
+    }
+  }, [isSuperAdmin]);
 
   const handleApproveReject = async (id: number, status: "Approved" | "Rejected") => {
     try {
@@ -165,6 +197,87 @@ export function KnowledgeAdmin() {
     }
   };
 
+  const handleSearchSources = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!searchQuery.trim()) return;
+
+    setSearching(true);
+    setSearchError(null);
+    setSearchSuccess(null);
+    setCandidates([]);
+
+    try {
+      const res = await apiFetch("/api/index.php?route=elr&action=kb_search", {
+        method: "POST",
+        body: JSON.stringify({
+          query: searchQuery,
+          sources: selectedSources,
+          category: searchCategory
+        })
+      });
+
+      if (!res.ok) throw new Error(`HTTP error ${res.status}`);
+      const data = await res.json();
+
+      if (data.success) {
+        setCandidates(data.candidates || []);
+        if ((data.candidates || []).length === 0) {
+          setSearchError("No candidates returned. Gemini response: " + (data.raw || "No matches."));
+        } else {
+          setSearchSuccess(`Located ${data.candidates.length} authoritative candidate document(s).`);
+        }
+      } else {
+        setSearchError(data.error || "Failed to complete external search.");
+      }
+    } catch (err: any) {
+      console.error(err);
+      setSearchError(err.message || "An error occurred during search query resolution.");
+    } finally {
+      setSearching(false);
+    }
+  };
+
+  const handleIngest = async (cand: any, index: number) => {
+    setIngestingIndex(index);
+    setSearchError(null);
+    setSearchSuccess(null);
+
+    const payload = {
+      entry_type: cand.entry_type || "reference",
+      title: cand.title,
+      summary: cand.summary,
+      suggested_category: cand.suggested_category || cand.category || "General",
+      source_type: cand.source_type || "Web Ingest",
+      official_url: cand.official_url,
+      key_principles: cand.key_principles,
+      risk_level: cand.risk_level || "Medium",
+      recommended_process: cand.recommended_process
+    };
+
+    try {
+      const res = await apiFetch("/api/index.php?route=elr&action=kb_ingest", {
+        method: "POST",
+        body: JSON.stringify(payload)
+      });
+
+      if (!res.ok) throw new Error(`HTTP error ${res.status}`);
+      const data = await res.json();
+
+      if (data.success) {
+        setSearchSuccess(`Successfully ingested "${cand.title}" as PENDING. Approved items will be used by AI.`);
+        setCandidates(prev => prev.map((c, i) => i === index ? { ...c, ingested: true } : c));
+        fetchData();
+      } else {
+        setSearchError(data.error || "Failed to stage candidate.");
+      }
+    } catch (err: any) {
+      console.error(err);
+      setSearchError(err.message || "An error occurred during staging operations.");
+    } finally {
+      setIngestingIndex(null);
+    }
+  };
+
   const getStatusBadgeColor = (status: string) => {
     switch (status) {
       case "Approved": return "bg-[#00e07a]/10 text-[#00e07a] border-[#00e07a]/25";
@@ -180,6 +293,12 @@ export function KnowledgeAdmin() {
       case "Medium": return "bg-yellow-500/20 text-yellow-400 border-yellow-500/30";
       default: return "bg-blue-500/20 text-blue-400 border-blue-500/30";
     }
+  };
+
+  const toggleSourceSelection = (sid: string) => {
+    setSelectedSources(prev => 
+      prev.includes(sid) ? prev.filter(x => x !== sid) : [...prev, sid]
+    );
   };
 
   return (
@@ -199,7 +318,7 @@ export function KnowledgeAdmin() {
                 setFormError(null);
                 setShowAddModal(true);
               }}
-              className="px-4 py-2 bg-gradient-to-r from-[#00e07a] to-[#00b8ff] text-black font-bold border-none rounded-lg text-sm hover:opacity-90 transition-opacity shadow-[0_0_15px_rgba(0,224,122,0.3)] flex items-center gap-2"
+              className="px-4 py-2 bg-gradient-to-r from-[#00e07a] to-[#00b8ff] text-black font-bold border-none rounded-lg text-sm hover:opacity-90 transition-opacity shadow-[0_0_15px_rgba(0,224,122,0.3)] flex items-center gap-2 cursor-pointer"
             >
               <Plus size={16} /> Add Corpus Entry
             </button>
@@ -230,7 +349,7 @@ export function KnowledgeAdmin() {
             <p className="text-sm text-gray-400">{error}</p>
             <button 
               onClick={fetchData}
-              className="mt-2 px-4 py-2 bg-white/5 hover:bg-white/10 text-white rounded-lg text-xs transition-colors border border-white/10"
+              className="mt-2 px-4 py-2 bg-white/5 hover:bg-white/10 text-white rounded-lg text-xs transition-colors border border-white/10 cursor-pointer"
             >
               Retry
             </button>
@@ -241,7 +360,7 @@ export function KnowledgeAdmin() {
             <div className="flex gap-4 border-b border-white/5">
               <button 
                 onClick={() => setActiveTab("references")}
-                className={`pb-3 px-1 text-sm font-medium transition-colors flex items-center gap-2 ${
+                className={`pb-3 px-1 text-sm font-medium transition-colors flex items-center gap-2 cursor-pointer ${
                   activeTab === "references" ? "text-white border-b-2 border-[#00e07a]" : "text-gray-500 hover:text-gray-300"
                 }`}
               >
@@ -249,12 +368,22 @@ export function KnowledgeAdmin() {
               </button>
               <button 
                 onClick={() => setActiveTab("precedents")}
-                className={`pb-3 px-1 text-sm font-medium transition-colors flex items-center gap-2 ${
+                className={`pb-3 px-1 text-sm font-medium transition-colors flex items-center gap-2 cursor-pointer ${
                   activeTab === "precedents" ? "text-white border-b-2 border-[#00e07a]" : "text-gray-500 hover:text-gray-300"
                 }`}
               >
                 <Scale size={16} /> Legal Precedents ({precedents.length})
               </button>
+              {isSuperAdmin && (
+                <button 
+                  onClick={() => setActiveTab("search_sources")}
+                  className={`pb-3 px-1 text-sm font-medium transition-colors flex items-center gap-2 cursor-pointer ${
+                    activeTab === "search_sources" ? "text-white border-b-2 border-[#00e07a]" : "text-gray-500 hover:text-gray-300"
+                  }`}
+                >
+                  <Compass size={16} /> Search Sources
+                </button>
+              )}
             </div>
 
             {/* TAB CONTENT: REFERENCES */}
@@ -301,14 +430,14 @@ export function KnowledgeAdmin() {
                                 <div className="inline-flex gap-2">
                                   <button 
                                     onClick={() => handleApproveReject(ref.id, "Approved")}
-                                    className="p-1.5 bg-[#00e07a]/15 text-[#00e07a] border border-[#00e07a]/25 rounded hover:bg-[#00e07a]/25"
+                                    className="p-1.5 bg-[#00e07a]/15 text-[#00e07a] border border-[#00e07a]/25 rounded hover:bg-[#00e07a]/25 cursor-pointer"
                                     title="Approve Reference"
                                   >
                                     <Check size={14} />
                                   </button>
                                   <button 
                                     onClick={() => handleApproveReject(ref.id, "Rejected")}
-                                    className="p-1.5 bg-red-500/15 text-red-500 border border-red-500/25 rounded hover:bg-red-500/25"
+                                    className="p-1.5 bg-red-500/15 text-red-500 border border-red-500/25 rounded hover:bg-red-500/25 cursor-pointer"
                                     title="Reject Reference"
                                   >
                                     <X size={14} />
@@ -382,6 +511,169 @@ export function KnowledgeAdmin() {
                 </div>
               </div>
             )}
+
+            {/* TAB CONTENT: SEARCH SOURCES */}
+            {activeTab === "search_sources" && isSuperAdmin && (
+              <div className="space-y-6">
+                
+                {/* Search Form Panel */}
+                <div className="bg-[#161922]/70 border border-white/5 p-6 rounded-2xl shadow-xl space-y-4">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Globe size={18} className="text-[#00e07a]" />
+                    <h3 className="text-sm font-bold text-white uppercase tracking-wider">Search Authoritative Web Corpus</h3>
+                  </div>
+
+                  <form onSubmit={handleSearchSources} className="space-y-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1.5">Query / Topic</label>
+                        <div className="relative">
+                          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" size={14} />
+                          <input 
+                            type="text"
+                            required
+                            placeholder="e.g. Twin notice rule termination procedure..."
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            className="w-full bg-[#0b0f1a] border border-white/10 rounded-lg py-2.5 pl-9 pr-3 text-white text-sm focus:outline-none focus:border-[#00e07a]/50"
+                          />
+                        </div>
+                      </div>
+                      <div>
+                        <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1.5">Focus Category (Optional)</label>
+                        <input 
+                          type="text"
+                          placeholder="e.g. Dismissals, Maternity, Overtime Pay..."
+                          value={searchCategory}
+                          onChange={(e) => setSearchCategory(e.target.value)}
+                          className="w-full bg-[#0b0f1a] border border-white/10 rounded-lg py-2.5 px-3 text-white text-sm focus:outline-none focus:border-[#00e07a]/50"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Checkboxes Whitelist */}
+                    <div>
+                      <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1.5">Search Restrictions (Curated Official Domains)</label>
+                      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3 pt-1">
+                        {sourcesList.map(src => {
+                          const checked = selectedSources.includes(src.id);
+                          return (
+                            <label 
+                              key={src.id} 
+                              className={`flex items-center gap-2 px-3 py-2 border rounded-xl cursor-pointer select-none transition-all text-xs ${
+                                checked 
+                                  ? "bg-[#00e07a]/10 border-[#00e07a]/35 text-[#00e07a]" 
+                                  : "bg-black/10 border-white/5 text-gray-400 hover:text-white"
+                              }`}
+                            >
+                              <input 
+                                type="checkbox"
+                                checked={checked}
+                                onChange={() => toggleSourceSelection(src.id)}
+                                className="hidden"
+                              />
+                              <span>{src.label}</span>
+                            </label>
+                          );
+                        })}
+                      </div>
+                    </div>
+
+                    <div className="pt-2 flex justify-end">
+                      <button
+                        type="submit"
+                        disabled={searching}
+                        className="px-5 py-2.5 bg-gradient-to-r from-[#00e07a] to-[#00b8ff] text-black font-extrabold rounded-lg text-xs hover:opacity-95 transition-opacity shadow-[0_0_15px_rgba(0,224,122,0.25)] flex items-center gap-2 cursor-pointer disabled:opacity-50"
+                      >
+                        {searching ? (
+                          <>
+                            <Loader2 size={14} className="animate-spin" /> Querying Grounded LLM...
+                          </>
+                        ) : (
+                          <>
+                            <Sparkles size={14} /> Run Source Search
+                          </>
+                        )}
+                      </button>
+                    </div>
+                  </form>
+                </div>
+
+                {/* Feedback notes */}
+                {searchError && (
+                  <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-xl text-red-400 text-sm flex items-start gap-3">
+                    <AlertCircle className="w-5 h-5 flex-shrink-0" />
+                    <span>{searchError}</span>
+                  </div>
+                )}
+                {searchSuccess && (
+                  <div className="p-4 bg-[#00e07a]/10 border border-[#00e07a]/20 rounded-xl text-[#00e07a] text-sm flex items-start gap-3">
+                    <Check className="w-5 h-5 flex-shrink-0" />
+                    <span>{searchSuccess}</span>
+                  </div>
+                )}
+
+                {/* Candidate List Cards */}
+                {candidates.length > 0 && (
+                  <div className="space-y-4">
+                    <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider">Candidate Documents Retrieved</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      {candidates.map((cand, idx) => (
+                        <div key={idx} className="bg-[#161922]/70 border border-white/5 rounded-2xl p-5 flex flex-col justify-between hover:border-white/10 transition-all relative overflow-hidden">
+                          {cand.ingested && (
+                            <div className="absolute top-3 right-3 px-2 py-0.5 bg-[#00e07a]/15 text-[#00e07a] border border-[#00e07a]/25 rounded text-[9px] font-bold uppercase">
+                              Staged
+                            </div>
+                          )}
+                          <div className="space-y-3">
+                            <div className="flex flex-wrap gap-2 items-center">
+                              <span className="px-2 py-0.5 bg-blue-500/10 text-blue-400 border border-blue-500/20 rounded text-[9px] font-bold uppercase">
+                                {cand.source_type || "Web Resource"}
+                              </span>
+                              <span className="px-2 py-0.5 bg-purple-500/10 text-purple-400 border border-purple-500/20 rounded text-[9px] font-bold uppercase">
+                                {cand.suggested_category || cand.category || "General"}
+                              </span>
+                              <span className="text-[10px] font-bold text-gray-500 font-mono uppercase">{cand.entry_type || "reference"}</span>
+                            </div>
+                            <h4 className="text-sm font-bold text-white leading-snug">{cand.title}</h4>
+                            <p className="text-xs text-gray-400 leading-relaxed font-sans">{cand.summary}</p>
+                          </div>
+
+                          <div className="pt-4 border-t border-white/5 mt-4 flex items-center justify-between gap-4">
+                            {cand.official_url ? (
+                              <a 
+                                href={cand.official_url} 
+                                target="_blank" 
+                                rel="noreferrer" 
+                                className="inline-flex items-center gap-1.5 text-xs text-cyan-400 hover:text-cyan-300 font-semibold"
+                              >
+                                Source Link <ExternalLink size={12} />
+                              </a>
+                            ) : (
+                              <span className="text-xs text-gray-600">No URL</span>
+                            )}
+
+                            <button
+                              disabled={cand.ingested || ingestingIndex !== null}
+                              onClick={() => handleIngest(cand, idx)}
+                              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
+                                cand.ingested 
+                                  ? "bg-[#00e07a]/5 text-[#00e07a]/50 border border-[#00e07a]/10 cursor-default" 
+                                  : "bg-[#00e07a]/15 text-[#00e07a] hover:bg-[#00e07a]/25 border border-[#00e07a]/30"
+                              }`}
+                            >
+                              {ingestingIndex === idx && <Loader2 size={12} className="animate-spin" />}
+                              {cand.ingested ? "Staged in Pending" : "Ingest as Pending"}
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+              </div>
+            )}
           </>
         )}
       </div>
@@ -394,7 +686,7 @@ export function KnowledgeAdmin() {
               <h3 className="text-base font-bold text-white uppercase tracking-wider">Add Knowledge Entry</h3>
               <button 
                 onClick={() => setShowAddModal(false)} 
-                className="text-gray-400 hover:text-white text-xl leading-none"
+                className="text-gray-400 hover:text-white text-xl leading-none cursor-pointer"
               >
                 &times;
               </button>
@@ -452,9 +744,9 @@ export function KnowledgeAdmin() {
                   required
                   value={summary}
                   onChange={(e) => setSummary(e.target.value)}
-                  rows={3}
-                  className="w-full bg-[#0b0f1a] border border-white/10 rounded-lg py-2 px-3 text-white text-sm focus:outline-none focus:border-[#00e07a]/50 resize-none" 
-                  placeholder="Summarize the legal parameters of this reference..."
+                  rows={4}
+                  className="w-full bg-[#0b0f1a] border border-white/10 rounded-lg py-2 px-3 text-white text-sm focus:outline-none focus:border-[#00e07a]/50 resize-none font-sans" 
+                  placeholder="Summarize the core guidelines or implications of this advisory..."
                 ></textarea>
               </div>
 
@@ -470,7 +762,7 @@ export function KnowledgeAdmin() {
                         value={category}
                         onChange={(e) => setCategory(e.target.value)}
                         className="w-full bg-[#0b0f1a] border border-white/10 rounded-lg py-2 px-3 text-white text-sm focus:outline-none focus:border-[#00e07a]/50" 
-                        placeholder="e.g. Labor Standard"
+                        placeholder="e.g. Contracting / Subcontracting"
                       />
                     </div>
                     <div>
@@ -481,20 +773,20 @@ export function KnowledgeAdmin() {
                         value={sourceType}
                         onChange={(e) => setSourceType(e.target.value)}
                         className="w-full bg-[#0b0f1a] border border-white/10 rounded-lg py-2 px-3 text-white text-sm focus:outline-none focus:border-[#00e07a]/50" 
-                        placeholder="e.g. DOLE"
+                        placeholder="e.g. DOLE Advisory"
                       />
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">Official URL</label>
+                      <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">Official Reference URL</label>
                       <input 
                         type="url" 
                         value={officialUrl}
                         onChange={(e) => setOfficialUrl(e.target.value)}
                         className="w-full bg-[#0b0f1a] border border-white/10 rounded-lg py-2 px-3 text-white text-sm focus:outline-none focus:border-[#00e07a]/50" 
-                        placeholder="https://example.gov.ph/advisory"
+                        placeholder="https://..."
                       />
                     </div>
                     <div>
@@ -559,7 +851,7 @@ export function KnowledgeAdmin() {
                       value={keyPrinciples}
                       onChange={(e) => setKeyPrinciples(e.target.value)}
                       rows={2}
-                      className="w-full bg-[#0b0f1a] border border-white/10 rounded-lg py-2 px-3 text-white text-sm focus:outline-none focus:border-[#00e07a]/50 resize-none" 
+                      className="w-full bg-[#0b0f1a] border border-white/10 rounded-lg py-2 px-3 text-white text-sm focus:outline-none focus:border-[#00e07a]/50 resize-none font-sans" 
                       placeholder="Core legal standards established by the SC in this case..."
                     ></textarea>
                   </div>
@@ -571,7 +863,7 @@ export function KnowledgeAdmin() {
                       value={recommendedProcess}
                       onChange={(e) => setRecommendedProcess(e.target.value)}
                       rows={2}
-                      className="w-full bg-[#0b0f1a] border border-white/10 rounded-lg py-2 px-3 text-white text-sm focus:outline-none focus:border-[#00e07a]/50 resize-none" 
+                      className="w-full bg-[#0b0f1a] border border-white/10 rounded-lg py-2 px-3 text-white text-sm focus:outline-none focus:border-[#00e07a]/50 resize-none font-sans" 
                       placeholder="What should HR do operationally based on this ruling..."
                     ></textarea>
                   </div>
@@ -582,14 +874,14 @@ export function KnowledgeAdmin() {
                 <button 
                   type="button" 
                   onClick={() => setShowAddModal(false)} 
-                  className="px-3 py-1.5 text-gray-400 hover:text-white text-xs font-semibold"
+                  className="px-3 py-1.5 text-gray-400 hover:text-white text-xs font-semibold cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button 
                   type="submit" 
                   disabled={submitting}
-                  className="px-4 py-2 bg-[#00e07a] hover:bg-[#00c96a] text-black font-bold rounded-lg text-xs transition-colors flex items-center gap-1.5"
+                  className="px-4 py-2 bg-[#00e07a] hover:bg-[#00c96a] text-black font-bold rounded-lg text-xs transition-colors flex items-center gap-1.5 cursor-pointer"
                 >
                   {submitting && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
                   Submit Entry

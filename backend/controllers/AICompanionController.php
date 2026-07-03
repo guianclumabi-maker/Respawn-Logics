@@ -116,7 +116,7 @@ class AICompanionController
             return "⚠️ **SYSTEM ALERT:** The Google Gemini API key has not been configured yet. Please insert your API key in `backend/controllers/AICompanionController.php` on line 104 to enable the AI Companion's reasoning engine.\n\n**Synthesized Context:**\n" . $context;
         }
 
-        $apiUrl = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent";
+        $apiUrl = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent";
 
         // System prompt to instruct the LLM on its role
         $systemPrompt = "You are an expert HR and Employee Relations AI Companion for Philippine Labor Law and company policies. 
