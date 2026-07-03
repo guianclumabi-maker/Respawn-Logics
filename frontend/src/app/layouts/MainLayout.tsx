@@ -17,6 +17,7 @@ export default function MainLayout() {
     
     // Apps
     if (path === "/dashboard" || path === "/") return { view: "Dashboard" };
+    if (path.includes("/my-hr-cases")) return { view: "My HR Cases" };
     if (path.includes("/employee-relations")) return { view: "Employee Relations" };
     if (path.includes("/elr-copilot")) return { view: "ELR Copilot" };
     if (path.includes("/onboarding")) return { view: "Onboarding" };
@@ -111,13 +112,21 @@ export default function MainLayout() {
     fetchBadges();
   }, []);
 
+  // The ELR module (My HR Cases + ELR Admin Console) is a full-screen sub-app that renders
+  // its OWN sidebar, so hide the main platform sidebar on those routes to avoid a double sidebar.
+  const isElrSubApp =
+    location.pathname.includes("/employee-relations") ||
+    location.pathname.includes("/my-hr-cases");
+
   return (
     <div className="flex h-screen bg-background text-foreground overflow-hidden">
-      <Sidebar
-        activeView={activeView}
-        onViewChange={handleViewChange}
-        badges={badges}
-      />
+      {!isElrSubApp && (
+        <Sidebar
+          activeView={activeView}
+          onViewChange={handleViewChange}
+          badges={badges}
+        />
+      )}
       <main className="flex-1 flex flex-col min-w-0 overflow-hidden relative z-10 bg-[#0f1422]">
         <Outlet context={{ setBadges }} />
       </main>

@@ -4,7 +4,6 @@ import {
   Briefcase,
   Users,
   BarChart2,
-  Building2,
   Settings,
   ChevronDown,
   ChevronRight,
@@ -25,7 +24,7 @@ type NavItem = {
   hasChevron?: boolean;
 };
 
-const navItems: NavItem[] = [
+const adminNavItems: NavItem[] = [
   { label: "Dashboard", viewName: "Dashboard", icon: <LayoutDashboard size={20} /> },
   { label: "Cases", viewName: "Cases", icon: <Users size={20} /> },
   { label: "AI Companion", viewName: "AICompanion", icon: <BotMessageSquare size={20} className="text-cyan-400" /> },
@@ -34,19 +33,26 @@ const navItems: NavItem[] = [
   { label: "Analytics", viewName: "Analytics", icon: <BarChart2 size={20} /> },
 ];
 
+// Employee self-service view: only their own cases + the AI companion.
+const employeeNavItems: NavItem[] = [
+  { label: "My Cases", viewName: "Cases", icon: <Users size={20} /> },
+  { label: "AI Companion", viewName: "AICompanion", icon: <BotMessageSquare size={20} className="text-cyan-400" /> },
+];
+
 const basePath = window.location.hostname === 'localhost' ? '/respawn-logics' : '';
 
 const bottomItems = [
-  { label: "Company Directory", icon: <Building2 size={20} />, path: `${basePath}/frontend/dist/index.html#/org-chart` },
-  { label: "Return to Workspace", icon: <ArrowLeft size={20} />, path: `${basePath}/pages/dashboard.php`, highlight: true },
+  { label: "Return to Workspace", icon: <ArrowLeft size={20} />, path: `${basePath}/frontend/dist/index.html#/dashboard`, highlight: true },
 ];
 
 type SidebarProps = {
   activeView: string;
   onViewChange: (view: any) => void;
+  mode?: "employee" | "admin";
 };
 
-export function Sidebar({ activeView, onViewChange }: SidebarProps) {
+export function Sidebar({ activeView, onViewChange, mode = "admin" }: SidebarProps) {
+  const navItems = mode === "employee" ? employeeNavItems : adminNavItems;
   const [collapsed, setCollapsed] = useState(false);
   const [expanded, setExpanded] = useState<string>("Cases");
   const [sessionUser, setSessionUser] = useState<{ full_name: string; role: string; initials: string; department?: string; profile_image?: string } | null>(null);

@@ -567,7 +567,14 @@ class ELRController
             $params[':user_emp_id'] = $userEmployeeId;
             $params[':user_role'] = '"' . $userRole . '"';
         }
-        
+
+        // "My HR Cases" filter — restrict to cases where the current user is the subject or the reporter.
+        if (!empty($_GET['mine'])) {
+            $sql .= " AND (c.employee_id = :mine_emp OR c.reported_by_employee_id = :mine_emp2)";
+            $params[':mine_emp']  = $userEmployeeId;
+            $params[':mine_emp2'] = $userEmployeeId;
+        }
+
         $sql .= " ORDER BY c.created_at DESC";
         
         $stmt = $this->pdo->prepare($sql);
