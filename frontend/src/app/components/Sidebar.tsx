@@ -41,7 +41,9 @@ import {
   CheckCircle,
   Database,
   Search,
-  LogOut
+  LogOut,
+  ChevronDown,
+  ChevronRight
 } from "lucide-react";
 
 // ── Types ──────────────────────────────────────────────────
@@ -215,6 +217,34 @@ export function Sidebar({ activeView, onViewChange, badges = {} }: SidebarProps)
 
   const isActive = (view: string) => activeView.view === view;
 
+  const [collapsedSections, setCollapsedSections] = useState<Record<string, boolean>>(() => {
+    try {
+      const saved = localStorage.getItem("sidebarCollapsedSections");
+      if (saved) return JSON.parse(saved);
+    } catch (e) {}
+    return {};
+  });
+
+  useEffect(() => {
+    const activeSection = sections.find(s => s.items.some(i => i.view === activeView.view));
+    if (activeSection && collapsedSections[activeSection.title]) {
+      setCollapsedSections(prev => {
+        const next = { ...prev, [activeSection.title]: false };
+        localStorage.setItem("sidebarCollapsedSections", JSON.stringify(next));
+        return next;
+      });
+    }
+  }, [activeView.view, sections]);
+
+  const toggleSection = (title: string) => {
+    if (!title) return;
+    setCollapsedSections(prev => {
+      const next = { ...prev, [title]: !prev[title] };
+      localStorage.setItem("sidebarCollapsedSections", JSON.stringify(next));
+      return next;
+    });
+  };
+
   return (
     <aside
       style={{
@@ -272,19 +302,30 @@ export function Sidebar({ activeView, onViewChange, badges = {} }: SidebarProps)
 
       {/* ── Navigation ────────────────────────────────── */}
       <div className="flex-1 px-3 overflow-y-auto py-5 space-y-5 scrollbar-thin">
-        {sections.map((section) => (
+        {sections.map((section) => {
+          const isSectionCollapsed = !!collapsedSections[section.title];
+          return (
           <div key={section.title || "_top"}>
             {/* Section title */}
             {section.title && !collapsed && (
-              <p
-                className="pl-[12px] text-[0.75rem] font-bold text-muted-foreground dark:text-muted-foreground tracking-[1px] uppercase mb-1.5"
-                style={{ fontFamily: "'Space Grotesk', sans-serif" }}
+              <button
+                onClick={() => toggleSection(section.title)}
+                className="w-full flex items-center justify-between pl-[12px] pr-2 mb-1.5 cursor-pointer group"
               >
-                {section.title}
-              </p>
+                <p
+                  className="text-[0.75rem] font-bold text-muted-foreground dark:text-muted-foreground tracking-[1px] uppercase group-hover:text-slate-700 dark:group-hover:text-slate-300 transition-colors"
+                  style={{ fontFamily: "'Space Grotesk', sans-serif" }}
+                >
+                  {section.title}
+                </p>
+                <span className="text-muted-foreground group-hover:text-slate-700 dark:group-hover:text-slate-300 transition-colors">
+                  {isSectionCollapsed ? <ChevronRight size={14} /> : <ChevronDown size={14} />}
+                </span>
+              </button>
             )}
 
-            <div className="space-y-0.5">
+            {(!isSectionCollapsed || collapsed) && (
+            <div className="space-y-0.5 mb-5">
               {section.items.map((item) => {
                 const active = isActive(item.view);
                 const badgeCount = item.badgeKey ? (badges[item.badgeKey as keyof SidebarBadges] || 0) : 0;
@@ -327,8 +368,9 @@ export function Sidebar({ activeView, onViewChange, badges = {} }: SidebarProps)
                 );
               })}
             </div>
+            )}
           </div>
-        ))}
+        )})}
 
         {/* ── Gamified Theme Toggle ─────────────────────── */}
         <div className="mt-4 pt-4 border-t border-gray-200 dark:border-border">
