@@ -14,6 +14,7 @@ import {
   User,
   LayoutDashboard
 } from "lucide-react";
+import { ELRCaseDrawer } from "./ELRCaseDrawer";
 
 interface DailyReportSummary {
   total_filed: number;
@@ -77,12 +78,6 @@ export function ELRDailyReport() {
 
   // Card Details Modal
   const [selectedCardId, setSelectedCardId] = useState<number | null>(null);
-  const [cardDetails, setCardDetails] = useState<{
-    card: Card,
-    documents: GeneratedDoc[],
-    transitions: Transition[]
-  } | null>(null);
-  const [detailsLoading, setDetailsLoading] = useState(false);
 
   useEffect(() => {
     fetchReport();
@@ -116,27 +111,6 @@ export function ELRDailyReport() {
       setError("Unable to load daily report.");
     } finally {
       setLoading(false);
-    }
-  };
-
-  const fetchCardDetails = async (id: number) => {
-    setDetailsLoading(true);
-    setSelectedCardId(id);
-    setCardDetails(null);
-    try {
-      const res = await apiFetch(`/api/index.php?route=elr_pipeline&action=card&id=${id}`);
-      const data = await res.json();
-      if (data.success) {
-        setCardDetails(data.data);
-      } else {
-        setError(data.error || "Failed to fetch card details");
-        setSelectedCardId(null);
-      }
-    } catch (err) {
-      setError("Unable to load card details");
-      setSelectedCardId(null);
-    } finally {
-      setDetailsLoading(false);
     }
   };
 
@@ -320,7 +294,7 @@ export function ELRDailyReport() {
                     {filteredCases.map((c) => (
                       <tr 
                         key={c.id} 
-                        onClick={() => fetchCardDetails(c.id)}
+                        onClick={() => setSelectedCardId(c.id)}
                         className="hover:bg-white/[0.02] transition-colors cursor-pointer group"
                       >
                         <td className="py-4 px-6">
@@ -368,94 +342,11 @@ export function ELRDailyReport() {
         )}
       </div>
 
-      {/* Card Detail Drawer */}
       {selectedCardId && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex justify-end">
-          <div className="w-[500px] bg-[#0f1422] h-full shadow-2xl border-l border-[#2a2d36] flex flex-col animate-in slide-in-from-right">
-            <div className="p-5 border-b border-[#2a2d36] flex justify-between items-center bg-[#0b0f1a]">
-              <h2 className="text-lg font-bold font-['Space_Grotesk'] text-white">Case Details</h2>
-              <button onClick={() => setSelectedCardId(null)} className="text-gray-400 hover:text-white p-1"><X size={20} /></button>
-            </div>
-            
-            <div className="flex-1 overflow-y-auto p-6 space-y-8 scrollbar-thin">
-              {detailsLoading || !cardDetails ? (
-                <div className="flex justify-center py-10"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#00e07a]"></div></div>
-              ) : (
-                <>
-                  {/* Employee Info */}
-                  <div>
-                    <h3 className="text-xs font-bold uppercase tracking-wider text-gray-500 mb-3 border-b border-white/5 pb-2">Employee Information</h3>
-                    <div className="flex items-center gap-4 mb-4">
-                      <div className="w-12 h-12 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center font-bold text-lg">
-                        {cardDetails.card.full_name.charAt(0)}
-                      </div>
-                      <div>
-                        <div className="font-bold text-white text-lg">{cardDetails.card.full_name}</div>
-                        <div className="text-sm font-mono text-gray-500">{cardDetails.card.employee_id} • {cardDetails.card.department}</div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Documents */}
-                  <div>
-                    <h3 className="text-xs font-bold uppercase tracking-wider text-gray-500 mb-3 border-b border-white/5 pb-2 flex items-center gap-2"><FileText size={14}/> Generated Documents ({cardDetails.documents.length})</h3>
-                    {cardDetails.documents.length === 0 ? (
-                      <p className="text-sm text-gray-400 italic">No documents generated yet.</p>
-                    ) : (
-                      <div className="space-y-3">
-                        {cardDetails.documents.map(doc => (
-                          <div key={doc.id} className="bg-[#161922] border border-[#2a2d36] rounded-xl overflow-hidden">
-                            <div className="px-4 py-3 border-b border-[#2a2d36] flex justify-between items-center bg-[#1a1f2e]">
-                              <div>
-                                <div className="font-bold text-sm text-white">{doc.template_name}</div>
-                                <div className="text-[10px] text-gray-400 font-mono mt-0.5">{new Date(doc.created_at).toLocaleString()} • {doc.doc_type}</div>
-                              </div>
-                              <button 
-                                onClick={() => handlePrint(doc.body, doc.template_name)}
-                                className="p-1.5 bg-white/5 hover:bg-white/10 rounded text-gray-300 transition-colors"
-                                title="Print / PDF"
-                              >
-                                <Printer size={16} />
-                              </button>
-                            </div>
-                            <div className="p-4 max-h-[200px] overflow-y-auto scrollbar-thin bg-[#0b0f1a] font-mono text-[11px] text-gray-300 whitespace-pre-wrap leading-relaxed">
-                              {doc.body}
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Timeline */}
-                  <div>
-                    <h3 className="text-xs font-bold uppercase tracking-wider text-gray-500 mb-3 border-b border-white/5 pb-2 flex items-center gap-2"><Clock size={14}/> Transition Timeline</h3>
-                    <div className="relative pl-3 border-l-2 border-[#2a2d36] space-y-4 mt-4 ml-2">
-                      {cardDetails.transitions.map(trx => (
-                        <div key={trx.id} className="relative">
-                          <div className="absolute -left-[17px] top-1 w-3 h-3 bg-[#0f1422] border-2 border-[#00e07a] rounded-full"></div>
-                          <div className="text-sm font-medium text-white">
-                            Moved to <span className="text-[#00e07a]">{trx.to_stage}</span>
-                          </div>
-                          <div className="text-[11px] text-gray-500 mt-1">
-                            {new Date(trx.created_at).toLocaleString()} • by {trx.user_name}
-                          </div>
-                        </div>
-                      ))}
-                      <div className="relative">
-                        <div className="absolute -left-[17px] top-1 w-3 h-3 bg-[#0f1422] border-2 border-blue-400 rounded-full"></div>
-                        <div className="text-sm font-medium text-white">Case Created ({cardDetails.card.source === 'system_auto' ? 'Automated' : 'Manual'})</div>
-                        <div className="text-[11px] text-gray-500 mt-1">
-                          {new Date(cardDetails.card.created_at).toLocaleString()}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </>
-              )}
-            </div>
-          </div>
-        </div>
+        <ELRCaseDrawer 
+          cardId={selectedCardId} 
+          onClose={() => setSelectedCardId(null)} 
+        />
       )}
 
     </div>

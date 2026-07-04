@@ -16,7 +16,8 @@ import {
   GitBranch,
   Kanban,
   Bot,
-  FileText
+  FileText,
+  CheckSquare
 } from "lucide-react";
 import { GamifiedThemeToggle } from "./GamifiedThemeToggle";
 
@@ -33,6 +34,7 @@ const adminNavItems: NavItem[] = [
   { label: "Daily Report", viewName: "DailyReport", icon: <FileText size={20} /> },
   { label: "Cases", viewName: "Cases", icon: <Users size={20} /> },
   { label: "Pipeline Board", viewName: "PipelineBoard", icon: <Kanban size={20} /> },
+  { label: "Approvals", viewName: "Approvals", icon: <CheckSquare size={20} /> },
   { label: "Pipelines Settings", viewName: "Pipelines", icon: <GitBranch size={20} /> },
   { label: "Automation", viewName: "Automation", icon: <Bot size={20} /> },
   { label: "Templates", viewName: "Templates", icon: <Layers size={20} /> },

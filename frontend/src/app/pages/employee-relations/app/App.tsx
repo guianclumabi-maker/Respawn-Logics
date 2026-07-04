@@ -12,6 +12,7 @@ import { ELRPipelines } from "./components/ELRPipelines";
 import { ELRPipelineBoard } from "./components/ELRPipelineBoard";
 import { ELRAutomation } from "./components/ELRAutomation";
 import { ELRDailyReport } from "./components/ELRDailyReport";
+import { ELRApprovals } from "./components/ELRApprovals";
 
 export default function App({ mode = "admin" }: { mode?: "employee" | "admin" }) {
   const [activeView, setActiveView] = useState<string>(mode === "employee" ? "Cases" : "Dashboard");
@@ -79,6 +80,10 @@ export default function App({ mode = "admin" }: { mode?: "employee" | "admin" })
 
         {activeView === "DailyReport" && (
           <ELRDailyReport />
+        )}
+
+        {activeView === "Approvals" && (
+          <ELRApprovals />
         )}
       </div>
     </div>
