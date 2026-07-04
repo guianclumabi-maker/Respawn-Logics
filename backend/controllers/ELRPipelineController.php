@@ -151,6 +151,34 @@ class ELRPipelineController
                     }
                     break;
 
+                // ── Phase 5: serve/acknowledge documents, hearings, approvals ──
+                case 'serve_document':
+                    if ($_SERVER['REQUEST_METHOD'] === 'POST') { $this->markDocument($input, 'served'); }
+                    else { echo json_encode(['success' => false, 'error' => 'Invalid method']); }
+                    break;
+                case 'acknowledge_document':
+                    if ($_SERVER['REQUEST_METHOD'] === 'POST') { $this->markDocument($input, 'acknowledged'); }
+                    else { echo json_encode(['success' => false, 'error' => 'Invalid method']); }
+                    break;
+                case 'hearings':
+                    $this->listHearings();
+                    break;
+                case 'save_hearing':
+                    if ($_SERVER['REQUEST_METHOD'] === 'POST') { $this->saveHearing($input); }
+                    else { echo json_encode(['success' => false, 'error' => 'Invalid method']); }
+                    break;
+                case 'approvals':
+                    $this->listApprovals();
+                    break;
+                case 'request_approval':
+                    if ($_SERVER['REQUEST_METHOD'] === 'POST') { $this->requestApproval($input); }
+                    else { echo json_encode(['success' => false, 'error' => 'Invalid method']); }
+                    break;
+                case 'decide_approval':
+                    if ($_SERVER['REQUEST_METHOD'] === 'POST') { $this->decideApproval($input); }
+                    else { echo json_encode(['success' => false, 'error' => 'Invalid method']); }
+                    break;
+
                 default:
                     http_response_code(400);
                     echo json_encode(['success' => false, 'error' => 'Invalid action']);
@@ -1072,5 +1100,148 @@ class ELRPipelineController
             }
         }
         return $matches;
+    }
+
+    // ─────────────────────────────────────────────────────────────
+    //  Phase 5 — Serve/acknowledge documents, hearings, approvals
+    //  Completes the due-process trail: issued -> served -> acknowledged,
+    //  plus the hearing ("opportunity to be heard") and a sign-off gate.
+    // ─────────────────────────────────────────────────────────────
+
+    /** Stamp a generated document as served or acknowledged. */
+    private function markDocument($input, $mode)
+    {
+        $this->requireManage();
+        $id = (int)($input['id'] ?? ($input['document_id'] ?? 0));
+        if (!$id) {
+            echo json_encode(['success' => false, 'error' => 'Document ID required']);
+            return;
+        }
+        $col = $mode === 'acknowledged' ? 'acknowledged_at' : 'served_at'; // fixed set, safe to interpolate
+        $stmt = $this->pdo->prepare("UPDATE `elr_generated_documents` SET `$col` = NOW() WHERE `id` = ? AND `tenant_id` = ?");
+        $stmt->execute([$id, $this->tenantId]);
+        echo json_encode(['success' => true, 'message' => ucfirst($mode) . '.']);
+    }
+
+    /** List hearings for a case. */
+    private function listHearings()
+    {
+        $cardId = (int)($_GET['case_card_id'] ?? 0);
+        if (!$cardId) {
+            http_response_code(400);
+            echo json_encode(['success' => false, 'error' => 'case_card_id required']);
+            return;
+        }
+        $stmt = $this->pdo->prepare(
+            "SELECT * FROM `elr_hearings` WHERE `case_card_id` = ? AND `tenant_id` = ? ORDER BY `scheduled_at` DESC, `id` DESC"
+        );
+        $stmt->execute([$cardId, $this->tenantId]);
+        echo json_encode(['success' => true, 'hearings' => $stmt->fetchAll(PDO::FETCH_ASSOC)]);
+    }
+
+    /** Create or update a hearing / conference. */
+    private function saveHearing($input)
+    {
+        $this->requireManage();
+        $id       = (int)($input['id'] ?? 0);
+        $cardId   = (int)($input['case_card_id'] ?? 0);
+        $sched    = trim($input['scheduled_at'] ?? '') ?: null;   // 'YYYY-MM-DD HH:MM:SS'
+        $location = trim($input['location'] ?? '');
+        $notes    = trim($input['notes'] ?? '');
+        $outcome  = trim($input['outcome'] ?? '') ?: null;
+        $status   = in_array($input['status'] ?? 'Scheduled', ['Scheduled', 'Held', 'Cancelled'], true) ? $input['status'] : 'Scheduled';
+        $actor    = is_array($this->currentUser) ? ($this->currentUser['full_name'] ?? 'Admin') : 'Admin';
+
+        if ($id > 0) {
+            $stmt = $this->pdo->prepare(
+                "UPDATE `elr_hearings` SET `scheduled_at` = ?, `location` = ?, `notes` = ?, `outcome` = ?, `status` = ?
+                 WHERE `id` = ? AND `tenant_id` = ?"
+            );
+            $stmt->execute([$sched, $location, $notes, $outcome, $status, $id, $this->tenantId]);
+            echo json_encode(['success' => true, 'id' => $id, 'message' => 'Hearing updated.']);
+            return;
+        }
+        // Validate the case belongs to this tenant before creating.
+        $chk = $this->pdo->prepare("SELECT COUNT(*) FROM `elr_case_cards` WHERE `id` = ? AND `tenant_id` = ?");
+        $chk->execute([$cardId, $this->tenantId]);
+        if (!$chk->fetchColumn()) {
+            echo json_encode(['success' => false, 'error' => 'Invalid case.']);
+            return;
+        }
+        $stmt = $this->pdo->prepare(
+            "INSERT INTO `elr_hearings` (`tenant_id`, `case_card_id`, `scheduled_at`, `location`, `notes`, `outcome`, `status`, `created_by`)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
+        );
+        $stmt->execute([$this->tenantId, $cardId, $sched, $location, $notes, $outcome, $status, $actor]);
+        echo json_encode(['success' => true, 'id' => (int)$this->pdo->lastInsertId(), 'message' => 'Hearing scheduled.']);
+    }
+
+    /** List approvals for a case, or the tenant's pending-approvals queue if no case id given. */
+    private function listApprovals()
+    {
+        $cardId = (int)($_GET['case_card_id'] ?? 0);
+        if ($cardId) {
+            $stmt = $this->pdo->prepare(
+                "SELECT * FROM `elr_approvals` WHERE `case_card_id` = ? AND `tenant_id` = ? ORDER BY `requested_at` DESC"
+            );
+            $stmt->execute([$cardId, $this->tenantId]);
+        } else {
+            $stmt = $this->pdo->prepare(
+                "SELECT a.*, u.`full_name` AS employee_name
+                 FROM `elr_approvals` a
+                 LEFT JOIN `elr_case_cards` c ON a.`case_card_id` = c.`id`
+                 LEFT JOIN `users` u ON c.`employee_id` = u.`employee_id` AND u.`tenant_id` = a.`tenant_id`
+                 WHERE a.`tenant_id` = ? AND a.`status` = 'Pending'
+                 ORDER BY a.`requested_at` ASC"
+            );
+            $stmt->execute([$this->tenantId]);
+        }
+        echo json_encode(['success' => true, 'approvals' => $stmt->fetchAll(PDO::FETCH_ASSOC)]);
+    }
+
+    /** Request sign-off on a decisive action (e.g. issuing a NOD). */
+    private function requestApproval($input)
+    {
+        $this->requireManage();
+        $cardId  = (int)($input['case_card_id'] ?? 0);
+        $subject = trim($input['subject'] ?? '');
+        $stageId = !empty($input['stage_id']) ? (int)$input['stage_id'] : null;
+        if (!$cardId || $subject === '') {
+            echo json_encode(['success' => false, 'error' => 'case_card_id and subject are required']);
+            return;
+        }
+        $chk = $this->pdo->prepare("SELECT COUNT(*) FROM `elr_case_cards` WHERE `id` = ? AND `tenant_id` = ?");
+        $chk->execute([$cardId, $this->tenantId]);
+        if (!$chk->fetchColumn()) {
+            echo json_encode(['success' => false, 'error' => 'Invalid case.']);
+            return;
+        }
+        $actor = is_array($this->currentUser) ? ($this->currentUser['full_name'] ?? 'Admin') : 'Admin';
+        $stmt = $this->pdo->prepare(
+            "INSERT INTO `elr_approvals` (`tenant_id`, `case_card_id`, `stage_id`, `subject`, `requested_by`, `status`)
+             VALUES (?, ?, ?, ?, ?, 'Pending')"
+        );
+        $stmt->execute([$this->tenantId, $cardId, $stageId, $subject, $actor]);
+        echo json_encode(['success' => true, 'id' => (int)$this->pdo->lastInsertId(), 'message' => 'Approval requested.']);
+    }
+
+    /** Approve or reject a pending approval. */
+    private function decideApproval($input)
+    {
+        $this->requireManage();
+        $id       = (int)($input['id'] ?? 0);
+        $decision = in_array($input['status'] ?? '', ['Approved', 'Rejected'], true) ? $input['status'] : '';
+        $note     = trim($input['decision_note'] ?? '') ?: null;
+        if (!$id || $decision === '') {
+            echo json_encode(['success' => false, 'error' => 'id and a valid status (Approved/Rejected) are required']);
+            return;
+        }
+        $approver = is_array($this->currentUser) ? ($this->currentUser['full_name'] ?? 'Admin') : 'Admin';
+        $stmt = $this->pdo->prepare(
+            "UPDATE `elr_approvals` SET `status` = ?, `approver` = ?, `decision_note` = ?, `decided_at` = NOW()
+             WHERE `id` = ? AND `tenant_id` = ? AND `status` = 'Pending'"
+        );
+        $stmt->execute([$decision, $approver, $note, $id, $this->tenantId]);
+        echo json_encode(['success' => true, 'message' => 'Approval ' . strtolower($decision) . '.']);
     }
 }

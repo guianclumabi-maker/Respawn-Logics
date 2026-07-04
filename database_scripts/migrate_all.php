@@ -21,6 +21,7 @@ $scripts = [
     'migrate_elr_knowledge.php',
     'migrate_elr_pipeline.php',
     'migrate_elr_auto_rules.php',
+    'migrate_elr_phase5.php',
     'migrate_esm.php',
     'migrate_expenses.php',
     'migrate_global_cache.php',
