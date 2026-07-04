@@ -27,6 +27,7 @@ type NavItem = {
 const adminNavItems: NavItem[] = [
   { label: "Dashboard", viewName: "Dashboard", icon: <LayoutDashboard size={20} /> },
   { label: "Cases", viewName: "Cases", icon: <Users size={20} /> },
+  { label: "Templates", viewName: "Templates", icon: <Layers size={20} /> },
   { label: "AI Companion", viewName: "AICompanion", icon: <BotMessageSquare size={20} className="text-cyan-400" /> },
   { label: "Knowledge Base", viewName: "Knowledge Base", icon: <Settings size={20} /> },
   { label: "Attendance", viewName: "Attendance", icon: <Clock size={20} /> },
