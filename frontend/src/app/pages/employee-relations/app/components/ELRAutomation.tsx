@@ -41,7 +41,7 @@ interface AutoRule {
   id?: number;
   rule_type: string;
   name: string;
-  is_active: number;
+  enabled: number;
   params: Record<string, any>;
   target_pipeline_id: number | "";
   target_stage_id: number | "";
@@ -100,6 +100,7 @@ export function ELRAutomation() {
         const loadedRules = (rulesData.rules || []).map((r: any) => ({
           ...r,
           params: typeof r.params === 'string' ? JSON.parse(r.params) : (r.params || {}),
+          enabled: r.enabled,
           target_pipeline_id: r.target_pipeline_id || "",
           target_stage_id: r.target_stage_id || ""
         }));
@@ -124,7 +125,7 @@ export function ELRAutomation() {
       id: undefined,
       rule_type: defaultDetector.key,
       name: "New Automation Rule",
-      is_active: 1,
+      enabled: 1,
       params: defaultParams,
       target_pipeline_id: "",
       target_stage_id: ""
@@ -162,7 +163,7 @@ export function ELRAutomation() {
         id: rule.id,
         rule_type: rule.rule_type,
         name: rule.name,
-        enabled: rule.is_active,
+        enabled: rule.enabled,
         params: rule.params,
         target_pipeline_id: rule.target_pipeline_id,
         target_stage_id: rule.target_stage_id
@@ -260,7 +261,7 @@ export function ELRAutomation() {
           <div className="flex gap-3">
             <button 
               onClick={handleRunScan}
-              disabled={scanning || rules.filter(r => r.is_active === 1).length === 0}
+              disabled={scanning || rules.filter(r => r.enabled === 1).length === 0}
               className="px-4 py-2 bg-blue-500/10 hover:bg-blue-500/20 text-blue-500 border border-blue-500/20 rounded-lg text-sm font-bold flex items-center gap-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {scanning ? <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-500"></div> : <Play size={16} />}
@@ -353,14 +354,14 @@ export function ELRAutomation() {
                   
                   <div className="flex items-center gap-4">
                     <label className="flex items-center gap-2 cursor-pointer relative">
-                      <span className="text-sm font-bold text-gray-500">{rule.is_active ? 'Enabled' : 'Disabled'}</span>
+                      <span className="text-sm font-bold text-gray-500">{rule.enabled ? 'Enabled' : 'Disabled'}</span>
                       <input 
                         type="checkbox" 
                         className="sr-only peer" 
-                        checked={rule.is_active === 1} 
+                        checked={rule.enabled === 1} 
                         onChange={(e) => {
                           const updated = [...rules];
-                          updated[idx].is_active = e.target.checked ? 1 : 0;
+                          updated[idx].enabled = e.target.checked ? 1 : 0;
                           setRules(updated);
                         }} 
                       />

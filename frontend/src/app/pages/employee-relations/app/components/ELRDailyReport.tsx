@@ -17,9 +17,9 @@ import {
 import { ELRCaseDrawer } from "./ELRCaseDrawer";
 
 interface DailyReportSummary {
-  total_filed: number;
-  auto_count: number;
-  manual_count: number;
+  total: number;
+  auto: number;
+  manual: number;
   by_pipeline: Record<string, number>;
   by_department: Record<string, number>;
 }
@@ -33,6 +33,7 @@ interface Card {
   department: string;
   doc_count: number;
   created_at: string;
+  entered_via: string;
   source: string;
   pipeline_name: string;
   stage_name: string;
@@ -63,9 +64,9 @@ export function ELRDailyReport() {
   const [cases, setCases] = useState<Card[]>([]);
 
   // Filters
-  const [dateRange, setDateRange] = useState(() => {
+  const [filters, setFilters] = useState(() => {
     const today = new Date().toISOString().split('T')[0];
-    return today;
+    return { start_date: today, end_date: today };
   });
   const [search, setSearch] = useState("");
   const [sourceFilter, setSourceFilter] = useState("");
@@ -81,23 +82,23 @@ export function ELRDailyReport() {
 
   useEffect(() => {
     fetchReport();
-  }, [dateRange]);
+  }, [filters.start_date, filters.end_date]);
 
   const fetchReport = async () => {
     setLoading(true);
     setError(null);
     try {
-      const res = await apiFetch(`/api/index.php?route=elr_pipeline&action=daily_report&date=${dateRange}`);
+      const res = await apiFetch(`/api/index.php?route=elr_pipeline&action=daily_report&start_date=${filters.start_date}&end_date=${filters.end_date}`);
       const data = await res.json();
       
       if (data.success) {
         setSummary(data.summary);
-        setCases(data.cases || []);
+        setCases(data.cards || []);
         
         // Extract unique filters
         const depts = new Set<string>();
         const pipes = new Set<string>();
-        (data.cases || []).forEach((c: Card) => {
+        (data.cards || []).forEach((c: Card) => {
           if (c.department) depts.add(c.department);
           if (c.pipeline_name) pipes.add(c.pipeline_name);
         });
@@ -139,11 +140,11 @@ export function ELRDailyReport() {
   const filteredCases = cases.filter(c => {
     const matchesSearch = c.full_name.toLowerCase().includes(search.toLowerCase()) || 
                           c.employee_id.toLowerCase().includes(search.toLowerCase());
-    const matchesSource = sourceFilter === "" || c.source === sourceFilter;
+    if (sourceFilter && c.entered_via !== sourceFilter) return false;
     const matchesDept = deptFilter === "" || c.department === deptFilter;
     const matchesPipeline = pipelineFilter === "" || c.pipeline_name === pipelineFilter;
     
-    return matchesSearch && matchesSource && matchesDept && matchesPipeline;
+    return matchesSearch && matchesDept && matchesPipeline;
   });
 
   return (
@@ -158,14 +159,25 @@ export function ELRDailyReport() {
             <p className="text-sm text-gray-400">Review newly filed cases and automation outcomes.</p>
           </div>
           <div className="flex items-center gap-3">
-            <div className="relative">
-              <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" size={15} />
-              <input 
-                type="date"
-                value={dateRange}
-                onChange={(e) => setDateRange(e.target.value)}
-                className="w-full bg-[#0b0f1a] border border-white/10 rounded-lg py-2 pl-9 pr-3 text-white text-sm focus:outline-none focus:border-[#00e07a]/50"
-              />
+            <div className="relative flex gap-2">
+                <div>
+                  <label className="block text-[10px] font-bold text-gray-500 uppercase mb-1">Start Date</label>
+                  <input 
+                    type="date" 
+                    value={filters.start_date}
+                    onChange={e => setFilters({...filters, start_date: e.target.value})}
+                    className="w-full bg-[#0b0f1a] border border-[#2a2d36] rounded px-3 py-1.5 text-xs focus:outline-none focus:border-[#00e07a] text-white"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[10px] font-bold text-gray-500 uppercase mb-1">End Date</label>
+                  <input 
+                    type="date" 
+                    value={filters.end_date}
+                    onChange={e => setFilters({...filters, end_date: e.target.value})}
+                    className="w-full bg-[#0b0f1a] border border-[#2a2d36] rounded px-3 py-1.5 text-xs focus:outline-none focus:border-[#00e07a] text-white"
+                  />
+                </div>
             </div>
             <button 
               onClick={() => window.print()}
@@ -196,19 +208,19 @@ export function ELRDailyReport() {
                 <div className="bg-[#161922]/70 border border-white/5 rounded-xl p-5 shadow-lg relative overflow-hidden">
                   <div className="absolute top-0 left-0 w-1 h-full bg-[#00e07a]"></div>
                   <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Total Filed Today</h3>
-                  <div className="text-3xl font-bold text-white font-mono">{summary.total_filed}</div>
+                  <div className="text-2xl font-bold font-mono text-white mb-1">{summary.total}</div>
                 </div>
                 
                 <div className="bg-[#161922]/70 border border-white/5 rounded-xl p-5 shadow-lg relative overflow-hidden">
                   <div className="absolute top-0 left-0 w-1 h-full bg-blue-500"></div>
                   <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Automated (System)</h3>
-                  <div className="text-3xl font-bold text-blue-400 font-mono">{summary.auto_count}</div>
+                  <div className="text-2xl font-bold font-mono text-white mb-1">{summary.auto}</div>
                 </div>
                 
                 <div className="bg-[#161922]/70 border border-white/5 rounded-xl p-5 shadow-lg relative overflow-hidden">
                   <div className="absolute top-0 left-0 w-1 h-full bg-purple-500"></div>
                   <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Manual Filing</h3>
-                  <div className="text-3xl font-bold text-purple-400 font-mono">{summary.manual_count}</div>
+                  <div className="text-2xl font-bold font-mono text-white mb-1">{summary.manual}</div>
                 </div>
 
                 <div className="bg-[#161922]/70 border border-white/5 rounded-xl p-4 shadow-lg overflow-hidden flex flex-col justify-center">
@@ -248,7 +260,7 @@ export function ELRDailyReport() {
                   className="bg-[#0b0f1a] border border-white/10 rounded-lg py-2 px-3 text-sm text-white focus:outline-none focus:border-[#00e07a]/50"
                 >
                   <option value="">All Sources</option>
-                  <option value="system_auto">Automated (System)</option>
+                  <option value="auto">Automated (System)</option>
                   <option value="manual">Manual Entry</option>
                 </select>
 
@@ -307,15 +319,9 @@ export function ELRDailyReport() {
                           <span className="bg-white/5 px-2 py-1 rounded border border-white/10">{c.stage_name}</span>
                         </td>
                         <td className="py-4 px-6 text-center">
-                          {c.source === 'system_auto' ? (
-                            <span className="inline-flex items-center gap-1.5 px-2 py-1 rounded text-[10px] font-bold uppercase border bg-blue-500/10 text-blue-400 border-blue-500/20">
-                              <Bot size={12} /> Auto
-                            </span>
-                          ) : (
-                            <span className="inline-flex items-center gap-1.5 px-2 py-1 rounded text-[10px] font-bold uppercase border bg-purple-500/10 text-purple-400 border-purple-500/20">
-                              <User size={12} /> Manual
-                            </span>
-                          )}
+                          <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${c.entered_via === 'auto' ? 'bg-purple-500/10 text-purple-400 border border-purple-500/20' : 'bg-blue-500/10 text-blue-400 border border-blue-500/20'}`}>
+                            {c.entered_via === 'auto' ? 'Auto-detected' : 'Manual'}
+                          </span>
                         </td>
                         <td className="py-4 px-6 text-center text-[11px] text-gray-500">
                           {new Date(c.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}

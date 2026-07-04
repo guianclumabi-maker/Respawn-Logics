@@ -33,19 +33,18 @@ interface Stage {
   id: number;
   pipeline_id: number;
   name: string;
-  stage_order: number;
+  order_index: number;
   sla_days: number;
-  is_terminal: number;
-  auto_template_id: number | null;
+  is_terminal: number | boolean;
+  template_id: number | null;
 }
 
 interface Card {
   id: number;
-  pipeline_id: number;
-  stage_id: number;
   employee_id: string;
   full_name: string;
   department: string;
+  current_stage_id: number;
   doc_count: number;
   created_at: string;
 }
@@ -187,14 +186,11 @@ export function ELRPipelineBoard() {
     const cardId = parseInt(e.dataTransfer.getData("cardId"));
     if (!cardId) return;
     
-    // Check if card is already in this stage
     const card = cards.find(c => c.id === cardId);
-    if (card && card.stage_id === toStageId) return;
+    if (card && card.current_stage_id === toStageId) return;
 
-    // Check if target stage has a template that might need fields
     const toStage = stages.find(s => s.id === toStageId);
-    if (toStage && toStage.auto_template_id) {
-      // Show modal to collect fields
+    if (toStage && toStage.template_id) {
       setPendingMove({ cardId, toStageId });
       setTransitionFields({});
       setShowTransitionModal(true);
@@ -204,6 +200,7 @@ export function ELRPipelineBoard() {
   };
 
   const executeMove = async (cardId: number, toStageId: number, fields: any) => {
+    const toStage = stages.find(s => s.id === toStageId);
     try {
       const res = await apiFetch("/api/index.php?route=elr_pipeline&action=move_card", {
         method: "POST",
@@ -215,8 +212,8 @@ export function ELRPipelineBoard() {
       });
       const data = await res.json();
       if (data.success) {
-        if (data.document_generated) {
-          showToast(`Moved to new stage. Document generated: ${data.document_generated.template_name}`);
+        if (data.generated_document) {
+          showToast(`Moved to ${toStage?.name}. Document generated: ${data.generated_document.title}`);
         } else {
           showToast("Card moved successfully");
         }
@@ -301,6 +298,7 @@ export function ELRPipelineBoard() {
   // RENDER: BOARD VIEW
   // ------------------------------------------------------------------
   const currentPipeline = pipelines.find(p => p.id === currentPipelineId);
+  const grouped: Record<number, Card[]> = {};
 
   return (
     <main className="flex-1 flex flex-col h-full bg-[#f4f6f8] dark:bg-[#06070a] text-slate-900 dark:text-white overflow-hidden transition-colors duration-300 relative">
@@ -345,7 +343,7 @@ export function ELRPipelineBoard() {
           </div>
         ) : (
           stages.map(stage => {
-            const stageCards = cards.filter(c => c.stage_id === stage.id);
+            grouped[stage.id] = cards.filter((c: any) => c.current_stage_id === stage.id);
             return (
               <div 
                 key={stage.id} 
@@ -358,7 +356,7 @@ export function ELRPipelineBoard() {
                   <div className="flex items-center gap-2">
                     <h3 className="font-bold text-sm tracking-tight text-slate-800 dark:text-white uppercase">{stage.name}</h3>
                     <span className="bg-gray-200 dark:bg-white/10 text-xs font-mono px-2 py-0.5 rounded-full text-slate-600 dark:text-gray-400">
-                      {stageCards.length}
+                      {grouped[stage.id].length}
                     </span>
                   </div>
                   {stage.is_terminal === 1 && (
@@ -368,7 +366,7 @@ export function ELRPipelineBoard() {
                 
                 {/* Column Body */}
                 <div className="flex-1 p-3 overflow-y-auto space-y-3 scrollbar-thin">
-                  {stageCards.map(card => (
+                  {grouped[stage.id].map(card => (
                     <div 
                       key={card.id}
                       draggable

@@ -68,10 +68,20 @@ export function ELRTemplates() {
     fetchTemplates();
   }, []);
 
-  const handleEdit = (tmpl: Template) => {
-    setFormData({ ...tmpl });
-    setDetectedFields(tmpl.merge_fields || []);
-    setEditingTemplate(tmpl);
+  const handleEdit = async (tmpl: Template) => {
+    try {
+      const res = await apiFetch(`/api/index.php?route=elr_pipeline&action=template&id=${tmpl.id}`);
+      const data = await res.json();
+      if (data.success && data.template) {
+        setFormData({ ...data.template });
+        setDetectedFields(data.template.merge_fields || []);
+        setEditingTemplate(data.template);
+      } else {
+        setError(data.error || "Failed to fetch template details");
+      }
+    } catch (err) {
+      setError("Error fetching template details");
+    }
   };
 
   const handleCreate = () => {
