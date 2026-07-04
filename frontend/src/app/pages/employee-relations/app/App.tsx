@@ -10,6 +10,7 @@ import { AttendanceReport } from "./components/AttendanceReport";
 import { ELRTemplates } from "./components/ELRTemplates";
 import { ELRPipelines } from "./components/ELRPipelines";
 import { ELRPipelineBoard } from "./components/ELRPipelineBoard";
+import { ELRAutomation } from "./components/ELRAutomation";
 
 export default function App({ mode = "admin" }: { mode?: "employee" | "admin" }) {
   const [activeView, setActiveView] = useState<string>(mode === "employee" ? "Cases" : "Dashboard");
@@ -69,6 +70,10 @@ export default function App({ mode = "admin" }: { mode?: "employee" | "admin" })
 
         {activeView === "PipelineBoard" && (
           <ELRPipelineBoard />
+        )}
+
+        {activeView === "Automation" && (
+          <ELRAutomation />
         )}
       </div>
     </div>
