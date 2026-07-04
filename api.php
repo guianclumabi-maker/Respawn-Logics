@@ -92,6 +92,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
             exit;
         }
 
+        // Ensure RBAC permissions + is_super are populated in the session BEFORE responding.
+        // Without this, the very first current_user call after login returns empty permissions
+        // (they're only loaded lazily by the api/index.php front controller), so the SPA renders
+        // a stripped-down "employee" sidebar until another request warms the cache. loadPermissions()
+        // is idempotent/cached, so this is cheap.
+        if (function_exists('loadPermissions')) {
+            loadPermissions();
+        }
+
         // Fetch User Roles Names
         $stmt = $pdo->prepare("
             SELECT r.name
@@ -123,6 +132,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                 'job_title' => $user['job_title'] ?? null,
                 'roles' => $roles,
                 'permissions' => $_SESSION['permissions'] ?? [],
+                'is_super' => !empty($_SESSION['is_super']),
                 'must_change_password' => !empty($_SESSION['must_change_password']),
                 'tier_config' => $tierConfig
             ]

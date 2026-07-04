@@ -14,6 +14,7 @@ interface AuthUser {
   job_title?: string;
   roles: string[];
   permissions: string[];
+  is_super?: boolean;
   tenant_id?: number;
   tenant_setup_mode?: string;
   theme?: string;
@@ -174,7 +175,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const hasPermission = (perm: string) => {
-    if (hasRole("Super_Admin")) return true;
+    // Platform admins bypass permission checks. Rely on the explicit is_super flag from the
+    // backend (deterministic) as well as the role name, so the sidebar never depends on the
+    // permissions cache being warm.
+    if (user?.is_super || hasRole("Super_Admin") || hasRole("Platform_Admin")) return true;
     return user?.permissions?.includes(perm) ?? false;
   };
 
