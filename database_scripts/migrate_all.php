@@ -19,6 +19,7 @@ $scripts = [
     'migrate_compensation.php',
     'migrate_elr.php',
     'migrate_elr_knowledge.php',
+    'migrate_elr_pipeline.php',
     'migrate_esm.php',
     'migrate_expenses.php',
     'migrate_global_cache.php',

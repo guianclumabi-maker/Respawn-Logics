@@ -105,6 +105,7 @@ $controllers = [
     'leaves' => 'LeavesController',
     'candidates' => 'CandidatesController',
     'elr' => 'ELRController',
+    'elr_pipeline' => 'ELRPipelineController',
     'employee_relations' => 'EmployeeRelationsController',
     'esm' => 'ESMController',
     'expenses' => 'ExpensesController',
