@@ -9,6 +9,7 @@ import { KnowledgeAdmin } from "../../KnowledgeAdmin";
 import { AttendanceReport } from "./components/AttendanceReport";
 import { ELRTemplates } from "./components/ELRTemplates";
 import { ELRPipelines } from "./components/ELRPipelines";
+import { ELRPipelineBoard } from "./components/ELRPipelineBoard";
 
 export default function App({ mode = "admin" }: { mode?: "employee" | "admin" }) {
   const [activeView, setActiveView] = useState<string>(mode === "employee" ? "Cases" : "Dashboard");
@@ -64,6 +65,10 @@ export default function App({ mode = "admin" }: { mode?: "employee" | "admin" })
 
         {activeView === "Pipelines" && (
           <ELRPipelines />
+        )}
+
+        {activeView === "PipelineBoard" && (
+          <ELRPipelineBoard />
         )}
       </div>
     </div>
