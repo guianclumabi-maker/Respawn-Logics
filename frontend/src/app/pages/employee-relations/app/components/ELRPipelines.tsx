@@ -31,12 +31,12 @@ interface Template {
 
 interface Stage {
   id: number;
-  pipeline_id: number;
+  pipeline_id?: number;
   name: string;
-  stage_order: number;
-  sla_days: number;
-  is_terminal: number | boolean;
-  auto_template_id: number | null;
+  order_index: number;
+  sla_days: number | "";
+  is_terminal: number;
+  template_id: number | "";
 }
 
 export function ELRPipelines() {
@@ -177,15 +177,15 @@ export function ELRPipelines() {
     setEditingStage({
       pipeline_id: currentPipeline.id,
       name: "",
-      stage_order: (stages.length > 0 ? Math.max(...stages.map(s => s.stage_order)) + 10 : 10),
-      sla_days: 0,
-      is_terminal: 0,
-      auto_template_id: null
+      order_index: stages.length, 
+      sla_days: "", 
+      is_terminal: 0, 
+      template_id: "" 
     });
   };
 
   const handleEditStage = (stage: Stage) => {
-    setEditingStage({ ...stage });
+    setEditingStage({ ...stage, pipeline_id: currentPipeline.id });
   };
 
   const handleSaveStage = async () => {
@@ -469,9 +469,9 @@ export function ELRPipelines() {
                         ) : null}
                       </div>
                       <div className="flex gap-4 text-xs font-mono text-gray-500 mt-2">
-                        <span className="flex items-center gap-1"><ListOrdered size={14} /> Order: {stage.stage_order}</span>
+                        <span className="flex items-center gap-1"><ListOrdered size={14} /> Order: {stage.order_index}</span>
                         <span className="flex items-center gap-1"><Clock size={14} /> SLA: {stage.sla_days} days</span>
-                        {stage.auto_template_id && (
+                        {stage.template_id && (
                           <span className="flex items-center gap-1 text-emerald-500"><FileText size={14} /> Auto-Document Trigger</span>
                         )}
                       </div>
@@ -529,11 +529,11 @@ export function ELRPipelines() {
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">Order</label>
+                  <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">Order Index</label>
                   <input 
-                    type="number" 
-                    value={editingStage.stage_order || 0} 
-                    onChange={e => setEditingStage({ ...editingStage, stage_order: parseInt(e.target.value) || 0 })}
+                    type="number"
+                    value={editingStage.order_index}
+                    onChange={e => setEditingStage({...editingStage, order_index: parseInt(e.target.value) || 0})}
                     className="w-full bg-gray-50 dark:bg-[#0b0f1a] border border-gray-200 dark:border-[#2a2d36] rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:border-[#00e07a]"
                   />
                 </div>
@@ -549,10 +549,10 @@ export function ELRPipelines() {
               </div>
 
               <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">Automated Template</label>
+                <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">Auto-Generate Document (Optional)</label>
                 <select 
-                  value={editingStage.auto_template_id || ""} 
-                  onChange={e => setEditingStage({ ...editingStage, auto_template_id: e.target.value ? parseInt(e.target.value) : null })}
+                  value={editingStage.template_id}
+                  onChange={e => setEditingStage({...editingStage, template_id: parseInt(e.target.value) || ""})}
                   className="w-full bg-gray-50 dark:bg-[#0b0f1a] border border-gray-200 dark:border-[#2a2d36] rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:border-[#00e07a]"
                 >
                   <option value="">None (Manual processing)</option>

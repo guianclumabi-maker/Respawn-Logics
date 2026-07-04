@@ -18,20 +18,20 @@ import {
 interface GeneratedDoc {
   id: number;
   card_id: number;
-  template_name: string;
+  title: string;
   doc_type: string;
-  body: string;
-  created_at: string;
+  content: string;
+  generated_at: string;
   served_at: string | null;
   acknowledged_at: string | null;
 }
 
 interface Transition {
   id: number;
-  from_stage: string | null;
-  to_stage: string;
-  created_at: string;
-  user_name: string;
+  from_stage_name: string | null;
+  to_stage_name: string;
+  transitioned_at: string;
+  actor: string;
 }
 
 interface Hearing {
@@ -60,7 +60,7 @@ interface Card {
   employee_id: string;
   department: string;
   created_at: string;
-  source: string;
+  entered_via: string;
 }
 
 interface CardDetails {
@@ -112,7 +112,7 @@ export function ELRCaseDrawer({ cardId, onClose, onUpdate }: ELRCaseDrawerProps)
       const res = await apiFetch(`/api/index.php?route=elr_pipeline&action=card&id=${id}`);
       const data = await res.json();
       if (data.success) {
-        setCardDetails(data.data);
+        setCardDetails(data);
       } else {
         showToast(data.error || "Failed to fetch card details", true);
         onClose();
@@ -276,11 +276,11 @@ export function ELRCaseDrawer({ cardId, onClose, onUpdate }: ELRCaseDrawerProps)
                       <div key={doc.id} className="bg-gray-50 dark:bg-[#161922] border border-gray-200 dark:border-[#2a2d36] rounded-xl overflow-hidden shadow-sm">
                         <div className="px-4 py-3 border-b border-gray-200 dark:border-[#2a2d36] flex justify-between items-center bg-white dark:bg-[#1a1f2e]">
                           <div>
-                            <div className="font-bold text-sm text-slate-900 dark:text-white">{doc.template_name}</div>
-                            <div className="text-[10px] text-gray-400 font-mono mt-0.5">{new Date(doc.created_at).toLocaleString()} • {doc.doc_type}</div>
+                            <div className="font-bold text-sm text-slate-900 dark:text-white">{doc.title}</div>
+                            <div className="text-[10px] text-gray-400 font-mono mt-0.5">{new Date(doc.generated_at).toLocaleString()} • {doc.doc_type}</div>
                           </div>
                           <button 
-                            onClick={() => handlePrint(doc.body, doc.template_name)}
+                            onClick={() => handlePrint(doc.content, doc.title)}
                             className="p-1.5 bg-gray-100 dark:bg-white/5 hover:bg-gray-200 dark:hover:bg-white/10 rounded text-slate-600 dark:text-gray-300 transition-colors"
                             title="Print / PDF"
                           >
@@ -311,7 +311,7 @@ export function ELRCaseDrawer({ cardId, onClose, onUpdate }: ELRCaseDrawerProps)
                         </div>
 
                         <div className="p-4 max-h-[150px] overflow-y-auto scrollbar-thin font-mono text-[11px] text-gray-600 dark:text-gray-300 whitespace-pre-wrap leading-relaxed">
-                          {doc.body}
+                          {doc.content}
                         </div>
                       </div>
                     ))}
@@ -453,20 +453,20 @@ export function ELRCaseDrawer({ cardId, onClose, onUpdate }: ELRCaseDrawerProps)
               <div>
                 <h3 className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-3 border-b border-gray-100 dark:border-white/5 pb-2 flex items-center gap-2"><Clock size={14}/> Transition Timeline</h3>
                 <div className="relative pl-3 border-l-2 border-gray-200 dark:border-[#2a2d36] space-y-4 mt-4 ml-2">
-                  {cardDetails.transitions.map(trx => (
-                    <div key={trx.id} className="relative">
+                  {cardDetails.transitions.map((trx, index) => (
+                    <div key={trx.id || index} className="relative">
                       <div className="absolute -left-[17px] top-1 w-3 h-3 bg-white dark:bg-[#0f1422] border-2 border-[#00e07a] rounded-full"></div>
                       <div className="text-sm font-medium text-slate-900 dark:text-white">
-                        Moved to <span className="text-[#00e07a]">{trx.to_stage}</span>
+                        Moved to <span className="text-[#00e07a]">{trx.to_stage_name}</span>
                       </div>
                       <div className="text-[11px] text-gray-500 mt-1">
-                        {new Date(trx.created_at).toLocaleString()} • by {trx.user_name}
+                        {new Date(trx.transitioned_at).toLocaleString()} • by {trx.actor}
                       </div>
                     </div>
                   ))}
                   <div className="relative">
                     <div className="absolute -left-[17px] top-1 w-3 h-3 bg-white dark:bg-[#0f1422] border-2 border-blue-400 rounded-full"></div>
-                    <div className="text-sm font-medium text-slate-900 dark:text-white">Case Created ({cardDetails.card.source === 'system_auto' ? 'Automated' : 'Manual'})</div>
+                    <div className="text-sm font-medium text-slate-900 dark:text-white">Case Created ({cardDetails.card.entered_via === 'auto' ? 'Automated' : 'Manual'})</div>
                     <div className="text-[11px] text-gray-500 mt-1">
                       {new Date(cardDetails.card.created_at).toLocaleString()}
                     </div>
