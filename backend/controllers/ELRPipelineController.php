@@ -119,6 +119,11 @@ class ELRPipelineController
                     }
                     break;
 
+                // ── Daily incident report (digest of everything filed in a window) ──
+                case 'daily_report':
+                    $this->getDailyReport();
+                    break;
+
                 // ── Phase 4: auto-population (AWOL detection) ──
                 case 'auto_rules':
                     $this->getAutoRules();
@@ -509,9 +514,9 @@ class ELRPipelineController
 
         $dStmt = $this->pdo->prepare(
             "SELECT `id`, `template_id`, `stage_id`, `doc_type`, `title`, `content`, `generated_by`, `generated_at`, `served_at`, `acknowledged_at`
-             FROM `elr_generated_documents` WHERE `case_card_id` = ? ORDER BY `generated_at` DESC"
+             FROM `elr_generated_documents` WHERE `case_card_id` = ? AND `tenant_id` = ? ORDER BY `generated_at` DESC"
         );
-        $dStmt->execute([$id]);
+        $dStmt->execute([$id, $this->tenantId]);
 
         $tStmt = $this->pdo->prepare(
             "SELECT tr.`from_stage_id`, tr.`to_stage_id`, tr.`actor`, tr.`note`, tr.`transitioned_at`,
@@ -519,9 +524,9 @@ class ELRPipelineController
              FROM `elr_stage_transitions` tr
              LEFT JOIN `elr_pipeline_stages` fs ON tr.`from_stage_id` = fs.`id`
              LEFT JOIN `elr_pipeline_stages` ts ON tr.`to_stage_id` = ts.`id`
-             WHERE tr.`case_card_id` = ? ORDER BY tr.`transitioned_at` ASC"
+             WHERE tr.`case_card_id` = ? AND tr.`tenant_id` = ? ORDER BY tr.`transitioned_at` ASC"
         );
-        $tStmt->execute([$id]);
+        $tStmt->execute([$id, $this->tenantId]);
 
         echo json_encode([
             'success'     => true,
@@ -724,6 +729,75 @@ class ELRPipelineController
             $key = $m[1];
             return array_key_exists($key, $data) && $data[$key] !== '' ? $data[$key] : '________';
         }, (string)$body);
+    }
+
+    // ─────────────────────────────────────────────────────────────
+    //  Daily Incident Report
+    //  An incident-type-agnostic digest: every case filed in the window
+    //  (auto AND manual, any pipeline), with filters + summary counts.
+    //  Powers both the on-demand view and the scheduled 24h digest.
+    // ─────────────────────────────────────────────────────────────
+    private function getDailyReport()
+    {
+        // Window: defaults to today. Filterable to any range.
+        $start = $_GET['start_date'] ?? date('Y-m-d');
+        $end   = $_GET['end_date'] ?? $start;
+        $s = strtotime($start);
+        $e = strtotime($end);
+        if ($s === false || $e === false) {
+            echo json_encode(['success' => false, 'error' => 'Invalid date range.']);
+            return;
+        }
+        if ($e < $s) { $t = $s; $s = $e; $e = $t; }
+        $startD = date('Y-m-d', $s);
+        $endD   = date('Y-m-d', $e);
+
+        // Filters (all optional) — keep the digest useful.
+        $pipelineId = (int)($_GET['pipeline_id'] ?? 0);
+        $dept       = trim($_GET['department'] ?? '');
+        $status     = trim($_GET['status'] ?? '');   // Active / Resolved / Closed
+        $source     = trim($_GET['source'] ?? '');   // auto / manual
+        $search     = trim($_GET['search'] ?? '');
+
+        $sql = "SELECT c.`id`, c.`employee_id`, c.`pipeline_id`, c.`current_stage_id`, c.`status`, c.`entered_via`, c.`created_at`,
+                       u.`full_name`, u.`department`,
+                       p.`name` AS pipeline_name,
+                       st.`name` AS stage_name,
+                       (SELECT COUNT(*) FROM `elr_generated_documents` g WHERE g.`case_card_id` = c.`id`) AS doc_count
+                FROM `elr_case_cards` c
+                LEFT JOIN `users` u ON c.`employee_id` = u.`employee_id` AND u.`tenant_id` = c.`tenant_id`
+                LEFT JOIN `elr_pipelines` p ON c.`pipeline_id` = p.`id`
+                LEFT JOIN `elr_pipeline_stages` st ON c.`current_stage_id` = st.`id`
+                WHERE c.`tenant_id` = ? AND DATE(c.`created_at`) BETWEEN ? AND ?";
+        $params = [$this->tenantId, $startD, $endD];
+
+        if ($pipelineId)                          { $sql .= " AND c.`pipeline_id` = ?"; $params[] = $pipelineId; }
+        if ($dept !== '')                         { $sql .= " AND u.`department` = ?";  $params[] = $dept; }
+        if ($status !== '')                       { $sql .= " AND c.`status` = ?";      $params[] = $status; }
+        if ($source === 'auto' || $source === 'manual') { $sql .= " AND c.`entered_via` = ?"; $params[] = $source; }
+        if ($search !== '')                       { $sql .= " AND (u.`full_name` LIKE ? OR c.`employee_id` LIKE ?)"; $params[] = "%$search%"; $params[] = "%$search%"; }
+
+        $sql .= " ORDER BY c.`created_at` DESC";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute($params);
+        $cards = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        // Summary counts for the digest header.
+        $summary = ['total' => count($cards), 'auto' => 0, 'manual' => 0, 'by_pipeline' => [], 'by_department' => []];
+        foreach ($cards as $c) {
+            ($c['entered_via'] === 'auto') ? $summary['auto']++ : $summary['manual']++;
+            $pn = $c['pipeline_name'] ?: 'Unassigned';
+            $dn = $c['department'] ?: 'Unassigned';
+            $summary['by_pipeline'][$pn]   = ($summary['by_pipeline'][$pn] ?? 0) + 1;
+            $summary['by_department'][$dn] = ($summary['by_department'][$dn] ?? 0) + 1;
+        }
+
+        echo json_encode([
+            'success' => true,
+            'window'  => ['from' => $startD, 'to' => $endD],
+            'summary' => $summary,
+            'cards'   => $cards,
+        ]);
     }
 
     // ─────────────────────────────────────────────────────────────
