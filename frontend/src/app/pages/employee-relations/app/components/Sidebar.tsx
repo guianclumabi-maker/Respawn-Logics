@@ -13,7 +13,8 @@ import {
   BotMessageSquare,
   Gamepad2,
   Clock,
-  GitBranch
+  GitBranch,
+  Kanban
 } from "lucide-react";
 import { GamifiedThemeToggle } from "./GamifiedThemeToggle";
 
@@ -28,7 +29,8 @@ type NavItem = {
 const adminNavItems: NavItem[] = [
   { label: "Dashboard", viewName: "Dashboard", icon: <LayoutDashboard size={20} /> },
   { label: "Cases", viewName: "Cases", icon: <Users size={20} /> },
-  { label: "Pipelines", viewName: "Pipelines", icon: <GitBranch size={20} /> },
+  { label: "Pipeline Board", viewName: "PipelineBoard", icon: <Kanban size={20} /> },
+  { label: "Pipelines Settings", viewName: "Pipelines", icon: <GitBranch size={20} /> },
   { label: "Templates", viewName: "Templates", icon: <Layers size={20} /> },
   { label: "AI Companion", viewName: "AICompanion", icon: <BotMessageSquare size={20} className="text-cyan-400" /> },
   { label: "Knowledge Base", viewName: "Knowledge Base", icon: <Settings size={20} /> },
