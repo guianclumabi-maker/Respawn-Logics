@@ -15,7 +15,8 @@ import {
   Clock,
   GitBranch,
   Kanban,
-  Bot
+  Bot,
+  FileText
 } from "lucide-react";
 import { GamifiedThemeToggle } from "./GamifiedThemeToggle";
 
@@ -29,6 +30,7 @@ type NavItem = {
 
 const adminNavItems: NavItem[] = [
   { label: "Dashboard", viewName: "Dashboard", icon: <LayoutDashboard size={20} /> },
+  { label: "Daily Report", viewName: "DailyReport", icon: <FileText size={20} /> },
   { label: "Cases", viewName: "Cases", icon: <Users size={20} /> },
   { label: "Pipeline Board", viewName: "PipelineBoard", icon: <Kanban size={20} /> },
   { label: "Pipelines Settings", viewName: "Pipelines", icon: <GitBranch size={20} /> },
