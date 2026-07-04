@@ -119,6 +119,26 @@ class ELRPipelineController
                     }
                     break;
 
+                // ── Phase 4: auto-population (AWOL detection) ──
+                case 'auto_rules':
+                    $this->getAutoRules();
+                    break;
+                case 'save_auto_rule':
+                    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+                        $this->saveAutoRule($input);
+                    } else {
+                        echo json_encode(['success' => false, 'error' => 'Invalid method']);
+                    }
+                    break;
+                case 'run_scan':
+                    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+                        $this->requireManage();
+                        echo json_encode($this->scanCurrentTenant());
+                    } else {
+                        echo json_encode(['success' => false, 'error' => 'Invalid method']);
+                    }
+                    break;
+
                 default:
                     http_response_code(400);
                     echo json_encode(['success' => false, 'error' => 'Invalid action']);
@@ -538,30 +558,35 @@ class ELRPipelineController
             return;
         }
 
-        // Entry stage = provided, else the first stage by order.
-        $entryStageId = (int)($input['stage_id'] ?? 0);
-        if (!$entryStageId) {
+        $stageId = (int)($input['stage_id'] ?? 0) ?: null;
+        $actor = is_array($this->currentUser) ? ($this->currentUser['full_name'] ?? 'Admin') : 'Admin';
+        $result = $this->createCardInternal($pipelineId, $employeeId, $enteredVia, $stageId, $extra, $actor);
+        echo json_encode(['success' => true, 'card_id' => $result['card_id'], 'generated_document' => $result['generated_document']]);
+    }
+
+    /**
+     * Shared card creation, used by manual add_card AND the automated AWOL scan (non-echoing).
+     * Defaults to the pipeline's first stage; logs entry and fires the entry stage's document.
+     */
+    private function createCardInternal($pipelineId, $employeeId, $enteredVia, $entryStageId, array $extra, $actor)
+    {
+        if (empty($entryStageId)) {
             $fs = $this->pdo->prepare(
                 "SELECT `id` FROM `elr_pipeline_stages` WHERE `pipeline_id` = ? AND `tenant_id` = ?
                  ORDER BY `stage_order` ASC, `id` ASC LIMIT 1"
             );
             $fs->execute([$pipelineId, $this->tenantId]);
-            $entryStageId = (int)$fs->fetchColumn();
+            $entryStageId = (int)$fs->fetchColumn() ?: null;
         }
-
-        $actor = is_array($this->currentUser) ? ($this->currentUser['full_name'] ?? 'Admin') : 'Admin';
         $ins = $this->pdo->prepare(
             "INSERT INTO `elr_case_cards` (`tenant_id`, `pipeline_id`, `employee_id`, `current_stage_id`, `status`, `entered_via`, `created_by`)
              VALUES (?, ?, ?, ?, 'Active', ?, ?)"
         );
-        $ins->execute([$this->tenantId, $pipelineId, $employeeId, $entryStageId ?: null, $enteredVia, $actor]);
+        $ins->execute([$this->tenantId, $pipelineId, $employeeId, $entryStageId, $enteredVia, $actor]);
         $cardId = (int)$this->pdo->lastInsertId();
-
-        // Log entry + fire the entry stage's document (if any).
-        $this->logTransition($cardId, null, $entryStageId ?: null, $actor, 'Added to pipeline');
+        $this->logTransition($cardId, null, $entryStageId, $actor, $enteredVia === 'auto' ? 'Auto-added (AWOL scan)' : 'Added to pipeline');
         $doc = $entryStageId ? $this->generateDocumentForStage($cardId, $employeeId, $entryStageId, $actor, $extra) : null;
-
-        echo json_encode(['success' => true, 'card_id' => $cardId, 'generated_document' => $doc]);
+        return ['card_id' => $cardId, 'generated_document' => $doc];
     }
 
     /**
@@ -699,5 +724,163 @@ class ELRPipelineController
             $key = $m[1];
             return array_key_exists($key, $data) && $data[$key] !== '' ? $data[$key] : '________';
         }, (string)$body);
+    }
+
+    // ─────────────────────────────────────────────────────────────
+    //  Phase 4 — Auto-population (AWOL detection from attendance)
+    //  A tenant configures the rule (threshold + which pipeline/stage to drop
+    //  AWOL employees into). The scan reads attendance the same way the
+    //  Attendance Report does, and auto-adds employees who are absent on every
+    //  one of the last N working days (no punch, no approved leave).
+    // ─────────────────────────────────────────────────────────────
+
+    /** Return the tenant's auto-population rule(s). Currently one: AWOL detection. */
+    private function getAutoRules()
+    {
+        $stmt = $this->pdo->prepare("SELECT * FROM `elr_awol_config` WHERE `tenant_id` = ?");
+        $stmt->execute([$this->tenantId]);
+        $cfg = $stmt->fetch(PDO::FETCH_ASSOC);
+        if (!$cfg) {
+            $cfg = [
+                'tenant_id'          => $this->tenantId,
+                'enabled'            => 0,
+                'consecutive_days'   => 3,
+                'target_pipeline_id' => null,
+                'target_stage_id'    => null,
+            ];
+        }
+        echo json_encode(['success' => true, 'rule_type' => 'AWOL', 'config' => $cfg]);
+    }
+
+    /** Upsert the AWOL auto-rule for this tenant. */
+    private function saveAutoRule($input)
+    {
+        $this->requireManage();
+        $enabled    = (int)!empty($input['enabled']);
+        $days       = max(1, (int)($input['consecutive_days'] ?? 3));
+        $pipelineId = !empty($input['target_pipeline_id']) ? (int)$input['target_pipeline_id'] : null;
+        $stageId    = !empty($input['target_stage_id']) ? (int)$input['target_stage_id'] : null;
+
+        // Validate target pipeline belongs to this tenant when enabling.
+        if ($enabled && $pipelineId) {
+            $chk = $this->pdo->prepare("SELECT COUNT(*) FROM `elr_pipelines` WHERE `id` = ? AND `tenant_id` = ?");
+            $chk->execute([$pipelineId, $this->tenantId]);
+            if (!$chk->fetchColumn()) {
+                echo json_encode(['success' => false, 'error' => 'Invalid target pipeline.']);
+                return;
+            }
+        }
+
+        $stmt = $this->pdo->prepare(
+            "INSERT INTO `elr_awol_config` (`tenant_id`, `enabled`, `consecutive_days`, `target_pipeline_id`, `target_stage_id`)
+             VALUES (?, ?, ?, ?, ?)
+             ON DUPLICATE KEY UPDATE `enabled` = VALUES(`enabled`), `consecutive_days` = VALUES(`consecutive_days`),
+                                     `target_pipeline_id` = VALUES(`target_pipeline_id`), `target_stage_id` = VALUES(`target_stage_id`)"
+        );
+        $stmt->execute([$this->tenantId, $enabled, $days, $pipelineId, $stageId]);
+        echo json_encode(['success' => true, 'message' => 'Auto-detection rule saved.']);
+    }
+
+    /**
+     * Run the AWOL scan for the CURRENT tenant. Public so a CLI/scheduled job can call it
+     * after setting the tenant context. Returns a summary array (does not echo).
+     */
+    public function scanCurrentTenant()
+    {
+        $cStmt = $this->pdo->prepare("SELECT * FROM `elr_awol_config` WHERE `tenant_id` = ?");
+        $cStmt->execute([$this->tenantId]);
+        $cfg = $cStmt->fetch(PDO::FETCH_ASSOC);
+        if (!$cfg || empty($cfg['enabled']) || empty($cfg['target_pipeline_id'])) {
+            return ['success' => true, 'skipped' => true, 'reason' => 'AWOL auto-detection is disabled or has no target pipeline.'];
+        }
+
+        $n              = max(1, (int)$cfg['consecutive_days']);
+        $targetPipeline = (int)$cfg['target_pipeline_id'];
+        $targetStage    = !empty($cfg['target_stage_id']) ? (int)$cfg['target_stage_id'] : null;
+
+        // Build the last N WORKING days (Mon–Fri) ending yesterday.
+        $workingDays = [];
+        $cursor = strtotime('yesterday');
+        while (count($workingDays) < $n) {
+            $dow = (int)date('N', $cursor); // 1=Mon..7=Sun
+            if ($dow < 6) { $workingDays[] = date('Y-m-d', $cursor); }
+            $cursor -= 86400;
+        }
+        $earliest = end($workingDays);
+        $latest   = $workingDays[0];
+
+        // Active employees with an email.
+        $eStmt = $this->pdo->prepare(
+            "SELECT `employee_id`, `full_name`, `email` FROM `users`
+             WHERE `tenant_id` = ? AND `employment_status` = 'Active' AND `email` IS NOT NULL AND `email` <> ''"
+        );
+        $eStmt->execute([$this->tenantId]);
+        $employees = $eStmt->fetchAll(PDO::FETCH_ASSOC);
+
+        // Attendance punches in the window: email -> set of dates present.
+        $present = [];
+        $aStmt = $this->pdo->prepare(
+            "SELECT LOWER(`employee_email`) AS mail, DATE(`time_in`) AS d
+             FROM `attendance` WHERE `tenant_id` = ? AND DATE(`time_in`) BETWEEN ? AND ?"
+        );
+        $aStmt->execute([$this->tenantId, $earliest, $latest]);
+        while ($r = $aStmt->fetch(PDO::FETCH_ASSOC)) { $present[$r['mail']][$r['d']] = true; }
+
+        // Approved leaves overlapping the window: email -> set of covered dates.
+        $onLeave = [];
+        $lStmt = $this->pdo->prepare(
+            "SELECT LOWER(`employee_email`) AS mail, `start_date`, `end_date`
+             FROM `leave_requests` WHERE `tenant_id` = ? AND `status` = 'Approved'
+             AND `start_date` <= ? AND `end_date` >= ?"
+        );
+        $lStmt->execute([$this->tenantId, $latest, $earliest]);
+        while ($lr = $lStmt->fetch(PDO::FETCH_ASSOC)) {
+            $ls = strtotime($lr['start_date']); $le = strtotime($lr['end_date']);
+            for ($d = $ls; $d <= $le; $d += 86400) { $onLeave[$lr['mail']][date('Y-m-d', $d)] = true; }
+        }
+
+        $actor = 'System (AWOL scan)';
+        $added = [];
+        $awolCount = 0;
+
+        foreach ($employees as $emp) {
+            $mail = strtolower((string)$emp['email']);
+            // AWOL only if absent on EVERY one of the N working days.
+            $absentAll = true;
+            foreach ($workingDays as $day) {
+                $hasPunch = isset($present[$mail][$day]);
+                $hasLeave = isset($onLeave[$mail][$day]);
+                if ($hasPunch || $hasLeave) { $absentAll = false; break; }
+            }
+            if (!$absentAll) { continue; }
+            $awolCount++;
+
+            // Skip if the employee already has an active card in the target pipeline.
+            $dup = $this->pdo->prepare(
+                "SELECT COUNT(*) FROM `elr_case_cards`
+                 WHERE `tenant_id` = ? AND `pipeline_id` = ? AND `employee_id` = ? AND `status` = 'Active'"
+            );
+            $dup->execute([$this->tenantId, $targetPipeline, $emp['employee_id']]);
+            if ($dup->fetchColumn() > 0) { continue; }
+
+            $this->createCardInternal(
+                $targetPipeline,
+                $emp['employee_id'],
+                'auto',
+                $targetStage,
+                ['awol_start_date' => $earliest, 'awol_days' => (string)$n],
+                $actor
+            );
+            $added[] = ['employee_id' => $emp['employee_id'], 'full_name' => $emp['full_name']];
+        }
+
+        return [
+            'success'       => true,
+            'window'        => ['from' => $earliest, 'to' => $latest, 'working_days' => $n],
+            'employees'     => count($employees),
+            'awol_detected' => $awolCount,
+            'cards_added'   => count($added),
+            'added'         => $added,
+        ];
     }
 }
