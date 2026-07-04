@@ -119,6 +119,11 @@ class ELRPipelineController
                     }
                     break;
 
+                // ── Daily incident report (digest of everything filed in a window) ──
+                case 'daily_report':
+                    $this->getDailyReport();
+                    break;
+
                 // ── Phase 4: auto-population (AWOL detection) ──
                 case 'auto_rules':
                     $this->getAutoRules();
@@ -126,6 +131,13 @@ class ELRPipelineController
                 case 'save_auto_rule':
                     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         $this->saveAutoRule($input);
+                    } else {
+                        echo json_encode(['success' => false, 'error' => 'Invalid method']);
+                    }
+                    break;
+                case 'delete_auto_rule':
+                    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+                        $this->deleteAutoRule($input);
                     } else {
                         echo json_encode(['success' => false, 'error' => 'Invalid method']);
                     }
@@ -509,9 +521,9 @@ class ELRPipelineController
 
         $dStmt = $this->pdo->prepare(
             "SELECT `id`, `template_id`, `stage_id`, `doc_type`, `title`, `content`, `generated_by`, `generated_at`, `served_at`, `acknowledged_at`
-             FROM `elr_generated_documents` WHERE `case_card_id` = ? ORDER BY `generated_at` DESC"
+             FROM `elr_generated_documents` WHERE `case_card_id` = ? AND `tenant_id` = ? ORDER BY `generated_at` DESC"
         );
-        $dStmt->execute([$id]);
+        $dStmt->execute([$id, $this->tenantId]);
 
         $tStmt = $this->pdo->prepare(
             "SELECT tr.`from_stage_id`, tr.`to_stage_id`, tr.`actor`, tr.`note`, tr.`transitioned_at`,
@@ -519,9 +531,9 @@ class ELRPipelineController
              FROM `elr_stage_transitions` tr
              LEFT JOIN `elr_pipeline_stages` fs ON tr.`from_stage_id` = fs.`id`
              LEFT JOIN `elr_pipeline_stages` ts ON tr.`to_stage_id` = ts.`id`
-             WHERE tr.`case_card_id` = ? ORDER BY tr.`transitioned_at` ASC"
+             WHERE tr.`case_card_id` = ? AND tr.`tenant_id` = ? ORDER BY tr.`transitioned_at` ASC"
         );
-        $tStmt->execute([$id]);
+        $tStmt->execute([$id, $this->tenantId]);
 
         echo json_encode([
             'success'     => true,
@@ -727,6 +739,90 @@ class ELRPipelineController
     }
 
     // ─────────────────────────────────────────────────────────────
+    //  Daily Incident Report
+    //  An incident-type-agnostic digest: every case filed in the window
+    //  (auto AND manual, any pipeline), with filters + summary counts.
+    //  Powers both the on-demand view and the scheduled 24h digest.
+    // ─────────────────────────────────────────────────────────────
+    private function getDailyReport()
+    {
+        // Window: defaults to today. Filterable to any range.
+        $start = $_GET['start_date'] ?? date('Y-m-d');
+        $end   = $_GET['end_date'] ?? $start;
+        $s = strtotime($start);
+        $e = strtotime($end);
+        if ($s === false || $e === false) {
+            echo json_encode(['success' => false, 'error' => 'Invalid date range.']);
+            return;
+        }
+        if ($e < $s) { $t = $s; $s = $e; $e = $t; }
+        $startD = date('Y-m-d', $s);
+        $endD   = date('Y-m-d', $e);
+
+        // Filters (all optional) — keep the digest useful.
+        $filters = [
+            'pipeline_id' => (int)($_GET['pipeline_id'] ?? 0),
+            'department'  => trim($_GET['department'] ?? ''),
+            'status'      => trim($_GET['status'] ?? ''),   // Active / Resolved / Closed
+            'source'      => trim($_GET['source'] ?? ''),   // auto / manual
+            'search'      => trim($_GET['search'] ?? ''),
+        ];
+        echo json_encode($this->dailyReportData($startD, $endD, $filters));
+    }
+
+    /**
+     * Build the daily incident report (summary + cards) for a window. Shared by the HTTP
+     * endpoint and the scheduled digest emailer. Returns the array (does not echo).
+     */
+    public function dailyReportData($startD, $endD, array $filters = [])
+    {
+        $pipelineId = (int)($filters['pipeline_id'] ?? 0);
+        $dept       = trim($filters['department'] ?? '');
+        $status     = trim($filters['status'] ?? '');
+        $source     = trim($filters['source'] ?? '');
+        $search     = trim($filters['search'] ?? '');
+
+        $sql = "SELECT c.`id`, c.`employee_id`, c.`pipeline_id`, c.`current_stage_id`, c.`status`, c.`entered_via`, c.`created_at`,
+                       u.`full_name`, u.`department`,
+                       p.`name` AS pipeline_name,
+                       st.`name` AS stage_name,
+                       (SELECT COUNT(*) FROM `elr_generated_documents` g WHERE g.`case_card_id` = c.`id`) AS doc_count
+                FROM `elr_case_cards` c
+                LEFT JOIN `users` u ON c.`employee_id` = u.`employee_id` AND u.`tenant_id` = c.`tenant_id`
+                LEFT JOIN `elr_pipelines` p ON c.`pipeline_id` = p.`id`
+                LEFT JOIN `elr_pipeline_stages` st ON c.`current_stage_id` = st.`id`
+                WHERE c.`tenant_id` = ? AND DATE(c.`created_at`) BETWEEN ? AND ?";
+        $params = [$this->tenantId, $startD, $endD];
+
+        if ($pipelineId)                          { $sql .= " AND c.`pipeline_id` = ?"; $params[] = $pipelineId; }
+        if ($dept !== '')                         { $sql .= " AND u.`department` = ?";  $params[] = $dept; }
+        if ($status !== '')                       { $sql .= " AND c.`status` = ?";      $params[] = $status; }
+        if ($source === 'auto' || $source === 'manual') { $sql .= " AND c.`entered_via` = ?"; $params[] = $source; }
+        if ($search !== '')                       { $sql .= " AND (u.`full_name` LIKE ? OR c.`employee_id` LIKE ?)"; $params[] = "%$search%"; $params[] = "%$search%"; }
+
+        $sql .= " ORDER BY c.`created_at` DESC";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute($params);
+        $cards = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        $summary = ['total' => count($cards), 'auto' => 0, 'manual' => 0, 'by_pipeline' => [], 'by_department' => []];
+        foreach ($cards as $c) {
+            ($c['entered_via'] === 'auto') ? $summary['auto']++ : $summary['manual']++;
+            $pn = $c['pipeline_name'] ?: 'Unassigned';
+            $dn = $c['department'] ?: 'Unassigned';
+            $summary['by_pipeline'][$pn]   = ($summary['by_pipeline'][$pn] ?? 0) + 1;
+            $summary['by_department'][$dn] = ($summary['by_department'][$dn] ?? 0) + 1;
+        }
+
+        return [
+            'success' => true,
+            'window'  => ['from' => $startD, 'to' => $endD],
+            'summary' => $summary,
+            'cards'   => $cards,
+        ];
+    }
+
+    // ─────────────────────────────────────────────────────────────
     //  Phase 4 — Auto-population (AWOL detection from attendance)
     //  A tenant configures the rule (threshold + which pipeline/stage to drop
     //  AWOL employees into). The scan reads attendance the same way the
@@ -734,34 +830,66 @@ class ELRPipelineController
     //  one of the last N working days (no punch, no approved leave).
     // ─────────────────────────────────────────────────────────────
 
-    /** Return the tenant's auto-population rule(s). Currently one: AWOL detection. */
-    private function getAutoRules()
+    /**
+     * The detector library (system-provided). Detection needs a measurable data signal,
+     * so companies can't invent detectors — but they compose rules from these and point
+     * each at one of their own pipelines. Add new detectors here as more signals are supported.
+     */
+    private function detectorLibrary()
     {
-        $stmt = $this->pdo->prepare("SELECT * FROM `elr_awol_config` WHERE `tenant_id` = ?");
-        $stmt->execute([$this->tenantId]);
-        $cfg = $stmt->fetch(PDO::FETCH_ASSOC);
-        if (!$cfg) {
-            $cfg = [
-                'tenant_id'          => $this->tenantId,
-                'enabled'            => 0,
-                'consecutive_days'   => 3,
-                'target_pipeline_id' => null,
-                'target_stage_id'    => null,
-            ];
-        }
-        echo json_encode(['success' => true, 'rule_type' => 'AWOL', 'config' => $cfg]);
+        return [
+            [
+                'key'    => 'awol',
+                'label'  => 'AWOL — consecutive absences',
+                'desc'   => 'Flags employees absent on every one of the last N working days (no punch, no approved leave).',
+                'params' => [
+                    ['key' => 'consecutive_days', 'label' => 'Consecutive absent working days', 'type' => 'number', 'default' => 3],
+                ],
+            ],
+            [
+                'key'    => 'tardiness',
+                'label'  => 'Tardiness — repeated lates',
+                'desc'   => 'Flags employees with N or more late arrivals within a rolling window.',
+                'params' => [
+                    ['key' => 'late_count',  'label' => 'Number of lates', 'type' => 'number', 'default' => 3],
+                    ['key' => 'window_days', 'label' => 'Within days',      'type' => 'number', 'default' => 30],
+                ],
+            ],
+        ];
     }
 
-    /** Upsert the AWOL auto-rule for this tenant. */
+    /** List this tenant's auto-rules + the available detector library (for the UI). */
+    private function getAutoRules()
+    {
+        $stmt = $this->pdo->prepare(
+            "SELECT `id`, `rule_type`, `name`, `enabled`, `params`, `target_pipeline_id`, `target_stage_id`, `updated_at`
+             FROM `elr_auto_rules` WHERE `tenant_id` = ? ORDER BY `created_at` ASC"
+        );
+        $stmt->execute([$this->tenantId]);
+        $rules = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        foreach ($rules as &$r) {
+            $r['params'] = $r['params'] ? json_decode($r['params'], true) : [];
+        }
+        echo json_encode(['success' => true, 'rules' => $rules, 'detectors' => $this->detectorLibrary()]);
+    }
+
+    /** Create or update an auto-rule (a detector pointed at a pipeline). */
     private function saveAutoRule($input)
     {
         $this->requireManage();
+        $id         = (int)($input['id'] ?? 0);
+        $ruleType   = trim($input['rule_type'] ?? '');
+        $name       = trim($input['name'] ?? '');
         $enabled    = (int)!empty($input['enabled']);
-        $days       = max(1, (int)($input['consecutive_days'] ?? 3));
+        $params     = is_array($input['params'] ?? null) ? $input['params'] : [];
         $pipelineId = !empty($input['target_pipeline_id']) ? (int)$input['target_pipeline_id'] : null;
         $stageId    = !empty($input['target_stage_id']) ? (int)$input['target_stage_id'] : null;
 
-        // Validate target pipeline belongs to this tenant when enabling.
+        $validTypes = array_column($this->detectorLibrary(), 'key');
+        if (!in_array($ruleType, $validTypes, true)) {
+            echo json_encode(['success' => false, 'error' => 'Unknown detector type.']);
+            return;
+        }
         if ($enabled && $pipelineId) {
             $chk = $this->pdo->prepare("SELECT COUNT(*) FROM `elr_pipelines` WHERE `id` = ? AND `tenant_id` = ?");
             $chk->execute([$pipelineId, $this->tenantId]);
@@ -770,46 +898,52 @@ class ELRPipelineController
                 return;
             }
         }
+        $paramsJson = json_encode($params);
 
+        if ($id > 0) {
+            $stmt = $this->pdo->prepare(
+                "UPDATE `elr_auto_rules`
+                 SET `rule_type` = ?, `name` = ?, `enabled` = ?, `params` = ?, `target_pipeline_id` = ?, `target_stage_id` = ?
+                 WHERE `id` = ? AND `tenant_id` = ?"
+            );
+            $stmt->execute([$ruleType, $name, $enabled, $paramsJson, $pipelineId, $stageId, $id, $this->tenantId]);
+            echo json_encode(['success' => true, 'id' => $id, 'message' => 'Rule updated.']);
+            return;
+        }
         $stmt = $this->pdo->prepare(
-            "INSERT INTO `elr_awol_config` (`tenant_id`, `enabled`, `consecutive_days`, `target_pipeline_id`, `target_stage_id`)
-             VALUES (?, ?, ?, ?, ?)
-             ON DUPLICATE KEY UPDATE `enabled` = VALUES(`enabled`), `consecutive_days` = VALUES(`consecutive_days`),
-                                     `target_pipeline_id` = VALUES(`target_pipeline_id`), `target_stage_id` = VALUES(`target_stage_id`)"
+            "INSERT INTO `elr_auto_rules` (`tenant_id`, `rule_type`, `name`, `enabled`, `params`, `target_pipeline_id`, `target_stage_id`)
+             VALUES (?, ?, ?, ?, ?, ?, ?)"
         );
-        $stmt->execute([$this->tenantId, $enabled, $days, $pipelineId, $stageId]);
-        echo json_encode(['success' => true, 'message' => 'Auto-detection rule saved.']);
+        $stmt->execute([$this->tenantId, $ruleType, $name, $enabled, $paramsJson, $pipelineId, $stageId]);
+        echo json_encode(['success' => true, 'id' => (int)$this->pdo->lastInsertId(), 'message' => 'Rule created.']);
+    }
+
+    private function deleteAutoRule($input)
+    {
+        $this->requireManage();
+        $id = (int)($input['id'] ?? 0);
+        if (!$id) { echo json_encode(['success' => false, 'error' => 'Rule ID required']); return; }
+        $this->pdo->prepare("DELETE FROM `elr_auto_rules` WHERE `id` = ? AND `tenant_id` = ?")
+                  ->execute([$id, $this->tenantId]);
+        echo json_encode(['success' => true, 'message' => 'Rule deleted.']);
     }
 
     /**
-     * Run the AWOL scan for the CURRENT tenant. Public so a CLI/scheduled job can call it
-     * after setting the tenant context. Returns a summary array (does not echo).
+     * Run ALL enabled auto-rules for the CURRENT tenant. Public so the CLI/scheduler can call it
+     * after setting the tenant context. Returns per-rule summaries (does not echo).
      */
     public function scanCurrentTenant()
     {
-        $cStmt = $this->pdo->prepare("SELECT * FROM `elr_awol_config` WHERE `tenant_id` = ?");
-        $cStmt->execute([$this->tenantId]);
-        $cfg = $cStmt->fetch(PDO::FETCH_ASSOC);
-        if (!$cfg || empty($cfg['enabled']) || empty($cfg['target_pipeline_id'])) {
-            return ['success' => true, 'skipped' => true, 'reason' => 'AWOL auto-detection is disabled or has no target pipeline.'];
+        $rStmt = $this->pdo->prepare(
+            "SELECT * FROM `elr_auto_rules` WHERE `tenant_id` = ? AND `enabled` = 1 AND `target_pipeline_id` IS NOT NULL"
+        );
+        $rStmt->execute([$this->tenantId]);
+        $rules = $rStmt->fetchAll(PDO::FETCH_ASSOC);
+        if (!$rules) {
+            return ['success' => true, 'skipped' => true, 'reason' => 'No enabled auto-rules.', 'results' => []];
         }
 
-        $n              = max(1, (int)$cfg['consecutive_days']);
-        $targetPipeline = (int)$cfg['target_pipeline_id'];
-        $targetStage    = !empty($cfg['target_stage_id']) ? (int)$cfg['target_stage_id'] : null;
-
-        // Build the last N WORKING days (Mon–Fri) ending yesterday.
-        $workingDays = [];
-        $cursor = strtotime('yesterday');
-        while (count($workingDays) < $n) {
-            $dow = (int)date('N', $cursor); // 1=Mon..7=Sun
-            if ($dow < 6) { $workingDays[] = date('Y-m-d', $cursor); }
-            $cursor -= 86400;
-        }
-        $earliest = end($workingDays);
-        $latest   = $workingDays[0];
-
-        // Active employees with an email.
+        // Active employees (shared across all detectors for this run).
         $eStmt = $this->pdo->prepare(
             "SELECT `employee_id`, `full_name`, `email` FROM `users`
              WHERE `tenant_id` = ? AND `employment_status` = 'Active' AND `email` IS NOT NULL AND `email` <> ''"
@@ -817,7 +951,60 @@ class ELRPipelineController
         $eStmt->execute([$this->tenantId]);
         $employees = $eStmt->fetchAll(PDO::FETCH_ASSOC);
 
-        // Attendance punches in the window: email -> set of dates present.
+        $results = [];
+        foreach ($rules as $rule) {
+            $params         = $rule['params'] ? json_decode($rule['params'], true) : [];
+            $targetPipeline = (int)$rule['target_pipeline_id'];
+            $targetStage    = !empty($rule['target_stage_id']) ? (int)$rule['target_stage_id'] : null;
+
+            switch ($rule['rule_type']) {
+                case 'awol':      $matches = $this->detectAwol($params, $employees); break;
+                case 'tardiness': $matches = $this->detectTardiness($params, $employees); break;
+                default:          $matches = []; break;
+            }
+
+            $actor = 'System (' . $rule['rule_type'] . ' rule)';
+            $added = [];
+            foreach ($matches as $m) {
+                // Skip if the employee already has an active card in the target pipeline.
+                $dup = $this->pdo->prepare(
+                    "SELECT COUNT(*) FROM `elr_case_cards`
+                     WHERE `tenant_id` = ? AND `pipeline_id` = ? AND `employee_id` = ? AND `status` = 'Active'"
+                );
+                $dup->execute([$this->tenantId, $targetPipeline, $m['employee_id']]);
+                if ($dup->fetchColumn() > 0) { continue; }
+
+                $this->createCardInternal($targetPipeline, $m['employee_id'], 'auto', $targetStage, $m['extra'] ?? [], $actor);
+                $added[] = ['employee_id' => $m['employee_id'], 'full_name' => $m['full_name']];
+            }
+
+            $results[] = [
+                'rule_id'     => (int)$rule['id'],
+                'rule_type'   => $rule['rule_type'],
+                'name'        => $rule['name'],
+                'detected'    => count($matches),
+                'cards_added' => count($added),
+                'added'       => $added,
+            ];
+        }
+
+        return ['success' => true, 'rules_run' => count($rules), 'employees' => count($employees), 'results' => $results];
+    }
+
+    /** Detector: AWOL — absent on every one of the last N working days (no punch, no approved leave). */
+    private function detectAwol(array $params, array $employees)
+    {
+        $n = max(1, (int)($params['consecutive_days'] ?? 3));
+
+        $workingDays = [];
+        $cursor = strtotime('yesterday');
+        while (count($workingDays) < $n) {
+            if ((int)date('N', $cursor) < 6) { $workingDays[] = date('Y-m-d', $cursor); }
+            $cursor -= 86400;
+        }
+        $earliest = end($workingDays);
+        $latest   = $workingDays[0];
+
         $present = [];
         $aStmt = $this->pdo->prepare(
             "SELECT LOWER(`employee_email`) AS mail, DATE(`time_in`) AS d
@@ -826,7 +1013,6 @@ class ELRPipelineController
         $aStmt->execute([$this->tenantId, $earliest, $latest]);
         while ($r = $aStmt->fetch(PDO::FETCH_ASSOC)) { $present[$r['mail']][$r['d']] = true; }
 
-        // Approved leaves overlapping the window: email -> set of covered dates.
         $onLeave = [];
         $lStmt = $this->pdo->prepare(
             "SELECT LOWER(`employee_email`) AS mail, `start_date`, `end_date`
@@ -839,48 +1025,52 @@ class ELRPipelineController
             for ($d = $ls; $d <= $le; $d += 86400) { $onLeave[$lr['mail']][date('Y-m-d', $d)] = true; }
         }
 
-        $actor = 'System (AWOL scan)';
-        $added = [];
-        $awolCount = 0;
-
+        $matches = [];
         foreach ($employees as $emp) {
             $mail = strtolower((string)$emp['email']);
-            // AWOL only if absent on EVERY one of the N working days.
             $absentAll = true;
             foreach ($workingDays as $day) {
-                $hasPunch = isset($present[$mail][$day]);
-                $hasLeave = isset($onLeave[$mail][$day]);
-                if ($hasPunch || $hasLeave) { $absentAll = false; break; }
+                if (isset($present[$mail][$day]) || isset($onLeave[$mail][$day])) { $absentAll = false; break; }
             }
-            if (!$absentAll) { continue; }
-            $awolCount++;
-
-            // Skip if the employee already has an active card in the target pipeline.
-            $dup = $this->pdo->prepare(
-                "SELECT COUNT(*) FROM `elr_case_cards`
-                 WHERE `tenant_id` = ? AND `pipeline_id` = ? AND `employee_id` = ? AND `status` = 'Active'"
-            );
-            $dup->execute([$this->tenantId, $targetPipeline, $emp['employee_id']]);
-            if ($dup->fetchColumn() > 0) { continue; }
-
-            $this->createCardInternal(
-                $targetPipeline,
-                $emp['employee_id'],
-                'auto',
-                $targetStage,
-                ['awol_start_date' => $earliest, 'awol_days' => (string)$n],
-                $actor
-            );
-            $added[] = ['employee_id' => $emp['employee_id'], 'full_name' => $emp['full_name']];
+            if ($absentAll) {
+                $matches[] = [
+                    'employee_id' => $emp['employee_id'],
+                    'full_name'   => $emp['full_name'],
+                    'extra'       => ['awol_start_date' => $earliest, 'awol_days' => (string)$n],
+                ];
+            }
         }
+        return $matches;
+    }
 
-        return [
-            'success'       => true,
-            'window'        => ['from' => $earliest, 'to' => $latest, 'working_days' => $n],
-            'employees'     => count($employees),
-            'awol_detected' => $awolCount,
-            'cards_added'   => count($added),
-            'added'         => $added,
-        ];
+    /** Detector: Tardiness — N or more late arrivals within a rolling window of days. */
+    private function detectTardiness(array $params, array $employees)
+    {
+        $lateCount  = max(1, (int)($params['late_count'] ?? 3));
+        $windowDays = max(1, (int)($params['window_days'] ?? 30));
+        $since = date('Y-m-d', strtotime("-{$windowDays} days"));
+
+        $counts = [];
+        $aStmt = $this->pdo->prepare(
+            "SELECT LOWER(`employee_email`) AS mail, COUNT(*) AS cnt
+             FROM `attendance`
+             WHERE `tenant_id` = ? AND `status` LIKE '%late%' AND DATE(`time_in`) >= ?
+             GROUP BY LOWER(`employee_email`)"
+        );
+        $aStmt->execute([$this->tenantId, $since]);
+        while ($r = $aStmt->fetch(PDO::FETCH_ASSOC)) { $counts[$r['mail']] = (int)$r['cnt']; }
+
+        $matches = [];
+        foreach ($employees as $emp) {
+            $c = $counts[strtolower((string)$emp['email'])] ?? 0;
+            if ($c >= $lateCount) {
+                $matches[] = [
+                    'employee_id' => $emp['employee_id'],
+                    'full_name'   => $emp['full_name'],
+                    'extra'       => ['late_count' => (string)$c, 'window_days' => (string)$windowDays],
+                ];
+            }
+        }
+        return $matches;
     }
 }
