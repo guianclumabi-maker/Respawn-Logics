@@ -1,14 +1,16 @@
 import React, { useState, useEffect } from "react";
 import { apiFetch } from "../../../../lib/apiClient";
 import { 
-  Settings, 
   Bot, 
   Play, 
   CheckCircle, 
   AlertCircle,
   Clock,
   Save,
-  Activity
+  Activity,
+  Plus,
+  Trash2,
+  Settings
 } from "lucide-react";
 
 interface Pipeline {
@@ -21,41 +23,49 @@ interface Stage {
   name: string;
 }
 
-export function ELRAutomation() {
-  const [enabled, setEnabled] = useState(false);
-  const [consecutiveDays, setConsecutiveDays] = useState(3);
-  const [targetPipelineId, setTargetPipelineId] = useState<number | "">("");
-  const [targetStageId, setTargetStageId] = useState<number | "">("");
-  
-  const [pipelines, setPipelines] = useState<Pipeline[]>([]);
-  const [stages, setStages] = useState<Stage[]>([]);
+interface DetectorParam {
+  key: string;
+  label: string;
+  type: string;
+  default: any;
+}
 
+interface Detector {
+  key: string;
+  label: string;
+  desc: string;
+  params: DetectorParam[];
+}
+
+interface AutoRule {
+  id?: number;
+  rule_type: string;
+  name: string;
+  is_active: number;
+  params: Record<string, any>;
+  target_pipeline_id: number | "";
+  target_stage_id: number | "";
+}
+
+export function ELRAutomation() {
+  const [rules, setRules] = useState<AutoRule[]>([]);
+  const [detectors, setDetectors] = useState<Detector[]>([]);
+  const [pipelines, setPipelines] = useState<Pipeline[]>([]);
+  const [pipelineStages, setPipelineStages] = useState<Record<number, Stage[]>>({});
+  
   const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
+  const [savingId, setSavingId] = useState<number | string | null>(null);
   const [scanning, setScanning] = useState(false);
   const [error, setError] = useState<string | null>(null);
   
   const [toast, setToast] = useState<{message: string, isError: boolean} | null>(null);
 
-  const [scanResult, setScanResult] = useState<{
-    scanned: number;
-    awol_detected: number;
-    cards_added: number;
-    added_employees: string[];
-  } | null>(null);
+  // Scan result: rule_id => { detected: number, cards_added: number, added_employees: string[] }
+  const [scanResults, setScanResults] = useState<any[] | null>(null);
 
   useEffect(() => {
     fetchInitData();
   }, []);
-
-  useEffect(() => {
-    if (targetPipelineId) {
-      fetchStages(targetPipelineId as number);
-    } else {
-      setStages([]);
-      setTargetStageId("");
-    }
-  }, [targetPipelineId]);
 
   const showToast = (message: string, isError = false) => {
     setToast({ message, isError });
@@ -68,26 +78,32 @@ export function ELRAutomation() {
       // 1. Fetch Pipelines
       const pipeRes = await apiFetch("/api/index.php?route=elr_pipeline&action=pipelines");
       const pipeData = await pipeRes.json();
-      if (pipeData.success) {
-        setPipelines(pipeData.pipelines || []);
-      }
+      const loadedPipelines = pipeData.success ? pipeData.pipelines || [] : [];
+      setPipelines(loadedPipelines);
       
-      // 2. Fetch Auto Rules
+      // Load stages for all pipelines
+      const stagesMap: Record<number, Stage[]> = {};
+      for (const p of loadedPipelines) {
+        const stageRes = await apiFetch(`/api/index.php?route=elr_pipeline&action=pipeline&id=${p.id}`);
+        const stageData = await stageRes.json();
+        if (stageData.success && stageData.pipeline) {
+          stagesMap[p.id] = stageData.pipeline.stages || [];
+        }
+      }
+      setPipelineStages(stagesMap);
+
+      // 2. Fetch Auto Rules & Detectors
       const rulesRes = await apiFetch("/api/index.php?route=elr_pipeline&action=auto_rules");
       const rulesData = await rulesRes.json();
-      if (rulesData.success && rulesData.rules) {
-        const awolRule = rulesData.rules.find((r: any) => r.rule_key === "awol");
-        if (awolRule) {
-          const config = typeof awolRule.config === 'string' ? JSON.parse(awolRule.config) : awolRule.config;
-          setEnabled(awolRule.is_active === 1);
-          setConsecutiveDays(config.consecutive_days || 3);
-          setTargetPipelineId(config.target_pipeline_id || "");
-          
-          if (config.target_pipeline_id) {
-            await fetchStages(config.target_pipeline_id);
-            setTargetStageId(config.target_target_id || config.target_stage_id || ""); // config uses target_stage_id ideally
-          }
-        }
+      if (rulesData.success) {
+        setDetectors(rulesData.detectors || []);
+        const loadedRules = (rulesData.rules || []).map((r: any) => ({
+          ...r,
+          params: typeof r.params === 'string' ? JSON.parse(r.params) : (r.params || {}),
+          target_pipeline_id: r.target_pipeline_id || "",
+          target_stage_id: r.target_stage_id || ""
+        }));
+        setRules(loadedRules);
       }
     } catch (err) {
       setError("Failed to load automation rules");
@@ -96,31 +112,60 @@ export function ELRAutomation() {
     }
   };
 
-  const fetchStages = async (pipelineId: number) => {
-    try {
-      const res = await apiFetch(`/api/index.php?route=elr_pipeline&action=pipeline&id=${pipelineId}`);
-      const data = await res.json();
-      if (data.success && data.pipeline) {
-        setStages(data.pipeline.stages || []);
-      }
-    } catch (err) {
-      console.error(err);
-    }
+  const handleAddRule = () => {
+    if (detectors.length === 0) return;
+    const defaultDetector = detectors[0];
+    const defaultParams: Record<string, any> = {};
+    defaultDetector.params.forEach(p => {
+      defaultParams[p.key] = p.default;
+    });
+
+    const newRule: AutoRule = {
+      id: undefined,
+      rule_type: defaultDetector.key,
+      name: "New Automation Rule",
+      is_active: 1,
+      params: defaultParams,
+      target_pipeline_id: "",
+      target_stage_id: ""
+    };
+    setRules([newRule, ...rules]);
   };
 
-  const handleSave = async () => {
-    setSaving(true);
+  const handleDetectorChange = (index: number, detectorKey: string) => {
+    const updatedRules = [...rules];
+    const detector = detectors.find(d => d.key === detectorKey);
+    if (!detector) return;
+    
+    const newParams: Record<string, any> = {};
+    detector.params.forEach(p => {
+      newParams[p.key] = p.default;
+    });
+
+    updatedRules[index].rule_type = detectorKey;
+    updatedRules[index].params = newParams;
+    setRules(updatedRules);
+  };
+
+  const updateRuleParam = (ruleIndex: number, paramKey: string, value: any) => {
+    const updatedRules = [...rules];
+    updatedRules[ruleIndex].params[paramKey] = value;
+    setRules(updatedRules);
+  };
+
+  const handleSaveRule = async (index: number) => {
+    const rule = rules[index];
+    setSavingId(rule.id || 'new');
     setError(null);
     try {
       const payload = {
-        rule_key: "awol",
-        name: "Auto-AWOL Detection",
-        is_active: enabled ? 1 : 0,
-        config: {
-          consecutive_days: consecutiveDays,
-          target_pipeline_id: targetPipelineId,
-          target_stage_id: targetStageId
-        }
+        id: rule.id,
+        rule_type: rule.rule_type,
+        name: rule.name,
+        enabled: rule.is_active,
+        params: rule.params,
+        target_pipeline_id: rule.target_pipeline_id,
+        target_stage_id: rule.target_stage_id
       };
 
       const res = await apiFetch("/api/index.php?route=elr_pipeline&action=save_auto_rule", {
@@ -129,20 +174,51 @@ export function ELRAutomation() {
       });
       const data = await res.json();
       if (data.success) {
-        showToast("Automation rules saved successfully");
+        showToast("Rule saved successfully");
+        fetchInitData(); // Refresh to get ID if it was new
       } else {
         setError(data.error || "Failed to save rule");
       }
     } catch (err) {
       setError("Error saving rule");
     } finally {
-      setSaving(false);
+      setSavingId(null);
+    }
+  };
+
+  const handleDeleteRule = async (index: number) => {
+    const rule = rules[index];
+    if (!rule.id) {
+      // It's a new unsaved rule, just remove it from UI
+      const updatedRules = [...rules];
+      updatedRules.splice(index, 1);
+      setRules(updatedRules);
+      return;
+    }
+
+    if (!confirm("Are you sure you want to delete this rule?")) return;
+    
+    setError(null);
+    try {
+      const res = await apiFetch("/api/index.php?route=elr_pipeline&action=delete_auto_rule", {
+        method: "POST",
+        body: JSON.stringify({ id: rule.id })
+      });
+      const data = await res.json();
+      if (data.success) {
+        showToast("Rule deleted");
+        fetchInitData();
+      } else {
+        setError(data.error || "Failed to delete rule");
+      }
+    } catch (err) {
+      setError("Error deleting rule");
     }
   };
 
   const handleRunScan = async () => {
     setScanning(true);
-    setScanResult(null);
+    setScanResults(null);
     setError(null);
     try {
       const res = await apiFetch("/api/index.php?route=elr_pipeline&action=run_scan", {
@@ -150,12 +226,7 @@ export function ELRAutomation() {
       });
       const data = await res.json();
       if (data.success) {
-        setScanResult({
-          scanned: data.scanned || 0,
-          awol_detected: data.awol_detected || 0,
-          cards_added: data.cards_added || 0,
-          added_employees: data.added_employees || []
-        });
+        setScanResults(data.results || []);
         showToast("Scan completed successfully");
       } else {
         setError(data.error || "Failed to run scan");
@@ -176,15 +247,32 @@ export function ELRAutomation() {
   }
 
   return (
-    <main className="flex-1 flex flex-col h-full bg-[#f4f6f8] dark:bg-[#06070a] text-slate-900 dark:text-white overflow-y-auto transition-colors duration-300">
-      <div className="p-8 max-w-4xl mx-auto w-full">
+    <main className="flex-1 flex flex-col h-full bg-[#f4f6f8] dark:bg-[#06070a] text-slate-900 dark:text-white overflow-y-auto transition-colors duration-300 scrollbar-thin">
+      <div className="p-8 max-w-5xl mx-auto w-full">
         
         <div className="flex items-center justify-between mb-8">
           <div>
             <h1 className="text-2xl font-bold tracking-tight bg-gradient-to-r from-white via-white to-gray-400 bg-clip-text text-transparent mb-1" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
               Automation & Triggers
             </h1>
-            <p className="text-slate-500 dark:text-slate-400 text-sm">Configure system routines to automatically generate cases based on data signals.</p>
+            <p className="text-slate-500 dark:text-slate-400 text-sm">Configure multiple detection rules to automatically flag and process HR incidents.</p>
+          </div>
+          <div className="flex gap-3">
+            <button 
+              onClick={handleRunScan}
+              disabled={scanning || rules.filter(r => r.is_active === 1).length === 0}
+              className="px-4 py-2 bg-blue-500/10 hover:bg-blue-500/20 text-blue-500 border border-blue-500/20 rounded-lg text-sm font-bold flex items-center gap-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {scanning ? <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-500"></div> : <Play size={16} />}
+              Run Scan Now
+            </button>
+            <button 
+              onClick={handleAddRule}
+              className="px-4 py-2 bg-[#00e07a]/10 hover:bg-[#00e07a]/20 text-[#00e07a] border border-[#00e07a]/20 rounded-lg text-sm font-bold flex items-center gap-2 transition-colors"
+            >
+              <Plus size={16} />
+              Add Rule
+            </button>
           </div>
         </div>
 
@@ -195,144 +283,184 @@ export function ELRAutomation() {
           </div>
         )}
 
-        <div className="bg-white dark:bg-[#0f1422]/80 border border-gray-200 dark:border-[#2a2d36] rounded-2xl overflow-hidden shadow-sm mb-8">
-          
-          <div className="p-5 border-b border-gray-200 dark:border-[#2a2d36] bg-gray-50 dark:bg-[#161922]/50 flex justify-between items-center">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-[#00e07a]/10 border border-[#00e07a]/20 flex items-center justify-center text-[#00e07a]">
-                <Bot size={20} />
-              </div>
-              <div>
-                <h2 className="text-lg font-bold">Auto-AWOL Detection</h2>
-                <p className="text-xs text-gray-500 dark:text-gray-400">Scans attendance logs to automatically flag absent employees.</p>
-              </div>
-            </div>
-            
-            <label className="flex items-center gap-2 cursor-pointer relative">
-              <span className="text-sm font-bold text-gray-500">{enabled ? 'Enabled' : 'Disabled'}</span>
-              <input 
-                type="checkbox" 
-                className="sr-only peer" 
-                checked={enabled} 
-                onChange={(e) => setEnabled(e.target.checked)} 
-              />
-              <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:right-[22px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-[#00e07a]"></div>
-            </label>
-          </div>
-
-          <div className="p-6 space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">Consecutive Absent Days Threshold</label>
-                  <input 
-                    type="number" 
-                    min="1"
-                    value={consecutiveDays}
-                    onChange={(e) => setConsecutiveDays(parseInt(e.target.value) || 1)}
-                    className="w-full bg-gray-50 dark:bg-[#0b0f1a] border border-gray-200 dark:border-[#2a2d36] rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#00e07a] focus:ring-1 focus:ring-[#00e07a]/50"
-                  />
-                  <p className="text-[11px] text-gray-500 mt-1">Number of consecutive days an employee must be absent to trigger this rule.</p>
-                </div>
-              </div>
-
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">Target Pipeline</label>
-                  <select
-                    value={targetPipelineId}
-                    onChange={(e) => setTargetPipelineId(parseInt(e.target.value) || "")}
-                    className="w-full bg-gray-50 dark:bg-[#0b0f1a] border border-gray-200 dark:border-[#2a2d36] rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#00e07a] focus:ring-1 focus:ring-[#00e07a]/50"
-                  >
-                    <option value="">Select Pipeline...</option>
-                    {pipelines.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">Target Stage</label>
-                  <select
-                    value={targetStageId}
-                    onChange={(e) => setTargetStageId(parseInt(e.target.value) || "")}
-                    disabled={!targetPipelineId}
-                    className="w-full bg-gray-50 dark:bg-[#0b0f1a] border border-gray-200 dark:border-[#2a2d36] rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#00e07a] focus:ring-1 focus:ring-[#00e07a]/50 disabled:opacity-50"
-                  >
-                    <option value="">Select Stage...</option>
-                    {stages.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
-                  </select>
-                </div>
-              </div>
-            </div>
-
-            <div className="flex justify-between items-center pt-6 border-t border-gray-200 dark:border-[#2a2d36]">
-              <div className="flex items-center gap-3">
-                <button 
-                  onClick={handleRunScan}
-                  disabled={scanning || !enabled}
-                  className="px-4 py-2 bg-blue-500/10 hover:bg-blue-500/20 text-blue-500 border border-blue-500/20 rounded-lg text-sm font-bold flex items-center gap-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {scanning ? <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-500"></div> : <Play size={16} />}
-                  Run Scan Now
-                </button>
-                <span className="text-[11px] text-gray-500 flex items-center gap-1">
-                  <Clock size={12} /> Requires manual trigger (no cron available on current tier)
-                </span>
-              </div>
-
-              <button 
-                onClick={handleSave}
-                disabled={saving}
-                className="px-6 py-2 bg-[#00e07a] hover:bg-[#00c96d] text-black rounded-lg text-sm font-bold flex items-center gap-2 transition-colors disabled:opacity-50"
-              >
-                <Save size={16} />
-                {saving ? 'Saving...' : 'Save Configuration'}
-              </button>
-            </div>
-          </div>
-        </div>
-
         {/* Scan Results Panel */}
-        {scanResult && (
-          <div className="bg-white dark:bg-[#0f1422]/80 border border-emerald-500/30 rounded-2xl p-6 shadow-[0_0_20px_rgba(16,185,129,0.05)] animate-in slide-in-from-bottom-4">
-            <div className="flex items-center gap-3 mb-6">
-              <div className="p-2 bg-emerald-500/10 rounded-lg">
-                <Activity className="text-emerald-500 w-5 h-5" />
+        {scanResults && (
+          <div className="bg-white dark:bg-[#0f1422]/80 border border-blue-500/30 rounded-2xl p-6 shadow-lg mb-8 animate-in slide-in-from-top-4">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="p-2 bg-blue-500/10 rounded-lg">
+                <Activity className="text-blue-500 w-5 h-5" />
               </div>
               <h3 className="font-bold text-lg">Scan Results Summary</h3>
             </div>
-
-            <div className="grid grid-cols-3 gap-4 mb-6">
-              <div className="p-4 bg-gray-50 dark:bg-[#161922] rounded-xl border border-gray-200 dark:border-[#2a2d36]">
-                <div className="text-2xl font-bold font-mono">{scanResult.scanned}</div>
-                <div className="text-xs text-gray-500 uppercase tracking-wider font-bold mt-1">Employees Scanned</div>
-              </div>
-              <div className="p-4 bg-gray-50 dark:bg-[#161922] rounded-xl border border-gray-200 dark:border-[#2a2d36]">
-                <div className="text-2xl font-bold font-mono text-orange-400">{scanResult.awol_detected}</div>
-                <div className="text-xs text-gray-500 uppercase tracking-wider font-bold mt-1">AWOL Detected</div>
-              </div>
-              <div className="p-4 bg-gray-50 dark:bg-[#161922] rounded-xl border border-gray-200 dark:border-[#2a2d36]">
-                <div className="text-2xl font-bold font-mono text-[#00e07a]">{scanResult.cards_added}</div>
-                <div className="text-xs text-gray-500 uppercase tracking-wider font-bold mt-1">Cards Added to Pipeline</div>
-              </div>
-            </div>
-
-            {scanResult.added_employees.length > 0 ? (
-              <div>
-                <h4 className="text-sm font-bold mb-3 border-b border-gray-200 dark:border-[#2a2d36] pb-2">Added Employees</h4>
-                <ul className="grid grid-cols-2 gap-2">
-                  {scanResult.added_employees.map((emp, idx) => (
-                    <li key={idx} className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300 bg-gray-50 dark:bg-[#161922]/50 px-3 py-2 rounded-lg">
-                      <CheckCircle size={14} className="text-[#00e07a]" /> {emp}
-                    </li>
-                  ))}
-                </ul>
-              </div>
+            {scanResults.length === 0 ? (
+              <p className="text-sm text-gray-500">No active rules to scan, or no matches found.</p>
             ) : (
-              <div className="text-sm text-gray-500 italic">No new employees were added to the pipeline.</div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {scanResults.map((res: any, idx: number) => (
+                  <div key={idx} className="p-4 bg-gray-50 dark:bg-[#161922] rounded-xl border border-gray-200 dark:border-[#2a2d36]">
+                    <div className="flex justify-between items-center mb-2">
+                      <span className="font-bold text-sm text-[#00e07a]">{res.rule_name || "Rule"}</span>
+                      <span className="text-[10px] text-gray-500 font-mono uppercase bg-black/20 px-2 py-0.5 rounded border border-white/5">{res.rule_type}</span>
+                    </div>
+                    <div className="flex gap-4">
+                      <div>
+                        <div className="text-lg font-bold font-mono text-orange-400">{res.detected}</div>
+                        <div className="text-[10px] text-gray-500 uppercase tracking-wider font-bold">Detected</div>
+                      </div>
+                      <div>
+                        <div className="text-lg font-bold font-mono text-blue-400">{res.cards_added}</div>
+                        <div className="text-[10px] text-gray-500 uppercase tracking-wider font-bold">Cards Added</div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
             )}
           </div>
         )}
+
+        <div className="space-y-6">
+          {rules.length === 0 ? (
+            <div className="text-center py-16 bg-white dark:bg-[#0f1422]/50 border border-gray-200 dark:border-[#2a2d36] rounded-2xl border-dashed">
+              <Bot className="w-12 h-12 text-gray-400 mx-auto mb-4 opacity-50" />
+              <h3 className="text-lg font-bold text-gray-700 dark:text-gray-300">No automation rules</h3>
+              <p className="text-sm text-gray-500 mt-1">Add a rule to automatically flag incidents like AWOL or Tardiness.</p>
+            </div>
+          ) : (
+            rules.map((rule, idx) => (
+              <div key={rule.id || `new-${idx}`} className="bg-white dark:bg-[#0f1422]/80 border border-gray-200 dark:border-[#2a2d36] rounded-2xl overflow-hidden shadow-sm">
+                
+                {/* Rule Header */}
+                <div className="p-5 border-b border-gray-200 dark:border-[#2a2d36] bg-gray-50 dark:bg-[#161922]/50 flex justify-between items-center">
+                  <div className="flex items-center gap-3 flex-1 mr-4">
+                    <div className="w-10 h-10 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400 flex-shrink-0">
+                      <Settings size={20} />
+                    </div>
+                    <div className="flex-1">
+                      <input 
+                        type="text"
+                        value={rule.name}
+                        onChange={(e) => {
+                          const updated = [...rules];
+                          updated[idx].name = e.target.value;
+                          setRules(updated);
+                        }}
+                        placeholder="Rule Name"
+                        className="bg-transparent text-lg font-bold text-gray-900 dark:text-white border-none focus:outline-none focus:ring-0 p-0 w-full placeholder-gray-500"
+                      />
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center gap-4">
+                    <label className="flex items-center gap-2 cursor-pointer relative">
+                      <span className="text-sm font-bold text-gray-500">{rule.is_active ? 'Enabled' : 'Disabled'}</span>
+                      <input 
+                        type="checkbox" 
+                        className="sr-only peer" 
+                        checked={rule.is_active === 1} 
+                        onChange={(e) => {
+                          const updated = [...rules];
+                          updated[idx].is_active = e.target.checked ? 1 : 0;
+                          setRules(updated);
+                        }} 
+                      />
+                      <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:right-[22px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-[#00e07a]"></div>
+                    </label>
+
+                    <button onClick={() => handleDeleteRule(idx)} className="p-2 text-gray-400 hover:text-red-500 transition-colors">
+                      <Trash2 size={18} />
+                    </button>
+                  </div>
+                </div>
+
+                {/* Rule Body */}
+                <div className="p-6">
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    
+                    {/* Detector Config */}
+                    <div className="space-y-5">
+                      <div>
+                        <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">Detector Type</label>
+                        <select
+                          value={rule.rule_type}
+                          onChange={(e) => handleDetectorChange(idx, e.target.value)}
+                          className="w-full bg-gray-50 dark:bg-[#0b0f1a] border border-gray-200 dark:border-[#2a2d36] rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#00e07a] focus:ring-1 focus:ring-[#00e07a]/50"
+                        >
+                          {detectors.map(d => <option key={d.key} value={d.key}>{d.label}</option>)}
+                        </select>
+                        <p className="text-[11px] text-gray-500 mt-1.5">{detectors.find(d => d.key === rule.rule_type)?.desc}</p>
+                      </div>
+
+                      <div className="bg-gray-50 dark:bg-[#161922]/30 p-4 rounded-xl border border-gray-200 dark:border-white/5 space-y-4">
+                        <h4 className="text-xs font-bold uppercase text-gray-400 mb-2">Detector Parameters</h4>
+                        {detectors.find(d => d.key === rule.rule_type)?.params.map(param => (
+                          <div key={param.key}>
+                            <label className="block text-xs text-gray-500 mb-1.5">{param.label}</label>
+                            <input 
+                              type={param.type}
+                              value={rule.params[param.key] ?? ''}
+                              onChange={(e) => updateRuleParam(idx, param.key, param.type === 'number' ? parseInt(e.target.value) || 0 : e.target.value)}
+                              className="w-full bg-white dark:bg-[#0b0f1a] border border-gray-200 dark:border-[#2a2d36] rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-[#00e07a]"
+                            />
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Target Pipeline Config */}
+                    <div className="space-y-5">
+                      <div>
+                        <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">Target Pipeline</label>
+                        <select
+                          value={rule.target_pipeline_id}
+                          onChange={(e) => {
+                            const updated = [...rules];
+                            updated[idx].target_pipeline_id = parseInt(e.target.value) || "";
+                            updated[idx].target_stage_id = ""; // reset stage
+                            setRules(updated);
+                          }}
+                          className="w-full bg-gray-50 dark:bg-[#0b0f1a] border border-gray-200 dark:border-[#2a2d36] rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#00e07a] focus:ring-1 focus:ring-[#00e07a]/50"
+                        >
+                          <option value="">Select Pipeline...</option>
+                          {pipelines.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
+                        </select>
+                      </div>
+
+                      <div>
+                        <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">Target Stage</label>
+                        <select
+                          value={rule.target_stage_id}
+                          onChange={(e) => {
+                            const updated = [...rules];
+                            updated[idx].target_stage_id = parseInt(e.target.value) || "";
+                            setRules(updated);
+                          }}
+                          disabled={!rule.target_pipeline_id}
+                          className="w-full bg-gray-50 dark:bg-[#0b0f1a] border border-gray-200 dark:border-[#2a2d36] rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#00e07a] focus:ring-1 focus:ring-[#00e07a]/50 disabled:opacity-50"
+                        >
+                          <option value="">Select Stage...</option>
+                          {(pipelineStages[rule.target_pipeline_id as number] || []).map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
+                        </select>
+                      </div>
+
+                      <div className="pt-4 flex justify-end">
+                        <button 
+                          onClick={() => handleSaveRule(idx)}
+                          disabled={savingId === (rule.id || 'new')}
+                          className="px-6 py-2 bg-[#00e07a] hover:bg-[#00c96d] text-black rounded-lg text-sm font-bold flex items-center gap-2 transition-colors disabled:opacity-50"
+                        >
+                          <Save size={16} />
+                          {savingId === (rule.id || 'new') ? 'Saving...' : 'Save Rule'}
+                        </button>
+                      </div>
+                    </div>
+
+                  </div>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
 
       </div>
 
@@ -345,7 +473,6 @@ export function ELRAutomation() {
           {toast.message}
         </div>
       )}
-
     </main>
   );
 }
