@@ -19,6 +19,18 @@ foreach (['DB_HOST', 'DB_PORT', 'DB_NAME', 'DB_USER', 'DB_PASS', 'APP_URL', 'APP
     }
 }
 
+// Authoritative override for known keys. getenv() with NO arguments (used in the merge above)
+// is unreliable on Windows for values set at runtime via putenv() or passed to a child process
+// via proc_open() — but getenv('KEY') WITH an argument IS reliable cross-platform. Letting it win
+// keeps the parent (PHPUnit) and child (php -S test server) pointed at the SAME database, and is
+// strictly more correct in production too (real env vars always win over a committed .env).
+foreach (['DB_HOST', 'DB_PORT', 'DB_NAME', 'DB_USER', 'DB_PASS', 'APP_URL', 'APP_ENV', 'APP_DEBUG'] as $key) {
+    $val = getenv($key);
+    if ($val !== false) {
+        $env[$key] = $val;
+    }
+}
+
 // 2. Load Configuration
 global $config;
 $config = require __DIR__ . '/../config/config.php';
@@ -44,11 +56,6 @@ if (session_status() === PHP_SESSION_NONE) {
 
     // NOTE: We load the database FIRST (below), then register the MySQL session handler.
     // Session is started after DB is ready. See "Start Session with MySQL Handler" block below.
-}
-
-// Generate CSRF Token
-if (empty($_SESSION['csrf_token'])) {
-    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }
 
 // 4. Global URL Helper
@@ -99,6 +106,15 @@ if (session_status() === PHP_SESSION_NONE) {
         error_log('MySQLSessionHandler setup failed, falling back to files: ' . $e->getMessage());
     }
     session_start();
+}
+
+// Generate CSRF Token — MUST come AFTER session_start(). If generated before, session_start()
+// loads the (empty, for a brand-new session) MySQL session store and overwrites $_SESSION,
+// discarding the token. That made the CSRF endpoint return "" for fresh sessions, so the very
+// first login on a new session always 403'd ("CSRF token mismatch").
+// Regression guard: tests/Integration/ELRPipelineTest::testLoginSucceeds.
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }
 
 // 6. Load Permissions & Auth Helpers

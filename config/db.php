@@ -16,12 +16,22 @@ try {
         $dbConfig['port'],
         $dbConfig['name']
     );
-    $pdo = new PDO($dsn, $dbConfig['user'], $dbConfig['pass'], [
+    $pdoOptions = [
         PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
         PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
         PDO::ATTR_EMULATE_PREPARES => false,
-        PDO::ATTR_PERSISTENT => true,
-    ]);
+    ];
+    // Persistent connections are pooled per-process and reused across requests inside the
+    // long-running `php -S` integration-test server. A pooled handle can outlive DB
+    // drops/recreates and keep serving requests against a stale connection. In the testing
+    // environment we therefore want a FRESH connection per request; keep persistence
+    // everywhere else for performance.
+    $isTesting = (getenv('APP_ENV') === 'testing')
+        || (substr((string)$dbConfig['name'], -5) === '_test');
+    if (!$isTesting) {
+        $pdoOptions[PDO::ATTR_PERSISTENT] = true;
+    }
+    $pdo = new PDO($dsn, $dbConfig['user'], $dbConfig['pass'], $pdoOptions);
     // Force MySQL session to UTC to align with PHP's timezone
     $pdo->exec("SET time_zone = '+00:00';");
 } catch (PDOException $e) {

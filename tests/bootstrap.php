@@ -52,6 +52,9 @@ $migrationScripts = [
     'migrate_esm.php',
     'migrate_elr.php',
     'migrate_elr_knowledge.php',
+    'migrate_elr_pipeline.php',
+    'migrate_elr_auto_rules.php',
+    'migrate_elr_phase5.php',
     'migrate_expenses.php',
     'migrate_global_cache.php',
     'migrate_knowledge_base.php',
@@ -68,6 +71,19 @@ foreach ($migrationScripts as $script) {
     $path = __DIR__ . '/../database_scripts/' . $script;
     if (file_exists($path)) {
         // Output buffering to hide successful migration echoes
+        ob_start();
+        require $path;
+        ob_end_clean();
+    }
+}
+
+$databaseMigrations = [
+    'rbac_phase1.php',
+    'rbac_phase2.php'
+];
+foreach ($databaseMigrations as $script) {
+    $path = __DIR__ . '/../database/migrations/' . $script;
+    if (file_exists($path)) {
         ob_start();
         require $path;
         ob_end_clean();
@@ -96,14 +112,16 @@ echo "Test database setup complete.\n\n";
 
 // --- Fixture Helpers ---
 class FixtureHelper {
-    public static function createTenant($pdo, $name = 'Test Tenant') {
-        $stmt = $pdo->prepare("INSERT INTO tenants (name) VALUES (?)");
-        $stmt->execute([$name]);
-        return (int)$pdo->lastInsertId();
+    public static function createTenant(PDO $pdo, string $name): string
+    {
+        $id = uniqid('test_tenant_');
+        $stmt = $pdo->prepare("INSERT INTO tenants (id, company_name, contact_email, created_at) VALUES (?, ?, 'test@example.com', NOW())");
+        $stmt->execute([$id, $name]);
+        return $id;
     }
 
     public static function createUser($pdo, $tenantId, $email, $role = 'Employee') {
-        $stmt = $pdo->prepare("INSERT INTO users (tenant_id, first_name, last_name, email, password_hash, role) VALUES (?, 'Test', 'User', ?, ?, ?)");
+        $stmt = $pdo->prepare("INSERT INTO users (tenant_id, first_name, last_name, full_name, email, password_hash, role) VALUES (?, 'Test', 'User', 'Test User', ?, ?, ?)");
         $stmt->execute([$tenantId, $email, password_hash('password123', PASSWORD_DEFAULT), $role]);
         $userId = (int)$pdo->lastInsertId();
         
