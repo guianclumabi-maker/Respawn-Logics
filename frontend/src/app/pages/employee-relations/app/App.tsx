@@ -8,6 +8,7 @@ import { AICompanion } from "./components/AICompanion";
 import { KnowledgeAdmin } from "../../KnowledgeAdmin";
 import { AttendanceReport } from "./components/AttendanceReport";
 import { ELRTemplates } from "./components/ELRTemplates";
+import { ELRPipelines } from "./components/ELRPipelines";
 
 export default function App({ mode = "admin" }: { mode?: "employee" | "admin" }) {
   const [activeView, setActiveView] = useState<string>(mode === "employee" ? "Cases" : "Dashboard");
@@ -59,6 +60,10 @@ export default function App({ mode = "admin" }: { mode?: "employee" | "admin" })
 
         {activeView === "Templates" && (
           <ELRTemplates />
+        )}
+
+        {activeView === "Pipelines" && (
+          <ELRPipelines />
         )}
       </div>
     </div>
