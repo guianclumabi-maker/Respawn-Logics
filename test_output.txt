@@ -1,0 +1,53 @@
+Running schema migrations...
+Test database setup complete.
+
+PHPUnit 9.6.34 by Sebastian Bergmann and contributors.
+
+Heuristic Scoring Provider (Tests\Unit\HeuristicScoringProvider)
+ ✔ Empty inputs return zero score
+ ✔ Perfect match
+ ✔ Salary out of range high
+ ✔ Location remote match
+
+Permission (Tests\Unit\Permission)
+ ✔ Has permission returns true when permission exists
+ ✔ Has permission returns false when permission missing
+ ✔ Has permission returns false when not logged in
+
+Tenant Scope (Tests\Unit\TenantScope)
+ ✔ Tenant module enabled returns true if explicitly enabled
+ ✔ Tenant module enabled returns false if explicitly disabled
+ ✔ Tenant module enabled returns false when not logged in
+ ✔ Tenant module enabled returns default true if undefined
+
+Candidates Controller (Tests\Integration\CandidatesController)
+ ✔ Tenant isolation
+ ✔ Authorization for reads and writes
+ ✔ Input validation rejects invalid data
+ ✔ Stage transitions clear timestamps
+
+ELRPipeline (Tests\Integration\ELRPipeline)
+ ✔ Login succeeds
+ ✔ Save template detects merge fields
+ ✔ Missing fields rejected
+ ✔ Tenant isolation on templates
+
+PDOConnection (Tests\Integration\PDOConnection)
+ ✔ Which d b
+
+
+PHPUnit Parent PDO is connected to: employee_system_test
+
+
+Rbac Scope Isolation (Tests\Integration\RbacScopeIsolation)
+ ✔ Tenant scope
+ ✔ Department scope hierarchy
+ ✔ Department scope manager id safeguard
+ ✔ Cross department isolation
+ ✔ Has scoped access
+ ✔ Fail closed no org unit
+ ✔ Get scope where clause aliases
+
+Time: 00:06.989, Memory: 8.00 MB
+
+OK (27 tests, 61 assertions)

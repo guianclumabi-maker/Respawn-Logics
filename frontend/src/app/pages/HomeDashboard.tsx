@@ -81,15 +81,15 @@ function MetricCard({
   accent: string;
 }) {
   return (
-    <div className="relative bg-[#141929] border border-white/5 rounded-xl p-5 flex flex-col gap-3 overflow-hidden group hover:border-white/10 transition-colors">
+    <div className="relative bg-card text-card-foreground border border-border rounded-xl p-5 flex flex-col gap-3 overflow-hidden group hover:border-slate-300 dark:hover:border-white/10 transition-colors">
       <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity"
            style={{ background: `radial-gradient(circle at top left, ${accent}08 0%, transparent 70%)` }} />
       <div className="flex items-center justify-between">
         <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">{label}</span>
         <span style={{ color: accent }} className="opacity-70">{icon}</span>
       </div>
-      <div className="text-3xl font-bold text-white font-mono tracking-tight">{value}</div>
-      <div className="text-xs text-slate-500">{sub}</div>
+      <div className="text-3xl font-bold text-foreground font-mono tracking-tight">{value}</div>
+      <div className="text-xs text-muted-foreground">{sub}</div>
     </div>
   );
 }
@@ -187,11 +187,8 @@ export function HomeDashboard() {
   // ── Loading ──
   if (loading) {
     return (
-      <div className="flex-1 flex items-center justify-center bg-[#0a0f1a] h-full w-full">
-        <div className="flex flex-col items-center gap-3">
-          <Loader2 className="w-8 h-8 text-[#00e07a] animate-spin" />
-          <span className="text-slate-400 text-sm font-mono">LOADING_DATA...</span>
-        </div>
+      <div className="flex-1 flex items-center justify-center bg-background h-full w-full">
+        <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
       </div>
     );
   }
@@ -199,10 +196,10 @@ export function HomeDashboard() {
   // ── Error ──
   if (error) {
     return (
-      <div className="flex-1 flex items-center justify-center bg-[#0a0f1a] h-full w-full p-8">
-        <div className="flex flex-col items-center gap-4 max-w-sm text-center">
-          <AlertCircle className="w-12 h-12 text-red-400" />
-          <p className="text-slate-300">{error}</p>
+      <div className="flex-1 flex items-center justify-center bg-background h-full w-full p-8">
+        <div className="bg-destructive/10 text-destructive p-6 rounded-xl border border-destructive/20 text-center max-w-md">
+          <p className="font-bold mb-2">Failed to load dashboard</p>
+          <p className="text-sm opacity-90">{error}</p>
         </div>
       </div>
     );
@@ -212,23 +209,19 @@ export function HomeDashboard() {
   const d = stats!;
 
   return (
-    <div className="flex-1 overflow-y-auto bg-[#0b0f1a] text-slate-200 p-8 h-full">
-      {/* Background glows */}
-      <div className="fixed top-[-100px] left-[-100px] w-[500px] h-[500px] rounded-full bg-[#00e07a] blur-[120px] opacity-[0.04] pointer-events-none" />
-      <div className="fixed bottom-[-150px] right-[-100px] w-[600px] h-[600px] rounded-full bg-[#9b6dff] blur-[140px] opacity-[0.03] pointer-events-none" />
-
+    <div className="flex-1 overflow-y-auto bg-background text-foreground p-8 h-full">
       <div className="max-w-6xl mx-auto space-y-8 relative">
 
         {/* ── Header ── */}
         <div>
           <h1
-            className="text-3xl font-bold text-white mb-1"
+            className="text-3xl font-bold text-foreground mb-1"
             style={{ fontFamily: "'Space Grotesk', sans-serif" }}
           >
             Welcome back,{" "}
-            <span className="text-[#00e07a]">{firstName}!</span>
+            <span className="text-primary">{firstName}!</span>
           </h1>
-          <p className="text-slate-400 text-sm">
+          <p className="text-muted-foreground text-sm">
             Viewing portal with active configurations.
           </p>
         </div>
@@ -269,36 +262,31 @@ export function HomeDashboard() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
 
           {/* Panel A — Real-Time Shift Clock */}
-          <div className="bg-[#141929] border border-white/5 rounded-xl p-6 flex flex-col">
-            {/* Title row */}
+          <div className="bg-card text-card-foreground border border-border rounded-xl p-6 flex flex-col">
             <div className="flex items-center justify-between mb-6">
-              <h3 className="font-semibold text-white">Real-Time Shift Clock</h3>
+              <h3 className="font-semibold text-foreground">Real-Time Shift Clock</h3>
               <span
                 className={`px-3 py-1 rounded-full text-xs font-mono font-bold border ${
                   d.clocked_in_today
-                    ? "bg-[#00e07a]/10 text-[#00e07a] border-[#00e07a]/30"
-                    : "bg-red-500/10 text-red-400 border-red-500/30"
+                    ? "bg-emerald-500/10 text-emerald-500 border-emerald-500/30"
+                    : "bg-red-500/10 text-red-500 border-red-500/30"
                 }`}
               >
                 {d.clocked_in_today ? "Clocked In" : "Clocked Out"}
               </span>
             </div>
 
-            {/* Clock display */}
             <div className="flex-1 flex flex-col items-center justify-center py-10">
-              <div className="text-slate-400 text-sm mb-2 font-mono">{date}</div>
+              <div className="text-muted-foreground text-sm mb-2 font-mono">{date}</div>
               <div
-                className="text-5xl font-extrabold tracking-tight font-mono"
+                className="text-5xl font-extrabold tracking-tight font-mono text-primary"
                 style={{
-                  background: "linear-gradient(90deg, #00e07a, #00b8ff)",
-                  WebkitBackgroundClip: "text",
-                  WebkitTextFillColor: "transparent",
                   textShadow: "0 0 40px rgba(0,224,122,0.3)",
                 }}
               >
                 {clock}
               </div>
-              <p className="text-slate-500 text-sm mt-6 text-center max-w-[240px] leading-relaxed">
+              <p className="text-muted-foreground text-sm mt-6 text-center max-w-[240px] leading-relaxed">
                 {d.clocked_in_today
                   ? "You are clocked in. Work hard, stay focused!"
                   : "Tap the Attendance tab in the sidebar to clock in."}
@@ -307,26 +295,19 @@ export function HomeDashboard() {
           </div>
 
           {/* Panel B — My Tasks Checklist */}
-          <div className="bg-[#141929] border border-white/5 rounded-xl p-6 flex flex-col">
-            {/* Title row */}
+          <div className="bg-card text-card-foreground border border-border rounded-xl p-6 flex flex-col">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="font-semibold text-white">My Tasks Checklist</h3>
+              <h3 className="font-semibold text-foreground">My Tasks Checklist</h3>
               <span
-                className="px-3 py-1 rounded-full text-xs font-bold border"
-                style={{
-                  background: "rgba(0,224,122,0.10)",
-                  color: "#c084fc",
-                  borderColor: "rgba(0,224,122,0.25)",
-                }}
+                className="px-3 py-1 rounded-full text-xs font-bold border border-primary/20 bg-primary/10 text-primary"
               >
                 {d.active_tasks_count} Active
               </span>
             </div>
 
-            {/* Task list */}
             <div className="flex-1 overflow-y-auto space-y-2 min-h-[180px]">
               {d.todo_list.length === 0 ? (
-                <div className="text-center text-slate-500 text-sm py-8">
+                <div className="text-center text-muted-foreground text-sm py-8">
                   No tasks found. Create one below to begin.
                 </div>
               ) : (
@@ -338,8 +319,8 @@ export function HomeDashboard() {
                       key={todo.id}
                       className={`flex items-center justify-between px-4 py-3 rounded-lg border transition-all ${
                         done
-                          ? "border-[#00e07a]/30 bg-[#00e07a]/5"
-                          : "border-white/5 bg-white/[0.02] hover:border-white/10"
+                          ? "border-primary/30 bg-primary/5"
+                          : "border-border bg-card hover:border-border/80"
                       }`}
                     >
                       <div className="flex items-center gap-3 min-w-0">
@@ -348,15 +329,15 @@ export function HomeDashboard() {
                           disabled={toggling}
                           className={`w-[18px] h-[18px] flex-shrink-0 rounded border flex items-center justify-center transition-all ${
                             done
-                              ? "bg-[#00e07a] border-[#00e07a] text-black"
-                              : "border-slate-500 hover:border-[#00e07a]"
+                              ? "bg-primary border-primary text-primary-foreground"
+                              : "border-muted-foreground hover:border-primary"
                           } ${toggling ? "opacity-50" : ""}`}
                         >
                           {done && <Check size={11} strokeWidth={3} />}
                         </button>
                         <span
                           className={`text-sm font-medium truncate ${
-                            done ? "line-through text-slate-500" : "text-slate-200"
+                            done ? "line-through text-muted-foreground" : "text-foreground"
                           }`}
                         >
                           {todo.task_name}
@@ -364,7 +345,7 @@ export function HomeDashboard() {
                       </div>
                       <span
                         className={`text-xs flex-shrink-0 ml-2 ${
-                          done ? "text-[#00e07a]" : "text-slate-500"
+                          done ? "text-primary" : "text-muted-foreground"
                         }`}
                       >
                         {done ? "Done" : "Active"}
@@ -375,10 +356,9 @@ export function HomeDashboard() {
               )}
             </div>
 
-            {/* Add task form */}
             <form
               onSubmit={addTask}
-              className="flex gap-2 mt-4 pt-4 border-t border-white/5"
+              className="flex gap-2 mt-4 pt-4 border-t border-border"
             >
               <input
                 ref={inputRef}
@@ -386,12 +366,12 @@ export function HomeDashboard() {
                 value={newTask}
                 onChange={(e) => setNewTask(e.target.value)}
                 placeholder="New task name..."
-                className="flex-1 bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white placeholder-slate-500 outline-none focus:border-[#00e07a]/50 transition-colors"
+                className="flex-1 bg-background border border-input rounded-lg px-3 py-2 text-sm text-foreground placeholder-muted-foreground outline-none focus:border-primary/50 transition-colors"
               />
               <button
                 type="submit"
                 disabled={!newTask.trim() || addingTask}
-                className="px-4 py-2 bg-[#00e07a]/10 hover:bg-[#00e07a]/20 border border-[#00e07a]/30 text-[#00e07a] text-sm font-semibold rounded-lg transition-all disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-1"
+                className="px-4 py-2 bg-primary/10 hover:bg-primary/20 border border-primary/30 text-primary text-sm font-semibold rounded-lg transition-all disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-1"
               >
                 {addingTask ? (
                   <Loader2 size={14} className="animate-spin" />
