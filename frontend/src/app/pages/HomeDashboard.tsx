@@ -210,7 +210,7 @@ export function HomeDashboard() {
 
   return (
     <div className="flex-1 overflow-y-auto bg-background text-foreground p-8 h-full">
-      <div className="max-w-6xl mx-auto space-y-8 relative">
+      <div className="w-full max-w-none space-y-8 relative">
 
         {/* ── Header ── */}
         <div>
