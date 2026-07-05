@@ -9,6 +9,6 @@ try {
     if (strpos($e->getMessage(), 'Duplicate column name') !== false) {
         echo "Column support_access_expires_at already exists.\n";
     } else {
-        die("Error migrating tenants: " . $e->getMessage() . "\n");
+        throw $e;
     }
 }
