@@ -106,7 +106,7 @@ const getSections = (hasPermission: (p: string) => boolean, hasRole: (r: string 
       ...(hasPermission("attendance.view") ? [{ label: "Attendance Tracking", view: "Attendance", icon: <Clock size={19} /> }] : []),
       ...(hasPermission("leave.view") || hasPermission("leave.request") ? [{ label: "Leave Requests", view: "Leaves", icon: <CalendarCheck size={19} /> }] : []),
       { label: "Org Chart Directory", view: "Org Chart", icon: <Network size={19} /> },
-      { label: "My HR Cases", view: "Employee Relations", icon: <ShieldHalf size={19} /> },
+      { label: "My HR Cases", view: "My HR Cases", icon: <ShieldHalf size={19} /> },
       { label: "ELR Copilot", view: "ELR Copilot", icon: <Sparkles size={19} />, color: "#00b8ff" },
       { label: "IT / HR Service Desk", view: "IT / HR Service Desk", icon: <Headphones size={19} /> },
     ],
