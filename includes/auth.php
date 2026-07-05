@@ -109,7 +109,11 @@ if (!function_exists('getCurrentUser')) {
                 $stmt = $pdo->prepare("SELECT * FROM `users` WHERE `email` = ? AND `tenant_id` = ?");
                 $stmt->execute([$_SESSION['user_email'], $tenantId]);
             }
-            return $stmt->fetch();
+            $cachedUser = $stmt->fetch();
+            if (is_array($cachedUser)) {
+                unset($cachedUser['password_hash']);
+            }
+            return $cachedUser;
         } catch (PDOException $e) {
             return null;
         }
