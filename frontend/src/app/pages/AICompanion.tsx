@@ -5,7 +5,6 @@ import {
   User,
   MessageSquare,
   Plus,
-  Settings,
   Menu,
   Sparkles,
   Search,
@@ -37,12 +36,7 @@ interface ChatSession {
   date: string;
 }
 
-const mockHistory: ChatSession[] = [
-  { id: '1', title: 'Termination Policy Clarification', date: 'Today' },
-  { id: '2', title: 'Performance Review Draft', date: 'Yesterday' },
-  { id: '3', title: 'Case #12 Resolution', date: 'Previous 7 Days' },
-  { id: '4', title: 'Onboarding Process Updates', date: 'Previous 7 Days' },
-];
+const mockHistory: ChatSession[] = [];
 
 const SUGGESTIONS = [
   { icon: <ShieldCheck size={16} />, text: 'What is our policy on repeated tardiness?' },
@@ -152,40 +146,34 @@ export function AICompanion() {
 
         {/* History */}
         <div className="flex-1 overflow-y-auto px-3 py-2 min-h-0">
-          {['Today', 'Yesterday', 'Previous 7 Days'].map((group) => (
-            <div key={group} className="mb-6">
-              <h3 className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3 px-3">
-                {group}
-              </h3>
-              <div className="space-y-1">
-                {mockHistory
-                  .filter((h) => h.date === group)
-                  .map((chat) => (
-                    <button
-                      key={chat.id}
-                      className="w-full flex items-center gap-3 px-3 py-2.5 text-sm text-slate-300 hover:text-white hover:bg-white/5 rounded-lg transition-colors group"
-                    >
-                      <MessageSquare className="w-4 h-4 text-slate-500 group-hover:text-indigo-400 flex-shrink-0" />
-                      <span className="truncate">{chat.title}</span>
-                    </button>
-                  ))}
-              </div>
+          {mockHistory.length === 0 ? (
+            <div className="px-3 py-4 text-sm text-slate-500">
+              No saved chats yet.
             </div>
-          ))}
+          ) : (
+            ['Today', 'Yesterday', 'Previous 7 Days'].map((group) => (
+              <div key={group} className="mb-6">
+                <h3 className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3 px-3">
+                  {group}
+                </h3>
+                <div className="space-y-1">
+                  {mockHistory
+                    .filter((h) => h.date === group)
+                    .map((chat) => (
+                      <button
+                        key={chat.id}
+                        className="w-full flex items-center gap-3 px-3 py-2.5 text-sm text-slate-300 hover:text-white hover:bg-white/5 rounded-lg transition-colors group"
+                      >
+                        <MessageSquare className="w-4 h-4 text-slate-500 group-hover:text-indigo-400 flex-shrink-0" />
+                        <span className="truncate">{chat.title}</span>
+                      </button>
+                    ))}
+                </div>
+              </div>
+            ))
+          )}
         </div>
 
-        {/* User footer */}
-        <div className="p-4 border-t border-white/5 flex-shrink-0">
-          <button className="w-full flex items-center gap-3 px-3 py-2 text-sm text-slate-400 hover:text-white transition-colors rounded-lg hover:bg-white/5">
-            <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-indigo-500 to-purple-500 flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
-              {user?.name?.[0]?.toUpperCase() || 'U'}
-            </div>
-            <span className="flex-1 text-left font-medium truncate">
-              {user?.name || 'User'}
-            </span>
-            <Settings className="w-4 h-4" />
-          </button>
-        </div>
       </div>
 
       {/* ── Main ── */}
@@ -231,11 +219,7 @@ export function AICompanion() {
                 <Bot className="w-8 h-8 text-white" />
               </div>
               <h2 className="text-2xl font-bold text-white mb-2">
-                How can I help,{' '}
-                <span className="bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">
-                  {user?.name?.split(' ')[0] || 'there'}
-                </span>
-                ?
+                How can I help?
               </h2>
               <p className="text-slate-400 mb-10 max-w-sm text-sm leading-relaxed">
                 I'm your Enterprise HR AI Copilot — ask me anything about HR
