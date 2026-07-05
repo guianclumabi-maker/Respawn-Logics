@@ -234,7 +234,8 @@ export function Sidebar({ activeView, onViewChange, badges = {} }: SidebarProps)
         return next;
       });
     }
-  }, [activeView.view, sections]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeView.view]);
 
   const toggleSection = (title: string) => {
     if (!title) return;
@@ -253,7 +254,13 @@ export function Sidebar({ activeView, onViewChange, badges = {} }: SidebarProps)
       className="h-full bg-white dark:bg-[#0f172a] flex flex-col flex-shrink-0 border-r border-gray-200 dark:border-border transition-all duration-300 overflow-hidden select-none"
     >
       {/* ── Brand header ──────────────────────────────── */}
-      <div className="flex items-center justify-between h-[70px] px-5 border-b border-gray-200 dark:border-border flex-shrink-0">
+      <div 
+        className={`flex ${
+          collapsed 
+            ? "flex-col items-center justify-center py-5 gap-4" 
+            : "items-center justify-between h-[70px] px-5"
+        } border-b border-gray-200 dark:border-border flex-shrink-0`}
+      >
         {!collapsed && (
           <div className="flex items-center gap-3">
             <div
@@ -285,7 +292,7 @@ export function Sidebar({ activeView, onViewChange, badges = {} }: SidebarProps)
         )}
         {collapsed && (
           <div
-            className="w-10 h-10 bg-gradient-to-br from-[#00e07a] to-[#00b8ff] flex items-center justify-center flex-shrink-0 mx-auto"
+            className="w-10 h-10 bg-gradient-to-br from-[#00e07a] to-[#00b8ff] flex items-center justify-center flex-shrink-0"
             style={{ borderRadius: '10px', boxShadow: '0 8px 20px rgba(0,224,122,0.25)' }}
           >
             <i className="fa-solid fa-gamepad" style={{ color: '#000', fontSize: '20px' }}></i>
@@ -293,7 +300,9 @@ export function Sidebar({ activeView, onViewChange, badges = {} }: SidebarProps)
         )}
         <button
           onClick={() => setCollapsed((c) => !c)}
-          className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-white/5 transition-colors text-muted-foreground hover:text-slate-800 dark:hover:text-foreground cursor-pointer ml-auto"
+          className={`p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-white/5 transition-colors text-muted-foreground hover:text-slate-800 dark:hover:text-foreground cursor-pointer ${
+            collapsed ? "" : "ml-auto"
+          }`}
           title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
         >
           {collapsed ? <Menu size={16} /> : <Layers size={16} />}

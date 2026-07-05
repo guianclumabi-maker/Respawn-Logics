@@ -17,9 +17,9 @@ if (is_resource($process)) {
         $token = trim($matches[1]);
         
         $data = [
-            'title' => 'feat(ui): smooth height animation for sidebar sections',
-            'body' => 'Replaces the instant conditional render (`&&`) of the sidebar collapsible sections with a CSS Grid (`1fr` to `0fr`) transition. This creates a butter-smooth slide down/up animation for the dropdowns without requiring javascript height calculations.',
-            'head' => 'feat/sidebar-dropdown-animation',
+            'title' => 'fix(ui): fix workspace dropdown infinite loop and header collapse layout',
+            'body' => 'Fixes two bugs in the Sidebar: 1. The active section (e.g. Workspace) could not be collapsed because a React `useEffect` was caught in an infinite loop due to shifting array references on every render. 2. When the sidebar was minimized, the logo and collapse button were squished side-by-side; they now stack elegantly in a column layout.',
+            'head' => 'fix/sidebar-layout-bugs',
             'base' => 'main'
         ];
         
