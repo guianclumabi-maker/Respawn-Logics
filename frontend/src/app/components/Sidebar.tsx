@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "./ui/hover-card";
 import { GamifiedThemeToggle } from "./GamifiedThemeToggle";
@@ -8,6 +8,7 @@ import {
   BarChart2,
   Sparkles,
   Clock,
+  ShieldCheck,
   Calendar,
   CalendarCheck,
   Network,
@@ -214,6 +215,7 @@ function Badge({ count }: { count: number }) {
 export function Sidebar({ activeView, onViewChange, badges = {} }: SidebarProps) {
   const [collapsed, setCollapsed] = useState(false);
   const { user, hasPermission, hasRole, logout } = useAuth();
+  const navigate = useNavigate();
   const location = useLocation();
   const isAtsContext = location.pathname.startsWith("/ats");
 
@@ -448,6 +450,23 @@ export function Sidebar({ activeView, onViewChange, badges = {} }: SidebarProps)
         <div className="mt-4 pt-4 border-t border-gray-200 dark:border-border">
           <GamifiedThemeToggle collapsed={collapsed} />
         </div>
+
+        {/* ── Platform Admin Command Center (Platform_Admin only) ── */}
+        {(user?.roles?.includes("Platform_Admin") || user?.is_super) && (
+          <div className="mt-3">
+            <button
+              onClick={() => navigate("/platform-admin")}
+              title="Command Center"
+              className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition-all cursor-pointer
+                bg-gradient-to-r from-violet-500/10 to-fuchsia-500/10 hover:from-violet-500/20 hover:to-fuchsia-500/20
+                text-violet-400 hover:text-violet-300 border border-violet-500/20 hover:border-violet-500/30
+                ${collapsed ? "justify-center" : ""}`}
+            >
+              <ShieldCheck size={15} className="flex-shrink-0" />
+              {!collapsed && <span>Command Center</span>}
+            </button>
+          </div>
+        )}
       </div>
 
       {/* ── Profile Footer ────────────────────────────── */}

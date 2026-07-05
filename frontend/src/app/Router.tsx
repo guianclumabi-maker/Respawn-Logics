@@ -63,6 +63,16 @@ import { AICompanion } from "./pages/AICompanion";
 import { Analytics } from "./pages/Analytics";
 import { OrgUnits } from "./pages/OrgUnits";
 
+// Platform Admin Command Center (Platform_Admin only)
+import { PlatformAdminGuard } from "./pages/platform-admin/PlatformAdminGuard";
+import { PlatformAdminLayout } from "./pages/platform-admin/PlatformAdminLayout";
+import { PlatformAdminOverview } from "./pages/platform-admin/Overview";
+import { PlatformAdminTenants } from "./pages/platform-admin/Tenants";
+import { PlatformAdminStaff } from "./pages/platform-admin/Staff";
+import { PlatformAdminHealth } from "./pages/platform-admin/Health";
+import { PlatformAdminSupport } from "./pages/platform-admin/SupportTickets";
+import { PlatformAdminImpersonate } from "./pages/platform-admin/Impersonate";
+
 function AtsRoute({ component: Component }: { component: any }) {
   const navigate = useNavigate();
   const { id } = useParams();
@@ -145,5 +155,26 @@ export const router = createHashRouter([
     ]
   },
   { path: "/onboarding", element: <AuthGuard><OnboardingManager /></AuthGuard> },
-  { path: "/setup", element: <SetupModeCards /> }
+  { path: "/setup", element: <SetupModeCards /> },
+
+  // ── Platform Admin Command Center ──────────────────────────────────────────
+  // Completely isolated route tree — no tenant-facing routes or layouts touched.
+  {
+    path: "/platform-admin",
+    element: (
+      <AuthGuard>
+        <PlatformAdminGuard>
+          <PlatformAdminLayout />
+        </PlatformAdminGuard>
+      </AuthGuard>
+    ),
+    children: [
+      { index: true, element: <PlatformAdminOverview /> },
+      { path: "tenants", element: <PlatformAdminTenants /> },
+      { path: "staff", element: <PlatformAdminStaff /> },
+      { path: "support", element: <PlatformAdminSupport /> },
+      { path: "health", element: <PlatformAdminHealth /> },
+      { path: "impersonate", element: <PlatformAdminImpersonate /> },
+    ],
+  },
 ]);

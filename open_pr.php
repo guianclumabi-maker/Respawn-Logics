@@ -16,10 +16,12 @@ if (is_resource($process)) {
     if (preg_match('/password=(.+)/', $output, $matches)) {
         $token = trim($matches[1]);
         
+        $branch = trim(shell_exec('git rev-parse --abbrev-ref HEAD'));
+        
         $data = [
-            'title' => 'feat(ui): add icons and hover popups to collapsed sidebar',
-            'body' => 'Enhances the collapsed sidebar state by showing section icons with interactive Radix UI hover-cards instead of hiding the sections completely.',
-            'head' => 'feat/sidebar-hover-menus',
+            'title' => 'feat(ui): Platform Admin Command Center',
+            'body' => 'Added a dedicated dark command-center for Platform Admins with its own layout, pages, and impersonation feature.',
+            'head' => $branch,
             'base' => 'main'
         ];
         
