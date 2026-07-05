@@ -191,7 +191,10 @@ class AuthController
                             'email' => $_SESSION['user_email'],
                             'tenant_id' => $_SESSION['tenant_id'],
                             'theme' => $_SESSION['theme_preference'] ?? 'dark',
-                            'permissions' => $_SESSION['permissions'] ?? []
+                            'permissions' => $_SESSION['permissions'] ?? [],
+                            'is_super' => !empty($_SESSION['is_super']),
+                            'role' => getCurrentUser()['role'] ?? null,
+                            'roles' => [getCurrentUser()['role'] ?? 'Employee'],
                         ]
                     ]);
                 } else {
