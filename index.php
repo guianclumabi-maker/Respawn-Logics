@@ -1714,7 +1714,7 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
             
             <div class="price-panel" style="text-align: left; margin-top: auto;">
                 <div class="price-num">₱0</div>
-                <div class="price-tag">FOREVER FREE</div>
+                <div class="price-tag">FREE FOR FIRST 3 MONTHS</div>
                 <?php if ($loggedIn): ?>
                     <a href="<?= url('/frontend/dist/index.html?v=<?= time() ?>#/dashboard') ?>" class="btn-primary" style="width:100%; justify-content:center;">
                         <i data-lucide="play"></i> Go to Dashboard
