@@ -46,9 +46,7 @@ import {
   ChevronDown,
   ChevronRight,
   User,
-  Server,
-  Briefcase,
-  Layers
+  Server
 } from "lucide-react";
 
 // ── Types ──────────────────────────────────────────────────
