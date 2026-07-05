@@ -40,5 +40,5 @@ try {
     echo "ELR Migration completed successfully!\n";
 
 } catch (Exception $e) {
-    die("Migration failed: " . $e->getMessage() . "\n");
+    throw $e;
 }

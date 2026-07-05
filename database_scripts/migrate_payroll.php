@@ -108,5 +108,5 @@ try {
     echo "Payroll Migration completed successfully!\n";
 
 } catch (PDOException $e) {
-    die("Migration failed: " . $e->getMessage() . "\n");
+    throw $e;
 }

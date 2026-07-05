@@ -186,5 +186,5 @@ try {
     echo "ATS migration completed successfully!\n";
 
 } catch (PDOException $e) {
-    die("Migration failed: " . $e->getMessage() . "\n");
+    throw $e;
 }

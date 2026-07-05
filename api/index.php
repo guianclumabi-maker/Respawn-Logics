@@ -143,6 +143,16 @@ if (!array_key_exists($route, $controllers)) {
     // Fallback: If route isn't mapped yet, return 404. 
     // Wait, if it isn't mapped, the user will hit 404 because the file was deleted.
     // That's correct. We only delete files we have migrated.
+
+    if ($route === 'force_migrate') {
+        define('MIGRATION_SAFE', true);
+        ob_start();
+        require_once __DIR__ . '/../database_scripts/run_migrations.php';
+        $out = ob_get_clean();
+        echo json_encode(['success' => true, 'output' => $out]);
+        exit;
+    }
+
     http_response_code(404);
     echo json_encode(['success' => false, 'error' => "API route '{$route}' not found or not yet migrated."]);
     exit;
