@@ -17,7 +17,8 @@ import {
   Kanban,
   Bot,
   FileText,
-  CheckSquare
+  CheckSquare,
+  HelpCircle
 } from "lucide-react";
 import { GamifiedThemeToggle } from "./GamifiedThemeToggle";
 
@@ -60,9 +61,10 @@ type SidebarProps = {
   activeView: string;
   onViewChange: (view: any) => void;
   mode?: "employee" | "admin";
+  onStartTour?: () => void;
 };
 
-export function Sidebar({ activeView, onViewChange, mode = "admin" }: SidebarProps) {
+export function Sidebar({ activeView, onViewChange, mode = "admin", onStartTour }: SidebarProps) {
   const navItems = mode === "employee" ? employeeNavItems : adminNavItems;
   const [collapsed, setCollapsed] = useState(false);
   const [expanded, setExpanded] = useState<string>("Cases");
@@ -132,13 +134,24 @@ export function Sidebar({ activeView, onViewChange, mode = "admin" }: SidebarPro
           </div>
         )}
         
-        {/* Toggle icon */}
-        <button
-          onClick={() => setCollapsed((c) => !c)}
-          className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-accent transition-colors text-muted-foreground hover:text-slate-800 dark:hover:text-foreground cursor-pointer ml-auto"
-        >
-          {collapsed ? <Menu size={16} /> : <Layers size={16} />}
-        </button>
+        {/* Header actions: replay tour (admin) + collapse toggle */}
+        <div className="flex items-center gap-1 ml-auto">
+          {!collapsed && onStartTour && (
+            <button
+              onClick={onStartTour}
+              title="Replay the guided tour"
+              className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-accent transition-colors text-muted-foreground hover:text-primary cursor-pointer"
+            >
+              <HelpCircle size={16} />
+            </button>
+          )}
+          <button
+            onClick={() => setCollapsed((c) => !c)}
+            className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-accent transition-colors text-muted-foreground hover:text-slate-800 dark:hover:text-foreground cursor-pointer"
+          >
+            {collapsed ? <Menu size={16} /> : <Layers size={16} />}
+          </button>
+        </div>
       </div>
 
       {/* Main navigation content */}
@@ -159,6 +172,7 @@ export function Sidebar({ activeView, onViewChange, mode = "admin" }: SidebarPro
               return (
                 <div key={item.label}>
                   <button
+                    id={item.viewName ? `tour-elr-nav-${item.viewName}` : undefined}
                     onClick={() => {
                       if (item.viewName) {
                         onViewChange(item.viewName);
