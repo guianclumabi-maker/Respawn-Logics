@@ -10,8 +10,10 @@ import {
   Loader2,
   AlertCircle,
   Check,
+  HelpCircle,
 } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
+import { useTour } from "../lib/useTour";
 
 const API_BASE =
   import.meta.env.VITE_API_BASE_URL ||
@@ -97,6 +99,11 @@ function MetricCard({
 // ── Main component ───────────────────────────────────────────────
 export function HomeDashboard() {
   const { user } = useAuth();
+  const { startTour } = useTour("dashboard_tour", [
+    { element: "#tour-metric-cards", popover: { title: "Dashboard Metrics", description: "Get an at-a-glance overview of your hours, clock state, pending leaves, and active tasks." } },
+    { element: "#tour-shift-clock", popover: { title: "Real-Time Shift Clock", description: "Monitor your current attendance status and exact clock time here." } },
+    { element: "#tour-tasks", popover: { title: "My Tasks Checklist", description: "Stay organized by managing your daily tasks. Add new items and cross them off as you complete them!" } }
+  ]);
   const [stats, setStats] = useState<Stats | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -213,21 +220,31 @@ export function HomeDashboard() {
       <div className="w-full max-w-none space-y-8 relative">
 
         {/* ── Header ── */}
-        <div>
-          <h1
-            className="text-3xl font-bold text-foreground mb-1"
-            style={{ fontFamily: "'Space Grotesk', sans-serif" }}
+        <div className="flex items-center justify-between">
+          <div>
+            <h1
+              className="text-3xl font-bold text-foreground mb-1"
+              style={{ fontFamily: "'Space Grotesk', sans-serif" }}
+            >
+              Welcome back,{" "}
+              <span className="text-primary">{firstName}!</span>
+            </h1>
+            <p className="text-muted-foreground text-sm">
+              Viewing portal with active configurations.
+            </p>
+          </div>
+          <button 
+            onClick={startTour} 
+            className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-muted-foreground bg-muted/30 hover:bg-muted rounded-full transition-colors"
+            title="Take a Tour"
           >
-            Welcome back,{" "}
-            <span className="text-primary">{firstName}!</span>
-          </h1>
-          <p className="text-muted-foreground text-sm">
-            Viewing portal with active configurations.
-          </p>
+            <HelpCircle size={16} />
+            <span>Help Tour</span>
+          </button>
         </div>
 
         {/* ── Metric Cards ── */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div id="tour-metric-cards" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <MetricCard
             label="Weekly Working Hours"
             value={`${d.total_hours.toFixed(1)}h`}
@@ -262,7 +279,7 @@ export function HomeDashboard() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
 
           {/* Panel A — Real-Time Shift Clock */}
-          <div className="bg-card text-card-foreground border border-border rounded-xl p-6 flex flex-col">
+          <div id="tour-shift-clock" className="bg-card text-card-foreground border border-border rounded-xl p-6 flex flex-col">
             <div className="flex items-center justify-between mb-6">
               <h3 className="font-semibold text-foreground">Real-Time Shift Clock</h3>
               <span
@@ -295,7 +312,7 @@ export function HomeDashboard() {
           </div>
 
           {/* Panel B — My Tasks Checklist */}
-          <div className="bg-card text-card-foreground border border-border rounded-xl p-6 flex flex-col">
+          <div id="tour-tasks" className="bg-card text-card-foreground border border-border rounded-xl p-6 flex flex-col">
             <div className="flex items-center justify-between mb-4">
               <h3 className="font-semibold text-foreground">My Tasks Checklist</h3>
               <span
