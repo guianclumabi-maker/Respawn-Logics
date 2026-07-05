@@ -62,6 +62,58 @@ class TimesheetControllerTest extends TestCase
         $this->assertSame('Approved', $list2['json']['timesheets'][0]['status']);
     }
 
+    public function testGenerateDraftFromAttendance(): void
+    {
+        global $pdo;
+
+        // Seed two attendance punches for the employee (weekdays, no holiday):
+        //  - 8h shift  -> 60min break deducted -> 7h regular
+        //  - 11h shift -> 60min break deducted -> 10h worked -> 8 regular + 2 overtime
+        $ins = $pdo->prepare("INSERT INTO `attendance` (`tenant_id`, `employee_email`, `time_in`, `time_out`) VALUES (?, 'ts.emp@test.com', ?, ?)");
+        $ins->execute([self::$tenantId, '2026-07-06 09:00:00', '2026-07-06 17:00:00']); // Mon
+        $ins->execute([self::$tenantId, '2026-07-07 09:00:00', '2026-07-07 20:00:00']); // Tue
+
+        self::loginAs('ts.admin@test.com');
+        $gen = self::apiPost($this->base() . '&action=generate_draft', [
+            'start_date' => '2026-07-06', 'end_date' => '2026-07-07', 'employee_id' => self::$empId,
+        ]);
+        $this->assertTrue($gen['json']['success'] ?? false, 'generate_draft should succeed: ' . $gen['body']);
+        $this->assertSame(2, (int) ($gen['json']['drafted'] ?? 0));
+
+        $list = self::apiGet($this->base() . '&action=list&start_date=2026-07-06&end_date=2026-07-07&employee_id=' . self::$empId);
+        $byDate = [];
+        foreach ($list['json']['timesheets'] as $t) { $byDate[$t['timesheet_date']] = $t; }
+
+        $this->assertArrayHasKey('2026-07-06', $byDate);
+        $this->assertEqualsWithDelta(7.0, (float) $byDate['2026-07-06']['regular_hours'], 0.01);
+        $this->assertEqualsWithDelta(0.0, (float) $byDate['2026-07-06']['overtime_hours'], 0.01);
+        $this->assertSame('Pending', $byDate['2026-07-06']['status']);
+
+        $this->assertArrayHasKey('2026-07-07', $byDate);
+        $this->assertEqualsWithDelta(8.0, (float) $byDate['2026-07-07']['regular_hours'], 0.01);
+        $this->assertEqualsWithDelta(2.0, (float) $byDate['2026-07-07']['overtime_hours'], 0.01);
+    }
+
+    public function testGenerateDraftDoesNotOverwriteApproved(): void
+    {
+        // 2026-06-01 was approved in testSaveApproveAndList. A punch on the same day
+        // must NOT clobber the manager-approved row.
+        global $pdo;
+        $pdo->prepare("INSERT INTO `attendance` (`tenant_id`, `employee_email`, `time_in`, `time_out`) VALUES (?, 'ts.emp@test.com', '2026-06-01 08:00:00', '2026-06-01 18:00:00')")
+            ->execute([self::$tenantId]);
+
+        self::loginAs('ts.admin@test.com');
+        $gen = self::apiPost($this->base() . '&action=generate_draft', [
+            'start_date' => '2026-06-01', 'end_date' => '2026-06-01', 'employee_id' => self::$empId,
+        ]);
+        $this->assertTrue($gen['json']['success'] ?? false);
+        $this->assertSame(1, (int) ($gen['json']['skipped_approved'] ?? 0));
+
+        $list = self::apiGet($this->base() . '&action=list&start_date=2026-06-01&end_date=2026-06-01&employee_id=' . self::$empId);
+        $this->assertSame('Approved', $list['json']['timesheets'][0]['status']);
+        $this->assertEqualsWithDelta(8.0, (float) $list['json']['timesheets'][0]['regular_hours'], 0.01);
+    }
+
     public function testTenantIsolation(): void
     {
         global $pdo;
