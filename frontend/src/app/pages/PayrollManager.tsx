@@ -116,6 +116,11 @@ export function PayrollManager() {
   const [editingTsData, setEditingTsData] = useState<any>({});
   const [selectedTsIds, setSelectedTsIds] = useState<number[]>([]);
   const [isTsLoading, setIsTsLoading] = useState(false);
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [holidays, setHolidays] = useState<any[]>([]);
+  const [showHolidays, setShowHolidays] = useState(false);
+  const [isHolidaysLoading, setIsHolidaysLoading] = useState(false);
+  const [newHoliday, setNewHoliday] = useState({ holiday_date: '', name: '', type: 'Regular Holiday' });
 
   const fetchTimesheets = async () => {
     setIsTsLoading(true);
@@ -259,6 +264,110 @@ export function PayrollManager() {
       console.error("Error deleting timesheet:", err);
     }
   };
+
+  const handleGenerateDraft = async () => {
+    if (!confirm("Generate draft timesheets from attendance punches for the selected date range? Existing Approved days are never overwritten.")) {
+      return;
+    }
+    setIsGenerating(true);
+    try {
+      const res = await apiFetch('/api/index.php?route=timesheets&action=generate_draft', {
+        method: 'POST',
+        body: JSON.stringify({
+          start_date: tsStart,
+          end_date: tsEnd,
+          employee_id: tsEmpId || undefined
+        })
+      });
+      if (res.ok) {
+        const json = await res.json();
+        if (json.success) {
+          fetchTimesheets();
+          alert(`Drafted ${json.drafted} day(s). Skipped ${json.skipped_approved} already-approved.\n\n${json.note || ''}`);
+        } else {
+          alert(json.error || "Failed to generate drafts.");
+        }
+      } else {
+        alert("Server returned error response.");
+      }
+    } catch (err) {
+      console.error("Error generating drafts:", err);
+      alert("Error generating drafts.");
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
+  const fetchHolidays = async () => {
+    setIsHolidaysLoading(true);
+    try {
+      const url = `/api/index.php?route=timesheets&action=holidays&start_date=${tsStart}&end_date=${tsEnd}`;
+      const res = await apiFetch(url);
+      if (res.ok) {
+        const json = await res.json();
+        if (json.success) {
+          setHolidays(json.holidays || []);
+        }
+      }
+    } catch (err) {
+      console.error("Error fetching holidays:", err);
+    } finally {
+      setIsHolidaysLoading(false);
+    }
+  };
+
+  const handleSaveHoliday = async (e: any) => {
+    e.preventDefault();
+    if (!newHoliday.holiday_date || !newHoliday.name) {
+      alert("Please fill in all holiday fields.");
+      return;
+    }
+    try {
+      const res = await apiFetch('/api/index.php?route=timesheets&action=save_holiday', {
+        method: 'POST',
+        body: JSON.stringify(newHoliday)
+      });
+      if (res.ok) {
+        const json = await res.json();
+        if (json.success) {
+          setNewHoliday({ holiday_date: '', name: '', type: 'Regular Holiday' });
+          fetchHolidays();
+        } else {
+          alert(json.error || "Failed to save holiday.");
+        }
+      }
+    } catch (err) {
+      console.error("Error saving holiday:", err);
+    }
+  };
+
+  const handleDeleteHoliday = async (id: number) => {
+    if (!confirm("Are you sure you want to delete this holiday?")) {
+      return;
+    }
+    try {
+      const res = await apiFetch('/api/index.php?route=timesheets&action=delete_holiday', {
+        method: 'POST',
+        body: JSON.stringify({ id })
+      });
+      if (res.ok) {
+        const json = await res.json();
+        if (json.success) {
+          fetchHolidays();
+        } else {
+          alert(json.error || "Failed to delete holiday.");
+        }
+      }
+    } catch (err) {
+      console.error("Error deleting holiday:", err);
+    }
+  };
+
+  useEffect(() => {
+    if (activeTab === 'timesheets' && showHolidays) {
+      fetchHolidays();
+    }
+  }, [activeTab, showHolidays, tsStart, tsEnd]);
 
   // Live Progress Simulation State
   const [processedEmployees, setProcessedEmployees] = useState(0);
@@ -1290,6 +1399,135 @@ export function PayrollManager() {
             )}
           </div>
         </div>
+
+        {/* Generation & Holiday Calendar Actions */}
+        <div className="card mb-6 flex justify-between items-center bg-[#161922]/20 border-white/5 p-4 gap-4">
+          <div className="flex items-center gap-3">
+            <button
+              onClick={handleGenerateDraft}
+              disabled={isGenerating}
+              className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all flex-shrink-0 ${isGenerating ? 'bg-slate-700 text-slate-400 cursor-not-allowed' : 'bg-emerald-600 hover:bg-emerald-700 text-white cursor-pointer'}`}
+            >
+              {isGenerating ? "Generating..." : "Generate from Attendance"}
+            </button>
+            <span className="text-xs text-gray-400 leading-normal">
+              Drafts are created as Pending — review and approve before running payroll. Break/OT/rest-day rules follow company policy defaults.
+            </span>
+          </div>
+          <div>
+            <button
+              onClick={() => setShowHolidays(!showHolidays)}
+              className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all border border-white/10 ${showHolidays ? 'bg-blue-600 text-white' : 'bg-white/5 hover:bg-white/10 text-white cursor-pointer'}`}
+            >
+              {showHolidays ? "Hide Holiday Calendar" : "Show Holiday Calendar"}
+            </button>
+          </div>
+        </div>
+
+        {/* Holiday Calendar Panel */}
+        {showHolidays && (
+          <div className="card mb-6 bg-[#161922]/40 border-white/5 p-6 animate-slide-up">
+            <div className="flex justify-between items-center mb-4 pb-2 border-b border-white/5">
+              <h3 className="text-lg font-bold text-white flex items-center gap-2">
+                <CalendarClock size={20} className="text-blue-500" />
+                Holiday Calendar ({tsStart} to {tsEnd})
+              </h3>
+              <span className="text-xs text-gray-500">Only applicable to holidays in the selected period</span>
+            </div>
+
+            {isHolidaysLoading ? (
+              <div className="text-center text-muted py-4">Loading holidays...</div>
+            ) : (
+              <div className="grid grid-cols-3 gap-6">
+                {/* Add Holiday Form */}
+                <div className="col-span-1 bg-black/20 p-4 rounded-lg border border-white/5">
+                  <h4 className="font-semibold text-sm mb-3 text-gray-200">Add Holiday</h4>
+                  <form onSubmit={handleSaveHoliday} className="space-y-3">
+                    <div className="form-group">
+                      <label className="text-xs text-tertiary block mb-1">Date</label>
+                      <input 
+                        type="date" 
+                        required
+                        className="w-full p-2 rounded bg-[#0f172a] border border-white/10 text-white text-xs outline-none focus:border-emerald-500"
+                        value={newHoliday.holiday_date}
+                        onChange={e => setNewHoliday({ ...newHoliday, holiday_date: e.target.value })}
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label className="text-xs text-tertiary block mb-1">Name</label>
+                      <input 
+                        type="text" 
+                        required
+                        placeholder="e.g. Christmas Day"
+                        className="w-full p-2 rounded bg-[#0f172a] border border-white/10 text-white text-xs outline-none focus:border-emerald-500"
+                        value={newHoliday.name}
+                        onChange={e => setNewHoliday({ ...newHoliday, name: e.target.value })}
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label className="text-xs text-tertiary block mb-1">Type</label>
+                      <select 
+                        className="w-full p-2 rounded bg-[#0f172a] border border-white/10 text-white text-xs outline-none focus:border-emerald-500"
+                        value={newHoliday.type}
+                        onChange={e => setNewHoliday({ ...newHoliday, type: e.target.value })}
+                      >
+                        <option value="Regular Holiday">Regular Holiday</option>
+                        <option value="Special Non-Working">Special Non-Working</option>
+                      </select>
+                    </div>
+                    <button 
+                      type="submit"
+                      className="w-full py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded transition-all cursor-pointer"
+                    >
+                      + Save Holiday
+                    </button>
+                  </form>
+                </div>
+
+                {/* Holiday List Table */}
+                <div className="col-span-2 overflow-hidden border border-white/5 rounded-lg">
+                  <table className="w-full text-left border-collapse text-xs">
+                    <thead>
+                      <tr className="bg-black/40 border-b border-white/5 text-gray-400 font-semibold">
+                        <th className="p-3">Date</th>
+                        <th className="p-3">Name</th>
+                        <th className="p-3">Type</th>
+                        <th className="p-3 text-right">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {holidays.length === 0 ? (
+                        <tr>
+                          <td colSpan={4} className="p-4 text-center text-muted">No holidays registered in this period.</td>
+                        </tr>
+                      ) : (
+                        holidays.map(h => (
+                          <tr key={h.id} className="border-b border-white/5 hover:bg-white/5">
+                            <td className="p-3 font-mono text-gray-300">{h.holiday_date}</td>
+                            <td className="p-3 font-semibold text-white">{h.name}</td>
+                            <td className="p-3">
+                              <span className={`badge ${h.type === 'Regular Holiday' ? 'badge-blue' : 'badge-amber'}`}>
+                                {h.type}
+                              </span>
+                            </td>
+                            <td className="p-3 text-right">
+                              <button 
+                                onClick={() => handleDeleteHoliday(h.id)}
+                                className="px-2 py-1 bg-rose-600/20 text-rose-400 hover:bg-rose-600/30 rounded text-[10px] font-bold transition-all cursor-pointer"
+                              >
+                                Delete
+                              </button>
+                            </td>
+                          </tr>
+                        ))
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
 
         {/* Timesheets Data Table */}
         <div className="card p-0 overflow-hidden bg-[#161922]/30 border-white/5">
