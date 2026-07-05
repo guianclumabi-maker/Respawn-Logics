@@ -132,7 +132,10 @@ class TimesheetController
             $hours[$col] = max(0, (float)($input[$col] ?? 0));
         }
         // Editing a row sends it back to Pending unless an approver explicitly approves.
-        $status = in_array($input['status'] ?? 'Pending', ['Pending', 'Approved', 'Rejected'], true) ? $input['status'] : 'Pending';
+        $status = 'Pending';
+        if (isset($input['status']) && in_array($input['status'], ['Pending', 'Approved', 'Rejected'], true)) {
+            $status = $input['status'];
+        }
 
         $stmt = $this->pdo->prepare(
             "INSERT INTO `timesheets`
