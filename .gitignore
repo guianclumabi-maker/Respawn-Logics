@@ -10,3 +10,7 @@ scratch/
 storage/tenant_*/
 !storage/.htaccess
 vendor/
+
+# Local DB backups (contain data / connection details — never commit)
+backup_db.bat
+respawn_backup_*.sql
