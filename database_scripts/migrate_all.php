@@ -28,6 +28,7 @@ $scripts = [
     'migrate_knowledge_base.php',
     'migrate_onboarding.php',
     'migrate_payroll.php',
+    'migrate_timesheets.php',
     'migrate_performance.php',
     'migrate_security.php',
     'setup_db.php',
