@@ -123,6 +123,7 @@ $controllers = [
     'compensation' => 'CompensationController',
     'iam' => 'IAMController',
     'payroll_engine' => 'PayrollController',
+    'timesheets' => 'TimesheetController',
     'performance' => 'PerformanceController',
     'platform_support' => 'PlatformSupportController',
     'esm_support' => 'ESMSupportController',

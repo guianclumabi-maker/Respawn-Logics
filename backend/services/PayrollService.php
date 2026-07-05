@@ -193,6 +193,26 @@ class PayrollService
         return max(0, $cap - $used);
     }
 
+    /**
+     * Sum the basic-pay 13th-month accrual across the calendar year's Regular runs for an employee.
+     * Equals (total basic salary earned in the year) / 12 — the legally-correct 13th-month base
+     * (PD 851), tenant-scoped, excluding the 13th-month run itself.
+     */
+    private function getThirteenthMonthAccrued($empId, $payDate, $tenantId) {
+        $year = date('Y', strtotime($payDate));
+        $stmt = $this->pdo->prepare("
+            SELECT COALESCE(SUM(pre.thirteenth_month_accrual), 0)
+            FROM payroll_run_employees pre
+            JOIN payroll_runs pr ON pre.payroll_run_id = pr.id
+            WHERE pre.employee_id = ?
+            AND pr.tenant_id = ?
+            AND pr.run_type = 'Regular'
+            AND YEAR(pr.pay_date) = ?
+        ");
+        $stmt->execute([$empId, $tenantId, $year]);
+        return floatval($stmt->fetchColumn());
+    }
+
     public function generateRun($tenantId, $scheduleId, $start, $end, $payDate, $createdById, $runType = 'Regular')
     {
         try {
@@ -351,9 +371,17 @@ class PayrollService
                     $sss = ['ee' => 0, 'er' => 0, 'ec' => 0, 'wisp_er' => 0];
                     $phic = ['ee' => 0, 'er' => 0];
                     $hdmf = ['ee' => 0, 'er' => 0];
-                    // Approximation: payout full base salary
-                    $thirteenthPayout = floatval($emp['base_salary']);
+                    // 13th-month pay (PD 851) = total BASIC salary earned in the calendar year / 12.
+                    // We sum the per-run basic accrual (grossReg/12) across the year's Regular runs,
+                    // which equals (annual basic earned) / 12 — correct for mid-year hires, raises and
+                    // unpaid absences, unlike paying one month's *current* base salary.
+                    // NOTE: "basic salary" here excludes OT, holiday premium, night diff and allowances
+                    // per the standard interpretation; company policy/CBA integration must be CPA-confirmed.
+                    $thirteenthPayout = round($this->getThirteenthMonthAccrued($empId, $payDate, $tenantId), 2);
                     $otherBenefitsThisRun += $thirteenthPayout;
+                    // A 13th-month run pays ONLY the 13th month — zero all work-pay components so
+                    // no basic/OT/holiday/night-diff line items leak in (keeps the payslip reconciled).
+                    $grossReg = $grossOt = $grossRest = $grossSpec = $grossHol = $grossNd = 0;
                     $cutoffBase = 0; // No regular basic salary this run
                 }
                 
@@ -443,7 +471,10 @@ class PayrollService
                 
                 $tax = round($this->calculateTax($taxableIncome, $frequency), 2);
                 
-                $thirteenthAccrual = round($cutoffBase / 12, 2);
+                // Accrue 13th-month on BASIC pay only (regular-hours pay), excluding OT, holiday
+                // premium, night differential and allowances — per PD 851's "basic salary".
+                // The 13th-month run itself does not accrue.
+                $thirteenthAccrual = $is13thMonth ? 0.00 : round($grossReg / 12, 2);
 
                 $totalDeductions = round($tax + $sss['ee'] + $phic['ee'] + $hdmf['ee'] + $totalHmoDeduction + $customDeductions, 2);
                 $net = round($gross - $totalDeductions, 2);

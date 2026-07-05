@@ -27,7 +27,8 @@ import {
   ServerCog,
   Download,
   Printer,
-  Gamepad2
+  Gamepad2,
+  Trash2
 } from 'lucide-react';
 import {
   AreaChart,
@@ -39,6 +40,7 @@ import {
   ResponsiveContainer
 } from 'recharts';
 import { useAuth } from '../context/AuthContext';
+import { apiFetch } from '../lib/apiClient';
 import './PayrollManager.css';
 
 const API_BASE = window.location.origin + (window.location.hostname === 'localhost' ? '/respawn-logics' : '') + '/api/index.php?route=payroll_engine';
@@ -96,6 +98,167 @@ export function PayrollManager() {
   const [govReports, setGovReports] = useState<any[]>([]);
   
   const [selectedPayslipDetails, setSelectedPayslipDetails] = useState<any>(null);
+
+  // Timesheets States
+  const [timesheets, setTimesheets] = useState<any[]>([]);
+  const [employees, setEmployees] = useState<any[]>([]);
+  const [tsStart, setTsStart] = useState(() => {
+    const d = new Date();
+    return new Date(d.getFullYear(), d.getMonth(), 1).toISOString().split('T')[0];
+  });
+  const [tsEnd, setTsEnd] = useState(() => {
+    const d = new Date();
+    return new Date(d.getFullYear(), d.getMonth() + 1, 0).toISOString().split('T')[0];
+  });
+  const [tsEmpId, setTsEmpId] = useState('');
+  const [tsStatus, setTsStatus] = useState('');
+  const [editingTsId, setEditingTsId] = useState<number | null>(null);
+  const [editingTsData, setEditingTsData] = useState<any>({});
+  const [selectedTsIds, setSelectedTsIds] = useState<number[]>([]);
+  const [isTsLoading, setIsTsLoading] = useState(false);
+
+  const fetchTimesheets = async () => {
+    setIsTsLoading(true);
+    try {
+      const url = `/api/index.php?route=timesheets&action=list&start_date=${tsStart}&end_date=${tsEnd}&employee_id=${tsEmpId}&status=${tsStatus}`;
+      const res = await apiFetch(url);
+      if (res.ok) {
+        const json = await res.json();
+        if (json.success) {
+          setTimesheets(json.timesheets || []);
+        }
+      }
+    } catch (err) {
+      console.error("Error fetching timesheets:", err);
+    } finally {
+      setIsTsLoading(false);
+    }
+  };
+
+  const fetchEmployees = async () => {
+    try {
+      const res = await apiFetch('/api/index.php?route=iam&action=users');
+      if (res.ok) {
+        const json = await res.json();
+        if (json.success && json.data) {
+          setEmployees(json.data);
+        }
+      }
+    } catch (err) {
+      console.error("Error fetching employees:", err);
+    }
+  };
+
+  useEffect(() => {
+    if (activeTab === 'timesheets') {
+      fetchTimesheets();
+    }
+  }, [activeTab, tsStart, tsEnd, tsEmpId, tsStatus]);
+
+  useEffect(() => {
+    if (activeTab === 'timesheets' && employees.length === 0) {
+      fetchEmployees();
+    }
+  }, [activeTab]);
+
+  const handleSaveTsRow = async (row: any) => {
+    try {
+      const res = await apiFetch('/api/index.php?route=timesheets&action=save', {
+        method: 'POST',
+        body: JSON.stringify(row)
+      });
+      if (res.ok) {
+        const json = await res.json();
+        if (json.success) {
+          setEditingTsId(null);
+          fetchTimesheets();
+        } else {
+          alert(json.error || "Failed to save timesheet");
+        }
+      }
+    } catch (err) {
+      console.error("Error saving timesheet:", err);
+    }
+  };
+
+  const handleSetTsStatus = async (status: 'Approved' | 'Rejected', ids?: number[]) => {
+    const targetIds = ids || selectedTsIds;
+    if (targetIds.length === 0) {
+      alert("No timesheets selected.");
+      return;
+    }
+    try {
+      const action = status === 'Approved' ? 'approve' : 'reject';
+      const res = await apiFetch(`/api/index.php?route=timesheets&action=${action}`, {
+        method: 'POST',
+        body: JSON.stringify({ ids: targetIds })
+      });
+      if (res.ok) {
+        const json = await res.json();
+        if (json.success) {
+          setSelectedTsIds([]);
+          fetchTimesheets();
+        } else {
+          alert(json.error || `Failed to ${action} timesheets`);
+        }
+      }
+    } catch (err) {
+      console.error(`Error performing ${status} action:`, err);
+    }
+  };
+
+  const handleSetTsStatusPeriod = async (status: 'Approved' | 'Rejected') => {
+    if (!tsEmpId) {
+      alert("Please select an employee filter first to perform period-based approval/rejection.");
+      return;
+    }
+    if (!confirm(`Are you sure you want to ${status.toLowerCase()} all timesheets in the selected date range for this employee?`)) {
+      return;
+    }
+    try {
+      const action = status === 'Approved' ? 'approve' : 'reject';
+      const res = await apiFetch(`/api/index.php?route=timesheets&action=${action}`, {
+        method: 'POST',
+        body: JSON.stringify({
+          employee_id: tsEmpId,
+          start_date: tsStart,
+          end_date: tsEnd
+        })
+      });
+      if (res.ok) {
+        const json = await res.json();
+        if (json.success) {
+          fetchTimesheets();
+        } else {
+          alert(json.error || `Failed to ${action} timesheets for period`);
+        }
+      }
+    } catch (err) {
+      console.error(`Error performing ${status} action for period:`, err);
+    }
+  };
+
+  const handleDeleteTsRow = async (id: number) => {
+    if (!confirm("Are you sure you want to delete this timesheet entry?")) {
+      return;
+    }
+    try {
+      const res = await apiFetch('/api/index.php?route=timesheets&action=delete', {
+        method: 'POST',
+        body: JSON.stringify({ id })
+      });
+      if (res.ok) {
+        const json = await res.json();
+        if (json.success) {
+          fetchTimesheets();
+        } else {
+          alert(json.error || "Failed to delete timesheet");
+        }
+      }
+    } catch (err) {
+      console.error("Error deleting timesheet:", err);
+    }
+  };
 
   // Live Progress Simulation State
   const [processedEmployees, setProcessedEmployees] = useState(0);
@@ -1003,6 +1166,470 @@ export function PayrollManager() {
     </div>
   );
 
+  const renderTimesheets = () => {
+    const isAllSelected = timesheets.length > 0 && selectedTsIds.length === timesheets.length;
+
+    const handleSelectAll = (e: any) => {
+      if (e.target.checked) {
+        setSelectedTsIds(timesheets.map(t => t.id));
+      } else {
+        setSelectedTsIds([]);
+      }
+    };
+
+    const handleSelectRow = (id: number, checked: boolean) => {
+      if (checked) {
+        setSelectedTsIds([...selectedTsIds, id]);
+      } else {
+        setSelectedTsIds(selectedTsIds.filter(x => x !== id));
+      }
+    };
+
+    return (
+      <div className="dashboard-content animate-slide-up pb-20">
+        <div className="flex justify-between items-center mb-6">
+          <div>
+            <h2 className="text-2xl font-bold">Timesheets Checkpoint</h2>
+            <p className="text-muted mt-1">Review, edit, and approve employee daily work hours for payroll calculation.</p>
+          </div>
+          
+          <div className="flex gap-2">
+            <button 
+              onClick={() => handleSetTsStatus('Approved')}
+              disabled={selectedTsIds.length === 0}
+              className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all ${selectedTsIds.length === 0 ? 'bg-slate-700 text-slate-400 cursor-not-allowed' : 'bg-emerald-600 hover:bg-emerald-700 text-white cursor-pointer'}`}
+            >
+              Approve Selected ({selectedTsIds.length})
+            </button>
+            <button 
+              onClick={() => handleSetTsStatus('Rejected')}
+              disabled={selectedTsIds.length === 0}
+              className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all ${selectedTsIds.length === 0 ? 'bg-slate-700 text-slate-400 cursor-not-allowed' : 'bg-rose-600 hover:bg-rose-700 text-white cursor-pointer'}`}
+            >
+              Reject Selected ({selectedTsIds.length})
+            </button>
+          </div>
+        </div>
+
+        {/* Warning banner about payroll compliance requirement */}
+        <div className="card bg-amber-500/10 border-amber-500/30 mb-6 flex items-start gap-3 p-4">
+          <AlertTriangle className="text-amber-500 flex-shrink-0 mt-0.5" size={20} />
+          <div>
+            <h4 className="font-semibold text-amber-200 text-sm">Compliance Note</h4>
+            <p className="text-xs text-amber-200/70 mt-1">
+              Only <strong>Approved</strong> timesheet entries are processed for payouts by the payroll system. 
+              Any hours that are <strong>Pending</strong> or <strong>Rejected</strong> are completely ignored during payroll calculation.
+            </p>
+          </div>
+        </div>
+
+        {/* Filters */}
+        <div className="card mb-6 grid grid-cols-5 gap-4 items-end bg-[#161922]/50 border-white/5">
+          <div className="form-group">
+            <label className="text-xs text-tertiary font-semibold mb-1 block">Start Date</label>
+            <input 
+              type="date" 
+              className="w-full p-2 rounded bg-[#0f172a] border border-white/10 text-white focus:border-emerald-500 outline-none" 
+              value={tsStart}
+              onChange={e => setTsStart(e.target.value)}
+            />
+          </div>
+          <div className="form-group">
+            <label className="text-xs text-tertiary font-semibold mb-1 block">End Date</label>
+            <input 
+              type="date" 
+              className="w-full p-2 rounded bg-[#0f172a] border border-white/10 text-white focus:border-emerald-500 outline-none" 
+              value={tsEnd}
+              onChange={e => setTsEnd(e.target.value)}
+            />
+          </div>
+          <div className="form-group">
+            <label className="text-xs text-tertiary font-semibold mb-1 block">Employee</label>
+            <select 
+              className="w-full p-2 rounded bg-[#0f172a] border border-white/10 text-white focus:border-emerald-500 outline-none"
+              value={tsEmpId}
+              onChange={e => setTsEmpId(e.target.value)}
+            >
+              <option value="">All Employees</option>
+              {employees.map(e => (
+                <option key={e.id} value={e.id}>{e.full_name} ({e.email})</option>
+              ))}
+            </select>
+          </div>
+          <div className="form-group">
+            <label className="text-xs text-tertiary font-semibold mb-1 block">Status</label>
+            <select 
+              className="w-full p-2 rounded bg-[#0f172a] border border-white/10 text-white focus:border-emerald-500 outline-none"
+              value={tsStatus}
+              onChange={e => setTsStatus(e.target.value)}
+            >
+              <option value="">All Statuses</option>
+              <option value="Pending">Pending</option>
+              <option value="Approved">Approved</option>
+              <option value="Rejected">Rejected</option>
+            </select>
+          </div>
+          <div className="flex gap-2 justify-end mb-[2px]">
+            {tsEmpId && (
+              <>
+                <button 
+                  onClick={() => handleSetTsStatusPeriod('Approved')}
+                  className="px-3 py-2 bg-emerald-600/20 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-600/30 rounded text-xs font-semibold transition-all cursor-pointer"
+                  title="Approve all matching rows in selected date range for this employee"
+                >
+                  Approve Period
+                </button>
+                <button 
+                  onClick={() => handleSetTsStatusPeriod('Rejected')}
+                  className="px-3 py-2 bg-rose-600/20 text-rose-400 border border-rose-500/30 hover:bg-rose-600/30 rounded text-xs font-semibold transition-all cursor-pointer"
+                  title="Reject all matching rows in selected date range for this employee"
+                >
+                  Reject Period
+                </button>
+              </>
+            )}
+          </div>
+        </div>
+
+        {/* Timesheets Data Table */}
+        <div className="card p-0 overflow-hidden bg-[#161922]/30 border-white/5">
+          {isTsLoading ? (
+            <div className="p-8 text-center text-muted">Loading timesheets...</div>
+          ) : timesheets.length === 0 ? (
+            <div className="p-8 text-center text-muted flex flex-col items-center gap-2">
+              <p>No timesheets found for this range.</p>
+              <button 
+                onClick={() => {
+                  if(!tsEmpId) {
+                    alert("Please select a specific employee to initialize a timesheet row.");
+                    return;
+                  }
+                  setEditingTsId(-1);
+                  setEditingTsData({
+                    employee_id: tsEmpId,
+                    timesheet_date: tsStart,
+                    regular_hours: 8,
+                    overtime_hours: 0,
+                    rest_day_hours: 0,
+                    special_day_hours: 0,
+                    regular_holiday_hours: 0,
+                    night_diff_hours: 0,
+                    status: 'Pending'
+                  });
+                }}
+                className="px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded text-xs font-semibold text-white cursor-pointer"
+              >
+                + Add Daily Entry
+              </button>
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="data-table w-full text-left border-collapse">
+                <thead>
+                  <tr className="bg-black/20 border-b border-white/5">
+                    <th className="p-3 w-10 text-center">
+                      <input 
+                        type="checkbox" 
+                        className="accent-[#00e07a]" 
+                        checked={isAllSelected}
+                        onChange={handleSelectAll}
+                      />
+                    </th>
+                    <th className="p-3 text-tertiary font-semibold text-xs uppercase tracking-wider">Employee</th>
+                    <th className="p-3 text-tertiary font-semibold text-xs uppercase tracking-wider">Date</th>
+                    <th className="p-3 text-tertiary font-semibold text-xs uppercase tracking-wider text-center">Reg Hrs</th>
+                    <th className="p-3 text-tertiary font-semibold text-xs uppercase tracking-wider text-center">OT Hrs</th>
+                    <th className="p-3 text-tertiary font-semibold text-xs uppercase tracking-wider text-center">Rest Day</th>
+                    <th className="p-3 text-tertiary font-semibold text-xs uppercase tracking-wider text-center">Spec Day</th>
+                    <th className="p-3 text-tertiary font-semibold text-xs uppercase tracking-wider text-center">Reg Hol</th>
+                    <th className="p-3 text-tertiary font-semibold text-xs uppercase tracking-wider text-center">Night Diff</th>
+                    <th className="p-3 text-tertiary font-semibold text-xs uppercase tracking-wider text-center">Status</th>
+                    <th className="p-3 text-tertiary font-semibold text-xs uppercase tracking-wider text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {/* Inline creation form */}
+                  {editingTsId === -1 && (
+                    <tr className="bg-emerald-500/5 border-b border-white/5">
+                      <td className="p-3"></td>
+                      <td className="p-3 font-semibold text-white">
+                        {employees.find(e => e.id == editingTsData.employee_id)?.full_name || 'Select Employee'}
+                      </td>
+                      <td className="p-3">
+                        <input 
+                          type="date"
+                          className="w-32 bg-[#0f172a] border border-white/10 rounded px-2 py-1 text-xs text-white"
+                          value={editingTsData.timesheet_date || ''}
+                          onChange={e => setEditingTsData({ ...editingTsData, timesheet_date: e.target.value })}
+                        />
+                      </td>
+                      <td className="p-3 text-center">
+                        <input 
+                          type="number" step="0.5" min="0" max="24"
+                          className="w-14 bg-[#0f172a] border border-white/10 rounded px-1 py-0.5 text-xs text-white text-center"
+                          value={editingTsData.regular_hours ?? 0}
+                          onChange={e => setEditingTsData({ ...editingTsData, regular_hours: parseFloat(e.target.value) || 0 })}
+                        />
+                      </td>
+                      <td className="p-3 text-center">
+                        <input 
+                          type="number" step="0.5" min="0" max="24"
+                          className="w-14 bg-[#0f172a] border border-white/10 rounded px-1 py-0.5 text-xs text-white text-center"
+                          value={editingTsData.overtime_hours ?? 0}
+                          onChange={e => setEditingTsData({ ...editingTsData, overtime_hours: parseFloat(e.target.value) || 0 })}
+                        />
+                      </td>
+                      <td className="p-3 text-center">
+                        <input 
+                          type="number" step="0.5" min="0" max="24"
+                          className="w-14 bg-[#0f172a] border border-white/10 rounded px-1 py-0.5 text-xs text-white text-center"
+                          value={editingTsData.rest_day_hours ?? 0}
+                          onChange={e => setEditingTsData({ ...editingTsData, rest_day_hours: parseFloat(e.target.value) || 0 })}
+                        />
+                      </td>
+                      <td className="p-3 text-center">
+                        <input 
+                          type="number" step="0.5" min="0" max="24"
+                          className="w-14 bg-[#0f172a] border border-white/10 rounded px-1 py-0.5 text-xs text-white text-center"
+                          value={editingTsData.special_day_hours ?? 0}
+                          onChange={e => setEditingTsData({ ...editingTsData, special_day_hours: parseFloat(e.target.value) || 0 })}
+                        />
+                      </td>
+                      <td className="p-3 text-center">
+                        <input 
+                          type="number" step="0.5" min="0" max="24"
+                          className="w-14 bg-[#0f172a] border border-white/10 rounded px-1 py-0.5 text-xs text-white text-center"
+                          value={editingTsData.regular_holiday_hours ?? 0}
+                          onChange={e => setEditingTsData({ ...editingTsData, regular_holiday_hours: parseFloat(e.target.value) || 0 })}
+                        />
+                      </td>
+                      <td className="p-3 text-center">
+                        <input 
+                          type="number" step="0.5" min="0" max="24"
+                          className="w-14 bg-[#0f172a] border border-white/10 rounded px-1 py-0.5 text-xs text-white text-center"
+                          value={editingTsData.night_diff_hours ?? 0}
+                          onChange={e => setEditingTsData({ ...editingTsData, night_diff_hours: parseFloat(e.target.value) || 0 })}
+                        />
+                      </td>
+                      <td className="p-3 text-center">
+                        <span className="badge badge-amber">Pending</span>
+                      </td>
+                      <td className="p-3 text-right flex gap-1 justify-end">
+                        <button onClick={() => handleSaveTsRow(editingTsData)} className="px-2 py-1 bg-emerald-600 hover:bg-emerald-500 rounded text-xs text-white flex items-center gap-1 font-semibold cursor-pointer">
+                          <Save size={12}/> Save
+                        </button>
+                        <button onClick={() => setEditingTsId(null)} className="px-2 py-1 bg-slate-700 hover:bg-slate-600 rounded text-xs text-white cursor-pointer">
+                          Cancel
+                        </button>
+                      </td>
+                    </tr>
+                  )}
+
+                  {timesheets.map((ts) => {
+                    const isEditing = editingTsId === ts.id;
+                    const isSelected = selectedTsIds.includes(ts.id);
+
+                    return (
+                      <tr key={ts.id} className={`border-b border-white/5 transition-colors ${isEditing ? 'bg-blue-500/5' : 'hover:bg-white/5'}`}>
+                        <td className="p-3 text-center">
+                          <input 
+                            type="checkbox" 
+                            className="accent-[#00e07a]" 
+                            checked={isSelected}
+                            onChange={(e) => handleSelectRow(ts.id, e.target.checked)}
+                          />
+                        </td>
+                        <td className="p-3">
+                          <span className="font-semibold text-white block">{ts.full_name || 'N/A'}</span>
+                          <span className="text-xs text-gray-500">{ts.department || 'Staff'}</span>
+                        </td>
+                        <td className="p-3 font-mono text-sm text-gray-300">{ts.timesheet_date}</td>
+                        
+                        <td className="p-3 text-center">
+                          {isEditing ? (
+                            <input 
+                              type="number" step="0.5" min="0" max="24"
+                              className="w-14 bg-[#0f172a] border border-white/10 rounded px-1 py-0.5 text-xs text-white text-center"
+                              value={editingTsData.regular_hours ?? 0}
+                              onChange={e => setEditingTsData({ ...editingTsData, regular_hours: parseFloat(e.target.value) || 0 })}
+                            />
+                          ) : (
+                            <span className="font-mono text-sm">{parseFloat(ts.regular_hours || 0)}</span>
+                          )}
+                        </td>
+                        
+                        <td className="p-3 text-center">
+                          {isEditing ? (
+                            <input 
+                              type="number" step="0.5" min="0" max="24"
+                              className="w-14 bg-[#0f172a] border border-white/10 rounded px-1 py-0.5 text-xs text-white text-center"
+                              value={editingTsData.overtime_hours ?? 0}
+                              onChange={e => setEditingTsData({ ...editingTsData, overtime_hours: parseFloat(e.target.value) || 0 })}
+                            />
+                          ) : (
+                            <span className="font-mono text-sm text-gray-400">{parseFloat(ts.overtime_hours || 0) || '-'}</span>
+                          )}
+                        </td>
+
+                        <td className="p-3 text-center">
+                          {isEditing ? (
+                            <input 
+                              type="number" step="0.5" min="0" max="24"
+                              className="w-14 bg-[#0f172a] border border-white/10 rounded px-1 py-0.5 text-xs text-white text-center"
+                              value={editingTsData.rest_day_hours ?? 0}
+                              onChange={e => setEditingTsData({ ...editingTsData, rest_day_hours: parseFloat(e.target.value) || 0 })}
+                            />
+                          ) : (
+                            <span className="font-mono text-sm text-gray-400">{parseFloat(ts.rest_day_hours || 0) || '-'}</span>
+                          )}
+                        </td>
+
+                        <td className="p-3 text-center">
+                          {isEditing ? (
+                            <input 
+                              type="number" step="0.5" min="0" max="24"
+                              className="w-14 bg-[#0f172a] border border-white/10 rounded px-1 py-0.5 text-xs text-white text-center"
+                              value={editingTsData.special_day_hours ?? 0}
+                              onChange={e => setEditingTsData({ ...editingTsData, special_day_hours: parseFloat(e.target.value) || 0 })}
+                            />
+                          ) : (
+                            <span className="font-mono text-sm text-gray-400">{parseFloat(ts.special_day_hours || 0) || '-'}</span>
+                          )}
+                        </td>
+
+                        <td className="p-3 text-center">
+                          {isEditing ? (
+                            <input 
+                              type="number" step="0.5" min="0" max="24"
+                              className="w-14 bg-[#0f172a] border border-white/10 rounded px-1 py-0.5 text-xs text-white text-center"
+                              value={editingTsData.regular_holiday_hours ?? 0}
+                              onChange={e => setEditingTsData({ ...editingTsData, regular_holiday_hours: parseFloat(e.target.value) || 0 })}
+                            />
+                          ) : (
+                            <span className="font-mono text-sm text-gray-400">{parseFloat(ts.regular_holiday_hours || 0) || '-'}</span>
+                          )}
+                        </td>
+
+                        <td className="p-3 text-center">
+                          {isEditing ? (
+                            <input 
+                              type="number" step="0.5" min="0" max="24"
+                              className="w-14 bg-[#0f172a] border border-white/10 rounded px-1 py-0.5 text-xs text-white text-center"
+                              value={editingTsData.night_diff_hours ?? 0}
+                              onChange={e => setEditingTsData({ ...editingTsData, night_diff_hours: parseFloat(e.target.value) || 0 })}
+                            />
+                          ) : (
+                            <span className="font-mono text-sm text-gray-400">{parseFloat(ts.night_diff_hours || 0) || '-'}</span>
+                          )}
+                        </td>
+
+                        <td className="p-3 text-center">
+                          {isEditing ? (
+                            <select 
+                              className="bg-[#0f172a] border border-white/10 rounded px-1 py-0.5 text-xs text-white text-center outline-none"
+                              value={editingTsData.status || 'Pending'}
+                              onChange={e => setEditingTsData({ ...editingTsData, status: e.target.value })}
+                            >
+                              <option value="Pending">Pending</option>
+                              <option value="Approved">Approved</option>
+                              <option value="Rejected">Rejected</option>
+                            </select>
+                          ) : (
+                            <span className={`badge ${
+                              ts.status === 'Approved' ? 'badge-emerald' : 
+                              ts.status === 'Rejected' ? 'badge-red' : 'badge-amber'
+                            }`}>
+                              {ts.status || 'Pending'}
+                            </span>
+                          )}
+                        </td>
+
+                        <td className="p-3 text-right">
+                          <div className="flex gap-1 justify-end">
+                            {isEditing ? (
+                              <>
+                                <button onClick={() => handleSaveTsRow(editingTsData)} className="p-1.5 bg-emerald-600 hover:bg-emerald-500 rounded text-white cursor-pointer" title="Save">
+                                  <Save size={14}/>
+                                </button>
+                                <button onClick={() => setEditingTsId(null)} className="p-1.5 bg-slate-700 hover:bg-slate-600 rounded text-white cursor-pointer" title="Cancel">
+                                  <AlertCircle size={14}/>
+                                </button>
+                              </>
+                            ) : (
+                              <>
+                                <button 
+                                  onClick={() => {
+                                    setEditingTsId(ts.id);
+                                    setEditingTsData({ ...ts });
+                                  }}
+                                  className="px-2 py-1 bg-white/5 hover:bg-white/10 border border-white/10 rounded text-xs text-white cursor-pointer"
+                                >
+                                  Edit
+                                </button>
+                                <button 
+                                  onClick={() => handleSetTsStatus('Approved', [ts.id])}
+                                  className="px-2 py-1 bg-emerald-600/10 text-emerald-400 hover:bg-emerald-600/20 border border-emerald-500/20 rounded text-xs cursor-pointer"
+                                >
+                                  Approve
+                                </button>
+                                <button 
+                                  onClick={() => handleSetTsStatus('Rejected', [ts.id])}
+                                  className="px-2 py-1 bg-rose-600/10 text-rose-400 hover:bg-rose-600/20 border border-rose-500/20 rounded text-xs cursor-pointer"
+                                >
+                                  Reject
+                                </button>
+                                <button 
+                                  onClick={() => handleDeleteTsRow(ts.id)}
+                                  className="p-1 hover:bg-rose-500/20 text-rose-500 rounded cursor-pointer"
+                                  title="Delete Daily Entry"
+                                >
+                                  <Trash2 size={14}/>
+                                </button>
+                              </>
+                            )}
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+        
+        {/* Helper button to init entry if not in edit mode */}
+        {editingTsId === null && (
+          <div className="mt-4 flex justify-end">
+            <button 
+              onClick={() => {
+                if(!tsEmpId) {
+                  alert("Please select a specific employee to initialize a timesheet row.");
+                  return;
+                }
+                setEditingTsId(-1);
+                setEditingTsData({
+                  employee_id: tsEmpId,
+                  timesheet_date: tsStart,
+                  regular_hours: 8,
+                  overtime_hours: 0,
+                  rest_day_hours: 0,
+                  special_day_hours: 0,
+                  regular_holiday_hours: 0,
+                  night_diff_hours: 0,
+                  status: 'Pending'
+                });
+              }}
+              className="px-4 py-2 bg-[#00e07a] text-black font-bold rounded-lg text-sm shadow-[0_0_10px_rgba(0,224,122,0.3)] cursor-pointer"
+            >
+              + Add Timesheet Row
+            </button>
+          </div>
+        )}
+      </div>
+    );
+  };
+
   const handleExport = () => {
     const isLocal = window.location.hostname === 'localhost';
     const basePath = isLocal ? '/respawn-logics' : '';
@@ -1026,6 +1653,7 @@ export function PayrollManager() {
               <button className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${activeTab === 'exceptions' ? 'bg-red-500/20 text-red-500' : 'text-gray-400 hover:text-white'}`} onClick={() => setActiveTab('exceptions')}>Exceptions ({exceptions.filter(e => e.severity === 'Critical').length})</button>
               <button className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${activeTab === 'compensation' ? 'bg-[#00e07a]/20 text-[#00e07a]' : 'text-gray-400 hover:text-white'}`} onClick={() => setActiveTab('compensation')}>Compensation</button>
               <button className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${activeTab === 'payslips' ? 'bg-[#00e07a]/20 text-[#00e07a]' : 'text-gray-400 hover:text-white'}`} onClick={() => setActiveTab('payslips')}>Payslips</button>
+              <button className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${activeTab === 'timesheets' ? 'bg-[#00e07a]/20 text-[#00e07a]' : 'text-gray-400 hover:text-white'}`} onClick={() => setActiveTab('timesheets')}>Timesheets</button>
               <button className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${activeTab === 'govreports' ? 'bg-[#00e07a]/20 text-[#00e07a]' : 'text-gray-400 hover:text-white'}`} onClick={() => setActiveTab('govreports')}>Reports</button>
               <button className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${activeTab === 'settings' ? 'bg-[#00e07a]/20 text-[#00e07a]' : 'text-gray-400 hover:text-white'}`} onClick={() => setActiveTab('settings')}>Settings</button>
             </div>
@@ -1053,6 +1681,7 @@ export function PayrollManager() {
           {activeTab === 'compensation' && renderCompensation()}
           {activeTab === 'settings' && renderSettings()}
           {activeTab === 'payslips' && renderPayslips()}
+          {activeTab === 'timesheets' && renderTimesheets()}
           {activeTab === 'govreports' && renderGovReports()}
         </div>
       </div>
