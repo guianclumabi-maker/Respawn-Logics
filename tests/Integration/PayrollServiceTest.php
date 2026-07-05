@@ -111,7 +111,42 @@ class PayrollServiceTest extends TestCase
         $foreignSchedId = (int) self::$pdo->lastInsertId();
 
         $svc = new \PayrollService(self::$pdo);
-        $res = $svc->generateRun(self::$tenantId, $foreignSchedId, '2025-06-01', '2025-06-30', '2025-06-30', self::$empId, 'Regular');
+        $res = $svc->generateRun(self::$tenantId, $foreignSchedId, '2026-06-01', '2026-06-30', '2026-06-30', self::$empId, 'Regular');
         $this->assertFalse($res['success'] ?? true, 'running payroll against another tenant\'s schedule must fail');
+    }
+
+    /**
+     * 13th-month pay must be the accrued basic-salary total (PD 851), not one month's base salary.
+     * @depends testGenerateRunSucceeds
+     */
+    public function testThirteenthMonthUsesAccruedBasicNotBaseSalary(array $res): void
+    {
+        // The Regular run from testGenerateRunSucceeds accrued basic (grossReg / 12) for 2026.
+        $accStmt = self::$pdo->prepare(
+            "SELECT COALESCE(SUM(pre.thirteenth_month_accrual),0)
+             FROM payroll_run_employees pre
+             JOIN payroll_runs pr ON pre.payroll_run_id = pr.id
+             WHERE pre.employee_id = ? AND pr.tenant_id = ? AND pr.run_type = 'Regular' AND YEAR(pr.pay_date) = 2026"
+        );
+        $accStmt->execute([self::$empId, self::$tenantId]);
+        $accrued = round((float) $accStmt->fetchColumn(), 2);
+        $this->assertGreaterThan(0, $accrued, 'a Regular run should have accrued 13th-month basic');
+
+        // Run a 13th-month run.
+        $svc = new \PayrollService(self::$pdo);
+        $res13 = $svc->generateRun(self::$tenantId, self::$schedId, '2026-01-01', '2026-12-31', '2026-12-24', self::$empId, '13th Month');
+        $this->assertTrue($res13['success'] ?? false, '13th-month run should succeed: ' . json_encode($res13));
+        $runId = (int) $res13['run_id'];
+
+        // The payout must equal the accrued basic total — NOT one month's base salary (30000).
+        $payStmt = self::$pdo->prepare(
+            "SELECT COALESCE(SUM(amount),0) FROM payroll_earnings
+             WHERE payroll_run_id = ? AND employee_id = ? AND earning_type LIKE '13th Month%'"
+        );
+        $payStmt->execute([$runId, self::$empId]);
+        $payout = round((float) $payStmt->fetchColumn(), 2);
+
+        $this->assertEqualsWithDelta($accrued, $payout, 0.05, '13th-month payout must equal accrued basic, not base salary');
+        $this->assertGreaterThan(0.05, abs($payout - 30000.00), '13th-month payout must NOT be one month base salary (the old approximation)');
     }
 }
