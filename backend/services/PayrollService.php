@@ -184,7 +184,7 @@ class PayrollService
             JOIN payroll_runs pr ON pe.payroll_run_id = pr.id
             WHERE pe.employee_id = ?
             AND pr.tenant_id = ?
-            AND pe.earning_type = 'Non-Taxable Other Benefits'
+            AND (pe.earning_type = 'Non-Taxable Other Benefits' OR pe.earning_type = '13th Month Pay (Non-Taxable)' OR pe.earning_type LIKE 'De Minimis (Exempt): %')
             AND YEAR(pr.pay_date) = ?
         ");
         $stmt->execute([$empId, $tenantId, $year]);
@@ -232,6 +232,9 @@ class PayrollService
 
             // Load global configs and tenant configs based on pay date
             $this->loadConfigs($payDate, $tenantId, $frequency);
+            if (!empty($this->tenantSettings['tax_annualization'])) {
+                throw new Exception('Tax annualization is enabled but not implemented in PayrollService. Disable it or implement annualized BIR withholding before running payroll.');
+            }
             
             $prorateFactor = ($frequency === 'Semi-Monthly') ? 0.5 : 1.0;
             
@@ -343,8 +346,8 @@ class PayrollService
                     $grossNd = floatval($tsData['nd']) * $hourly * ($this->statutoryParams['night_diff_multiplier'] ?? 0.10);
 
                     $cutoffBase = $grossReg + $grossOt + $grossRest + $grossSpec + $grossHol + $grossNd;
-                } else {
-                    $warnings[] = "Employee #{$empId} has no approved timesheets. Gross pay computed as 0.";
+                } else if ($runType === 'Regular') {
+                    throw new Exception("Employee #{$empId} has no approved timesheets for the payroll period. Approve timesheets before running payroll.");
                 }
                 $remaining90k = $this->getRemaining90kExemption($empId, $payDate, $tenantId);
 
@@ -378,7 +381,6 @@ class PayrollService
                     // NOTE: "basic salary" here excludes OT, holiday premium, night diff and allowances
                     // per the standard interpretation; company policy/CBA integration must be CPA-confirmed.
                     $thirteenthPayout = round($this->getThirteenthMonthAccrued($empId, $payDate, $tenantId), 2);
-                    $otherBenefitsThisRun += $thirteenthPayout;
                     // A 13th-month run pays ONLY the 13th month — zero all work-pay components so
                     // no basic/OT/holiday/night-diff line items leak in (keeps the payslip reconciled).
                     $grossReg = $grossOt = $grossRest = $grossSpec = $grossHol = $grossNd = 0;
@@ -416,10 +418,7 @@ class PayrollService
                 if ($grossRest > 0) $earningStmt->execute([$runId, $empId, 'Rest Day Pay', round($grossRest, 2)]);
                 if ($grossSpec > 0) $earningStmt->execute([$runId, $empId, 'Special Holiday Pay', round($grossSpec, 2)]);
                 if ($grossHol > 0) $earningStmt->execute([$runId, $empId, 'Regular Holiday Pay', round($grossHol, 2)]);
-                if ($grossNd > 0) $earningStmt->execute([$runId, $empId, 'Night Differential', round($grossNd, 2)]);
-                if ($thirteenthPayout > 0) {
-                    $earningStmt->execute([$runId, $empId, '13th Month Pay (Included in Other Benefits)', round($thirteenthPayout, 2)]);
-                }
+                if ($grossNd > 0) $earningStmt->execute([$runId, $empId, 'Night Differential Premium', round($grossNd, 2)]);
 
                 foreach ($empBenefits as $ben) {
                     if ($ben['type'] === 'HMO') {
@@ -443,15 +442,31 @@ class PayrollService
                     }
                 }
                 
+                $exempt13thMonth = 0;
+                $taxable13thMonth = 0;
+                if ($thirteenthPayout > 0) {
+                    $exempt13thMonth = min($thirteenthPayout, $remaining90k);
+                    $taxable13thMonth = $thirteenthPayout - $exempt13thMonth;
+                    $remaining90k -= $exempt13thMonth;
+
+                    if ($exempt13thMonth > 0) {
+                        $earningStmt->execute([$runId, $empId, '13th Month Pay (Non-Taxable)', round($exempt13thMonth, 2)]);
+                    }
+                    if ($taxable13thMonth > 0) {
+                        $earningStmt->execute([$runId, $empId, '13th Month Pay (Taxable)', round($taxable13thMonth, 2)]);
+                    }
+                }
+
                 $exemptOtherBenefits = min($otherBenefitsThisRun, $remaining90k);
                 $taxableOtherBenefits = $otherBenefitsThisRun - $exemptOtherBenefits;
 
                 if ($exemptOtherBenefits > 0) {
-                    $earningStmt->execute([$runId, $empId, 'Non-Taxable Other Benefits', $exemptOtherBenefits]);
+                    $earningStmt->execute([$runId, $empId, 'Non-Taxable Other Benefits', round($exemptOtherBenefits, 2)]);
                 }
                 if ($taxableOtherBenefits > 0) {
-                    $earningStmt->execute([$runId, $empId, 'Taxable Other Benefits', $taxableOtherBenefits]);
+                    $earningStmt->execute([$runId, $empId, 'Taxable Other Benefits', round($taxableOtherBenefits, 2)]);
                 }
+                $taxableOtherBenefits += $taxable13thMonth;
                 
                 foreach ($empExpenses as $exp) {
                     $catName = $exp['category_name'] ?: 'Expense';

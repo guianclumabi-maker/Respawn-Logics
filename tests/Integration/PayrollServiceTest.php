@@ -149,4 +149,51 @@ class PayrollServiceTest extends TestCase
         $this->assertEqualsWithDelta($accrued, $payout, 0.05, '13th-month payout must equal accrued basic, not base salary');
         $this->assertGreaterThan(0.05, abs($payout - 30000.00), '13th-month payout must NOT be one month base salary (the old approximation)');
     }
+
+    /**
+     * A 13th-month run must reconcile just like a regular payslip; the payout
+     * must not be duplicated as both 13th-month pay and generic other benefits.
+     * @depends testGenerateRunSucceeds
+     */
+    public function testThirteenthMonthPayslipReconcilesWithoutDoubleCounting(array $res): void
+    {
+        $svc = new \PayrollService(self::$pdo);
+        $res13 = $svc->generateRun(self::$tenantId, self::$schedId, '2026-01-01', '2026-12-31', '2026-12-23', self::$empId, '13th Month');
+        $this->assertTrue($res13['success'] ?? false, '13th-month run should succeed: ' . json_encode($res13));
+        $runId = (int) $res13['run_id'];
+
+        $recStmt = self::$pdo->prepare(
+            "SELECT gross_pay, total_deductions, net_pay
+             FROM payroll_run_employees WHERE payroll_run_id = ? AND employee_id = ?"
+        );
+        $recStmt->execute([$runId, self::$empId]);
+        $rec = $recStmt->fetch(\PDO::FETCH_ASSOC);
+        $gross = round((float) $rec['gross_pay'], 2);
+        $deduct = round((float) $rec['total_deductions'], 2);
+        $net = round((float) $rec['net_pay'], 2);
+
+        $sumEarnStmt = self::$pdo->prepare("SELECT COALESCE(SUM(amount),0) FROM payroll_earnings WHERE payroll_run_id = ? AND employee_id = ?");
+        $sumEarnStmt->execute([$runId, self::$empId]);
+        $sumEarn = round((float) $sumEarnStmt->fetchColumn(), 2);
+
+        $this->assertEqualsWithDelta($gross - $deduct, $net, 0.001, '13th-month net_pay must equal gross - deductions');
+        $this->assertEqualsWithDelta($gross, $sumEarn, 0.001, '13th-month earning lines must not double-count the payout');
+    }
+
+    public function testRegularRunFailsWithoutApprovedTimesheets(): void
+    {
+        $tenantId = \FixtureHelper::createTenant(self::$pdo, 'No Timesheet Payroll Tenant');
+        $empId = \FixtureHelper::createUser(self::$pdo, $tenantId, 'no.timesheet@test.com', 'Employee');
+        self::$pdo->prepare("UPDATE users SET base_salary = 30000, is_mwe = 0 WHERE id = ?")->execute([$empId]);
+        self::$pdo->prepare("INSERT INTO payroll_schedules (tenant_id, name, frequency) VALUES (?, 'Monthly', 'Monthly')")
+            ->execute([$tenantId]);
+        $schedId = (int) self::$pdo->lastInsertId();
+        self::$pdo->prepare("UPDATE users SET payroll_schedule_id = ? WHERE id = ?")->execute([$schedId, $empId]);
+
+        $svc = new \PayrollService(self::$pdo);
+        $res = $svc->generateRun($tenantId, $schedId, '2026-07-01', '2026-07-31', '2026-07-31', $empId, 'Regular');
+
+        $this->assertFalse($res['success'] ?? true, 'regular payroll must fail closed when timesheets are missing');
+        $this->assertStringContainsString('no approved timesheets', strtolower($res['error'] ?? ''));
+    }
 }
