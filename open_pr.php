@@ -17,9 +17,9 @@ if (is_resource($process)) {
         $token = trim($matches[1]);
         
         $data = [
-            'title' => 'feat(ui): remove onboarding from sidebar',
-            'body' => 'Removes the Onboarding entry from the Workspace section of the main navigation sidebar as requested.',
-            'head' => 'feat/remove-onboarding',
+            'title' => 'feat(ui): move shift scheduler and ats to administration',
+            'body' => 'Moves the Shift Scheduler and Recruitment / ATS links out of the Workspace section and into the Administration section as requested.',
+            'head' => 'feat/move-scheduler-ats',
             'base' => 'main'
         ];
         
