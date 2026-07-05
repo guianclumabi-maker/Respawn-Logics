@@ -105,15 +105,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // ── Login ──
   const login = useCallback(
     async (email: string, password: string): Promise<{ success: boolean; error?: string; redirect?: string }> => {
-      if (!(window as any).__CSRF_TOKEN__) {
+      let token = (window as any).__CSRF_TOKEN__;
+      if (!token) {
         try {
           const tokenRes = await fetch(`${API_BASE}/api/index.php?route=auth&action=csrf`, { credentials: "include" });
           const tokenData = await tokenRes.json();
           if (tokenData.success && tokenData.csrf_token) {
-            (window as any).__CSRF_TOKEN__ = tokenData.csrf_token;
+            token = (window as any).__CSRF_TOKEN__ = tokenData.csrf_token;
           }
         } catch (e) {
-          console.error("Failed to fetch initial CSRF token", e);
+          console.error("Failed to auto-fetch CSRF token on login", e);
         }
       }
 
@@ -124,7 +125,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             method: "POST",
             headers: { 
               "Content-Type": "application/json",
-              "X-CSRF-Token": (window as any).__CSRF_TOKEN__ || ""
+              "X-CSRF-Token": token || ""
             },
             credentials: "include",
             body: JSON.stringify({ email, password }),
@@ -161,8 +162,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         },
         credentials: "include",
       });
+      
+      // Fetch a fresh CSRF token for the new guest session
+      const tokenRes = await fetch(`${API_BASE}/api/index.php?route=auth&action=csrf`, { credentials: "include" });
+      const tokenData = await tokenRes.json();
+      if (tokenData.success && tokenData.csrf_token) {
+        (window as any).__CSRF_TOKEN__ = tokenData.csrf_token;
+      } else {
+        (window as any).__CSRF_TOKEN__ = undefined;
+      }
     } catch {
-      // ignore
+      (window as any).__CSRF_TOKEN__ = undefined;
     }
     setUser(null);
     // Navigate to login via hash
