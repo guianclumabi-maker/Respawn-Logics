@@ -19,8 +19,8 @@ if (is_resource($process)) {
         $branch = trim(shell_exec('git rev-parse --abbrev-ref HEAD'));
         
         $data = [
-            'title' => 'feat(ui): Platform Admin Command Center',
-            'body' => 'Added a dedicated dark command-center for Platform Admins with its own layout, pages, and impersonation feature.',
+            'title' => 'fix(auth): fix missing is_super on page refresh',
+            'body' => 'Added `is_super` and `roles` to the `/auth/me` endpoint. Previously, if a Platform Admin refreshed their browser, these fields were dropped from the session rehydration, causing the frontend to hide the Command Center button.',
             'head' => $branch,
             'base' => 'main'
         ];
