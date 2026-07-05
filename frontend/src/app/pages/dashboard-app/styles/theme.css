@@ -1,4 +1,4 @@
-@custom-variant dark (&:is(.dark *));
+@custom-variant dark (&:is([data-theme="dark"] *));
 
 :root {
   --font-size: 16px;
@@ -41,7 +41,7 @@
   --sidebar-ring: #00e07a;
 }
 
-.dark {
+[data-theme="dark"] {
   --background: #0d1117;
   --foreground: #f0f4ff;
   --card: rgba(255, 255, 255, 0.05);
