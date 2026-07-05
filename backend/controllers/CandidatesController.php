@@ -732,6 +732,10 @@ class CandidatesController
             $userPayload['permissions'] = $_SESSION['permissions'] ?? [];
             $userPayload['is_super']    = !empty($_SESSION['is_super']);
             $userPayload['name']        = $this->currentUser['full_name'] ?? ($userPayload['name'] ?? null);
+            // Alias theme_preference -> theme so the frontend re-applies the saved per-user
+            // theme on every reload (AuthContext reads user.theme). Without this the DB
+            // preference is only honored right after login, not on subsequent reloads.
+            $userPayload['theme']       = $this->currentUser['theme_preference'] ?? ($userPayload['theme'] ?? null);
             echo json_encode(['success' => true, 'user' => $userPayload]);
         } else {
             if (isset($_SESSION['user_name'])) {
