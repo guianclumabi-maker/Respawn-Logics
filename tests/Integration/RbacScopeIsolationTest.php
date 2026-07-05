@@ -54,7 +54,7 @@ class RbacScopeIsolationTest extends TestCase
 
     private function createUser($email, $roleId, $scope, $orgUnitId, $managerId)
     {
-        $stmt = $this->pdo->prepare("INSERT INTO users (tenant_id, full_name, email, password_hash, org_unit_id, manager_id) VALUES (?, 'Test User', ?, 'pass', ?, ?)");
+        $stmt = $this->pdo->prepare("INSERT INTO users (tenant_id, full_name, email, password_hash, org_unit_id, manager_id, department, role, immediate_supervisor, profile_image) VALUES (?, 'Test User', ?, 'pass', ?, ?, 'Engineering', 'Employee', 'Manager', 'default.png')");
         $stmt->execute([$this->tenantId, $email, $orgUnitId, $managerId]);
         $userId = (int)$this->pdo->lastInsertId();
 

@@ -1,4 +1,13 @@
 <?php
+// SAFETY GUARD: this is a DESTRUCTIVE script — it DROPs elr_precedents, labor_references,
+// and global_intelligence_cache and re-seeds them. It is NOT part of the deploy chain
+// (migrate_all.php / run_migrations.php) and must never run against production by accident.
+// To run it intentionally (e.g. a local reset), invoke with: ALLOW_DESTRUCTIVE=1 php backend/migrate_intelligence.php
+if ((getenv('ALLOW_DESTRUCTIVE') !== '1') && !defined('ALLOW_DESTRUCTIVE')) {
+    http_response_code(403);
+    die("Refusing to run: this destructive script is disabled. Set ALLOW_DESTRUCTIVE=1 to override.\n");
+}
+
 require_once __DIR__ . '/../bootstrap/app.php';
 global $pdo;
 

@@ -102,8 +102,9 @@ class ScopeResolver
             $params = [':tenant_id' => $tenantId, ':user_id' => $userId];
 
             if ($userEmail !== '') {
-                $sql .= " OR LOWER(immediate_supervisor) = :email OR LOWER(department_manager) = :email";
-                $params[':email'] = $userEmail;
+                $sql .= " OR LOWER(immediate_supervisor) = :supervisor_email OR LOWER(department_manager) = :manager_email";
+                $params[':supervisor_email'] = $userEmail;
+                $params[':manager_email'] = $userEmail;
             }
             $sql .= ")";
 

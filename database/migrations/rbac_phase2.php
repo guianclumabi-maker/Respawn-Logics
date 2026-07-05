@@ -64,4 +64,5 @@ try {
         $pdo->rollBack();
     }
     echo "Migration failed: " . $e->getMessage() . "\n";
+    throw $e;
 }

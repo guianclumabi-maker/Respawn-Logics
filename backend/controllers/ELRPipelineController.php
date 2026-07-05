@@ -610,6 +610,15 @@ class ELRPipelineController
      */
     private function createCardInternal($pipelineId, $employeeId, $enteredVia, $entryStageId, array $extra, $actor)
     {
+        // Validate a supplied entry stage actually belongs to this pipeline/tenant; otherwise
+        // ignore it and fall back to the first stage (prevents invisible "ghost" cards).
+        if (!empty($entryStageId)) {
+            $sv = $this->pdo->prepare(
+                "SELECT COUNT(*) FROM `elr_pipeline_stages` WHERE `id` = ? AND `pipeline_id` = ? AND `tenant_id` = ?"
+            );
+            $sv->execute([$entryStageId, $pipelineId, $this->tenantId]);
+            if (!$sv->fetchColumn()) { $entryStageId = null; }
+        }
         if (empty($entryStageId)) {
             $fs = $this->pdo->prepare(
                 "SELECT `id` FROM `elr_pipeline_stages` WHERE `pipeline_id` = ? AND `tenant_id` = ?
@@ -757,12 +766,18 @@ class ELRPipelineController
         ];
     }
 
-    /** Replace {{placeholders}} with data; unknown fields become a fill-in blank so nothing leaks. */
+    /**
+     * Replace {{placeholders}} with data; unknown fields become a fill-in blank.
+     * Merge VALUES are HTML-escaped (employee names / caller-supplied fields are untrusted and
+     * the rendered content is later printed via document.write) — this prevents stored XSS.
+     * The template body itself is admin-authored and left as-is so intended formatting survives.
+     */
     private function renderTemplate($body, array $data)
     {
         return preg_replace_callback('/\{\{\s*([a-zA-Z0-9_]+)\s*\}\}/', function ($m) use ($data) {
             $key = $m[1];
-            return array_key_exists($key, $data) && $data[$key] !== '' ? $data[$key] : '________';
+            $val = array_key_exists($key, $data) && $data[$key] !== '' ? $data[$key] : '________';
+            return htmlspecialchars((string)$val, ENT_QUOTES, 'UTF-8');
         }, (string)$body);
     }
 
@@ -923,6 +938,15 @@ class ELRPipelineController
             $chk->execute([$pipelineId, $this->tenantId]);
             if (!$chk->fetchColumn()) {
                 echo json_encode(['success' => false, 'error' => 'Invalid target pipeline.']);
+                return;
+            }
+        }
+        // Validate the target stage belongs to the target pipeline (prevents ghost auto-added cards).
+        if ($stageId && $pipelineId) {
+            $sv = $this->pdo->prepare("SELECT COUNT(*) FROM `elr_pipeline_stages` WHERE `id` = ? AND `pipeline_id` = ? AND `tenant_id` = ?");
+            $sv->execute([$stageId, $pipelineId, $this->tenantId]);
+            if (!$sv->fetchColumn()) {
+                echo json_encode(['success' => false, 'error' => 'Target stage does not belong to the pipeline.']);
                 return;
             }
         }
