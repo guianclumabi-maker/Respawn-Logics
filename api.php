@@ -131,6 +131,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                 'profile_image' => $user['profile_image'] ?? null,
                 'job_title' => $user['job_title'] ?? null,
                 'roles' => $roles,
+                'role' => $user['role'] ?? null,
                 'permissions' => $_SESSION['permissions'] ?? [],
                 'is_super' => !empty($_SESSION['is_super']),
                 'must_change_password' => !empty($_SESSION['must_change_password']),

@@ -107,7 +107,7 @@ class AuthController
                         }
 
                         session_regenerate_id(true); // Prevent Session Fixation
-                        
+
                         $_SESSION['user_id']           = $user['id'];
                         $_SESSION['user_email']        = $user['email'];
                         $_SESSION['user_name']         = $user['full_name'];
@@ -115,17 +115,48 @@ class AuthController
                         $_SESSION['theme_preference']  = $user['theme_preference'] ?? 'dark';
                         $_SESSION['must_change_password'] = false;
 
-                        echo json_encode([
-                            'success' => true,
-                            'user' => [
-                                'id' => $user['id'],
-                                'name' => $user['full_name'],
-                                'email' => $user['email'],
-                                'tenant_id' => $user['tenant_id'],
-                                'theme' => $user['theme_preference'] ?? null,
-                                'must_change_password' => !empty($user['must_change_password'])
-                            ]
-                        ]);
+                        // Hydrate RBAC into the session using the SAME canonical loader every
+                        // other request uses (loadPermissions), so the login response is complete
+                        // and cannot drift from GET current_user. Without this, the frontend gets a
+                        // "lite" user with no role/permissions/is_super and hides admin UI until a
+                        // full page reload re-hydrates the session.
+                        if (function_exists('loadPermissions')) {
+                            loadPermissions();
+                        }
+
+                        // Fetch User Roles Names
+                        $stmtRoles = $this->pdo->prepare("
+                            SELECT r.name
+                            FROM roles r
+                            JOIN user_roles ur ON r.id = ur.role_id
+                            WHERE ur.user_id = ?
+                        ");
+                        $stmtRoles->execute([$user['id']]);
+                        $roles = $stmtRoles->fetchAll(PDO::FETCH_COLUMN);
+
+                        require_once __DIR__ . '/../services/RoleSeederService.php';
+                        $stmtTier = $this->pdo->prepare("SELECT setup_mode FROM tenants WHERE id = ?");
+                        $stmtTier->execute([$user['tenant_id']]);
+                        $setupMode = $stmtTier->fetchColumn() ?: 'Solo';
+                        $tierConfig = RoleSeederService::getTierConfig($setupMode);
+
+                        $fullUser = [
+                            'id' => $user['id'],
+                            'name' => $user['full_name'],
+                            'profile_image' => $user['profile_image'] ?? null,
+                            'job_title' => $user['job_title'] ?? null,
+                            'roles' => $roles,
+                            'role' => $user['role'] ?? null,
+                            'permissions' => $_SESSION['permissions'] ?? [],
+                            'is_super' => !empty($_SESSION['is_super']),
+                            'must_change_password' => !empty($user['must_change_password']),
+                            'tier_config' => $tierConfig,
+                            'theme' => $user['theme_preference'] ?? null,
+                            'email' => $user['email'],
+                            'tenant_id' => $user['tenant_id']
+                        ];
+
+                        echo json_encode(['success' => true, 'user' => $fullUser]);
                     } else {
                         http_response_code(401);
                         echo json_encode(['success' => false, 'error' => 'Invalid email or password.']);

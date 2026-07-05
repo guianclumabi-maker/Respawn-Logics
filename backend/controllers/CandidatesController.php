@@ -725,11 +725,15 @@ class CandidatesController
     }
 
     private function currentUserAction() {
-        if ($this->currentUser) { 
-            $userPayload = $this->currentUser; 
-            unset($userPayload['password_hash']); 
-            echo json_encode(['success' => true, 'user' => $userPayload]); 
-        } else { 
+        if ($this->currentUser) {
+            $userPayload = $this->currentUser;
+            unset($userPayload['password_hash']);
+            // Expose RBAC flags so this matches the login response exactly (single source of truth).
+            $userPayload['permissions'] = $_SESSION['permissions'] ?? [];
+            $userPayload['is_super']    = !empty($_SESSION['is_super']);
+            $userPayload['name']        = $this->currentUser['full_name'] ?? ($userPayload['name'] ?? null);
+            echo json_encode(['success' => true, 'user' => $userPayload]);
+        } else {
             if (isset($_SESSION['user_name'])) {
                 error_log('[' . __CLASS__ . '] User session exists but database lookup failed for user: ' . $_SESSION['user_name']);
                 http_response_code(403);
