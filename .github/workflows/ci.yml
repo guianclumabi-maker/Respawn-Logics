@@ -51,7 +51,8 @@ jobs:
         with:
           php-version: '8.2'
           extensions: pdo, pdo_mysql, curl, mbstring
-          # No global phpunit — use the Composer-installed one in vendor/ to avoid a version clash.
+          # Self-contained PHPUnit phar (matches local v9.6) — avoids vendor/bin autoload issues on CI.
+          tools: phpunit:9.6
           
       - name: Verify MySQL Connection
         run: |
@@ -73,4 +74,4 @@ jobs:
           DB_PASS: ""
           DB_NAME: employee_system_test
           APP_ENV: testing
-        run: php vendor/bin/phpunit --testdox
+        run: phpunit --testdox
