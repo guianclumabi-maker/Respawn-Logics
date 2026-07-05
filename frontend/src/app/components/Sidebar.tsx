@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { HoverCard, HoverCardContent, HoverCardTrigger } from "./ui/hover-card";
 import { GamifiedThemeToggle } from "./GamifiedThemeToggle";
 import {
   LayoutGrid,
@@ -43,7 +44,9 @@ import {
   Search,
   LogOut,
   ChevronDown,
-  ChevronRight
+  ChevronRight,
+  User,
+  Server
 } from "lucide-react";
 
 // ── Types ──────────────────────────────────────────────────
@@ -83,6 +86,7 @@ type NavEntry = {
 
 type NavSection = {
   title: string;
+  icon?: React.ReactNode;
   items: NavEntry[];
   hide?: boolean;
 };
@@ -92,6 +96,7 @@ type NavSection = {
 const getSections = (hasPermission: (p: string) => boolean, hasRole: (r: string | string[]) => boolean, tenantId: number | null, isAtsContext: boolean, tierConfig: any): NavSection[] => [
   {
     title: "Workspace",
+    icon: <Layers size={20} />,
     hide: isAtsContext,
     items: [
       { label: "Dashboard", view: "Dashboard", icon: <LayoutGrid size={19} /> },
@@ -108,6 +113,7 @@ const getSections = (hasPermission: (p: string) => boolean, hasRole: (r: string 
   },
   {
     title: "My Space",
+    icon: <User size={20} />,
     hide: isAtsContext,
     items: [
       { label: "My Profile", view: "My Profile", icon: <UserCog size={19} /> },
@@ -118,6 +124,7 @@ const getSections = (hasPermission: (p: string) => boolean, hasRole: (r: string 
   },
   {
     title: "Administration",
+    icon: <Settings size={20} />,
     hide: isAtsContext || !(hasPermission("users.view") || hasPermission("settings.manage")),
     items: [
       ...(hasPermission("analytics.view") ? [{ label: "Workforce Analytics", view: "Analytics", icon: <PieChart size={19} /> }] : []),
@@ -152,6 +159,7 @@ const getSections = (hasPermission: (p: string) => boolean, hasRole: (r: string 
 
   {
     title: "System",
+    icon: <Server size={20} />,
     hide: isAtsContext || !hasPermission("audit.view"),
     items: [
       { label: "Audit Trail", view: "Audit Logs", icon: <Scroll size={19} /> }
@@ -159,6 +167,7 @@ const getSections = (hasPermission: (p: string) => boolean, hasRole: (r: string 
   },
   ...(hasPermission("ats.view") || hasPermission("ats.edit") || hasPermission("ats.edit_job") || hasPermission("ats.create_job") ? [{
     title: "Hiring (ATS)",
+    icon: <Users size={20} />,
     hide: !isAtsContext,
     items: [
       { label: "Back to Workspace", view: "Dashboard", icon: <ArrowLeft size={19} />, color: "#00b8ff" },
@@ -175,6 +184,7 @@ const getSections = (hasPermission: (p: string) => boolean, hasRole: (r: string 
   }] : []),
   {
     title: "Account",
+    icon: <UserCog size={20} />,
     items: [
       ...(tenantId !== null ? [{
         label: "Give us Feedback",
@@ -313,7 +323,61 @@ export function Sidebar({ activeView, onViewChange, badges = {} }: SidebarProps)
           const isSectionCollapsed = !!collapsedSections[section.title];
           return (
           <div key={section.title || "_top"}>
-            {/* Section title */}
+            
+            {/* Collapsed Section Icon with HoverCard */}
+            {section.title && collapsed && (
+              <HoverCard openDelay={0} closeDelay={0}>
+                <HoverCardTrigger asChild>
+                  <button className="w-10 h-10 mx-auto flex items-center justify-center text-slate-400 hover:bg-slate-100 hover:text-slate-900 dark:hover:bg-white/10 dark:hover:text-white rounded-lg transition-colors cursor-pointer mb-3">
+                    {section.icon}
+                  </button>
+                </HoverCardTrigger>
+                <HoverCardContent 
+                  side="right" 
+                  sideOffset={20} 
+                  align="start"
+                  className="bg-white dark:bg-[#16181d] border border-gray-200 dark:border-white/10 shadow-2xl p-2 w-56 rounded-xl z-50"
+                >
+                  <h4 className="text-[0.75rem] font-bold text-muted-foreground tracking-[1px] uppercase mb-2 px-2" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
+                    {section.title}
+                  </h4>
+                  <div className="space-y-0.5">
+                    {section.items.map((item) => {
+                      const active = isActive(item.view);
+                      const badgeCount = item.badgeKey ? (badges[item.badgeKey as keyof SidebarBadges] || 0) : 0;
+                      return (
+                        <button
+                          key={item.label}
+                          onClick={() => {
+                            if (item.onClick) {
+                              item.onClick();
+                            } else if (item.externalLink) {
+                              window.location.href = item.externalLink;
+                            } else {
+                              onViewChange({ view: item.view });
+                            }
+                          }}
+                          className={`
+                            w-full flex items-center gap-3 px-[12px] py-2.5 rounded-lg transition-all duration-200 justify-start
+                            ${active ? "bg-primary/10 text-primary font-semibold dark:bg-[#00e07a]/10 dark:text-[#00e07a]" : "text-slate-600 dark:text-slate-400 hover:bg-slate-100 hover:text-slate-900 dark:hover:bg-white/5 dark:hover:text-white"}
+                          `}
+                        >
+                          <div className="flex-shrink-0 transition-transform duration-200 hover:scale-110" style={{ color: item.color || (active ? 'inherit' : '') }}>
+                            {item.icon}
+                          </div>
+                          <span className="text-[13px] leading-tight truncate flex-1 text-left" style={{ color: item.color || (active ? 'inherit' : '') }}>
+                            {item.label}
+                          </span>
+                          {badgeCount > 0 && <Badge count={badgeCount} />}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </HoverCardContent>
+              </HoverCard>
+            )}
+
+            {/* Section title (Expanded) */}
             {section.title && !collapsed && (
               <button
                 onClick={() => toggleSection(section.title)}
@@ -331,59 +395,56 @@ export function Sidebar({ activeView, onViewChange, badges = {} }: SidebarProps)
               </button>
             )}
 
-            <div
-              className={`grid transition-[grid-template-rows,opacity,margin] duration-300 ease-in-out ${
-                !isSectionCollapsed || collapsed
-                  ? "grid-rows-[1fr] opacity-100 mb-5"
-                  : "grid-rows-[0fr] opacity-0 mb-0 pointer-events-none"
-              }`}
-            >
-              <div className="overflow-hidden">
-                <div className="space-y-0.5">
-                  {section.items.map((item) => {
-                    const active = isActive(item.view);
-                    const badgeCount = item.badgeKey ? (badges[item.badgeKey as keyof SidebarBadges] || 0) : 0;
-                    
-                    return (
-                      <button
-                        key={item.label}
-                        onClick={() => {
-                          if (item.onClick) {
-                            item.onClick();
-                          } else if (item.externalLink) {
-                            window.location.href = item.externalLink;
-                          } else {
-                            onViewChange({ view: item.view });
-                          }
-                        }}
-                        className={`
-                          w-full flex items-center gap-3 px-[12px] py-2.5 rounded-lg transition-all duration-200
-                          ${collapsed ? "justify-center" : "justify-start"}
-                          ${
-                            active
-                              ? "bg-primary/10 text-primary font-semibold dark:bg-[#00e07a]/10 dark:text-[#00e07a]"
-                              : "text-slate-600 dark:text-slate-400 hover:bg-slate-100 hover:text-slate-900 dark:hover:bg-white/5 dark:hover:text-white"
-                          }
-                        `}
-                      >
-                        <div className="flex-shrink-0 transition-transform duration-200 group-hover:scale-110" style={{ color: item.color || (active ? 'inherit' : '') }}>
-                          {item.icon}
-                        </div>
-
-                        {!collapsed && (
-                          <>
-                            <span className="text-[13px] leading-tight truncate flex-1 text-left" style={{ color: item.color || (active ? 'inherit' : '') }}>
-                              {item.label}
-                            </span>
-                            {badgeCount > 0 && <Badge count={badgeCount} />}
-                          </>
-                        )}
-                      </button>
-                    );
-                  })}
+            {/* Section Items (Expanded) */}
+            {!collapsed && (
+              <div
+                className={`grid transition-[grid-template-rows,opacity,margin] duration-300 ease-in-out ${
+                  !isSectionCollapsed
+                    ? "grid-rows-[1fr] opacity-100 mb-5"
+                    : "grid-rows-[0fr] opacity-0 mb-0 pointer-events-none"
+                }`}
+              >
+                <div className="overflow-hidden">
+                  <div className="space-y-0.5">
+                    {section.items.map((item) => {
+                      const active = isActive(item.view);
+                      const badgeCount = item.badgeKey ? (badges[item.badgeKey as keyof SidebarBadges] || 0) : 0;
+                      
+                      return (
+                        <button
+                          key={item.label}
+                          onClick={() => {
+                            if (item.onClick) {
+                              item.onClick();
+                            } else if (item.externalLink) {
+                              window.location.href = item.externalLink;
+                            } else {
+                              onViewChange({ view: item.view });
+                            }
+                          }}
+                          className={`
+                            w-full flex items-center gap-3 px-[12px] py-2.5 rounded-lg transition-all duration-200 justify-start
+                            ${
+                              active
+                                ? "bg-primary/10 text-primary font-semibold dark:bg-[#00e07a]/10 dark:text-[#00e07a]"
+                                : "text-slate-600 dark:text-slate-400 hover:bg-slate-100 hover:text-slate-900 dark:hover:bg-white/5 dark:hover:text-white"
+                            }
+                          `}
+                        >
+                          <div className="flex-shrink-0 transition-transform duration-200 group-hover:scale-110" style={{ color: item.color || (active ? 'inherit' : '') }}>
+                            {item.icon}
+                          </div>
+                          <span className="text-[13px] leading-tight truncate flex-1 text-left" style={{ color: item.color || (active ? 'inherit' : '') }}>
+                            {item.label}
+                          </span>
+                          {badgeCount > 0 && <Badge count={badgeCount} />}
+                        </button>
+                      );
+                    })}
+                  </div>
                 </div>
               </div>
-            </div>
+            )}
           </div>
         )})}
 

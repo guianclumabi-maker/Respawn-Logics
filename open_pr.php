@@ -17,9 +17,9 @@ if (is_resource($process)) {
         $token = trim($matches[1]);
         
         $data = [
-            'title' => 'feat(ui): move shift scheduler and ats to administration',
-            'body' => 'Moves the Shift Scheduler and Recruitment / ATS links out of the Workspace section and into the Administration section as requested.',
-            'head' => 'feat/move-scheduler-ats',
+            'title' => 'feat(ui): add icons and hover popups to collapsed sidebar',
+            'body' => 'Enhances the collapsed sidebar state by showing section icons with interactive Radix UI hover-cards instead of hiding the sections completely.',
+            'head' => 'feat/sidebar-hover-menus',
             'base' => 'main'
         ];
         
