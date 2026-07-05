@@ -13,10 +13,76 @@ import { ELRPipelineBoard } from "./components/ELRPipelineBoard";
 import { ELRAutomation } from "./components/ELRAutomation";
 import { ELRDailyReport } from "./components/ELRDailyReport";
 import { ELRApprovals } from "./components/ELRApprovals";
+import { useTour } from "../../../lib/useTour";
+
+// First-run guided tour of the ELR Admin Console. Walks the key sidebar workflow:
+// overview -> cases -> pipeline board -> templates -> automation -> approvals.
+// Steps target the sidebar nav ids (#tour-elr-nav-<viewName>). Admin only.
+const elrAdminTourSteps = [
+  {
+    element: "#tour-elr-nav-Dashboard",
+    popover: {
+      title: "ELR Admin Console",
+      description: "This is your command center for employee-relations cases — like an applicant tracker, but for disciplinary and due-process workflows.",
+      side: "right",
+      align: "start",
+    },
+  },
+  {
+    element: "#tour-elr-nav-Cases",
+    popover: {
+      title: "Cases",
+      description: "Every employee-relations matter lives here as a case card, with its full timeline and generated documents.",
+      side: "right",
+      align: "start",
+    },
+  },
+  {
+    element: "#tour-elr-nav-PipelineBoard",
+    popover: {
+      title: "Pipeline Board",
+      description: "Drag cases through stages (e.g. AWOL → Return-to-Work → NTE → Decision). Moving a card auto-generates that stage's document — your due-process audit trail.",
+      side: "right",
+      align: "start",
+    },
+  },
+  {
+    element: "#tour-elr-nav-Templates",
+    popover: {
+      title: "Templates",
+      description: "Define the document templates (with {{merge_fields}}) that stages generate automatically. Set these up once and every case reuses them.",
+      side: "right",
+      align: "start",
+    },
+  },
+  {
+    element: "#tour-elr-nav-Automation",
+    popover: {
+      title: "Automation",
+      description: "Rules that scan attendance and flag issues (AWOL, tardiness) automatically, so cases open themselves instead of waiting on manual review.",
+      side: "right",
+      align: "start",
+    },
+  },
+  {
+    element: "#tour-elr-nav-Approvals",
+    popover: {
+      title: "Approvals",
+      description: "Where generated documents wait for sign-off before they're issued — the human checkpoint that keeps the process defensible.",
+      side: "right",
+      align: "start",
+    },
+  },
+];
 
 export default function App({ mode = "admin" }: { mode?: "employee" | "admin" }) {
   const [activeView, setActiveView] = useState<string>(mode === "employee" ? "Cases" : "Dashboard");
   const [selectedCaseId, setSelectedCaseId] = useState<number | null>(null);
+
+  // Admin-only guided tour (employees get the simpler two-item nav, no tour).
+  const { startTour: startElrTour } = useTour("elr_admin", elrAdminTourSteps, {
+    enabled: mode === "admin",
+  });
 
   const handleViewChange = (v: string) => {
     setActiveView(v);
@@ -26,7 +92,7 @@ export default function App({ mode = "admin" }: { mode?: "employee" | "admin" })
   return (
     <div className="flex h-full w-full bg-[#06070a] text-[#c8d0e0] overflow-hidden relative">
       {/* ELR Left-Nav Sidebar */}
-      <Sidebar mode={mode} activeView={activeView} onViewChange={handleViewChange} />
+      <Sidebar mode={mode} activeView={activeView} onViewChange={handleViewChange} onStartTour={mode === "admin" ? startElrTour : undefined} />
 
       {/* Main Content Pane */}
       <div className="flex-1 flex flex-col h-full overflow-hidden relative">
