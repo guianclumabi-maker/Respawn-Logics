@@ -62,6 +62,7 @@ $migrationScripts = [
     'migrate_payroll.php',
     'migrate_timesheets.php',
     'migrate_holidays.php',
+    'migrate_tour_progress.php',
     'migrate_performance.php',
     'migrate_score_breakdown.php',
     'migrate_scoring_columns.php',

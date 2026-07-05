@@ -124,6 +124,7 @@ $controllers = [
     'iam' => 'IAMController',
     'payroll_engine' => 'PayrollController',
     'timesheets' => 'TimesheetController',
+    'tours' => 'TourController',
     'performance' => 'PerformanceController',
     'platform_support' => 'PlatformSupportController',
     'esm_support' => 'ESMSupportController',
