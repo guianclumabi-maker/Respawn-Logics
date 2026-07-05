@@ -50,6 +50,7 @@ if (session_status() === PHP_SESSION_NONE) {
         'domain' => '', // Empty string lets the browser automatically use the current host
         'secure' => $sessionSecure,
         'httponly' => $config['session']['httponly'],
+        'samesite' => $config['session']['samesite'], // was missing — browsers were using their own default
     ]);
     ini_set('session.gc_maxlifetime', $config['session']['timeout']);
 

@@ -50,14 +50,26 @@ if (empty($route)) {
 }
 
 if ($route === 'auth' && $action === 'csrf') {
-    echo json_encode(['success' => true, 'csrf_token' => $_SESSION['csrf_token'] ?? '']);
+    // Return current token AND regenerate one for the next request so each
+    // session always has a valid token stored server-side.
+    if (empty($_SESSION['csrf_token'])) {
+        $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+    }
+    echo json_encode(['success' => true, 'csrf_token' => $_SESSION['csrf_token']]);
     exit;
 }
 
-// CSRF Protection
-if ($_SERVER['REQUEST_METHOD'] !== 'GET' && $_SERVER['REQUEST_METHOD'] !== 'OPTIONS') {
+// CSRF Protection — skip for safe methods and for the public login/2fa actions
+// (login doesn't need CSRF: an attacker can't force you to log in as yourself
+// without already knowing your credentials).
+$csrfExemptActions = ['login', 'login_2fa', 'exchange_token'];
+$needsCsrf = $_SERVER['REQUEST_METHOD'] !== 'GET'
+    && $_SERVER['REQUEST_METHOD'] !== 'OPTIONS'
+    && !($route === 'auth' && in_array($action, $csrfExemptActions, true));
+
+if ($needsCsrf) {
     $requestCsrf = '';
-    
+
     // Check all headers case-insensitively
     if (function_exists('getallheaders')) {
         foreach (getallheaders() as $name => $value) {
@@ -67,7 +79,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'GET' && $_SERVER['REQUEST_METHOD'] !== 'OPTI
             }
         }
     }
-    
+
     // Fallback to $_SERVER superglobal
     if (empty($requestCsrf) && isset($_SERVER['HTTP_X_CSRF_TOKEN'])) {
         $requestCsrf = $_SERVER['HTTP_X_CSRF_TOKEN'];
@@ -80,8 +92,13 @@ if ($_SERVER['REQUEST_METHOD'] !== 'GET' && $_SERVER['REQUEST_METHOD'] !== 'OPTI
     }
 
     if (empty($requestCsrf) || !hash_equals($_SESSION['csrf_token'] ?? '', $requestCsrf)) {
+        // Return a fresh token in the error so the client can retry immediately
         http_response_code(403);
-        echo json_encode(['success' => false, 'error' => 'CSRF token mismatch']);
+        echo json_encode([
+            'success' => false,
+            'error' => 'CSRF token mismatch',
+            'csrf_token' => $_SESSION['csrf_token'] ?? '',
+        ]);
         exit;
     }
 }
