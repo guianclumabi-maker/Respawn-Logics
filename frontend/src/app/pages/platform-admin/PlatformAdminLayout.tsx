@@ -4,7 +4,7 @@ import {
   Building2,
   Users,
   HeartPulse,
-  UserSwitch,
+  UserCog,
   LogOut,
   ShieldCheck,
   Ticket,
@@ -17,15 +17,15 @@ const navItems = [
   { to: "/platform-admin/staff", label: "Internal Staff", icon: Users },
   { to: "/platform-admin/support", label: "Support Tickets", icon: Ticket },
   { to: "/platform-admin/health", label: "System Health", icon: HeartPulse },
-  { to: "/platform-admin/impersonate", label: "Impersonate User", icon: UserSwitch },
+  { to: "/platform-admin/impersonate", label: "Impersonate User", icon: UserCog },
 ];
 
 export function PlatformAdminLayout() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
 
-  const initials = user?.full_name
-    ? user.full_name.split(" ").map((n: string) => n[0]).join("").substring(0, 2).toUpperCase()
+  const initials = user?.name
+    ? user.name.split(" ").map((n: string) => n[0]).join("").substring(0, 2).toUpperCase()
     : "PA";
 
   return (
@@ -85,7 +85,7 @@ export function PlatformAdminLayout() {
               {initials}
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-xs font-semibold text-slate-200 truncate">{user?.full_name ?? "Platform Admin"}</p>
+              <p className="text-xs font-semibold text-slate-200 truncate">{user?.name ?? "Platform Admin"}</p>
               <p className="text-[0.65rem] text-violet-400/70">Platform Admin</p>
             </div>
             <button

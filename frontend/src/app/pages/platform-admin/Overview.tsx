@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Building2, Users, Ticket, AlertTriangle, TrendingUp, ExternalLink, UserSwitch } from "lucide-react";
+import { Building2, Users, Ticket, AlertTriangle, TrendingUp, ExternalLink, UserCog } from "lucide-react";
 import { apiFetch } from "../../lib/apiClient";
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || (window.location.origin + (window.location.hostname === "localhost" ? "/respawn-logics" : ""));
@@ -121,7 +121,7 @@ export function PlatformAdminOverview() {
                         rel="noopener noreferrer"
                         className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-violet-500/10 text-violet-300 text-xs hover:bg-violet-500/20 transition-colors border border-violet-500/20"
                       >
-                        <UserSwitch size={12} /> Impersonate
+                        <UserCog size={12} /> Impersonate
                       </a>
                     </td>
                   </tr>

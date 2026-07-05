@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Search, UserSwitch, AlertCircle } from "lucide-react";
+import { Search, UserCog, AlertCircle } from "lucide-react";
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || (window.location.origin + (window.location.hostname === "localhost" ? "/respawn-logics" : ""));
 
@@ -28,7 +28,7 @@ export function PlatformAdminImpersonate() {
         
         <div className="relative z-10">
           <div className="w-12 h-12 bg-violet-500/10 border border-violet-500/20 rounded-xl flex items-center justify-center mb-6">
-            <UserSwitch size={24} className="text-violet-400" />
+            <UserCog size={24} className="text-violet-400" />
           </div>
           
           <h1 className="text-2xl font-bold text-white mb-2" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
@@ -67,7 +67,7 @@ export function PlatformAdminImpersonate() {
               type="submit"
               className="w-full flex items-center justify-center gap-2 bg-violet-600 hover:bg-violet-500 text-white font-medium py-3 rounded-xl transition-all shadow-[0_0_20px_rgba(124,58,237,0.15)] hover:shadow-[0_0_25px_rgba(124,58,237,0.25)] cursor-pointer"
             >
-              <UserSwitch size={18} />
+              <UserCog size={18} />
               Start Impersonation Session
             </button>
           </form>
