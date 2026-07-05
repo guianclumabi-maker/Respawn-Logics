@@ -324,51 +324,59 @@ export function Sidebar({ activeView, onViewChange, badges = {} }: SidebarProps)
               </button>
             )}
 
-            {(!isSectionCollapsed || collapsed) && (
-            <div className="space-y-0.5 mb-5">
-              {section.items.map((item) => {
-                const active = isActive(item.view);
-                const badgeCount = item.badgeKey ? (badges[item.badgeKey as keyof SidebarBadges] || 0) : 0;
-                
-                return (
-                  <button
-                    key={item.label}
-                    onClick={() => {
-                      if (item.onClick) {
-                        item.onClick();
-                      } else if (item.externalLink) {
-                        window.location.href = item.externalLink;
-                      } else {
-                        onViewChange({ view: item.view });
-                      }
-                    }}
-                    className={`
-                      w-full flex items-center gap-3 px-[12px] py-2.5 rounded-lg transition-all duration-200
-                      ${collapsed ? "justify-center" : "justify-start"}
-                      ${
-                        active
-                          ? "bg-primary/10 text-primary font-semibold dark:bg-[#00e07a]/10 dark:text-[#00e07a]"
-                          : "text-slate-600 dark:text-slate-400 hover:bg-slate-100 hover:text-slate-900 dark:hover:bg-white/5 dark:hover:text-white"
-                      }
-                    `}
-                  >
-                    <div className="flex-shrink-0 transition-transform duration-200 group-hover:scale-110" style={{ color: item.color || (active ? 'inherit' : '') }}>
-                      {item.icon}
-                    </div>
+            <div
+              className={`grid transition-[grid-template-rows,opacity,margin] duration-300 ease-in-out ${
+                !isSectionCollapsed || collapsed
+                  ? "grid-rows-[1fr] opacity-100 mb-5"
+                  : "grid-rows-[0fr] opacity-0 mb-0 pointer-events-none"
+              }`}
+            >
+              <div className="overflow-hidden">
+                <div className="space-y-0.5">
+                  {section.items.map((item) => {
+                    const active = isActive(item.view);
+                    const badgeCount = item.badgeKey ? (badges[item.badgeKey as keyof SidebarBadges] || 0) : 0;
+                    
+                    return (
+                      <button
+                        key={item.label}
+                        onClick={() => {
+                          if (item.onClick) {
+                            item.onClick();
+                          } else if (item.externalLink) {
+                            window.location.href = item.externalLink;
+                          } else {
+                            onViewChange({ view: item.view });
+                          }
+                        }}
+                        className={`
+                          w-full flex items-center gap-3 px-[12px] py-2.5 rounded-lg transition-all duration-200
+                          ${collapsed ? "justify-center" : "justify-start"}
+                          ${
+                            active
+                              ? "bg-primary/10 text-primary font-semibold dark:bg-[#00e07a]/10 dark:text-[#00e07a]"
+                              : "text-slate-600 dark:text-slate-400 hover:bg-slate-100 hover:text-slate-900 dark:hover:bg-white/5 dark:hover:text-white"
+                          }
+                        `}
+                      >
+                        <div className="flex-shrink-0 transition-transform duration-200 group-hover:scale-110" style={{ color: item.color || (active ? 'inherit' : '') }}>
+                          {item.icon}
+                        </div>
 
-                    {!collapsed && (
-                      <>
-                        <span className="text-[13px] leading-tight truncate flex-1 text-left" style={{ color: item.color || (active ? 'inherit' : '') }}>
-                          {item.label}
-                        </span>
-                        {badgeCount > 0 && <Badge count={badgeCount} />}
-                      </>
-                    )}
-                  </button>
-                );
-              })}
+                        {!collapsed && (
+                          <>
+                            <span className="text-[13px] leading-tight truncate flex-1 text-left" style={{ color: item.color || (active ? 'inherit' : '') }}>
+                              {item.label}
+                            </span>
+                            {badgeCount > 0 && <Badge count={badgeCount} />}
+                          </>
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
             </div>
-            )}
           </div>
         )})}
 
