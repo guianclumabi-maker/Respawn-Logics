@@ -41,6 +41,8 @@ import {
 } from 'recharts';
 import { useAuth } from '../context/AuthContext';
 import { apiFetch } from '../lib/apiClient';
+import { useTour } from '../lib/useTour';
+import { HelpCircle } from 'lucide-react';
 import './PayrollManager.css';
 
 const API_BASE = window.location.origin + (window.location.hostname === 'localhost' ? '/respawn-logics' : '') + '/api/index.php?route=payroll_engine';
@@ -160,6 +162,52 @@ export function PayrollManager() {
       fetchEmployees();
     }
   }, [activeTab]);
+
+  // First-run guided tour for the Timesheets checkpoint (see useTour + TourController).
+  // Steps target stable ids added to the elements below. Auto-runs once per user; the
+  // "?" button in the header replays it on demand.
+  const timesheetTourSteps = [
+    {
+      element: '#tour-ts-header',
+      popover: {
+        title: 'Timesheets Checkpoint',
+        description: 'This is where daily work hours are reviewed and approved before payroll runs. Nothing gets paid until it is approved here.',
+        side: 'bottom',
+        align: 'start',
+      },
+    },
+    {
+      element: '#tour-ts-filters',
+      popover: {
+        title: 'Filter the view',
+        description: 'Narrow down by date range, a specific employee, or status (Pending / Approved / Rejected) to find the rows you need.',
+        side: 'bottom',
+        align: 'start',
+      },
+    },
+    {
+      element: '#tour-ts-approve',
+      popover: {
+        title: 'Approve hours',
+        description: 'Tick the rows you have checked, then approve them. Only Approved hours are paid — Pending and Rejected rows are ignored by payroll.',
+        side: 'left',
+        align: 'start',
+      },
+    },
+    {
+      element: '#tour-ts-table',
+      popover: {
+        title: 'The daily grid',
+        description: 'Each row is one employee for one day. You can edit hours inline, then approve. This is your audit trail for every payroll run.',
+        side: 'top',
+        align: 'start',
+      },
+    },
+  ];
+
+  const { startTour: startTimesheetTour } = useTour('payroll', timesheetTourSteps, {
+    enabled: activeTab === 'timesheets',
+  });
 
   const handleSaveTsRow = async (row: any) => {
     try {
@@ -1187,14 +1235,24 @@ export function PayrollManager() {
 
     return (
       <div className="dashboard-content animate-slide-up pb-20">
-        <div className="flex justify-between items-center mb-6">
+        <div id="tour-ts-header" className="flex justify-between items-center mb-6">
           <div>
-            <h2 className="text-2xl font-bold">Timesheets Checkpoint</h2>
+            <h2 className="text-2xl font-bold flex items-center gap-2">
+              Timesheets Checkpoint
+              <button
+                type="button"
+                onClick={startTimesheetTour}
+                title="Replay the guided tour"
+                className="text-gray-400 hover:text-[#00e07a] transition-colors"
+              >
+                <HelpCircle size={18} />
+              </button>
+            </h2>
             <p className="text-muted mt-1">Review, edit, and approve employee daily work hours for payroll calculation.</p>
           </div>
-          
-          <div className="flex gap-2">
-            <button 
+
+          <div id="tour-ts-approve" className="flex gap-2">
+            <button
               onClick={() => handleSetTsStatus('Approved')}
               disabled={selectedTsIds.length === 0}
               className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all ${selectedTsIds.length === 0 ? 'bg-slate-700 text-slate-400 cursor-not-allowed' : 'bg-emerald-600 hover:bg-emerald-700 text-white cursor-pointer'}`}
@@ -1224,7 +1282,7 @@ export function PayrollManager() {
         </div>
 
         {/* Filters */}
-        <div className="card mb-6 grid grid-cols-5 gap-4 items-end bg-[#161922]/50 border-white/5">
+        <div id="tour-ts-filters" className="card mb-6 grid grid-cols-5 gap-4 items-end bg-[#161922]/50 border-white/5">
           <div className="form-group">
             <label className="text-xs text-tertiary font-semibold mb-1 block">Start Date</label>
             <input 
@@ -1292,7 +1350,7 @@ export function PayrollManager() {
         </div>
 
         {/* Timesheets Data Table */}
-        <div className="card p-0 overflow-hidden bg-[#161922]/30 border-white/5">
+        <div id="tour-ts-table" className="card p-0 overflow-hidden bg-[#161922]/30 border-white/5">
           {isTsLoading ? (
             <div className="p-8 text-center text-muted">Loading timesheets...</div>
           ) : timesheets.length === 0 ? (
