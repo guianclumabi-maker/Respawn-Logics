@@ -17,9 +17,9 @@ if (is_resource($process)) {
         $token = trim($matches[1]);
         
         $data = [
-            'title' => 'fix(theme): remove hardcoded dark backgrounds from MainLayout and HomeDashboard',
-            'body' => 'Fixes the visual bug where the sidebar would correctly transition to Light Mode but the dashboard area and its inner cards remained stuck in dark mode due to hardcoded hex colors (`bg-[#0f1422]`, `bg-[#141929]`). Replaced them with the correct semantic theme variables (`bg-background`, `bg-card`).',
-            'head' => 'fix/dashboard-hardcoded-colors',
+            'title' => 'feat(ui): smooth height animation for sidebar sections',
+            'body' => 'Replaces the instant conditional render (`&&`) of the sidebar collapsible sections with a CSS Grid (`1fr` to `0fr`) transition. This creates a butter-smooth slide down/up animation for the dropdowns without requiring javascript height calculations.',
+            'head' => 'feat/sidebar-dropdown-animation',
             'base' => 'main'
         ];
         
