@@ -102,7 +102,6 @@ const getSections = (hasPermission: (p: string) => boolean, hasRole: (r: string 
       ...(hasPermission("shifts.manage") ? [{ label: "Shift Scheduler", view: "Scheduling", icon: <Calendar size={19} /> }] : []),
       ...(hasPermission("leave.view") || hasPermission("leave.request") ? [{ label: "Leave Requests", view: "Leaves", icon: <CalendarCheck size={19} /> }] : []),
       { label: "Org Chart Directory", view: "Org Chart", icon: <Network size={19} /> },
-      ...(hasPermission("users.manage") ? [{ label: "Onboarding", view: "Onboarding", icon: <Zap size={19} /> }] : []),
       ...(hasPermission("intelligence.view") ? [{ label: "Predictive AI", view: "Analytics", icon: <Brain size={19} />, color: "#f59e0b" }] : []),
       ...(hasPermission("ats.view") ? [{ label: "Recruitment / ATS", view: "ATS Dashboard", icon: <Crosshair size={19} /> }] : []),
       { label: "My HR Cases", view: "Employee Relations", icon: <ShieldHalf size={19} /> },

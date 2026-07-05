@@ -17,9 +17,9 @@ if (is_resource($process)) {
         $token = trim($matches[1]);
         
         $data = [
-            'title' => 'fix(ui): fix workspace dropdown infinite loop and header collapse layout',
-            'body' => 'Fixes two bugs in the Sidebar: 1. The active section (e.g. Workspace) could not be collapsed because a React `useEffect` was caught in an infinite loop due to shifting array references on every render. 2. When the sidebar was minimized, the logo and collapse button were squished side-by-side; they now stack elegantly in a column layout.',
-            'head' => 'fix/sidebar-layout-bugs',
+            'title' => 'feat(ui): remove onboarding from sidebar',
+            'body' => 'Removes the Onboarding entry from the Workspace section of the main navigation sidebar as requested.',
+            'head' => 'feat/remove-onboarding',
             'base' => 'main'
         ];
         
