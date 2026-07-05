@@ -100,6 +100,7 @@ function MetricCard({
 export function HomeDashboard() {
   const { user } = useAuth();
   const { startTour } = useTour("dashboard_tour", [
+    { element: ".app-sidebar", popover: { title: "Main Navigation", description: "Use the sidebar to jump between different modules like Payroll, Employee Relations, and Settings." } },
     { element: "#tour-metric-cards", popover: { title: "Dashboard Metrics", description: "Get an at-a-glance overview of your hours, clock state, pending leaves, and active tasks." } },
     { element: "#tour-shift-clock", popover: { title: "Real-Time Shift Clock", description: "Monitor your current attendance status and exact clock time here." } },
     { element: "#tour-tasks", popover: { title: "My Tasks Checklist", description: "Stay organized by managing your daily tasks. Add new items and cross them off as you complete them!" } }
