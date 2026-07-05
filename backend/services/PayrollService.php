@@ -176,17 +176,18 @@ class PayrollService
         return ['exempt' => $exempt, 'excess' => $excess];
     }
 
-    private function getRemaining90kExemption($empId, $payDate) {
+    private function getRemaining90kExemption($empId, $payDate, $tenantId) {
         $year = date('Y', strtotime($payDate));
         $stmt = $this->pdo->prepare("
-            SELECT SUM(pe.amount) 
+            SELECT SUM(pe.amount)
             FROM payroll_earnings pe
             JOIN payroll_runs pr ON pe.payroll_run_id = pr.id
-            WHERE pe.employee_id = ? 
+            WHERE pe.employee_id = ?
+            AND pr.tenant_id = ?
             AND pe.earning_type = 'Non-Taxable Other Benefits'
             AND YEAR(pr.pay_date) = ?
         ");
-        $stmt->execute([$empId, $year]);
+        $stmt->execute([$empId, $tenantId, $year]);
         $used = floatval($stmt->fetchColumn());
         $cap = $this->statutoryParams['thirteenth_month_exemption_cap'] ?? 90000;
         return max(0, $cap - $used);
@@ -197,11 +198,17 @@ class PayrollService
         try {
             $this->pdo->beginTransaction();
 
-            // Fetch schedule frequency
-            $stmt = $this->pdo->prepare("SELECT frequency FROM payroll_schedules WHERE id = ?");
-            $stmt->execute([$scheduleId]);
+            // Fetch schedule frequency (tenant-scoped — never run payroll against another
+            // tenant's schedule, and never silently default the frequency, which would apply
+            // the wrong statutory proration and BIR bracket).
+            $stmt = $this->pdo->prepare("SELECT frequency FROM payroll_schedules WHERE id = ? AND tenant_id = ?");
+            $stmt->execute([$scheduleId, $tenantId]);
             $schedule = $stmt->fetch();
-            $frequency = $schedule ? $schedule['frequency'] : 'Monthly';
+            if (!$schedule) {
+                $this->pdo->rollBack();
+                return ['success' => false, 'error' => 'Payroll schedule not found for this tenant.'];
+            }
+            $frequency = $schedule['frequency'];
 
             // Load global configs and tenant configs based on pay date
             $this->loadConfigs($payDate, $tenantId, $frequency);
@@ -319,7 +326,7 @@ class PayrollService
                 } else {
                     $warnings[] = "Employee #{$empId} has no approved timesheets. Gross pay computed as 0.";
                 }
-                $remaining90k = $this->getRemaining90kExemption($empId, $payDate);
+                $remaining90k = $this->getRemaining90kExemption($empId, $payDate, $tenantId);
 
                 $empExpenses = $expensesByEmployee[$empId] ?? [];
                 $empBenefits = $benefitsByEmployee[$empId] ?? [];
