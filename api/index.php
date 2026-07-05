@@ -15,6 +15,17 @@ $action = isset($_GET['action']) ? $_GET['action'] : '';
 
 // Middleware: Verify Authentication before ANY controller logic runs
 if (!isLoggedIn() && $route !== 'auth') {
+    // ── TEMP DEBUG — 401 investigation. Distinguishes "login failed" from "session lost". ──
+    @error_log(sprintf(
+        "[%s] MIDDLEWARE-401 route=%s action=%s | session_id=%s | session_keys=[%s] | cookie_header=%s\n",
+        date('c'),
+        $route,
+        $action,
+        session_id(),
+        implode(',', array_keys($_SESSION ?? [])),
+        $_SERVER['HTTP_COOKIE'] ?? '(none)'
+    ), 3, __DIR__ . '/../debug_login.log');
+    // ── END TEMP DEBUG ─────────────────────────────────────────────────────────────────────
     http_response_code(401);
     echo json_encode(['success' => false, 'error' => 'Unauthorized']);
     exit;
@@ -112,6 +123,7 @@ $controllers = [
     'compensation' => 'CompensationController',
     'iam' => 'IAMController',
     'payroll_engine' => 'PayrollController',
+    'timesheets' => 'TimesheetController',
     'performance' => 'PerformanceController',
     'platform_support' => 'PlatformSupportController',
     'esm_support' => 'ESMSupportController',

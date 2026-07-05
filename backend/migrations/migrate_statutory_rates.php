@@ -1,23 +1,25 @@
 <?php
-$env = parse_ini_file(__DIR__ . '/../../.env');
-$host = $env['DB_HOST'] ?? 'localhost';
-$db   = $env['DB_NAME'] ?? 'employee_system';
-$user = $env['DB_USER'] ?? 'root';
-$pass = $env['DB_PASS'] ?? '';
+if (!isset($pdo)) {
+    $env = parse_ini_file(__DIR__ . '/../../.env');
+    $host = $env['DB_HOST'] ?? 'localhost';
+    $db   = $env['DB_NAME'] ?? 'employee_system';
+    $user = $env['DB_USER'] ?? 'root';
+    $pass = $env['DB_PASS'] ?? '';
 
-// Check if Railway URL string is provided by the environment
-if (isset($_SERVER['DATABASE_URL'])) {
-    $dbOpts = parse_url($_SERVER['DATABASE_URL']);
-    $host = $dbOpts['host'];
-    $port = $dbOpts['port'] ?? 3306;
-    $user = $dbOpts['user'];
-    $pass = $dbOpts['pass'] ?? '';
-    $db = ltrim($dbOpts['path'], '/');
-}
+    // Check if Railway URL string is provided by the environment
+    if (isset($_SERVER['DATABASE_URL'])) {
+        $dbOpts = parse_url($_SERVER['DATABASE_URL']);
+        $host = $dbOpts['host'];
+        $port = $dbOpts['port'] ?? 3306;
+        $user = $dbOpts['user'];
+        $pass = $dbOpts['pass'] ?? '';
+        $db = ltrim($dbOpts['path'], '/');
+    }
 
-$dsn = "mysql:host=$host;dbname=$db;charset=utf8mb4";
-if (isset($port)) {
-    $dsn = "mysql:host=$host;port=$port;dbname=$db;charset=utf8mb4";
+    $dsn = "mysql:host=$host;dbname=$db;charset=utf8mb4";
+    if (isset($port)) {
+        $dsn = "mysql:host=$host;port=$port;dbname=$db;charset=utf8mb4";
+    }
 }
 
 function insertVersionedRecord($pdo, $table, $columns, $rows, $idempotencyKeys = ['effective_from']) {
@@ -91,10 +93,13 @@ function insertVersionedRecord($pdo, $table, $columns, $rows, $idempotencyKeys =
 }
 
 try {
-    $pdo = new PDO($dsn, $user, $pass);
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
-    echo "Connected to DB successfully.\n";
+    if (!isset($pdo)) {
+        $pdo = new PDO($dsn, $user, $pass);
+        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        echo "Connected to DB successfully.\n";
+    } else {
+        echo "Using existing DB connection.\n";
+    }
 
     // 1. Statutory Parameters (New Table)
     $pdo->exec("

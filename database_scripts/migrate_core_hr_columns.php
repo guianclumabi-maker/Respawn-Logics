@@ -11,10 +11,7 @@ try {
         ADD COLUMN `employee_number` VARCHAR(100) DEFAULT NULL,
         ADD COLUMN `work_email` VARCHAR(255) DEFAULT NULL,
         ADD COLUMN `manager_id` INT DEFAULT NULL,
-        ADD COLUMN `hire_date` DATE DEFAULT NULL,
-        ADD COLUMN `phone` VARCHAR(50) DEFAULT NULL,
-        ADD COLUMN `emergency_name` VARCHAR(150) DEFAULT NULL,
-        ADD COLUMN `emergency_phone` VARCHAR(50) DEFAULT NULL;
+        ADD COLUMN `hire_date` DATE DEFAULT NULL;
     ";
     
     $colCheck = $pdo->query("SHOW COLUMNS FROM `users` LIKE 'employee_id'");

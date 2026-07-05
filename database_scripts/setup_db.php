@@ -29,10 +29,13 @@ try {
         error_message TEXT NOT NULL
     );');
     $cols = [
+        'first_name'          => "VARCHAR(100) DEFAULT NULL",
+        'last_name'           => "VARCHAR(100) DEFAULT NULL",
         'organization_unit_1' => "VARCHAR(150) DEFAULT NULL",
         'organization_unit_2' => "VARCHAR(150) DEFAULT NULL",
         'organization_unit_3' => "VARCHAR(150) DEFAULT NULL",
         'organization_unit_4' => "VARCHAR(150) DEFAULT NULL",
+        'department_manager'  => "VARCHAR(150) DEFAULT NULL",
         'emergency_name'      => "VARCHAR(150) DEFAULT NULL",
         'emergency_phone'     => "VARCHAR(50) DEFAULT NULL",
         'phone'               => "VARCHAR(50) DEFAULT NULL",
