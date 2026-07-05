@@ -191,11 +191,7 @@ const getSections = (hasPermission: (p: string) => boolean, hasRole: (r: string 
         view: "Feedback",
         icon: <MessageCircle size={19} />,
         onClick: () => {
-          if (typeof window !== "undefined" && (window as any).openGlobalFeedbackModal) {
-            (window as any).openGlobalFeedbackModal();
-          } else {
-            alert("Feedback module is only available from within the legacy wrapper.");
-          }
+          window.location.href = "mailto:support@respawn-logics.com?subject=Respawn%20Logics%20Feedback";
         }
       }] : []),
     ]
