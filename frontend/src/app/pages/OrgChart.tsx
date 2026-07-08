@@ -51,22 +51,22 @@ export function OrgChart() {
     return ceo;
   };
 
-  if (!canView) return <div className="h-full flex items-center justify-center bg-[#0b0f1a] text-slate-400">Permission denied.</div>;
+  if (!canView) return <div className="h-full flex items-center justify-center bg-background text-muted-foreground">Permission denied.</div>;
 
   return (
     <ThemeProvider attribute="data-theme" defaultTheme="dark">
-      <div className="h-full w-full flex flex-col bg-[#0b0f1a] text-slate-200">
+      <div className="h-full w-full flex flex-col bg-background text-slate-200">
         
         {/* Header */}
-        <div className="p-8 pb-4 border-b border-white/5 flex justify-between items-end bg-[#141929]">
+        <div className="p-8 pb-4 border-b border-border flex justify-between items-end bg-[#141929]">
           <div>
             <h1 className="text-3xl font-bold text-white mb-2" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>Organization Chart</h1>
-            <p className="text-slate-400 text-sm">Visual hierarchy of all employees</p>
+            <p className="text-muted-foreground text-sm">Visual hierarchy of all employees</p>
           </div>
-          <div className="flex gap-2 bg-black/20 p-1 rounded-lg border border-white/10">
-            <button onClick={() => setZoom(z => Math.min(z + 0.1, 2))} className="p-2 text-slate-400 hover:text-white hover:bg-white/10 rounded"><ZoomIn size={18} /></button>
-            <button onClick={() => setZoom(1)} className="p-2 text-slate-400 hover:text-white hover:bg-white/10 rounded"><Maximize size={18} /></button>
-            <button onClick={() => setZoom(z => Math.max(z - 0.1, 0.5))} className="p-2 text-slate-400 hover:text-white hover:bg-white/10 rounded"><ZoomOut size={18} /></button>
+          <div className="flex gap-2 bg-input border-border p-1 rounded-lg border border-border">
+            <button onClick={() => setZoom(z => Math.min(z + 0.1, 2))} className="p-2 text-muted-foreground hover:text-white hover:bg-accent rounded"><ZoomIn size={18} /></button>
+            <button onClick={() => setZoom(1)} className="p-2 text-muted-foreground hover:text-white hover:bg-accent rounded"><Maximize size={18} /></button>
+            <button onClick={() => setZoom(z => Math.max(z - 0.1, 0.5))} className="p-2 text-muted-foreground hover:text-white hover:bg-accent rounded"><ZoomOut size={18} /></button>
           </div>
         </div>
 
@@ -108,9 +108,9 @@ function TreeNode({ node }: { node: Employee }) {
     <div className="flex flex-col items-center">
       {/* Card */}
       <div className="relative group">
-        <div className="w-56 bg-[#161922] border border-white/10 rounded-xl p-4 shadow-xl flex flex-col items-center text-center transition-all duration-200 hover:border-[#00e07a]/50 hover:shadow-[0_0_20px_rgba(0,224,122,0.15)] z-10 relative">
+        <div className="w-56 bg-card text-card-foreground border border-border rounded-xl p-4 shadow-xl flex flex-col items-center text-center transition-all duration-200 hover:border-[#00e07a]/50 hover:shadow-[0_0_20px_rgba(0,224,122,0.15)] z-10 relative">
           
-          <div className="w-12 h-12 bg-gradient-to-br from-slate-700 to-slate-800 rounded-full flex items-center justify-center text-white font-bold text-sm border-2 border-[#161922] shadow-md -mt-8 mb-3 group-hover:scale-110 transition-transform">
+          <div className="w-12 h-12 bg-gradient-to-br from-slate-700 to-slate-800 rounded-full flex items-center justify-center text-foreground font-bold text-sm border-2 border-[#161922] shadow-md -mt-8 mb-3 group-hover:scale-110 transition-transform">
             {getInitials(node.full_name)}
           </div>
           
@@ -128,8 +128,8 @@ function TreeNode({ node }: { node: Employee }) {
             {node.children!.map((child, index) => (
               <div key={child.id} className="relative flex flex-col items-center px-4">
                 {/* Connecting Lines for children */}
-                {index === 0 && <div className="absolute top-0 right-0 w-1/2 h-px bg-[#0b0f1a] -mt-px"></div>}
-                {index === node.children!.length - 1 && <div className="absolute top-0 left-0 w-1/2 h-px bg-[#0b0f1a] -mt-px"></div>}
+                {index === 0 && <div className="absolute top-0 right-0 w-1/2 h-px bg-background -mt-px"></div>}
+                {index === node.children!.length - 1 && <div className="absolute top-0 left-0 w-1/2 h-px bg-background -mt-px"></div>}
                 
                 <div className="absolute top-0 w-px h-4 bg-white/20 -mt-4"></div>
                 

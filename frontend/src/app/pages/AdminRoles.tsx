@@ -69,10 +69,10 @@ export function AdminRoles() {
     if (loading) return <div className="p-8 text-white">Loading...</div>;
 
     return (
-        <div className="p-8 bg-[#0b0f19] min-h-screen text-gray-300">
+        <div className="p-8 bg-background min-h-screen text-gray-300">
             <h1 className="text-2xl font-bold text-white mb-6">Manage Roles & Scopes</h1>
             
-            <div className="bg-white/5 border border-white/10 rounded-lg p-6 mb-8">
+            <div className="bg-white/5 border border-border rounded-lg p-6 mb-8">
                 <h2 className="text-lg font-semibold text-white mb-4">Assign / Update Role Scope</h2>
                 <form onSubmit={handleAssignRole} className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
@@ -80,7 +80,7 @@ export function AdminRoles() {
                         <select 
                             value={selectedUser} 
                             onChange={e => setSelectedUser(e.target.value)} 
-                            className="w-full bg-[#0b0f19] border border-white/10 rounded px-3 py-2 text-white"
+                            className="w-full bg-background border border-border rounded px-3 py-2 text-foreground"
                             required
                         >
                             <option value="">-- Select User --</option>
@@ -94,7 +94,7 @@ export function AdminRoles() {
                         <select 
                             value={selectedRole} 
                             onChange={e => setSelectedRole(e.target.value)} 
-                            className="w-full bg-[#0b0f19] border border-white/10 rounded px-3 py-2 text-white"
+                            className="w-full bg-background border border-border rounded px-3 py-2 text-foreground"
                             required
                         >
                             <option value="">-- Select Role --</option>
@@ -110,7 +110,7 @@ export function AdminRoles() {
                                 <select 
                                     value={selectedScope} 
                                     onChange={e => setSelectedScope(e.target.value)} 
-                                    className="w-full bg-[#0b0f19] border border-white/10 rounded px-3 py-2 text-white"
+                                    className="w-full bg-background border border-border rounded px-3 py-2 text-foreground"
                                     required
                                 >
                                     <option value="tenant">Tenant (All)</option>
@@ -125,7 +125,7 @@ export function AdminRoles() {
                                     <select 
                                         value={selectedOrgUnit} 
                                         onChange={e => setSelectedOrgUnit(e.target.value)} 
-                                        className="w-full bg-[#0b0f19] border border-white/10 rounded px-3 py-2 text-white"
+                                        className="w-full bg-background border border-border rounded px-3 py-2 text-foreground"
                                         required
                                     >
                                         <option value="">-- Select Org Unit --</option>
@@ -138,18 +138,18 @@ export function AdminRoles() {
                         </>
                     )}
                     <div className="md:col-span-2 pt-2">
-                        <button type="submit" className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">
+                        <button type="submit" className="bg-blue-600 hover:bg-blue-700 text-foreground px-4 py-2 rounded">
                             Assign / Update Role
                         </button>
                     </div>
                 </form>
             </div>
 
-            <div className="bg-white/5 border border-white/10 rounded-lg p-6">
+            <div className="bg-white/5 border border-border rounded-lg p-6">
                 <h2 className="text-lg font-semibold text-white mb-4">Current Assignments</h2>
                 <div className="space-y-4">
                     {users.map(u => (
-                        <div key={u.id} className="bg-white/5 p-4 rounded border border-white/5">
+                        <div key={u.id} className="bg-white/5 p-4 rounded border border-border">
                             <div className="font-medium text-white mb-2">{u.full_name} <span className="text-sm text-gray-500">({u.email})</span></div>
                             {u.roles && u.roles.length > 0 ? (
                                 <div className="flex flex-wrap gap-2">

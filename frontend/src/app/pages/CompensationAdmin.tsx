@@ -305,15 +305,15 @@ export function CompensationAdminContent() {
   };
 
   return (
-    <div className="flex-1 flex flex-col h-full overflow-hidden bg-[#06070a] text-[#c8d0e0]">
+    <div className="flex-1 flex flex-col h-full overflow-hidden bg-background text-foreground">
       {/* Header */}
-      <div className="flex-none px-8 py-6 border-b border-white/5 bg-[#161922]/50 backdrop-blur-md">
+      <div className="flex-none px-8 py-6 border-b border-border bg-card text-card-foreground/50 backdrop-blur-md">
         <div className="flex justify-between items-start">
           <div>
-            <h1 className="text-2xl font-bold text-white mb-1 font-['Space_Grotesk']">
+            <h1 className="text-2xl font-bold text-foreground mb-1 font-['Space_Grotesk']">
               Compensation & Equity Manager
             </h1>
-            <p className="text-sm text-gray-400">Configure salary ranges and equity structures across job roles</p>
+            <p className="text-sm text-muted-foreground">Configure salary ranges and equity structures across job roles</p>
           </div>
           {canManage && (
             <button 
@@ -344,11 +344,11 @@ export function CompensationAdminContent() {
         )}
 
         {/* Tab Selection */}
-        <div className="flex gap-4 border-b border-white/5 max-w-4xl mx-auto">
+        <div className="flex gap-4 border-b border-border max-w-4xl mx-auto">
           <button 
             onClick={() => setActiveTab("bands")}
             className={`pb-3 px-1 text-sm font-semibold transition-colors flex items-center gap-2 cursor-pointer ${
-              activeTab === "bands" ? "text-white border-b-2 border-[#00e07a]" : "text-gray-500 hover:text-gray-300"
+              activeTab === "bands" ? "text-foreground border-b-2 border-[#00e07a]" : "text-gray-500 hover:text-gray-300"
             }`}
           >
             <Banknote size={16} /> Salary Bands
@@ -356,7 +356,7 @@ export function CompensationAdminContent() {
           <button 
             onClick={() => setActiveTab("equity")}
             className={`pb-3 px-1 text-sm font-semibold transition-colors flex items-center gap-2 cursor-pointer ${
-              activeTab === "equity" ? "text-white border-b-2 border-[#00e07a]" : "text-gray-500 hover:text-gray-300"
+              activeTab === "equity" ? "text-foreground border-b-2 border-[#00e07a]" : "text-gray-500 hover:text-gray-300"
             }`}
           >
             <Coins size={16} /> Employee Equity
@@ -366,7 +366,7 @@ export function CompensationAdminContent() {
         {/* Tab Contents */}
         <div className="max-w-4xl mx-auto">
           {loading ? (
-            <div className="flex flex-col items-center justify-center py-20 gap-3 text-gray-400">
+            <div className="flex flex-col items-center justify-center py-20 gap-3 text-muted-foreground">
               <Loader2 className="w-8 h-8 animate-spin text-[#00e07a]" />
               <p className="text-sm font-medium">Decrypting compensation scales...</p>
             </div>
@@ -374,17 +374,17 @@ export function CompensationAdminContent() {
             <div className="flex flex-col items-center justify-center py-16 px-6 bg-red-500/10 border border-red-500/20 rounded-xl text-center space-y-3">
               <AlertCircle className="w-10 h-10 text-red-500" />
               <h3 className="text-lg font-bold text-white">Load Error</h3>
-              <p className="text-sm text-gray-400">{error}</p>
+              <p className="text-sm text-muted-foreground">{error}</p>
               <button 
                 onClick={loadData}
-                className="mt-2 px-4 py-2 bg-white/5 hover:bg-white/10 text-white rounded-lg text-xs transition-colors border border-white/10"
+                className="mt-2 px-4 py-2 bg-white/5 hover:bg-accent text-white rounded-lg text-xs transition-colors border border-border"
               >
                 Retry
               </button>
             </div>
           ) : activeTab === "bands" ? (
             /* SALARY BANDS TAB */
-            <div className="bg-[#161922]/70 border border-white/5 rounded-xl overflow-hidden shadow-2xl">
+            <div className="bg-card text-card-foreground/70 border border-border rounded-xl overflow-hidden shadow-2xl">
               <div className="overflow-x-auto">
                 <table className="w-full text-left border-collapse">
                   <thead className="bg-black/25 text-gray-500 text-xs font-semibold uppercase tracking-wider">
@@ -403,7 +403,7 @@ export function CompensationAdminContent() {
                         <td className="py-4 px-6 text-right font-mono text-xs text-gray-300">
                           {formatCurrency(b.min_salary, b.currency)}
                         </td>
-                        <td className="py-4 px-6 text-right font-mono text-xs text-white">
+                        <td className="py-4 px-6 text-right font-mono text-xs text-foreground">
                           {formatCurrency(b.mid_salary, b.currency)}
                         </td>
                         <td className="py-4 px-6 text-right font-mono text-xs text-gray-300">
@@ -414,13 +414,13 @@ export function CompensationAdminContent() {
                             <div className="flex justify-center gap-2">
                               <button 
                                 onClick={() => openEditBand(b)}
-                                className="p-1.5 hover:bg-white/5 text-gray-400 hover:text-white rounded transition-colors"
+                                className="p-1.5 hover:bg-accent text-muted-foreground hover:text-foreground rounded transition-colors"
                               >
                                 <Edit2 size={13} />
                               </button>
                               <button 
                                 onClick={() => handleBandDelete(b.id)}
-                                className="p-1.5 hover:bg-red-500/10 text-gray-400 hover:text-red-400 rounded transition-colors"
+                                className="p-1.5 hover:bg-red-500/10 text-muted-foreground hover:text-red-400 rounded transition-colors"
                               >
                                 <Trash2 size={13} />
                               </button>
@@ -442,7 +442,7 @@ export function CompensationAdminContent() {
             </div>
           ) : (
             /* EMPLOYEE EQUITY TAB */
-            <div className="bg-[#161922]/70 border border-white/5 rounded-xl overflow-hidden shadow-2xl">
+            <div className="bg-card text-card-foreground/70 border border-border rounded-xl overflow-hidden shadow-2xl">
               <div className="overflow-x-auto">
                 <table className="w-full text-left border-collapse">
                   <thead className="bg-black/25 text-gray-500 text-xs font-semibold uppercase tracking-wider">
@@ -475,13 +475,13 @@ export function CompensationAdminContent() {
                             <span className="text-white font-bold">{eq.vested_shares.toLocaleString()}</span>
                             <span className="text-gray-500"> / {eq.total_shares.toLocaleString()}</span>
                           </td>
-                          <td className="py-4 px-6 text-xs text-gray-400 max-w-[150px] truncate" title={eq.vesting_schedule}>
+                          <td className="py-4 px-6 text-xs text-muted-foreground max-w-[150px] truncate" title={eq.vesting_schedule}>
                             {eq.vesting_schedule}
                           </td>
                           <td className="py-4 px-6 w-44">
                             <div className="space-y-1.5">
                               <div className="flex justify-between text-[10px] font-mono font-bold leading-none">
-                                <span className="text-gray-400">{percent}% Vested</span>
+                                <span className="text-muted-foreground">{percent}% Vested</span>
                               </div>
                               <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
                                 <div 
@@ -496,13 +496,13 @@ export function CompensationAdminContent() {
                               <div className="flex justify-center gap-2">
                                 <button 
                                   onClick={() => openEditEquity(eq)}
-                                  className="p-1.5 hover:bg-white/5 text-gray-400 hover:text-white rounded transition-colors"
+                                  className="p-1.5 hover:bg-accent text-muted-foreground hover:text-foreground rounded transition-colors"
                                 >
                                   <Edit2 size={13} />
                                 </button>
                                 <button 
                                   onClick={() => handleEquityDelete(eq.id)}
-                                  className="p-1.5 hover:bg-red-500/10 text-gray-400 hover:text-red-400 rounded transition-colors"
+                                  className="p-1.5 hover:bg-red-500/10 text-muted-foreground hover:text-red-400 rounded transition-colors"
                                 >
                                   <Trash2 size={13} />
                                 </button>
@@ -530,75 +530,75 @@ export function CompensationAdminContent() {
       {/* Salary Band Modal */}
       {showBandModal && (
         <div className="fixed inset-0 bg-black/75 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-[#161922] border border-white/10 rounded-xl w-full max-w-md shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
-            <div className="p-5 border-b border-white/5 flex justify-between items-center bg-black/10">
-              <h3 className="text-base font-bold text-white uppercase tracking-wider">
+          <div className="bg-card text-card-foreground border border-border rounded-xl w-full max-w-md shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+            <div className="p-5 border-b border-border flex justify-between items-center bg-black/10">
+              <h3 className="text-base font-bold text-foreground uppercase tracking-wider">
                 {modalMode === "add" ? "Register Salary Band" : "Adjust Salary Band"}
               </h3>
-              <button onClick={() => setShowBandModal(false)} className="text-gray-400 hover:text-white text-xl leading-none">&times;</button>
+              <button onClick={() => setShowBandModal(false)} className="text-muted-foreground hover:text-white text-xl leading-none">&times;</button>
             </div>
             <form onSubmit={handleBandSubmit} className="p-5 space-y-4">
               <div>
-                <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">Job Title</label>
+                <label className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">Job Title</label>
                 <input 
                   type="text" 
                   required
                   value={jobTitle}
                   onChange={(e) => setJobTitle(e.target.value)}
-                  className="w-full bg-[#0b0f1a] border border-white/10 rounded-lg py-2.5 px-3 text-white text-sm focus:outline-none focus:border-[#00e07a]/50" 
+                  className="w-full bg-background border border-border rounded-lg py-2.5 px-3 text-white text-sm focus:outline-none focus:border-[#00e07a]/50" 
                   placeholder="e.g. Senior Software Engineer"
                 />
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">Min Salary</label>
+                  <label className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">Min Salary</label>
                   <input 
                     type="number" 
                     required
                     value={minSalary}
                     onChange={(e) => setMinSalary(e.target.value)}
-                    className="w-full bg-[#0b0f1a] border border-white/10 rounded-lg py-2.5 px-3 text-white text-sm focus:outline-none focus:border-[#00e07a]/50" 
+                    className="w-full bg-background border border-border rounded-lg py-2.5 px-3 text-white text-sm focus:outline-none focus:border-[#00e07a]/50" 
                     placeholder="Min"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">Mid Salary</label>
+                  <label className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">Mid Salary</label>
                   <input 
                     type="number" 
                     required
                     value={midSalary}
                     onChange={(e) => setMidSalary(e.target.value)}
-                    className="w-full bg-[#0b0f1a] border border-white/10 rounded-lg py-2.5 px-3 text-white text-sm focus:outline-none focus:border-[#00e07a]/50" 
+                    className="w-full bg-background border border-border rounded-lg py-2.5 px-3 text-white text-sm focus:outline-none focus:border-[#00e07a]/50" 
                     placeholder="Mid"
                   />
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">Max Salary</label>
+                  <label className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">Max Salary</label>
                   <input 
                     type="number" 
                     required
                     value={maxSalary}
                     onChange={(e) => setMaxSalary(e.target.value)}
-                    className="w-full bg-[#0b0f1a] border border-white/10 rounded-lg py-2.5 px-3 text-white text-sm focus:outline-none focus:border-[#00e07a]/50" 
+                    className="w-full bg-background border border-border rounded-lg py-2.5 px-3 text-white text-sm focus:outline-none focus:border-[#00e07a]/50" 
                     placeholder="Max"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">Currency</label>
+                  <label className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">Currency</label>
                   <input 
                     type="text" 
                     required
                     value={currency}
                     onChange={(e) => setCurrency(e.target.value.toUpperCase())}
-                    className="w-full bg-[#0b0f1a] border border-white/10 rounded-lg py-2.5 px-3 text-white text-sm focus:outline-none focus:border-[#00e07a]/50" 
+                    className="w-full bg-background border border-border rounded-lg py-2.5 px-3 text-white text-sm focus:outline-none focus:border-[#00e07a]/50" 
                     placeholder="PHP"
                   />
                 </div>
               </div>
-              <div className="pt-2 flex justify-end gap-3 border-t border-white/5 mt-4">
-                <button type="button" onClick={() => setShowBandModal(false)} className="px-3 py-1.5 text-gray-400 hover:text-white text-xs font-semibold">Cancel</button>
+              <div className="pt-2 flex justify-end gap-3 border-t border-border mt-4">
+                <button type="button" onClick={() => setShowBandModal(false)} className="px-3 py-1.5 text-muted-foreground hover:text-white text-xs font-semibold">Cancel</button>
                 <button type="submit" disabled={submitting} className="px-4 py-2 bg-[#00e07a] hover:bg-[#00c96a] text-black font-extrabold rounded-lg text-xs transition-colors flex items-center gap-1.5">
                   {submitting && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
                   Save Band Changes
@@ -612,32 +612,32 @@ export function CompensationAdminContent() {
       {/* Equity Modal */}
       {showEquityModal && (
         <div className="fixed inset-0 bg-black/75 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-[#161922] border border-white/10 rounded-xl w-full max-w-md shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
-            <div className="p-5 border-b border-white/5 flex justify-between items-center bg-black/10">
-              <h3 className="text-base font-bold text-white uppercase tracking-wider">
+          <div className="bg-card text-card-foreground border border-border rounded-xl w-full max-w-md shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+            <div className="p-5 border-b border-border flex justify-between items-center bg-black/10">
+              <h3 className="text-base font-bold text-foreground uppercase tracking-wider">
                 {modalMode === "add" ? "Grant Employee Equity" : "Adjust Equity Grant"}
               </h3>
-              <button onClick={() => setShowEquityModal(false)} className="text-gray-400 hover:text-white text-xl leading-none">&times;</button>
+              <button onClick={() => setShowEquityModal(false)} className="text-muted-foreground hover:text-white text-xl leading-none">&times;</button>
             </div>
             <form onSubmit={handleEquitySubmit} className="p-5 space-y-4">
               <div>
-                <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">Employee Name</label>
+                <label className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">Employee Name</label>
                 <input 
                   type="text" 
                   required
                   value={employeeName}
                   onChange={(e) => setEmployeeName(e.target.value)}
-                  className="w-full bg-[#0b0f1a] border border-white/10 rounded-lg py-2.5 px-3 text-white text-sm focus:outline-none focus:border-[#00e07a]/50" 
+                  className="w-full bg-background border border-border rounded-lg py-2.5 px-3 text-white text-sm focus:outline-none focus:border-[#00e07a]/50" 
                   placeholder="e.g. Juan dela Cruz"
                 />
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">Grant Type</label>
+                  <label className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">Grant Type</label>
                   <select 
                     value={grantType}
                     onChange={(e) => setGrantType(e.target.value as any)}
-                    className="w-full bg-[#0b0f1a] border border-white/10 rounded-lg py-2.5 px-3 text-white text-sm focus:outline-none focus:border-[#00e07a]/50"
+                    className="w-full bg-background border border-border rounded-lg py-2.5 px-3 text-white text-sm focus:outline-none focus:border-[#00e07a]/50"
                   >
                     <option value="ESOP">ESOP</option>
                     <option value="RSU">RSU</option>
@@ -645,53 +645,53 @@ export function CompensationAdminContent() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">Grant Date</label>
+                  <label className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">Grant Date</label>
                   <input 
                     type="date" 
                     required
                     value={grantDate}
                     onChange={(e) => setGrantDate(e.target.value)}
-                    className="w-full bg-[#0b0f1a] border border-white/10 rounded-lg py-2.5 px-3 text-white text-sm focus:outline-none focus:border-[#00e07a]/50 [color-scheme:dark]" 
+                    className="w-full bg-background border border-border rounded-lg py-2.5 px-3 text-white text-sm focus:outline-none focus:border-[#00e07a]/50 [color-scheme:dark]" 
                   />
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">Total Shares</label>
+                  <label className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">Total Shares</label>
                   <input 
                     type="number" 
                     required
                     value={totalShares}
                     onChange={(e) => setTotalShares(e.target.value)}
-                    className="w-full bg-[#0b0f1a] border border-white/10 rounded-lg py-2.5 px-3 text-white text-sm focus:outline-none focus:border-[#00e07a]/50" 
+                    className="w-full bg-background border border-border rounded-lg py-2.5 px-3 text-white text-sm focus:outline-none focus:border-[#00e07a]/50" 
                     placeholder="e.g. 10000"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">Vested Shares</label>
+                  <label className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">Vested Shares</label>
                   <input 
                     type="number" 
                     required
                     value={vestedShares}
                     onChange={(e) => setVestedShares(e.target.value)}
-                    className="w-full bg-[#0b0f1a] border border-white/10 rounded-lg py-2.5 px-3 text-white text-sm focus:outline-none focus:border-[#00e07a]/50" 
+                    className="w-full bg-background border border-border rounded-lg py-2.5 px-3 text-white text-sm focus:outline-none focus:border-[#00e07a]/50" 
                     placeholder="e.g. 2500"
                   />
                 </div>
               </div>
               <div>
-                <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">Vesting Schedule</label>
+                <label className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">Vesting Schedule</label>
                 <input 
                   type="text" 
                   required
                   value={vestingSchedule}
                   onChange={(e) => setVestingSchedule(e.target.value)}
-                  className="w-full bg-[#0b0f1a] border border-white/10 rounded-lg py-2.5 px-3 text-white text-sm focus:outline-none focus:border-[#00e07a]/50" 
+                  className="w-full bg-background border border-border rounded-lg py-2.5 px-3 text-white text-sm focus:outline-none focus:border-[#00e07a]/50" 
                   placeholder="e.g. 4-year monthly vesting, 1-year cliff"
                 />
               </div>
-              <div className="pt-2 flex justify-end gap-3 border-t border-white/5 mt-4">
-                <button type="button" onClick={() => setShowEquityModal(false)} className="px-3 py-1.5 text-gray-400 hover:text-white text-xs font-semibold">Cancel</button>
+              <div className="pt-2 flex justify-end gap-3 border-t border-border mt-4">
+                <button type="button" onClick={() => setShowEquityModal(false)} className="px-3 py-1.5 text-muted-foreground hover:text-white text-xs font-semibold">Cancel</button>
                 <button type="submit" disabled={submitting} className="px-4 py-2 bg-[#00e07a] hover:bg-[#00c96a] text-black font-extrabold rounded-lg text-xs transition-colors flex items-center gap-1.5">
                   {submitting && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
                   Save Grant Changes

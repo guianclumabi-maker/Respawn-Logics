@@ -128,28 +128,28 @@ export function AttendanceImportContent() {
 
   if (!canManage) {
     return (
-      <div className="flex-1 flex flex-col items-center justify-center p-8 bg-[#06070a] text-white">
+      <div className="flex-1 flex flex-col items-center justify-center p-8 bg-background text-foreground">
         <AlertCircle size={64} className="text-red-500 mb-4" />
         <h1 className="text-2xl font-bold mb-2">Access Denied</h1>
-        <p className="text-gray-400">You do not have the required permissions to manage attendance records.</p>
+        <p className="text-muted-foreground">You do not have the required permissions to manage attendance records.</p>
       </div>
     );
   }
 
   return (
-    <div className="flex-1 flex flex-col h-full overflow-hidden bg-[#06070a] text-[#c8d0e0]">
+    <div className="flex-1 flex flex-col h-full overflow-hidden bg-background text-foreground">
       {/* Header */}
-      <div className="flex-none px-8 py-6 border-b border-white/5 bg-[#161922]/50 backdrop-blur-md">
+      <div className="flex-none px-8 py-6 border-b border-border bg-card text-card-foreground/50 backdrop-blur-md">
         <div className="flex justify-between items-start">
           <div>
-            <h1 className="text-2xl font-bold text-white mb-1 font-['Space_Grotesk']">
+            <h1 className="text-2xl font-bold text-foreground mb-1 font-['Space_Grotesk']">
               Import Attendance Punches
             </h1>
-            <p className="text-sm text-gray-400">Upload biometric CSV logs to bulk import employee clock-ins and clock-outs</p>
+            <p className="text-sm text-muted-foreground">Upload biometric CSV logs to bulk import employee clock-ins and clock-outs</p>
           </div>
           <button 
             onClick={downloadTemplate}
-            className="px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/10 text-white font-semibold rounded-lg text-sm transition-all flex items-center gap-2 cursor-pointer"
+            className="px-4 py-2 bg-white/5 hover:bg-accent border border-border text-foreground font-semibold rounded-lg text-sm transition-all flex items-center gap-2 cursor-pointer"
           >
             <Download size={16} /> Download CSV Template
           </button>
@@ -160,15 +160,15 @@ export function AttendanceImportContent() {
       <div className="flex-1 overflow-auto p-8 max-w-4xl mx-auto w-full space-y-6">
         
         {/* Helper Instructions card */}
-        <div className="bg-[#161922]/40 border border-white/5 p-6 rounded-2xl space-y-3">
-          <h3 className="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
+        <div className="bg-card text-card-foreground/40 border border-border p-6 rounded-2xl space-y-3">
+          <h3 className="text-sm font-bold text-foreground uppercase tracking-wider flex items-center gap-2">
             <HelpCircle size={16} className="text-[#00e07a]" /> CSV Guidelines & Formatting
           </h3>
-          <div className="text-xs text-gray-400 space-y-2 leading-relaxed font-sans">
+          <div className="text-xs text-muted-foreground space-y-2 leading-relaxed font-sans">
             <p>
               Please structure your biometric import using these guidelines. Columns must match the exact case-sensitive headers:
             </p>
-            <div className="bg-black/35 p-3 rounded-lg font-mono text-[11px] text-gray-300 border border-white/5">
+            <div className="bg-black/35 p-3 rounded-lg font-mono text-[11px] text-gray-300 border border-border">
               employee_id, time_in, time_out<br />
               EMP-001, 2026-07-01 08:00, 2026-07-01 17:00<br />
               maria.clara@company.com, 2026-07-01 08:30, 2026-07-01 17:30
@@ -182,7 +182,7 @@ export function AttendanceImportContent() {
         </div>
 
         {/* Upload workspace */}
-        <div className="bg-[#161922]/70 border border-white/5 rounded-2xl p-8 shadow-2xl space-y-6">
+        <div className="bg-card text-card-foreground/70 border border-border rounded-2xl p-8 shadow-2xl space-y-6">
           
           {/* Status Responses */}
           {errorMsg && (
@@ -193,28 +193,28 @@ export function AttendanceImportContent() {
           )}
 
           {response && (
-            <div className="p-5 bg-white/[0.02] border border-white/5 rounded-xl space-y-4">
+            <div className="p-5 bg-white/[0.02] border border-border rounded-xl space-y-4">
               <div className="flex items-center gap-2.5">
                 <CheckCircle className="w-5 h-5 text-[#00e07a] flex-shrink-0" />
                 <h3 className="text-sm font-bold text-white uppercase tracking-wider">Import Processing Complete</h3>
               </div>
               <div className="grid grid-cols-2 gap-4">
-                <div className="bg-black/20 p-4 rounded-lg border border-white/5 text-center">
+                <div className="bg-input border-border p-4 rounded-lg border border-border text-center">
                   <span className="block text-2xl font-bold text-[#00e07a]">{response.processed ?? 0}</span>
                   <span className="text-[10px] text-gray-500 uppercase font-semibold tracking-wider">Processed & Saved</span>
                 </div>
-                <div className="bg-black/20 p-4 rounded-lg border border-white/5 text-center">
+                <div className="bg-input border-border p-4 rounded-lg border border-border text-center">
                   <span className="block text-2xl font-bold text-amber-500">{response.skipped ?? 0}</span>
                   <span className="text-[10px] text-gray-500 uppercase font-semibold tracking-wider">Skipped</span>
                 </div>
               </div>
 
               {response.warnings && response.warnings.length > 0 && (
-                <div className="border-t border-white/5 pt-3 mt-3 space-y-2">
+                <div className="border-t border-border pt-3 mt-3 space-y-2">
                   <span className="text-xs font-bold text-amber-500 uppercase tracking-wider block">Import warnings:</span>
-                  <div className="bg-black/25 p-3 rounded-lg border border-white/5 space-y-1.5 max-h-48 overflow-y-auto scrollbar-thin">
+                  <div className="bg-black/25 p-3 rounded-lg border border-border space-y-1.5 max-h-48 overflow-y-auto scrollbar-thin">
                     {response.warnings.map((w, idx) => (
-                      <p key={idx} className="text-xs text-gray-400 font-sans flex items-start gap-2">
+                      <p key={idx} className="text-xs text-muted-foreground font-sans flex items-start gap-2">
                         <span className="text-amber-500 font-bold">•</span>
                         <span>{w}</span>
                       </p>
@@ -236,7 +236,7 @@ export function AttendanceImportContent() {
               className={`border-2 border-dashed rounded-2xl p-12 text-center transition-all cursor-pointer flex flex-col items-center justify-center gap-3 ${
                 dragActive 
                   ? "border-[#00e07a] bg-[#00e07a]/5" 
-                  : "border-white/10 hover:border-white/20 bg-black/15"
+                  : "border-border hover:border-white/20 bg-black/15"
               }`}
             >
               <input 
@@ -246,13 +246,13 @@ export function AttendanceImportContent() {
                 accept=".csv"
                 className="hidden"
               />
-              <div className="w-14 h-14 rounded-full bg-white/5 border border-white/10 flex items-center justify-center shadow-lg">
-                <Upload className="w-6 h-6 text-gray-400" />
+              <div className="w-14 h-14 rounded-full bg-white/5 border border-border flex items-center justify-center shadow-lg">
+                <Upload className="w-6 h-6 text-muted-foreground" />
               </div>
               
               {file ? (
                 <div className="space-y-1">
-                  <p className="text-sm font-bold text-white flex items-center gap-2 justify-center">
+                  <p className="text-sm font-bold text-foreground flex items-center gap-2 justify-center">
                     <FileText size={16} className="text-[#00e07a]" /> {file.name}
                   </p>
                   <p className="text-xs text-gray-500">{(file.size / 1024).toFixed(2)} KB · Ready to import</p>

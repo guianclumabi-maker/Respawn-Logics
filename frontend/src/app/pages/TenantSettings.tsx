@@ -221,7 +221,7 @@ export function TenantSettings() {
 
   if (loading) {
     return (
-      <div className="flex-1 flex flex-col items-center justify-center bg-[#06070a] text-gray-400">
+      <div className="flex-1 flex flex-col items-center justify-center bg-background text-muted-foreground">
         <Loader2 className="w-8 h-8 animate-spin text-[#00e07a]" />
         <p className="text-sm font-medium mt-3">Loading tenant configuration...</p>
       </div>
@@ -230,14 +230,14 @@ export function TenantSettings() {
 
   if (error) {
     return (
-      <div className="flex-1 flex flex-col items-center justify-center bg-[#06070a] p-8">
+      <div className="flex-1 flex flex-col items-center justify-center bg-background p-8">
         <div className="flex flex-col items-center justify-center py-16 px-6 bg-red-500/10 border border-red-500/20 rounded-xl max-w-xl text-center space-y-3">
           <AlertCircle className="w-10 h-10 text-red-500" />
           <h3 className="text-lg font-bold text-white">Initialization Failed</h3>
-          <p className="text-sm text-gray-400">{error}</p>
+          <p className="text-sm text-muted-foreground">{error}</p>
           <button 
             onClick={fetchSettings}
-            className="mt-2 px-4 py-2 bg-white/5 hover:bg-white/10 text-white rounded-lg text-xs transition-colors border border-white/10"
+            className="mt-2 px-4 py-2 bg-white/5 hover:bg-accent text-white rounded-lg text-xs transition-colors border border-border"
           >
             Retry Connection
           </button>
@@ -247,21 +247,21 @@ export function TenantSettings() {
   }
 
   return (
-    <div className="flex-1 flex flex-col h-full overflow-hidden bg-[#06070a] text-[#c8d0e0]">
+    <div className="flex-1 flex flex-col h-full overflow-hidden bg-background text-foreground">
       {/* Header */}
-      <div className="flex-none px-8 py-6 border-b border-white/5 bg-[#161922]/50 backdrop-blur-md">
+      <div className="flex-none px-8 py-6 border-b border-border bg-card text-card-foreground/50 backdrop-blur-md">
         <div>
-          <h1 className="text-2xl font-bold text-white mb-1 font-['Space_Grotesk']">
+          <h1 className="text-2xl font-bold text-foreground mb-1 font-['Space_Grotesk']">
             Tenant Settings
           </h1>
-          <p className="text-sm text-gray-400">Manage workspace-wide configuration and compliance parameters</p>
+          <p className="text-sm text-muted-foreground">Manage workspace-wide configuration and compliance parameters</p>
         </div>
       </div>
 
       {/* Main Layout: Tabs + Form Content */}
       <div className="flex-1 flex overflow-hidden">
         {/* Vertical Tabs Sidebar */}
-        <div className="w-64 border-r border-white/5 bg-[#0f121d]/40 p-4 space-y-1">
+        <div className="w-64 border-r border-border bg-[#0f121d]/40 p-4 space-y-1">
           {tabItems.map((tab) => (
             <button
               key={tab.id}
@@ -273,7 +273,7 @@ export function TenantSettings() {
               className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-semibold transition-colors ${
                 activeTab === tab.id 
                   ? "bg-[#00e07a]/10 text-[#00e07a] border border-[#00e07a]/20" 
-                  : "text-gray-400 hover:text-white hover:bg-white/[0.02]"
+                  : "text-muted-foreground hover:text-white hover:bg-white/[0.02]"
               }`}
             >
               {tab.icon}
@@ -302,48 +302,48 @@ export function TenantSettings() {
           {/* PROFILE TAB */}
           {activeTab === "profile" && (
             <form onSubmit={handleSaveSettings} className="space-y-6">
-              <div className="border-b border-white/5 pb-2">
+              <div className="border-b border-border pb-2">
                 <h2 className="text-lg font-bold text-white font-['Space_Grotesk']">Company Profile</h2>
                 <p className="text-xs text-gray-500 mt-1">Configure company name, branding, timezones, and regional formats.</p>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">Company Name</label>
+                  <label className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">Company Name</label>
                   <input 
                     type="text" 
                     required
                     value={companyName}
                     onChange={(e) => setCompanyName(e.target.value)}
-                    className="w-full bg-[#0b0f1a] border border-white/10 rounded-lg py-2.5 px-3 text-white text-sm focus:outline-none focus:border-[#00e07a]/50" 
+                    className="w-full bg-background border border-border rounded-lg py-2.5 px-3 text-white text-sm focus:outline-none focus:border-[#00e07a]/50" 
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">Contact Email</label>
+                  <label className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">Contact Email</label>
                   <input 
                     type="email" 
                     required
                     value={contactEmail}
                     onChange={(e) => setContactEmail(e.target.value)}
-                    className="w-full bg-[#0b0f1a] border border-white/10 rounded-lg py-2.5 px-3 text-white text-sm focus:outline-none focus:border-[#00e07a]/50" 
+                    className="w-full bg-background border border-border rounded-lg py-2.5 px-3 text-white text-sm focus:outline-none focus:border-[#00e07a]/50" 
                   />
                 </div>
                 <div className="md:col-span-2">
-                  <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">Logo URL</label>
+                  <label className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">Logo URL</label>
                   <input 
                     type="text" 
                     value={logo}
                     onChange={(e) => setLogo(e.target.value)}
-                    className="w-full bg-[#0b0f1a] border border-white/10 rounded-lg py-2.5 px-3 text-white text-sm focus:outline-none focus:border-[#00e07a]/50" 
+                    className="w-full bg-background border border-border rounded-lg py-2.5 px-3 text-white text-sm focus:outline-none focus:border-[#00e07a]/50" 
                     placeholder="https://example.com/logo.png"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">Timezone</label>
+                  <label className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">Timezone</label>
                   <select 
                     value={timezone}
                     onChange={(e) => setTimezone(e.target.value)}
-                    className="w-full bg-[#0b0f1a] border border-white/10 rounded-lg py-2.5 px-3 text-white text-sm focus:outline-none focus:border-[#00e07a]/50"
+                    className="w-full bg-background border border-border rounded-lg py-2.5 px-3 text-white text-sm focus:outline-none focus:border-[#00e07a]/50"
                   >
                     <option value="Asia/Manila">Asia/Manila (PHT, GMT+8)</option>
                     <option value="Asia/Singapore">Asia/Singapore (SGT, GMT+8)</option>
@@ -353,11 +353,11 @@ export function TenantSettings() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">Locale / Formats</label>
+                  <label className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">Locale / Formats</label>
                   <select 
                     value={locale}
                     onChange={(e) => setLocale(e.target.value)}
-                    className="w-full bg-[#0b0f1a] border border-white/10 rounded-lg py-2.5 px-3 text-white text-sm focus:outline-none focus:border-[#00e07a]/50"
+                    className="w-full bg-background border border-border rounded-lg py-2.5 px-3 text-white text-sm focus:outline-none focus:border-[#00e07a]/50"
                   >
                     <option value="en_PH">en_PH (Philippines)</option>
                     <option value="en_US">en_US (United States)</option>
@@ -382,7 +382,7 @@ export function TenantSettings() {
           {/* PAY SCHEDULES TAB */}
           {activeTab === "payroll" && (
             <div className="space-y-6">
-              <div className="border-b border-white/5 pb-2 flex justify-between items-end">
+              <div className="border-b border-border pb-2 flex justify-between items-end">
                 <div>
                   <h2 className="text-lg font-bold text-white font-['Space_Grotesk']">Pay Schedules</h2>
                   <p className="text-xs text-gray-500 mt-1">Manage processing frequencies and calendar cycles.</p>
@@ -395,7 +395,7 @@ export function TenantSettings() {
                 </button>
               </div>
 
-              <div className="bg-[#161922]/70 border border-white/5 rounded-xl overflow-hidden shadow-2xl">
+              <div className="bg-card text-card-foreground/70 border border-border rounded-xl overflow-hidden shadow-2xl">
                 <table className="w-full text-left border-collapse">
                   <thead className="bg-black/25 text-gray-500 text-xs font-semibold uppercase tracking-wider">
                     <tr>
@@ -428,15 +428,15 @@ export function TenantSettings() {
           {/* SECURITY POLICY TAB */}
           {activeTab === "security" && (
             <form onSubmit={handleSaveSettings} className="space-y-6">
-              <div className="border-b border-white/5 pb-2">
+              <div className="border-b border-border pb-2">
                 <h2 className="text-lg font-bold text-white font-['Space_Grotesk']">Security & Authentication</h2>
                 <p className="text-xs text-gray-500 mt-1">Configure identity validation and MFA enforcement metrics.</p>
               </div>
 
-              <div className="bg-[#161922]/40 border border-white/5 p-6 rounded-xl flex items-start justify-between gap-4">
+              <div className="bg-card text-card-foreground/40 border border-border p-6 rounded-xl flex items-start justify-between gap-4">
                 <div className="space-y-1">
                   <h4 className="text-sm font-semibold text-white">Enforce Two-Factor Authentication (2FA)</h4>
-                  <p className="text-xs text-gray-400">When enabled, all users inside your tenant must enroll and verify credentials via TOTP authentication before entering the workspace.</p>
+                  <p className="text-xs text-muted-foreground">When enabled, all users inside your tenant must enroll and verify credentials via TOTP authentication before entering the workspace.</p>
                 </div>
                 <label className="relative inline-flex items-center cursor-pointer mt-1">
                   <input 
@@ -465,13 +465,13 @@ export function TenantSettings() {
           {/* NOTIFICATIONS TAB */}
           {activeTab === "notifications" && (
             <form onSubmit={handleSaveSettings} className="space-y-6">
-              <div className="border-b border-white/5 pb-2">
+              <div className="border-b border-border pb-2">
                 <h2 className="text-lg font-bold text-white font-['Space_Grotesk']">Notifications & Alerts</h2>
                 <p className="text-xs text-gray-500 mt-1">Configure subscription events and automated dashboard updates.</p>
               </div>
 
               <div className="space-y-4">
-                <label className="flex items-start gap-3 p-4 bg-[#161922]/30 border border-white/5 rounded-xl cursor-pointer hover:bg-white/[0.01] transition-colors">
+                <label className="flex items-start gap-3 p-4 bg-card text-card-foreground/30 border border-border rounded-xl cursor-pointer hover:bg-white/[0.01] transition-colors">
                   <input 
                     type="checkbox" 
                     checked={notifyLeaveApprovals}
@@ -480,11 +480,11 @@ export function TenantSettings() {
                   />
                   <div>
                     <span className="block text-sm font-semibold text-white">Leave Approvals</span>
-                    <span className="block text-xs text-gray-400">Trigger alerts when supervisor/manager leaves requires attention or are resolved.</span>
+                    <span className="block text-xs text-muted-foreground">Trigger alerts when supervisor/manager leaves requires attention or are resolved.</span>
                   </div>
                 </label>
 
-                <label className="flex items-start gap-3 p-4 bg-[#161922]/30 border border-white/5 rounded-xl cursor-pointer hover:bg-white/[0.01] transition-colors">
+                <label className="flex items-start gap-3 p-4 bg-card text-card-foreground/30 border border-border rounded-xl cursor-pointer hover:bg-white/[0.01] transition-colors">
                   <input 
                     type="checkbox" 
                     checked={notifyPayslipRelease}
@@ -493,11 +493,11 @@ export function TenantSettings() {
                   />
                   <div>
                     <span className="block text-sm font-semibold text-white">Payslip Releases</span>
-                    <span className="block text-xs text-gray-400">Trigger system messages immediately when a payroll cycle locks and payslips release.</span>
+                    <span className="block text-xs text-muted-foreground">Trigger system messages immediately when a payroll cycle locks and payslips release.</span>
                   </div>
                 </label>
 
-                <label className="flex items-start gap-3 p-4 bg-[#161922]/30 border border-white/5 rounded-xl cursor-pointer hover:bg-white/[0.01] transition-colors">
+                <label className="flex items-start gap-3 p-4 bg-card text-card-foreground/30 border border-border rounded-xl cursor-pointer hover:bg-white/[0.01] transition-colors">
                   <input 
                     type="checkbox" 
                     checked={notifyExpenses}
@@ -506,7 +506,7 @@ export function TenantSettings() {
                   />
                   <div>
                     <span className="block text-sm font-semibold text-white">Expenses & Claims updates</span>
-                    <span className="block text-xs text-gray-400">Dispatch system logs when expense reimbursement claims transition in states.</span>
+                    <span className="block text-xs text-muted-foreground">Dispatch system logs when expense reimbursement claims transition in states.</span>
                   </div>
                 </label>
               </div>
@@ -527,19 +527,19 @@ export function TenantSettings() {
           {/* SUPPORT ACCESS TAB */}
           {activeTab === "support" && (
             <div className="space-y-6">
-              <div className="border-b border-white/5 pb-2">
+              <div className="border-b border-border pb-2">
                 <h2 className="text-lg font-bold text-white font-['Space_Grotesk']">Platform Support Access</h2>
                 <p className="text-xs text-gray-500 mt-1">Manage external support debugging permissions.</p>
               </div>
 
-              <div className="bg-[#141929] p-8 rounded-2xl border border-white/5 text-center space-y-6">
+              <div className="bg-[#141929] p-8 rounded-2xl border border-border text-center space-y-6">
                 <div className="w-16 h-16 bg-blue-500/10 rounded-2xl border border-blue-500/20 flex items-center justify-center mx-auto shadow-[0_0_20px_rgba(59,130,246,0.15)]">
                   <ShieldAlert className="w-8 h-8 text-blue-400" />
                 </div>
                 
                 <div className="max-w-md mx-auto">
                   <h3 className="text-lg font-semibold text-white mb-2">Platform Support Operations</h3>
-                  <p className="text-xs text-gray-400 leading-relaxed mb-6">
+                  <p className="text-xs text-muted-foreground leading-relaxed mb-6">
                     By default, Respawn Logics staff cannot access your workspace data. Enable a temporary 24-hour access window for our customer support engineers to access your workspace and troubleshoot configuration issues.
                   </p>
                   
@@ -549,7 +549,7 @@ export function TenantSettings() {
                     className={`w-full py-2.5 px-4 rounded-lg font-semibold transition-colors ${
                       supportGranted 
                         ? 'bg-green-500/20 text-green-400 border border-green-500/50' 
-                        : 'bg-blue-600 hover:bg-blue-700 text-white'
+                        : 'bg-blue-600 hover:bg-blue-700 text-foreground'
                     }`}
                   >
                     {supportLoading ? 'Processing...' : supportGranted ? 'Access Granted (Expires in 24h)' : 'Grant 24h Support Access'}
@@ -565,12 +565,12 @@ export function TenantSettings() {
       {/* Add Pay Schedule Modal */}
       {showAddScheduleModal && (
         <div className="fixed inset-0 bg-black/75 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-[#161922] border border-white/10 rounded-xl w-full max-w-sm shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
-            <div className="p-5 border-b border-white/5 flex justify-between items-center bg-black/10">
+          <div className="bg-card text-card-foreground border border-border rounded-xl w-full max-w-sm shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+            <div className="p-5 border-b border-border flex justify-between items-center bg-black/10">
               <h3 className="text-sm font-bold text-white uppercase tracking-wider">Add Pay Schedule</h3>
               <button 
                 onClick={() => setShowAddScheduleModal(false)} 
-                className="text-gray-400 hover:text-white text-xl leading-none"
+                className="text-muted-foreground hover:text-foreground text-xl leading-none"
               >
                 &times;
               </button>
@@ -578,23 +578,23 @@ export function TenantSettings() {
             
             <form onSubmit={handleCreateSchedule} className="p-5 space-y-4">
               <div>
-                <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">Schedule Name</label>
+                <label className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">Schedule Name</label>
                 <input 
                   type="text" 
                   required
                   value={newScheduleName}
                   onChange={(e) => setNewScheduleName(e.target.value)}
-                  className="w-full bg-[#0b0f1a] border border-white/10 rounded-lg py-2 px-3 text-white text-sm focus:outline-none focus:border-[#00e07a]/50" 
+                  className="w-full bg-background border border-border rounded-lg py-2 px-3 text-white text-sm focus:outline-none focus:border-[#00e07a]/50" 
                   placeholder="e.g. Monthly Standard"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">Frequency</label>
+                <label className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">Frequency</label>
                 <select 
                   value={newScheduleFreq}
                   onChange={(e) => setNewScheduleFreq(e.target.value)}
-                  className="w-full bg-[#0b0f1a] border border-white/10 rounded-lg py-2 px-3 text-white text-sm focus:outline-none focus:border-[#00e07a]/50"
+                  className="w-full bg-background border border-border rounded-lg py-2 px-3 text-white text-sm focus:outline-none focus:border-[#00e07a]/50"
                 >
                   <option value="Monthly">Monthly</option>
                   <option value="Semi-Monthly">Semi-Monthly</option>
@@ -607,7 +607,7 @@ export function TenantSettings() {
                 <button 
                   type="button" 
                   onClick={() => setShowAddScheduleModal(false)} 
-                  className="px-3 py-1.5 text-gray-400 hover:text-white text-xs font-semibold"
+                  className="px-3 py-1.5 text-muted-foreground hover:text-foreground text-xs font-semibold"
                 >
                   Cancel
                 </button>

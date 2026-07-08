@@ -10,18 +10,18 @@ export function AttendanceModule() {
   const isManager = user?.permissions?.includes("attendance.manage") || user?.roles?.includes("Super_Admin");
 
   return (
-    <div className="flex flex-col h-full w-full bg-[#06070a]">
+    <div className="flex flex-col h-full w-full bg-background">
       {isManager && (
-        <div className="px-8 pt-8 flex gap-4 border-b border-white/5">
+        <div className="px-8 pt-8 flex gap-4 border-b border-border">
           <button 
             onClick={() => setActiveTab("my_logs")}
-            className={`pb-3 px-1 text-sm font-medium transition-colors ${activeTab === "my_logs" ? "text-white border-b-2 border-[#8b5cf6]" : "text-gray-500 hover:text-gray-300"}`}
+            className={`pb-3 px-1 text-sm font-medium transition-colors ${activeTab === "my_logs" ? "text-foreground border-b-2 border-[#8b5cf6]" : "text-gray-500 hover:text-gray-300"}`}
           >
             My Logs
           </button>
           <button 
             onClick={() => setActiveTab("manager_approvals")}
-            className={`pb-3 px-1 text-sm font-medium transition-colors flex items-center gap-2 ${activeTab === "manager_approvals" ? "text-white border-b-2 border-[#8b5cf6]" : "text-gray-500 hover:text-gray-300"}`}
+            className={`pb-3 px-1 text-sm font-medium transition-colors flex items-center gap-2 ${activeTab === "manager_approvals" ? "text-foreground border-b-2 border-[#8b5cf6]" : "text-gray-500 hover:text-gray-300"}`}
           >
             Manager Approvals
           </button>

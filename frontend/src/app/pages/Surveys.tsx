@@ -49,13 +49,13 @@ export function Surveys() {
 
   return (
     <ThemeProvider attribute="data-theme" defaultTheme="dark">
-      <div className="h-full w-full flex-1 overflow-y-auto bg-[#0b0f1a] text-slate-200 p-8">
+      <div className="h-full w-full flex-1 overflow-y-auto bg-background text-slate-200 p-8">
         <div className="max-w-7xl mx-auto space-y-8">
           
-          <div className="flex justify-between items-center border-b border-white/10 pb-6">
+          <div className="flex justify-between items-center border-b border-border pb-6">
             <div>
               <h1 className="text-3xl font-bold text-white mb-2" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>Engagement Surveys</h1>
-              <p className="text-slate-400 text-sm">Company-wide pulse surveys and eNPS tracking.</p>
+              <p className="text-muted-foreground text-sm">Company-wide pulse surveys and eNPS tracking.</p>
             </div>
             {isAdmin && (
               <button onClick={() => setShowBuilder(true)} className="bg-[#00e07a] text-black px-4 py-2 rounded-lg font-bold text-sm flex items-center gap-2 hover:bg-white transition-colors">
@@ -68,18 +68,18 @@ export function Surveys() {
             {loading ? (
               <div className="col-span-full text-center text-slate-500 py-10">Loading surveys...</div>
             ) : surveys.length === 0 ? (
-              <div className="col-span-full text-center text-slate-500 py-10 bg-white/5 rounded-xl border border-white/10">No surveys available.</div>
+              <div className="col-span-full text-center text-slate-500 py-10 bg-white/5 rounded-xl border border-border">No surveys available.</div>
             ) : (
               surveys.map(s => (
-                <div key={s.id} className="bg-white/5 border border-white/10 rounded-2xl p-6 flex flex-col hover:-translate-y-1 hover:border-white/20 transition-all shadow-lg backdrop-blur-md">
+                <div key={s.id} className="bg-white/5 border border-border rounded-2xl p-6 flex flex-col hover:-translate-y-1 hover:border-white/20 transition-all shadow-lg backdrop-blur-md">
                   {isAdmin ? (
                     <>
-                      <span className={`self-start px-2 py-1 rounded-md text-xs font-bold mb-3 ${s.status === 'Draft' ? 'bg-slate-500/10 text-slate-400' : s.status === 'Active' ? 'bg-[#00e07a]/10 text-[#00e07a]' : 'bg-red-500/10 text-red-500'}`}>
+                      <span className={`self-start px-2 py-1 rounded-md text-xs font-bold mb-3 ${s.status === 'Draft' ? 'bg-slate-500/10 text-muted-foreground' : s.status === 'Active' ? 'bg-[#00e07a]/10 text-[#00e07a]' : 'bg-red-500/10 text-red-500'}`}>
                         {s.status}
                       </span>
                       <h3 className="text-xl font-bold text-white mb-2" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>{s.title}</h3>
                       
-                      <div className="flex justify-between border-t border-white/10 pt-4 mt-auto mb-4">
+                      <div className="flex justify-between border-t border-border pt-4 mt-auto mb-4">
                         <div className="text-center">
                           <div className={`text-2xl font-bold font-mono ${s.enps !== null && s.enps < 0 ? 'text-red-500' : 'text-[#00e07a]'}`}>{s.enps !== null ? s.enps : '--'}</div>
                           <div className="text-[10px] text-slate-500 uppercase tracking-widest">eNPS Score</div>
@@ -99,7 +99,7 @@ export function Surveys() {
                           <Rocket size={16} /> Launch to Company
                         </button>
                       ) : (
-                        <button disabled className="w-full bg-transparent border border-white/10 text-slate-500 font-bold py-2 rounded-lg">
+                        <button disabled className="w-full bg-transparent border border-border text-slate-500 font-bold py-2 rounded-lg">
                           Live / Tracking
                         </button>
                       )}
@@ -108,14 +108,14 @@ export function Surveys() {
                     <>
                       <span className="self-start px-2 py-1 rounded-md text-xs font-bold mb-3 bg-[#00e07a]/10 text-[#00e07a]">Pending</span>
                       <h3 className="text-xl font-bold text-white mb-2" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>{s.title}</h3>
-                      <p className="text-sm text-slate-400 mb-6 flex-grow">{s.description || 'Please take a moment to fill out this pulse survey.'}</p>
+                      <p className="text-sm text-muted-foreground mb-6 flex-grow">{s.description || 'Please take a moment to fill out this pulse survey.'}</p>
                       
                       {s.has_completed === 0 ? (
                         <button onClick={() => setTakeSurveyId(s.id)} className="w-full bg-[#00e07a] text-black font-bold py-2 rounded-lg flex justify-center items-center gap-2 hover:bg-white transition-colors">
                           <Edit size={16} /> Take Survey
                         </button>
                       ) : (
-                        <button disabled className="w-full bg-white/5 border border-white/10 text-slate-400 font-bold py-2 rounded-lg flex justify-center items-center gap-2">
+                        <button disabled className="w-full bg-white/5 border border-border text-muted-foreground font-bold py-2 rounded-lg flex justify-center items-center gap-2">
                           <Check size={16} /> Completed
                         </button>
                       )}
@@ -156,20 +156,20 @@ function BuilderModal({ onClose, refresh }: { onClose: () => void, refresh: () =
 
   return (
     <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div className="bg-[#161922] border border-white/10 rounded-xl w-full max-w-2xl flex flex-col max-h-[90vh]">
-        <div className="p-6 border-b border-white/10 flex justify-between items-center">
+      <div className="bg-card text-card-foreground border border-border rounded-xl w-full max-w-2xl flex flex-col max-h-[90vh]">
+        <div className="p-6 border-b border-border flex justify-between items-center">
           <h3 className="text-xl font-bold text-white" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>Survey Builder</h3>
-          <button onClick={onClose} className="text-slate-400 hover:text-white"><X size={20}/></button>
+          <button onClick={onClose} className="text-muted-foreground hover:text-white"><X size={20}/></button>
         </div>
         <div className="p-6 overflow-y-auto space-y-6">
           
           <div>
-            <label className="block text-xs font-medium text-slate-400 mb-1">Survey Title</label>
-            <input type="text" value={title} onChange={e=>setTitle(e.target.value)} placeholder="e.g. Q3 Company Pulse" className="w-full bg-black/20 border border-white/10 rounded-md p-3 text-sm text-white focus:outline-none focus:border-[#00e07a]/50" />
+            <label className="block text-xs font-medium text-muted-foreground mb-1">Survey Title</label>
+            <input type="text" value={title} onChange={e=>setTitle(e.target.value)} placeholder="e.g. Q3 Company Pulse" className="w-full bg-input border-border border border-border rounded-md p-3 text-sm text-white focus:outline-none focus:border-[#00e07a]/50" />
           </div>
           <div>
-            <label className="block text-xs font-medium text-slate-400 mb-1">Description (Optional)</label>
-            <textarea value={desc} onChange={e=>setDesc(e.target.value)} rows={3} className="w-full bg-black/20 border border-white/10 rounded-md p-3 text-sm text-white focus:outline-none focus:border-[#00e07a]/50"></textarea>
+            <label className="block text-xs font-medium text-muted-foreground mb-1">Description (Optional)</label>
+            <textarea value={desc} onChange={e=>setDesc(e.target.value)} rows={3} className="w-full bg-input border-border border border-border rounded-md p-3 text-sm text-white focus:outline-none focus:border-[#00e07a]/50"></textarea>
           </div>
 
           <div className="bg-[#00e07a]/10 border border-[#00e07a]/30 rounded-lg p-4">
@@ -183,16 +183,16 @@ function BuilderModal({ onClose, refresh }: { onClose: () => void, refresh: () =
               <div key={i} className="flex gap-2 mb-2">
                 <input type="text" value={q.text} onChange={e => {
                   const newQ = [...questions]; newQ[i].text = e.target.value; setQuestions(newQ);
-                }} placeholder="Type your question..." className="flex-1 bg-black/20 border border-white/10 rounded-md p-2 text-sm text-white focus:outline-none focus:border-[#00e07a]/50" />
-                <button onClick={() => setQuestions(questions.filter((_, idx)=>idx!==i))} className="bg-transparent border border-white/10 text-slate-400 p-2 rounded-md hover:bg-red-500/20 hover:text-red-500 transition-colors"><Trash2 size={18}/></button>
+                }} placeholder="Type your question..." className="flex-1 bg-input border-border border border-border rounded-md p-2 text-sm text-white focus:outline-none focus:border-[#00e07a]/50" />
+                <button onClick={() => setQuestions(questions.filter((_, idx)=>idx!==i))} className="bg-transparent border border-border text-muted-foreground p-2 rounded-md hover:bg-red-500/20 hover:text-red-500 transition-colors"><Trash2 size={18}/></button>
               </div>
             ))}
-            <button onClick={() => setQuestions([...questions, {text: ''}])} className="w-full bg-white/5 border border-white/10 text-white font-semibold py-2 rounded-md hover:bg-white/10 flex items-center justify-center gap-2 text-sm mt-2 transition-colors"><Plus size={16}/> Add Text Question</button>
+            <button onClick={() => setQuestions([...questions, {text: ''}])} className="w-full bg-white/5 border border-border text-white font-semibold py-2 rounded-md hover:bg-accent flex items-center justify-center gap-2 text-sm mt-2 transition-colors"><Plus size={16}/> Add Text Question</button>
           </div>
 
         </div>
-        <div className="p-6 border-t border-white/10 flex justify-end gap-3 bg-black/20 rounded-b-xl">
-          <button onClick={onClose} className="px-5 py-2 rounded-md text-sm font-semibold text-white bg-transparent border border-white/20 hover:bg-white/10">Cancel</button>
+        <div className="p-6 border-t border-border flex justify-end gap-3 bg-input border-border rounded-b-xl">
+          <button onClick={onClose} className="px-5 py-2 rounded-md text-sm font-semibold text-white bg-transparent border border-white/20 hover:bg-accent">Cancel</button>
           <button onClick={save} className="px-5 py-2 rounded-md text-sm font-bold text-black bg-[#00e07a] hover:bg-white">Draft Survey</button>
         </div>
       </div>
@@ -235,22 +235,22 @@ function TakeModal({ surveyId, onClose, refresh }: { surveyId: number, onClose: 
 
   return (
     <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div className="bg-[#161922] border border-white/10 rounded-xl w-full max-w-3xl flex flex-col max-h-[90vh]">
-        <div className="p-6 border-b border-white/10 flex justify-between items-center">
+      <div className="bg-card text-card-foreground border border-border rounded-xl w-full max-w-3xl flex flex-col max-h-[90vh]">
+        <div className="p-6 border-b border-border flex justify-between items-center">
           <h3 className="text-xl font-bold text-white" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>{data.survey.title}</h3>
-          <button onClick={onClose} className="text-slate-400 hover:text-white"><X size={20}/></button>
+          <button onClick={onClose} className="text-muted-foreground hover:text-white"><X size={20}/></button>
         </div>
         
-        <div className="p-6 overflow-y-auto space-y-8 bg-[#0b0f1a]">
+        <div className="p-6 overflow-y-auto space-y-8 bg-background">
           {data.questions.map((q: any, idx: number) => (
-            <div key={q.id} className="bg-white/5 border border-white/10 rounded-xl p-6">
+            <div key={q.id} className="bg-white/5 border border-border rounded-xl p-6">
               <div className="text-lg font-semibold text-white mb-4">{idx+1}. {q.question_text}</div>
               
               {q.question_type === 'eNPS' ? (
                 <div>
                   <div className="flex flex-wrap gap-2">
                     {[0,1,2,3,4,5,6,7,8,9,10].map(val => (
-                      <button key={val} onClick={() => setAnswers({...answers, [q.id]: val.toString()})} className={`w-10 h-10 rounded-md font-bold transition-colors ${answers[q.id] === val.toString() ? 'bg-[#00b8ff] text-black border-transparent' : 'bg-[#161922] text-white border border-white/20 hover:border-[#00b8ff]'}`}>
+                      <button key={val} onClick={() => setAnswers({...answers, [q.id]: val.toString()})} className={`w-10 h-10 rounded-md font-bold transition-colors ${answers[q.id] === val.toString() ? 'bg-[#00b8ff] text-black border-transparent' : 'bg-card text-card-foreground text-white border border-white/20 hover:border-[#00b8ff]'}`}>
                         {val}
                       </button>
                     ))}
@@ -260,16 +260,16 @@ function TakeModal({ surveyId, onClose, refresh }: { surveyId: number, onClose: 
                   </div>
                 </div>
               ) : (
-                <textarea rows={3} value={answers[q.id] || ''} onChange={e => setAnswers({...answers, [q.id]: e.target.value})} placeholder="Type your answer here..." className="w-full bg-black/20 border border-white/10 rounded-md p-3 text-sm text-white focus:outline-none focus:border-[#00e07a]/50"></textarea>
+                <textarea rows={3} value={answers[q.id] || ''} onChange={e => setAnswers({...answers, [q.id]: e.target.value})} placeholder="Type your answer here..." className="w-full bg-input border-border border border-border rounded-md p-3 text-sm text-white focus:outline-none focus:border-[#00e07a]/50"></textarea>
               )}
             </div>
           ))}
         </div>
 
-        <div className="p-6 border-t border-white/10 flex items-center justify-between bg-black/20 rounded-b-xl">
-          <div className="flex items-center gap-2 text-slate-400 text-sm font-medium"><EyeOff size={18}/> Your responses are 100% anonymous.</div>
+        <div className="p-6 border-t border-border flex items-center justify-between bg-input border-border rounded-b-xl">
+          <div className="flex items-center gap-2 text-muted-foreground text-sm font-medium"><EyeOff size={18}/> Your responses are 100% anonymous.</div>
           <div className="flex gap-3">
-            <button onClick={onClose} className="px-5 py-2 rounded-md text-sm font-semibold text-white bg-transparent border border-white/20 hover:bg-white/10">Cancel</button>
+            <button onClick={onClose} className="px-5 py-2 rounded-md text-sm font-semibold text-white bg-transparent border border-white/20 hover:bg-accent">Cancel</button>
             <button onClick={submit} className="px-5 py-2 rounded-md text-sm font-bold text-black bg-[#00e07a] hover:bg-white">Submit Anonymous Answers</button>
           </div>
         </div>

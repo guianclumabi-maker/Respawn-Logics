@@ -812,7 +812,7 @@ export function PayrollManager() {
                         </div>
                         <span className={`badge ${
                           comp.status === 'Active' ? 'badge-emerald' : 
-                          comp.status === 'Future' ? 'badge-amber' : 'bg-slate-800 text-slate-400'
+                          comp.status === 'Future' ? 'badge-amber' : 'bg-slate-800 text-muted-foreground'
                         }`}>
                           {comp.status}
                         </span>
@@ -1352,7 +1352,7 @@ export function PayrollManager() {
                 type="button"
                 onClick={startTimesheetTour}
                 title="Replay the guided tour"
-                className="text-gray-400 hover:text-[#00e07a] transition-colors"
+                className="text-muted-foreground hover:text-[#00e07a] transition-colors"
               >
                 <HelpCircle size={18} />
               </button>
@@ -1364,14 +1364,14 @@ export function PayrollManager() {
             <button
               onClick={() => handleSetTsStatus('Approved')}
               disabled={selectedTsIds.length === 0}
-              className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all ${selectedTsIds.length === 0 ? 'bg-slate-700 text-slate-400 cursor-not-allowed' : 'bg-emerald-600 hover:bg-emerald-700 text-white cursor-pointer'}`}
+              className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all ${selectedTsIds.length === 0 ? 'bg-slate-700 text-muted-foreground cursor-not-allowed' : 'bg-emerald-600 hover:bg-emerald-700 text-foreground cursor-pointer'}`}
             >
               Approve Selected ({selectedTsIds.length})
             </button>
             <button 
               onClick={() => handleSetTsStatus('Rejected')}
               disabled={selectedTsIds.length === 0}
-              className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all ${selectedTsIds.length === 0 ? 'bg-slate-700 text-slate-400 cursor-not-allowed' : 'bg-rose-600 hover:bg-rose-700 text-white cursor-pointer'}`}
+              className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all ${selectedTsIds.length === 0 ? 'bg-slate-700 text-muted-foreground cursor-not-allowed' : 'bg-rose-600 hover:bg-rose-700 text-foreground cursor-pointer'}`}
             >
               Reject Selected ({selectedTsIds.length})
             </button>
@@ -1391,12 +1391,12 @@ export function PayrollManager() {
         </div>
 
         {/* Filters */}
-        <div id="tour-ts-filters" className="card mb-6 grid grid-cols-5 gap-4 items-end bg-[#161922]/50 border-white/5">
+        <div id="tour-ts-filters" className="card mb-6 grid grid-cols-5 gap-4 items-end bg-card text-card-foreground/50 border-border">
           <div className="form-group">
             <label className="text-xs text-tertiary font-semibold mb-1 block">Start Date</label>
             <input 
               type="date" 
-              className="w-full p-2 rounded bg-[#0f172a] border border-white/10 text-white focus:border-emerald-500 outline-none" 
+              className="w-full p-2 rounded bg-input border-border border border-border text-foreground focus:border-emerald-500 outline-none" 
               value={tsStart}
               onChange={e => setTsStart(e.target.value)}
             />
@@ -1405,7 +1405,7 @@ export function PayrollManager() {
             <label className="text-xs text-tertiary font-semibold mb-1 block">End Date</label>
             <input 
               type="date" 
-              className="w-full p-2 rounded bg-[#0f172a] border border-white/10 text-white focus:border-emerald-500 outline-none" 
+              className="w-full p-2 rounded bg-input border-border border border-border text-foreground focus:border-emerald-500 outline-none" 
               value={tsEnd}
               onChange={e => setTsEnd(e.target.value)}
             />
@@ -1413,7 +1413,7 @@ export function PayrollManager() {
           <div className="form-group">
             <label className="text-xs text-tertiary font-semibold mb-1 block">Employee</label>
             <select 
-              className="w-full p-2 rounded bg-[#0f172a] border border-white/10 text-white focus:border-emerald-500 outline-none"
+              className="w-full p-2 rounded bg-input border-border border border-border text-foreground focus:border-emerald-500 outline-none"
               value={tsEmpId}
               onChange={e => setTsEmpId(e.target.value)}
             >
@@ -1426,7 +1426,7 @@ export function PayrollManager() {
           <div className="form-group">
             <label className="text-xs text-tertiary font-semibold mb-1 block">Status</label>
             <select 
-              className="w-full p-2 rounded bg-[#0f172a] border border-white/10 text-white focus:border-emerald-500 outline-none"
+              className="w-full p-2 rounded bg-input border-border border border-border text-foreground focus:border-emerald-500 outline-none"
               value={tsStatus}
               onChange={e => setTsStatus(e.target.value)}
             >
@@ -1459,23 +1459,23 @@ export function PayrollManager() {
         </div>
 
         {/* Generation & Holiday Calendar Actions */}
-        <div className="card mb-6 flex justify-between items-center bg-[#161922]/20 border-white/5 p-4 gap-4">
+        <div className="card mb-6 flex justify-between items-center bg-card text-card-foreground/20 border-border p-4 gap-4">
           <div className="flex items-center gap-3">
             <button
               onClick={handleGenerateDraft}
               disabled={isGenerating}
-              className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all flex-shrink-0 ${isGenerating ? 'bg-slate-700 text-slate-400 cursor-not-allowed' : 'bg-emerald-600 hover:bg-emerald-700 text-white cursor-pointer'}`}
+              className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all flex-shrink-0 ${isGenerating ? 'bg-slate-700 text-muted-foreground cursor-not-allowed' : 'bg-emerald-600 hover:bg-emerald-700 text-foreground cursor-pointer'}`}
             >
               {isGenerating ? "Generating..." : "Generate from Attendance"}
             </button>
-            <span className="text-xs text-gray-400 leading-normal">
+            <span className="text-xs text-muted-foreground leading-normal">
               Drafts are created as Pending — review and approve before running payroll. Break/OT/rest-day rules follow company policy defaults.
             </span>
           </div>
           <div>
             <button
               onClick={() => setShowHolidays(!showHolidays)}
-              className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all border border-white/10 ${showHolidays ? 'bg-blue-600 text-white' : 'bg-white/5 hover:bg-white/10 text-white cursor-pointer'}`}
+              className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all border border-border ${showHolidays ? 'bg-blue-600 text-white' : 'bg-white/5 hover:bg-accent text-foreground cursor-pointer'}`}
             >
               {showHolidays ? "Hide Holiday Calendar" : "Show Holiday Calendar"}
             </button>
@@ -1484,9 +1484,9 @@ export function PayrollManager() {
 
         {/* Holiday Calendar Panel */}
         {showHolidays && (
-          <div className="card mb-6 bg-[#161922]/40 border-white/5 p-6 animate-slide-up">
-            <div className="flex justify-between items-center mb-4 pb-2 border-b border-white/5">
-              <h3 className="text-lg font-bold text-white flex items-center gap-2">
+          <div className="card mb-6 bg-card text-card-foreground/40 border-border p-6 animate-slide-up">
+            <div className="flex justify-between items-center mb-4 pb-2 border-b border-border">
+              <h3 className="text-lg font-bold text-foreground flex items-center gap-2">
                 <CalendarClock size={20} className="text-blue-500" />
                 Holiday Calendar ({tsStart} to {tsEnd})
               </h3>
@@ -1498,7 +1498,7 @@ export function PayrollManager() {
             ) : (
               <div className="grid grid-cols-3 gap-6">
                 {/* Add Holiday Form */}
-                <div className="col-span-1 bg-black/20 p-4 rounded-lg border border-white/5">
+                <div className="col-span-1 bg-input border-border p-4 rounded-lg border border-border">
                   <h4 className="font-semibold text-sm mb-3 text-gray-200">Add Holiday</h4>
                   <form onSubmit={handleSaveHoliday} className="space-y-3">
                     <div className="form-group">
@@ -1506,7 +1506,7 @@ export function PayrollManager() {
                       <input 
                         type="date" 
                         required
-                        className="w-full p-2 rounded bg-[#0f172a] border border-white/10 text-white text-xs outline-none focus:border-emerald-500"
+                        className="w-full p-2 rounded bg-input border-border border border-border text-foreground text-xs outline-none focus:border-emerald-500"
                         value={newHoliday.holiday_date}
                         onChange={e => setNewHoliday({ ...newHoliday, holiday_date: e.target.value })}
                       />
@@ -1517,7 +1517,7 @@ export function PayrollManager() {
                         type="text" 
                         required
                         placeholder="e.g. Christmas Day"
-                        className="w-full p-2 rounded bg-[#0f172a] border border-white/10 text-white text-xs outline-none focus:border-emerald-500"
+                        className="w-full p-2 rounded bg-input border-border border border-border text-foreground text-xs outline-none focus:border-emerald-500"
                         value={newHoliday.name}
                         onChange={e => setNewHoliday({ ...newHoliday, name: e.target.value })}
                       />
@@ -1525,7 +1525,7 @@ export function PayrollManager() {
                     <div className="form-group">
                       <label className="text-xs text-tertiary block mb-1">Type</label>
                       <select 
-                        className="w-full p-2 rounded bg-[#0f172a] border border-white/10 text-white text-xs outline-none focus:border-emerald-500"
+                        className="w-full p-2 rounded bg-input border-border border border-border text-foreground text-xs outline-none focus:border-emerald-500"
                         value={newHoliday.type}
                         onChange={e => setNewHoliday({ ...newHoliday, type: e.target.value })}
                       >
@@ -1535,7 +1535,7 @@ export function PayrollManager() {
                     </div>
                     <button 
                       type="submit"
-                      className="w-full py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded transition-all cursor-pointer"
+                      className="w-full py-2 bg-blue-600 hover:bg-blue-700 text-foreground text-xs font-bold rounded transition-all cursor-pointer"
                     >
                       + Save Holiday
                     </button>
@@ -1543,10 +1543,10 @@ export function PayrollManager() {
                 </div>
 
                 {/* Holiday List Table */}
-                <div className="col-span-2 overflow-hidden border border-white/5 rounded-lg">
+                <div className="col-span-2 overflow-hidden border border-border rounded-lg">
                   <table className="w-full text-left border-collapse text-xs">
                     <thead>
-                      <tr className="bg-black/40 border-b border-white/5 text-gray-400 font-semibold">
+                      <tr className="bg-black/40 border-b border-border text-muted-foreground font-semibold">
                         <th className="p-3">Date</th>
                         <th className="p-3">Name</th>
                         <th className="p-3">Type</th>
@@ -1560,7 +1560,7 @@ export function PayrollManager() {
                         </tr>
                       ) : (
                         holidays.map(h => (
-                          <tr key={h.id} className="border-b border-white/5 hover:bg-white/5">
+                          <tr key={h.id} className="border-b border-border hover:bg-accent">
                             <td className="p-3 font-mono text-gray-300">{h.holiday_date}</td>
                             <td className="p-3 font-semibold text-white">{h.name}</td>
                             <td className="p-3">
@@ -1588,7 +1588,7 @@ export function PayrollManager() {
         )}
 
         {/* Timesheets Data Table */}
-        <div id="tour-ts-table" className="card p-0 overflow-hidden bg-[#161922]/30 border-white/5">
+        <div id="tour-ts-table" className="card p-0 overflow-hidden bg-card text-card-foreground/30 border-border">
           {isTsLoading ? (
             <div className="p-8 text-center text-muted">Loading timesheets...</div>
           ) : timesheets.length === 0 ? (
@@ -1613,7 +1613,7 @@ export function PayrollManager() {
                     status: 'Pending'
                   });
                 }}
-                className="px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded text-xs font-semibold text-white cursor-pointer"
+                className="px-4 py-2 bg-white/5 hover:bg-accent border border-border rounded text-xs font-semibold text-foreground cursor-pointer"
               >
                 + Add Daily Entry
               </button>
@@ -1622,7 +1622,7 @@ export function PayrollManager() {
             <div className="overflow-x-auto">
               <table className="data-table w-full text-left border-collapse">
                 <thead>
-                  <tr className="bg-black/20 border-b border-white/5">
+                  <tr className="bg-input border-border border-b border-border">
                     <th className="p-3 w-10 text-center">
                       <input 
                         type="checkbox" 
@@ -1646,15 +1646,15 @@ export function PayrollManager() {
                 <tbody>
                   {/* Inline creation form */}
                   {editingTsId === -1 && (
-                    <tr className="bg-emerald-500/5 border-b border-white/5">
+                    <tr className="bg-emerald-500/5 border-b border-border">
                       <td className="p-3"></td>
-                      <td className="p-3 font-semibold text-white">
+                      <td className="p-3 font-semibold text-foreground">
                         {employees.find(e => e.id == editingTsData.employee_id)?.full_name || 'Select Employee'}
                       </td>
                       <td className="p-3">
                         <input 
                           type="date"
-                          className="w-32 bg-[#0f172a] border border-white/10 rounded px-2 py-1 text-xs text-white"
+                          className="w-32 bg-input border-border border border-border rounded px-2 py-1 text-xs text-foreground"
                           value={editingTsData.timesheet_date || ''}
                           onChange={e => setEditingTsData({ ...editingTsData, timesheet_date: e.target.value })}
                         />
@@ -1662,7 +1662,7 @@ export function PayrollManager() {
                       <td className="p-3 text-center">
                         <input 
                           type="number" step="0.5" min="0" max="24"
-                          className="w-14 bg-[#0f172a] border border-white/10 rounded px-1 py-0.5 text-xs text-white text-center"
+                          className="w-14 bg-input border-border border border-border rounded px-1 py-0.5 text-xs text-foreground text-center"
                           value={editingTsData.regular_hours ?? 0}
                           onChange={e => setEditingTsData({ ...editingTsData, regular_hours: parseFloat(e.target.value) || 0 })}
                         />
@@ -1670,7 +1670,7 @@ export function PayrollManager() {
                       <td className="p-3 text-center">
                         <input 
                           type="number" step="0.5" min="0" max="24"
-                          className="w-14 bg-[#0f172a] border border-white/10 rounded px-1 py-0.5 text-xs text-white text-center"
+                          className="w-14 bg-input border-border border border-border rounded px-1 py-0.5 text-xs text-foreground text-center"
                           value={editingTsData.overtime_hours ?? 0}
                           onChange={e => setEditingTsData({ ...editingTsData, overtime_hours: parseFloat(e.target.value) || 0 })}
                         />
@@ -1678,7 +1678,7 @@ export function PayrollManager() {
                       <td className="p-3 text-center">
                         <input 
                           type="number" step="0.5" min="0" max="24"
-                          className="w-14 bg-[#0f172a] border border-white/10 rounded px-1 py-0.5 text-xs text-white text-center"
+                          className="w-14 bg-input border-border border border-border rounded px-1 py-0.5 text-xs text-foreground text-center"
                           value={editingTsData.rest_day_hours ?? 0}
                           onChange={e => setEditingTsData({ ...editingTsData, rest_day_hours: parseFloat(e.target.value) || 0 })}
                         />
@@ -1686,7 +1686,7 @@ export function PayrollManager() {
                       <td className="p-3 text-center">
                         <input 
                           type="number" step="0.5" min="0" max="24"
-                          className="w-14 bg-[#0f172a] border border-white/10 rounded px-1 py-0.5 text-xs text-white text-center"
+                          className="w-14 bg-input border-border border border-border rounded px-1 py-0.5 text-xs text-foreground text-center"
                           value={editingTsData.special_day_hours ?? 0}
                           onChange={e => setEditingTsData({ ...editingTsData, special_day_hours: parseFloat(e.target.value) || 0 })}
                         />
@@ -1694,7 +1694,7 @@ export function PayrollManager() {
                       <td className="p-3 text-center">
                         <input 
                           type="number" step="0.5" min="0" max="24"
-                          className="w-14 bg-[#0f172a] border border-white/10 rounded px-1 py-0.5 text-xs text-white text-center"
+                          className="w-14 bg-input border-border border border-border rounded px-1 py-0.5 text-xs text-foreground text-center"
                           value={editingTsData.regular_holiday_hours ?? 0}
                           onChange={e => setEditingTsData({ ...editingTsData, regular_holiday_hours: parseFloat(e.target.value) || 0 })}
                         />
@@ -1702,7 +1702,7 @@ export function PayrollManager() {
                       <td className="p-3 text-center">
                         <input 
                           type="number" step="0.5" min="0" max="24"
-                          className="w-14 bg-[#0f172a] border border-white/10 rounded px-1 py-0.5 text-xs text-white text-center"
+                          className="w-14 bg-input border-border border border-border rounded px-1 py-0.5 text-xs text-foreground text-center"
                           value={editingTsData.night_diff_hours ?? 0}
                           onChange={e => setEditingTsData({ ...editingTsData, night_diff_hours: parseFloat(e.target.value) || 0 })}
                         />
@@ -1711,10 +1711,10 @@ export function PayrollManager() {
                         <span className="badge badge-amber">Pending</span>
                       </td>
                       <td className="p-3 text-right flex gap-1 justify-end">
-                        <button onClick={() => handleSaveTsRow(editingTsData)} className="px-2 py-1 bg-emerald-600 hover:bg-emerald-500 rounded text-xs text-white flex items-center gap-1 font-semibold cursor-pointer">
+                        <button onClick={() => handleSaveTsRow(editingTsData)} className="px-2 py-1 bg-emerald-600 hover:bg-emerald-500 rounded text-xs text-foreground flex items-center gap-1 font-semibold cursor-pointer">
                           <Save size={12}/> Save
                         </button>
-                        <button onClick={() => setEditingTsId(null)} className="px-2 py-1 bg-slate-700 hover:bg-slate-600 rounded text-xs text-white cursor-pointer">
+                        <button onClick={() => setEditingTsId(null)} className="px-2 py-1 bg-slate-700 hover:bg-slate-600 rounded text-xs text-foreground cursor-pointer">
                           Cancel
                         </button>
                       </td>
@@ -1726,7 +1726,7 @@ export function PayrollManager() {
                     const isSelected = selectedTsIds.includes(ts.id);
 
                     return (
-                      <tr key={ts.id} className={`border-b border-white/5 transition-colors ${isEditing ? 'bg-blue-500/5' : 'hover:bg-white/5'}`}>
+                      <tr key={ts.id} className={`border-b border-border transition-colors ${isEditing ? 'bg-blue-500/5' : 'hover:bg-accent'}`}>
                         <td className="p-3 text-center">
                           <input 
                             type="checkbox" 
@@ -1745,7 +1745,7 @@ export function PayrollManager() {
                           {isEditing ? (
                             <input 
                               type="number" step="0.5" min="0" max="24"
-                              className="w-14 bg-[#0f172a] border border-white/10 rounded px-1 py-0.5 text-xs text-white text-center"
+                              className="w-14 bg-input border-border border border-border rounded px-1 py-0.5 text-xs text-foreground text-center"
                               value={editingTsData.regular_hours ?? 0}
                               onChange={e => setEditingTsData({ ...editingTsData, regular_hours: parseFloat(e.target.value) || 0 })}
                             />
@@ -1758,12 +1758,12 @@ export function PayrollManager() {
                           {isEditing ? (
                             <input 
                               type="number" step="0.5" min="0" max="24"
-                              className="w-14 bg-[#0f172a] border border-white/10 rounded px-1 py-0.5 text-xs text-white text-center"
+                              className="w-14 bg-input border-border border border-border rounded px-1 py-0.5 text-xs text-foreground text-center"
                               value={editingTsData.overtime_hours ?? 0}
                               onChange={e => setEditingTsData({ ...editingTsData, overtime_hours: parseFloat(e.target.value) || 0 })}
                             />
                           ) : (
-                            <span className="font-mono text-sm text-gray-400">{parseFloat(ts.overtime_hours || 0) || '-'}</span>
+                            <span className="font-mono text-sm text-muted-foreground">{parseFloat(ts.overtime_hours || 0) || '-'}</span>
                           )}
                         </td>
 
@@ -1771,12 +1771,12 @@ export function PayrollManager() {
                           {isEditing ? (
                             <input 
                               type="number" step="0.5" min="0" max="24"
-                              className="w-14 bg-[#0f172a] border border-white/10 rounded px-1 py-0.5 text-xs text-white text-center"
+                              className="w-14 bg-input border-border border border-border rounded px-1 py-0.5 text-xs text-foreground text-center"
                               value={editingTsData.rest_day_hours ?? 0}
                               onChange={e => setEditingTsData({ ...editingTsData, rest_day_hours: parseFloat(e.target.value) || 0 })}
                             />
                           ) : (
-                            <span className="font-mono text-sm text-gray-400">{parseFloat(ts.rest_day_hours || 0) || '-'}</span>
+                            <span className="font-mono text-sm text-muted-foreground">{parseFloat(ts.rest_day_hours || 0) || '-'}</span>
                           )}
                         </td>
 
@@ -1784,12 +1784,12 @@ export function PayrollManager() {
                           {isEditing ? (
                             <input 
                               type="number" step="0.5" min="0" max="24"
-                              className="w-14 bg-[#0f172a] border border-white/10 rounded px-1 py-0.5 text-xs text-white text-center"
+                              className="w-14 bg-input border-border border border-border rounded px-1 py-0.5 text-xs text-foreground text-center"
                               value={editingTsData.special_day_hours ?? 0}
                               onChange={e => setEditingTsData({ ...editingTsData, special_day_hours: parseFloat(e.target.value) || 0 })}
                             />
                           ) : (
-                            <span className="font-mono text-sm text-gray-400">{parseFloat(ts.special_day_hours || 0) || '-'}</span>
+                            <span className="font-mono text-sm text-muted-foreground">{parseFloat(ts.special_day_hours || 0) || '-'}</span>
                           )}
                         </td>
 
@@ -1797,12 +1797,12 @@ export function PayrollManager() {
                           {isEditing ? (
                             <input 
                               type="number" step="0.5" min="0" max="24"
-                              className="w-14 bg-[#0f172a] border border-white/10 rounded px-1 py-0.5 text-xs text-white text-center"
+                              className="w-14 bg-input border-border border border-border rounded px-1 py-0.5 text-xs text-foreground text-center"
                               value={editingTsData.regular_holiday_hours ?? 0}
                               onChange={e => setEditingTsData({ ...editingTsData, regular_holiday_hours: parseFloat(e.target.value) || 0 })}
                             />
                           ) : (
-                            <span className="font-mono text-sm text-gray-400">{parseFloat(ts.regular_holiday_hours || 0) || '-'}</span>
+                            <span className="font-mono text-sm text-muted-foreground">{parseFloat(ts.regular_holiday_hours || 0) || '-'}</span>
                           )}
                         </td>
 
@@ -1810,19 +1810,19 @@ export function PayrollManager() {
                           {isEditing ? (
                             <input 
                               type="number" step="0.5" min="0" max="24"
-                              className="w-14 bg-[#0f172a] border border-white/10 rounded px-1 py-0.5 text-xs text-white text-center"
+                              className="w-14 bg-input border-border border border-border rounded px-1 py-0.5 text-xs text-foreground text-center"
                               value={editingTsData.night_diff_hours ?? 0}
                               onChange={e => setEditingTsData({ ...editingTsData, night_diff_hours: parseFloat(e.target.value) || 0 })}
                             />
                           ) : (
-                            <span className="font-mono text-sm text-gray-400">{parseFloat(ts.night_diff_hours || 0) || '-'}</span>
+                            <span className="font-mono text-sm text-muted-foreground">{parseFloat(ts.night_diff_hours || 0) || '-'}</span>
                           )}
                         </td>
 
                         <td className="p-3 text-center">
                           {isEditing ? (
                             <select 
-                              className="bg-[#0f172a] border border-white/10 rounded px-1 py-0.5 text-xs text-white text-center outline-none"
+                              className="bg-input border-border border border-border rounded px-1 py-0.5 text-xs text-foreground text-center outline-none"
                               value={editingTsData.status || 'Pending'}
                               onChange={e => setEditingTsData({ ...editingTsData, status: e.target.value })}
                             >
@@ -1844,10 +1844,10 @@ export function PayrollManager() {
                           <div className="flex gap-1 justify-end">
                             {isEditing ? (
                               <>
-                                <button onClick={() => handleSaveTsRow(editingTsData)} className="p-1.5 bg-emerald-600 hover:bg-emerald-500 rounded text-white cursor-pointer" title="Save">
+                                <button onClick={() => handleSaveTsRow(editingTsData)} className="p-1.5 bg-emerald-600 hover:bg-emerald-500 rounded text-foreground cursor-pointer" title="Save">
                                   <Save size={14}/>
                                 </button>
-                                <button onClick={() => setEditingTsId(null)} className="p-1.5 bg-slate-700 hover:bg-slate-600 rounded text-white cursor-pointer" title="Cancel">
+                                <button onClick={() => setEditingTsId(null)} className="p-1.5 bg-slate-700 hover:bg-slate-600 rounded text-foreground cursor-pointer" title="Cancel">
                                   <AlertCircle size={14}/>
                                 </button>
                               </>
@@ -1858,7 +1858,7 @@ export function PayrollManager() {
                                     setEditingTsId(ts.id);
                                     setEditingTsData({ ...ts });
                                   }}
-                                  className="px-2 py-1 bg-white/5 hover:bg-white/10 border border-white/10 rounded text-xs text-white cursor-pointer"
+                                  className="px-2 py-1 bg-white/5 hover:bg-accent border border-border rounded text-xs text-foreground cursor-pointer"
                                 >
                                   Edit
                                 </button>
@@ -1933,7 +1933,7 @@ export function PayrollManager() {
   };
 
   return (
-    <div className="flex-1 flex flex-col h-full overflow-hidden bg-[#0f172a] relative z-0">
+    <div className="flex-1 flex flex-col h-full overflow-hidden bg-input border-border relative z-0">
       {/* Global Background Glow Effects */}
       <div style={{ position: "absolute", top: -100, left: -100, width: 500, height: 500, borderRadius: "50%", background: "#00e07a", filter: "blur(120px)", opacity: 0.06, pointerEvents: "none", zIndex: -1 }} />
       <div style={{ position: "absolute", bottom: -150, right: -100, width: 600, height: 600, borderRadius: "50%", background: "#9b6dff", filter: "blur(140px)", opacity: 0.05, pointerEvents: "none", zIndex: -1 }} />
@@ -1941,23 +1941,23 @@ export function PayrollManager() {
       {/* Main Content */}
       <div className="flex-1 flex flex-col h-full overflow-hidden">
         {/* Module-specific top bar (stripped of global chrome) */}
-        <header className="flex-none px-8 py-4 border-b border-white/5 bg-[#161922]/50 backdrop-blur-md flex items-center justify-between">
+        <header className="flex-none px-8 py-4 border-b border-border bg-card text-card-foreground/50 backdrop-blur-md flex items-center justify-between">
           <div className="flex items-center gap-4 w-full justify-between">
-            <div className="flex bg-black/20 rounded-lg p-1 border border-white/10">
-              <button className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${activeTab === 'dashboard' ? 'bg-[#00e07a]/20 text-[#00e07a]' : 'text-gray-400 hover:text-white'}`} onClick={() => setActiveTab('dashboard')}>Dashboard</button>
-              <button className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${activeTab === 'queue' ? 'bg-[#00e07a]/20 text-[#00e07a]' : 'text-gray-400 hover:text-white'}`} onClick={() => setActiveTab('queue')}>Queue</button>
-              <button className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${activeTab === 'exceptions' ? 'bg-red-500/20 text-red-500' : 'text-gray-400 hover:text-white'}`} onClick={() => setActiveTab('exceptions')}>Exceptions ({exceptions.filter(e => e.severity === 'Critical').length})</button>
-              <button className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${activeTab === 'compensation' ? 'bg-[#00e07a]/20 text-[#00e07a]' : 'text-gray-400 hover:text-white'}`} onClick={() => setActiveTab('compensation')}>Compensation</button>
-              <button className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${activeTab === 'payslips' ? 'bg-[#00e07a]/20 text-[#00e07a]' : 'text-gray-400 hover:text-white'}`} onClick={() => setActiveTab('payslips')}>Payslips</button>
-              <button className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${activeTab === 'timesheets' ? 'bg-[#00e07a]/20 text-[#00e07a]' : 'text-gray-400 hover:text-white'}`} onClick={() => setActiveTab('timesheets')}>Timesheets</button>
-              <button className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${activeTab === 'govreports' ? 'bg-[#00e07a]/20 text-[#00e07a]' : 'text-gray-400 hover:text-white'}`} onClick={() => setActiveTab('govreports')}>Reports</button>
-              <button className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${activeTab === 'settings' ? 'bg-[#00e07a]/20 text-[#00e07a]' : 'text-gray-400 hover:text-white'}`} onClick={() => setActiveTab('settings')}>Settings</button>
+            <div className="flex bg-input border-border rounded-lg p-1 border border-border">
+              <button className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${activeTab === 'dashboard' ? 'bg-[#00e07a]/20 text-[#00e07a]' : 'text-muted-foreground hover:text-white'}`} onClick={() => setActiveTab('dashboard')}>Dashboard</button>
+              <button className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${activeTab === 'queue' ? 'bg-[#00e07a]/20 text-[#00e07a]' : 'text-muted-foreground hover:text-white'}`} onClick={() => setActiveTab('queue')}>Queue</button>
+              <button className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${activeTab === 'exceptions' ? 'bg-red-500/20 text-red-500' : 'text-muted-foreground hover:text-white'}`} onClick={() => setActiveTab('exceptions')}>Exceptions ({exceptions.filter(e => e.severity === 'Critical').length})</button>
+              <button className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${activeTab === 'compensation' ? 'bg-[#00e07a]/20 text-[#00e07a]' : 'text-muted-foreground hover:text-white'}`} onClick={() => setActiveTab('compensation')}>Compensation</button>
+              <button className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${activeTab === 'payslips' ? 'bg-[#00e07a]/20 text-[#00e07a]' : 'text-muted-foreground hover:text-white'}`} onClick={() => setActiveTab('payslips')}>Payslips</button>
+              <button className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${activeTab === 'timesheets' ? 'bg-[#00e07a]/20 text-[#00e07a]' : 'text-muted-foreground hover:text-white'}`} onClick={() => setActiveTab('timesheets')}>Timesheets</button>
+              <button className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${activeTab === 'govreports' ? 'bg-[#00e07a]/20 text-[#00e07a]' : 'text-muted-foreground hover:text-white'}`} onClick={() => setActiveTab('govreports')}>Reports</button>
+              <button className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${activeTab === 'settings' ? 'bg-[#00e07a]/20 text-[#00e07a]' : 'text-muted-foreground hover:text-white'}`} onClick={() => setActiveTab('settings')}>Settings</button>
             </div>
             <div className="flex gap-3">
               {hasPermission("payroll.view") && (
                 <button 
                   onClick={handleExport}
-                  className="px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/10 text-white rounded-lg text-sm font-semibold transition-all flex items-center gap-2 cursor-pointer"
+                  className="px-4 py-2 bg-white/5 hover:bg-accent border border-border text-foreground rounded-lg text-sm font-semibold transition-all flex items-center gap-2 cursor-pointer"
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
                   Export CSV
