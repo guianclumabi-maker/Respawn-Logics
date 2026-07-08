@@ -17,6 +17,7 @@ class ELRPipelineTest extends TestCase
 
     protected static $tenantA;
     protected static $tenantB;
+    protected static $defaultPipelineId;
 
     public static function setUpBeforeClass(): void
     {
@@ -101,5 +102,64 @@ class ELRPipelineTest extends TestCase
         // And B cannot fetch it directly.
         $direct = self::apiGet($this->base() . '&action=template&id=' . $aTplId);
         $this->assertFalse($direct['json']['success'] ?? true, 'Tenant B must not fetch Tenant A template by id');
+    }
+
+    /** A fresh tenant should get a default board auto-seeded with the six standard phases. */
+    public function testDefaultPipelineAutoSeeded(): void
+    {
+        self::loginAs('elradminA@test.com');
+        $r = self::apiGet($this->base() . '&action=pipelines');
+        $this->assertTrue($r['json']['success'] ?? false, 'pipelines should load: ' . $r['body']);
+
+        $default = null;
+        foreach (($r['json']['pipelines'] ?? []) as $p) {
+            if (($p['name'] ?? '') === 'Disciplinary Process') { $default = $p; }
+        }
+        $this->assertNotNull($default, 'a default pipeline should be auto-seeded for a new tenant');
+        $this->assertSame(6, (int) $default['stage_count'], 'default board should have six phases');
+        self::$defaultPipelineId = (int) $default['id'];
+
+        // Phases should be in the intended order.
+        $pg = self::apiGet($this->base() . '&action=pipeline&id=' . self::$defaultPipelineId);
+        $names = array_map(fn($s) => $s['name'], $pg['json']['pipeline']['stages']);
+        $this->assertSame(
+            ['AWOL Pool', 'Return-to-Work Notice', 'NTE', 'Hearing', 'Notice of Decision', 'Resolved'],
+            $names,
+            'seeded phases should be in the standard due-process order'
+        );
+    }
+
+    /** reorder_stages persists a whole new order in one call. */
+    public function testReorderStagesPersists(): void
+    {
+        $this->assertNotNull(self::$defaultPipelineId, 'default pipeline must exist first');
+        self::loginAs('elradminA@test.com');
+
+        $pg = self::apiGet($this->base() . '&action=pipeline&id=' . self::$defaultPipelineId);
+        $stageIds = array_map(fn($s) => (int) $s['id'], $pg['json']['pipeline']['stages']);
+        $reversed = array_reverse($stageIds);
+
+        $r = self::apiPost($this->base() . '&action=reorder_stages', [
+            'pipeline_id' => self::$defaultPipelineId,
+            'order'       => $reversed,
+        ]);
+        $this->assertTrue($r['json']['success'] ?? false, 'reorder should succeed: ' . $r['body']);
+
+        $pg2 = self::apiGet($this->base() . '&action=pipeline&id=' . self::$defaultPipelineId);
+        $newIds = array_map(fn($s) => (int) $s['id'], $pg2['json']['pipeline']['stages']);
+        $this->assertSame($reversed, $newIds, 'stages should return in the newly saved order');
+    }
+
+    /** A tenant cannot reorder another tenant's pipeline. */
+    public function testReorderRejectsCrossTenant(): void
+    {
+        $this->assertNotNull(self::$defaultPipelineId, 'tenant A pipeline must exist first');
+        self::loginAs('elradminB@test.com');
+
+        $r = self::apiPost($this->base() . '&action=reorder_stages', [
+            'pipeline_id' => self::$defaultPipelineId, // belongs to tenant A
+            'order'       => [1, 2, 3],
+        ]);
+        $this->assertFalse($r['json']['success'] ?? true, 'Tenant B must not reorder Tenant A pipeline');
     }
 }
