@@ -302,15 +302,15 @@ export function KnowledgeAdmin() {
   };
 
   return (
-    <div className="flex-1 flex flex-col h-full overflow-hidden bg-[#06070a] text-[#c8d0e0]">
+    <div className="flex-1 flex flex-col h-full overflow-hidden bg-background text-foreground">
       {/* Header */}
-      <div className="flex-none px-8 py-6 border-b border-white/5 bg-[#161922]/50 backdrop-blur-md">
+      <div className="flex-none px-8 py-6 border-b border-border bg-card text-card-foreground/50 backdrop-blur-md">
         <div className="flex justify-between items-start">
           <div>
-            <h1 className="text-2xl font-bold text-white mb-1 font-['Space_Grotesk']">
+            <h1 className="text-2xl font-bold text-foreground mb-1 font-['Space_Grotesk']">
               Knowledge Base Review
             </h1>
-            <p className="text-sm text-gray-400">Review statutory DOLE advisories and SC labor jurisprudence</p>
+            <p className="text-sm text-muted-foreground">Review statutory DOLE advisories and SC labor jurisprudence</p>
           </div>
           {isSuperAdmin && (
             <button 
@@ -331,14 +331,14 @@ export function KnowledgeAdmin() {
         
         {/* Permission Info (Non-Super Admins) */}
         {!isSuperAdmin && (
-          <div className="p-4 bg-blue-500/5 border border-blue-500/10 rounded-xl text-xs text-gray-400 flex items-center gap-2.5">
+          <div className="p-4 bg-blue-500/5 border border-blue-500/10 rounded-xl text-xs text-muted-foreground flex items-center gap-2.5">
             <Lock className="w-4 h-4 text-blue-400 flex-shrink-0" />
             <span>Read-Only View: Only platform administrators can write entries or approve/reject pending references.</span>
           </div>
         )}
 
         {loading ? (
-          <div className="flex flex-col items-center justify-center py-20 gap-3 text-gray-400">
+          <div className="flex flex-col items-center justify-center py-20 gap-3 text-muted-foreground">
             <Loader2 className="w-8 h-8 animate-spin text-[#00e07a]" />
             <p className="text-sm font-medium">Scanning compliance references...</p>
           </div>
@@ -346,10 +346,10 @@ export function KnowledgeAdmin() {
           <div className="flex flex-col items-center justify-center py-16 px-6 bg-red-500/10 border border-red-500/20 rounded-xl max-w-xl mx-auto text-center space-y-3">
             <AlertCircle className="w-10 h-10 text-red-500" />
             <h3 className="text-lg font-bold text-white">Load Error</h3>
-            <p className="text-sm text-gray-400">{error}</p>
+            <p className="text-sm text-muted-foreground">{error}</p>
             <button 
               onClick={fetchData}
-              className="mt-2 px-4 py-2 bg-white/5 hover:bg-white/10 text-white rounded-lg text-xs transition-colors border border-white/10 cursor-pointer"
+              className="mt-2 px-4 py-2 bg-white/5 hover:bg-accent text-white rounded-lg text-xs transition-colors border border-border cursor-pointer"
             >
               Retry
             </button>
@@ -357,11 +357,11 @@ export function KnowledgeAdmin() {
         ) : (
           <>
             {/* Tabs */}
-            <div className="flex gap-4 border-b border-white/5">
+            <div className="flex gap-4 border-b border-border">
               <button 
                 onClick={() => setActiveTab("references")}
                 className={`pb-3 px-1 text-sm font-medium transition-colors flex items-center gap-2 cursor-pointer ${
-                  activeTab === "references" ? "text-white border-b-2 border-[#00e07a]" : "text-gray-500 hover:text-gray-300"
+                  activeTab === "references" ? "text-foreground border-b-2 border-[#00e07a]" : "text-gray-500 hover:text-gray-300"
                 }`}
               >
                 <BookOpen size={16} /> Labor References ({references.length})
@@ -369,7 +369,7 @@ export function KnowledgeAdmin() {
               <button 
                 onClick={() => setActiveTab("precedents")}
                 className={`pb-3 px-1 text-sm font-medium transition-colors flex items-center gap-2 cursor-pointer ${
-                  activeTab === "precedents" ? "text-white border-b-2 border-[#00e07a]" : "text-gray-500 hover:text-gray-300"
+                  activeTab === "precedents" ? "text-foreground border-b-2 border-[#00e07a]" : "text-gray-500 hover:text-gray-300"
                 }`}
               >
                 <Scale size={16} /> Legal Precedents ({precedents.length})
@@ -378,7 +378,7 @@ export function KnowledgeAdmin() {
                 <button 
                   onClick={() => setActiveTab("search_sources")}
                   className={`pb-3 px-1 text-sm font-medium transition-colors flex items-center gap-2 cursor-pointer ${
-                    activeTab === "search_sources" ? "text-white border-b-2 border-[#00e07a]" : "text-gray-500 hover:text-gray-300"
+                    activeTab === "search_sources" ? "text-foreground border-b-2 border-[#00e07a]" : "text-gray-500 hover:text-gray-300"
                   }`}
                 >
                   <Compass size={16} /> Search Sources
@@ -388,7 +388,7 @@ export function KnowledgeAdmin() {
 
             {/* TAB CONTENT: REFERENCES */}
             {activeTab === "references" && (
-              <div className="bg-[#161922]/70 border border-white/5 rounded-xl overflow-hidden shadow-2xl">
+              <div className="bg-card text-card-foreground/70 border border-border rounded-xl overflow-hidden shadow-2xl">
                 <div className="overflow-x-auto">
                   <table className="w-full text-left border-collapse">
                     <thead className="bg-black/25 text-gray-500 text-xs font-semibold uppercase tracking-wider">
@@ -407,7 +407,7 @@ export function KnowledgeAdmin() {
                             <div className="text-sm font-bold text-white leading-tight">{ref.title}</div>
                             <div className="text-[10px] text-cyan-400 font-semibold uppercase mt-1">{ref.category}</div>
                           </td>
-                          <td className="py-4 px-6 text-sm text-gray-400 max-w-md line-clamp-3" title={ref.summary}>
+                          <td className="py-4 px-6 text-sm text-muted-foreground max-w-md line-clamp-3" title={ref.summary}>
                             {ref.summary}
                           </td>
                           <td className="py-4 px-6 text-xs text-gray-300">
@@ -466,7 +466,7 @@ export function KnowledgeAdmin() {
 
             {/* TAB CONTENT: PRECEDENTS */}
             {activeTab === "precedents" && (
-              <div className="bg-[#161922]/70 border border-white/5 rounded-xl overflow-hidden shadow-2xl">
+              <div className="bg-card text-card-foreground/70 border border-border rounded-xl overflow-hidden shadow-2xl">
                 <div className="overflow-x-auto">
                   <table className="w-full text-left border-collapse">
                     <thead className="bg-black/25 text-gray-500 text-xs font-semibold uppercase tracking-wider">
@@ -483,12 +483,12 @@ export function KnowledgeAdmin() {
                           <td className="py-4 px-6 max-w-xs">
                             <div className="text-sm font-bold text-white leading-tight">{prec.title}</div>
                             <div className="text-[10px] text-gray-500 font-mono mt-1">{prec.source_reference}</div>
-                            <div className="text-xs text-gray-400 mt-2 line-clamp-3">{prec.summary}</div>
+                            <div className="text-xs text-muted-foreground mt-2 line-clamp-3">{prec.summary}</div>
                           </td>
                           <td className="py-4 px-6 text-sm text-gray-300 max-w-xs font-sans" title={prec.key_principles}>
                             <p className="line-clamp-4">{prec.key_principles}</p>
                           </td>
-                          <td className="py-4 px-6 text-xs text-gray-400 max-w-xs font-sans" title={prec.recommended_process}>
+                          <td className="py-4 px-6 text-xs text-muted-foreground max-w-xs font-sans" title={prec.recommended_process}>
                             <p className="line-clamp-4">{prec.recommended_process}</p>
                           </td>
                           <td className="py-4 px-6">
@@ -517,7 +517,7 @@ export function KnowledgeAdmin() {
               <div className="space-y-6">
                 
                 {/* Search Form Panel */}
-                <div className="bg-[#161922]/70 border border-white/5 p-6 rounded-2xl shadow-xl space-y-4">
+                <div className="bg-card text-card-foreground/70 border border-border p-6 rounded-2xl shadow-xl space-y-4">
                   <div className="flex items-center gap-2 mb-2">
                     <Globe size={18} className="text-[#00e07a]" />
                     <h3 className="text-sm font-bold text-white uppercase tracking-wider">Search Authoritative Web Corpus</h3>
@@ -526,7 +526,7 @@ export function KnowledgeAdmin() {
                   <form onSubmit={handleSearchSources} className="space-y-4">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1.5">Query / Topic</label>
+                        <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-1.5">Query / Topic</label>
                         <div className="relative">
                           <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" size={14} />
                           <input 
@@ -535,25 +535,25 @@ export function KnowledgeAdmin() {
                             placeholder="e.g. Twin notice rule termination procedure..."
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
-                            className="w-full bg-[#0b0f1a] border border-white/10 rounded-lg py-2.5 pl-9 pr-3 text-white text-sm focus:outline-none focus:border-[#00e07a]/50"
+                            className="w-full bg-background border border-border rounded-lg py-2.5 pl-9 pr-3 text-white text-sm focus:outline-none focus:border-[#00e07a]/50"
                           />
                         </div>
                       </div>
                       <div>
-                        <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1.5">Focus Category (Optional)</label>
+                        <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-1.5">Focus Category (Optional)</label>
                         <input 
                           type="text"
                           placeholder="e.g. Dismissals, Maternity, Overtime Pay..."
                           value={searchCategory}
                           onChange={(e) => setSearchCategory(e.target.value)}
-                          className="w-full bg-[#0b0f1a] border border-white/10 rounded-lg py-2.5 px-3 text-white text-sm focus:outline-none focus:border-[#00e07a]/50"
+                          className="w-full bg-background border border-border rounded-lg py-2.5 px-3 text-white text-sm focus:outline-none focus:border-[#00e07a]/50"
                         />
                       </div>
                     </div>
 
                     {/* Checkboxes Whitelist */}
                     <div>
-                      <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1.5">Search Restrictions (Curated Official Domains)</label>
+                      <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-1.5">Search Restrictions (Curated Official Domains)</label>
                       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3 pt-1">
                         {sourcesList.map(src => {
                           const checked = selectedSources.includes(src.id);
@@ -563,7 +563,7 @@ export function KnowledgeAdmin() {
                               className={`flex items-center gap-2 px-3 py-2 border rounded-xl cursor-pointer select-none transition-all text-xs ${
                                 checked 
                                   ? "bg-[#00e07a]/10 border-[#00e07a]/35 text-[#00e07a]" 
-                                  : "bg-black/10 border-white/5 text-gray-400 hover:text-white"
+                                  : "bg-black/10 border-border text-muted-foreground hover:text-foreground"
                               }`}
                             >
                               <input 
@@ -619,7 +619,7 @@ export function KnowledgeAdmin() {
                     <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider">Candidate Documents Retrieved</h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       {candidates.map((cand, idx) => (
-                        <div key={idx} className="bg-[#161922]/70 border border-white/5 rounded-2xl p-5 flex flex-col justify-between hover:border-white/10 transition-all relative overflow-hidden">
+                        <div key={idx} className="bg-card text-card-foreground/70 border border-border rounded-2xl p-5 flex flex-col justify-between hover:border-border transition-all relative overflow-hidden">
                           {cand.ingested && (
                             <div className="absolute top-3 right-3 px-2 py-0.5 bg-[#00e07a]/15 text-[#00e07a] border border-[#00e07a]/25 rounded text-[9px] font-bold uppercase">
                               Staged
@@ -636,10 +636,10 @@ export function KnowledgeAdmin() {
                               <span className="text-[10px] font-bold text-gray-500 font-mono uppercase">{cand.entry_type || "reference"}</span>
                             </div>
                             <h4 className="text-sm font-bold text-white leading-snug">{cand.title}</h4>
-                            <p className="text-xs text-gray-400 leading-relaxed font-sans">{cand.summary}</p>
+                            <p className="text-xs text-muted-foreground leading-relaxed font-sans">{cand.summary}</p>
                           </div>
 
-                          <div className="pt-4 border-t border-white/5 mt-4 flex items-center justify-between gap-4">
+                          <div className="pt-4 border-t border-border mt-4 flex items-center justify-between gap-4">
                             {cand.official_url ? (
                               <a 
                                 href={cand.official_url} 
@@ -681,12 +681,12 @@ export function KnowledgeAdmin() {
       {/* Add Modal */}
       {showAddModal && (
         <div className="fixed inset-0 bg-black/75 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-[#161922] border border-white/10 rounded-xl w-full max-w-lg shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200 text-[#c8d0e0]">
-            <div className="p-5 border-b border-white/5 flex justify-between items-center bg-black/10">
+          <div className="bg-card text-card-foreground border border-border rounded-xl w-full max-w-lg shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200 text-foreground">
+            <div className="p-5 border-b border-border flex justify-between items-center bg-black/10">
               <h3 className="text-base font-bold text-white uppercase tracking-wider">Add Knowledge Entry</h3>
               <button 
                 onClick={() => setShowAddModal(false)} 
-                className="text-gray-400 hover:text-white text-xl leading-none cursor-pointer"
+                className="text-muted-foreground hover:text-foreground text-xl leading-none cursor-pointer"
               >
                 &times;
               </button>
@@ -701,9 +701,9 @@ export function KnowledgeAdmin() {
               )}
 
               <div>
-                <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">Entry Type</label>
+                <label className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">Entry Type</label>
                 <div className="flex gap-4">
-                  <label className="flex items-center gap-2 cursor-pointer text-sm text-white">
+                  <label className="flex items-center gap-2 cursor-pointer text-sm text-foreground">
                     <input 
                       type="radio" 
                       name="entryType"
@@ -713,7 +713,7 @@ export function KnowledgeAdmin() {
                     />
                     Labor Reference (DOLE / Statutory)
                   </label>
-                  <label className="flex items-center gap-2 cursor-pointer text-sm text-white">
+                  <label className="flex items-center gap-2 cursor-pointer text-sm text-foreground">
                     <input 
                       type="radio" 
                       name="entryType"
@@ -727,25 +727,25 @@ export function KnowledgeAdmin() {
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">Title</label>
+                <label className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">Title</label>
                 <input 
                   type="text" 
                   required
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
-                  className="w-full bg-[#0b0f1a] border border-white/10 rounded-lg py-2 px-3 text-white text-sm focus:outline-none focus:border-[#00e07a]/50" 
+                  className="w-full bg-background border border-border rounded-lg py-2 px-3 text-white text-sm focus:outline-none focus:border-[#00e07a]/50" 
                   placeholder="e.g. DOLE Advisory No. 17-15"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">Summary / Context</label>
+                <label className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">Summary / Context</label>
                 <textarea 
                   required
                   value={summary}
                   onChange={(e) => setSummary(e.target.value)}
                   rows={4}
-                  className="w-full bg-[#0b0f1a] border border-white/10 rounded-lg py-2 px-3 text-white text-sm focus:outline-none focus:border-[#00e07a]/50 resize-none font-sans" 
+                  className="w-full bg-background border border-border rounded-lg py-2 px-3 text-white text-sm focus:outline-none focus:border-[#00e07a]/50 resize-none font-sans" 
                   placeholder="Summarize the core guidelines or implications of this advisory..."
                 ></textarea>
               </div>
@@ -755,24 +755,24 @@ export function KnowledgeAdmin() {
                 <>
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">Category</label>
+                      <label className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">Category</label>
                       <input 
                         type="text" 
                         required
                         value={category}
                         onChange={(e) => setCategory(e.target.value)}
-                        className="w-full bg-[#0b0f1a] border border-white/10 rounded-lg py-2 px-3 text-white text-sm focus:outline-none focus:border-[#00e07a]/50" 
+                        className="w-full bg-background border border-border rounded-lg py-2 px-3 text-white text-sm focus:outline-none focus:border-[#00e07a]/50" 
                         placeholder="e.g. Contracting / Subcontracting"
                       />
                     </div>
                     <div>
-                      <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">Source Type</label>
+                      <label className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">Source Type</label>
                       <input 
                         type="text" 
                         required
                         value={sourceType}
                         onChange={(e) => setSourceType(e.target.value)}
-                        className="w-full bg-[#0b0f1a] border border-white/10 rounded-lg py-2 px-3 text-white text-sm focus:outline-none focus:border-[#00e07a]/50" 
+                        className="w-full bg-background border border-border rounded-lg py-2 px-3 text-white text-sm focus:outline-none focus:border-[#00e07a]/50" 
                         placeholder="e.g. DOLE Advisory"
                       />
                     </div>
@@ -780,22 +780,22 @@ export function KnowledgeAdmin() {
 
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">Official Reference URL</label>
+                      <label className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">Official Reference URL</label>
                       <input 
                         type="url" 
                         value={officialUrl}
                         onChange={(e) => setOfficialUrl(e.target.value)}
-                        className="w-full bg-[#0b0f1a] border border-white/10 rounded-lg py-2 px-3 text-white text-sm focus:outline-none focus:border-[#00e07a]/50" 
+                        className="w-full bg-background border border-border rounded-lg py-2 px-3 text-white text-sm focus:outline-none focus:border-[#00e07a]/50" 
                         placeholder="https://..."
                       />
                     </div>
                     <div>
-                      <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">Effective Date</label>
+                      <label className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">Effective Date</label>
                       <input 
                         type="date" 
                         value={effectiveDate}
                         onChange={(e) => setEffectiveDate(e.target.value)}
-                        className="w-full bg-[#0b0f1a] border border-white/10 rounded-lg py-2 px-3 text-white text-sm focus:outline-none focus:border-[#00e07a]/50 [color-scheme:dark]" 
+                        className="w-full bg-background border border-border rounded-lg py-2 px-3 text-white text-sm focus:outline-none focus:border-[#00e07a]/50 [color-scheme:dark]" 
                       />
                     </div>
                   </div>
@@ -807,22 +807,22 @@ export function KnowledgeAdmin() {
                 <>
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">Case Type</label>
+                      <label className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">Case Type</label>
                       <input 
                         type="text" 
                         required
                         value={caseType}
                         onChange={(e) => setCaseType(e.target.value)}
-                        className="w-full bg-[#0b0f1a] border border-white/10 rounded-lg py-2 px-3 text-white text-sm focus:outline-none focus:border-[#00e07a]/50" 
+                        className="w-full bg-background border border-border rounded-lg py-2 px-3 text-white text-sm focus:outline-none focus:border-[#00e07a]/50" 
                         placeholder="e.g. SC Jurisprudence"
                       />
                     </div>
                     <div>
-                      <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">Risk Level</label>
+                      <label className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">Risk Level</label>
                       <select 
                         value={riskLevel}
                         onChange={(e) => setRiskLevel(e.target.value as any)}
-                        className="w-full bg-[#0b0f1a] border border-white/10 rounded-lg py-2 px-3 text-white text-sm focus:outline-none focus:border-[#00e07a]/50"
+                        className="w-full bg-background border border-border rounded-lg py-2 px-3 text-white text-sm focus:outline-none focus:border-[#00e07a]/50"
                       >
                         <option value="Low">Low</option>
                         <option value="Medium">Medium</option>
@@ -833,48 +833,48 @@ export function KnowledgeAdmin() {
                   </div>
 
                   <div>
-                    <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">Source Reference / Case Citation</label>
+                    <label className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">Source Reference / Case Citation</label>
                     <input 
                       type="text" 
                       required
                       value={sourceReference}
                       onChange={(e) => setSourceReference(e.target.value)}
-                      className="w-full bg-[#0b0f1a] border border-white/10 rounded-lg py-2 px-3 text-white text-sm focus:outline-none focus:border-[#00e07a]/50" 
+                      className="w-full bg-background border border-border rounded-lg py-2 px-3 text-white text-sm focus:outline-none focus:border-[#00e07a]/50" 
                       placeholder="e.g. G.R. No. 123456 (2020)"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">Key Principles</label>
+                    <label className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">Key Principles</label>
                     <textarea 
                       required
                       value={keyPrinciples}
                       onChange={(e) => setKeyPrinciples(e.target.value)}
                       rows={2}
-                      className="w-full bg-[#0b0f1a] border border-white/10 rounded-lg py-2 px-3 text-white text-sm focus:outline-none focus:border-[#00e07a]/50 resize-none font-sans" 
+                      className="w-full bg-background border border-border rounded-lg py-2 px-3 text-white text-sm focus:outline-none focus:border-[#00e07a]/50 resize-none font-sans" 
                       placeholder="Core legal standards established by the SC in this case..."
                     ></textarea>
                   </div>
 
                   <div>
-                    <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">Recommended HR Process</label>
+                    <label className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">Recommended HR Process</label>
                     <textarea 
                       required
                       value={recommendedProcess}
                       onChange={(e) => setRecommendedProcess(e.target.value)}
                       rows={2}
-                      className="w-full bg-[#0b0f1a] border border-white/10 rounded-lg py-2 px-3 text-white text-sm focus:outline-none focus:border-[#00e07a]/50 resize-none font-sans" 
+                      className="w-full bg-background border border-border rounded-lg py-2 px-3 text-white text-sm focus:outline-none focus:border-[#00e07a]/50 resize-none font-sans" 
                       placeholder="What should HR do operationally based on this ruling..."
                     ></textarea>
                   </div>
                 </>
               )}
 
-              <div className="pt-2 flex justify-end gap-3 border-t border-white/5 mt-4">
+              <div className="pt-2 flex justify-end gap-3 border-t border-border mt-4">
                 <button 
                   type="button" 
                   onClick={() => setShowAddModal(false)} 
-                  className="px-3 py-1.5 text-gray-400 hover:text-white text-xs font-semibold cursor-pointer"
+                  className="px-3 py-1.5 text-muted-foreground hover:text-foreground text-xs font-semibold cursor-pointer"
                 >
                   Cancel
                 </button>

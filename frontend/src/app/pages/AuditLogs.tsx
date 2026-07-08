@@ -105,11 +105,11 @@ export function AuditLogs() {
 
   if (error && !logs.length) {
     return (
-      <div className="h-full w-full flex items-center justify-center bg-[#0b0f19] p-8">
+      <div className="h-full w-full flex items-center justify-center bg-background p-8">
         <div className="bg-[#141929] border border-red-500/20 rounded-xl p-8 max-w-md text-center">
           <ShieldAlert className="w-12 h-12 text-red-500 mx-auto mb-4" />
           <h2 className="text-xl font-bold text-white mb-2">Access Restricted</h2>
-          <p className="text-gray-400">{error}</p>
+          <p className="text-muted-foreground">{error}</p>
         </div>
       </div>
     );
@@ -119,28 +119,28 @@ export function AuditLogs() {
     <div className="h-full w-full flex flex-col p-8 overflow-y-auto" style={{ backgroundColor: "#0b0f19" }}>
       <header className="mb-6 flex flex-col md:flex-row md:justify-between md:items-end gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-white tracking-tight mb-2 flex items-center gap-2">
+          <h1 className="text-2xl font-bold text-foreground tracking-tight mb-2 flex items-center gap-2">
             <Activity className="w-6 h-6 text-blue-400" />
             Audit Logs
           </h1>
-          <p className="text-gray-400">Track and monitor security events and user activity across the system.</p>
+          <p className="text-muted-foreground">Track and monitor security events and user activity across the system.</p>
         </div>
         
         <div className="flex items-center gap-3">
           <div className="relative">
-            <Search className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
+            <Search className="w-4 h-4 text-muted-foreground absolute left-3 top-1/2 -translate-y-1/2" />
             <input 
               type="text"
               placeholder="Search logs..."
-              className="pl-9 pr-4 py-2 bg-[#141929] border border-white/10 rounded-lg text-sm text-white focus:outline-none focus:border-blue-500 w-64"
+              className="pl-9 pr-4 py-2 bg-[#141929] border border-border rounded-lg text-sm text-foreground focus:outline-none focus:border-blue-500 w-64"
               value={search}
               onChange={(e) => { setSearch(e.target.value); setPage(1); }}
             />
           </div>
           <div className="relative">
-            <Filter className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
+            <Filter className="w-4 h-4 text-muted-foreground absolute left-3 top-1/2 -translate-y-1/2" />
             <select
-              className="pl-9 pr-8 py-2 bg-[#141929] border border-white/10 rounded-lg text-sm text-white focus:outline-none focus:border-blue-500 appearance-none"
+              className="pl-9 pr-8 py-2 bg-[#141929] border border-border rounded-lg text-sm text-foreground focus:outline-none focus:border-blue-500 appearance-none"
               value={actionFilter}
               onChange={(e) => { setActionFilter(e.target.value); setPage(1); }}
             >
@@ -153,10 +153,10 @@ export function AuditLogs() {
         </div>
       </header>
 
-      <div className="bg-[#141929] rounded-xl border border-white/10 overflow-hidden flex-1 flex flex-col">
+      <div className="bg-[#141929] rounded-xl border border-border overflow-hidden flex-1 flex flex-col">
         <div className="overflow-x-auto flex-1">
           <table className="w-full text-left text-sm text-gray-300">
-            <thead className="text-xs text-gray-400 uppercase bg-black/20 border-b border-white/10">
+            <thead className="text-xs text-muted-foreground uppercase bg-input border-border border-b border-border">
               <tr>
                 <th className="px-6 py-4 font-semibold">Event</th>
                 <th className="px-6 py-4 font-semibold">User</th>
@@ -182,7 +182,7 @@ export function AuditLogs() {
                   <tr key={log.id} className="hover:bg-white/[0.02] transition-colors">
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
-                        <div className="p-2 rounded-lg bg-white/5 border border-white/5">
+                        <div className="p-2 rounded-lg bg-white/5 border border-border">
                           {getStatusIcon(log.action)}
                         </div>
                         <div>
@@ -212,7 +212,7 @@ export function AuditLogs() {
                       </p>
                     </td>
                     <td className="px-6 py-4 text-right whitespace-nowrap">
-                      <div className="flex items-center justify-end gap-2 text-gray-400">
+                      <div className="flex items-center justify-end gap-2 text-muted-foreground">
                         <Clock className="w-4 h-4" />
                         {new Date(log.created_at).toLocaleString()}
                       </div>
@@ -225,22 +225,22 @@ export function AuditLogs() {
         </div>
         
         {meta && meta.total_pages > 1 && (
-          <div className="p-4 border-t border-white/10 flex items-center justify-between bg-black/10">
-            <div className="text-sm text-gray-400">
+          <div className="p-4 border-t border-border flex items-center justify-between bg-black/10">
+            <div className="text-sm text-muted-foreground">
               Showing <span className="font-medium text-gray-200">{((meta.page - 1) * meta.limit) + 1}</span> to <span className="font-medium text-gray-200">{Math.min(meta.page * meta.limit, meta.total)}</span> of <span className="font-medium text-gray-200">{meta.total}</span> entries
             </div>
             <div className="flex items-center gap-2">
               <button 
                 onClick={() => setPage(p => Math.max(1, p - 1))}
                 disabled={page === 1}
-                className="px-3 py-1 bg-white/5 border border-white/10 rounded text-gray-300 hover:bg-white/10 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-3 py-1 bg-white/5 border border-border rounded text-gray-300 hover:bg-accent disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Previous
               </button>
               <button 
                 onClick={() => setPage(p => Math.min(meta.total_pages, p + 1))}
                 disabled={page === meta.total_pages}
-                className="px-3 py-1 bg-white/5 border border-white/10 rounded text-gray-300 hover:bg-white/10 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-3 py-1 bg-white/5 border border-border rounded text-gray-300 hover:bg-accent disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Next
               </button>

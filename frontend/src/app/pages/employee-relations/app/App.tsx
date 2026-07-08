@@ -90,7 +90,7 @@ export default function App({ mode = "admin" }: { mode?: "employee" | "admin" })
   };
 
   return (
-    <div className="flex h-full w-full bg-[#06070a] text-[#c8d0e0] overflow-hidden relative">
+    <div className="flex h-full w-full bg-background text-foreground overflow-hidden relative">
       {/* ELR Left-Nav Sidebar */}
       <Sidebar mode={mode} activeView={activeView} onViewChange={handleViewChange} onStartTour={mode === "admin" ? startElrTour : undefined} />
 

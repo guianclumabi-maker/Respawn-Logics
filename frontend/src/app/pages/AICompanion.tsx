@@ -130,7 +130,7 @@ export function AICompanion() {
       <div
         className={`${
           sidebarOpen ? 'w-72' : 'w-0'
-        } transition-all duration-300 ease-in-out flex flex-col bg-[#16181d] border-r border-white/5 flex-shrink-0 overflow-hidden`}
+        } transition-all duration-300 ease-in-out flex flex-col bg-card text-card-foreground border-r border-border flex-shrink-0 overflow-hidden`}
       >
         {/* New Chat */}
         <div className="p-4 flex-shrink-0">
@@ -162,7 +162,7 @@ export function AICompanion() {
                     .map((chat) => (
                       <button
                         key={chat.id}
-                        className="w-full flex items-center gap-3 px-3 py-2.5 text-sm text-slate-300 hover:text-white hover:bg-white/5 rounded-lg transition-colors group"
+                        className="w-full flex items-center gap-3 px-3 py-2.5 text-sm text-slate-300 hover:text-white hover:bg-accent rounded-lg transition-colors group"
                       >
                         <MessageSquare className="w-4 h-4 text-slate-500 group-hover:text-indigo-400 flex-shrink-0" />
                         <span className="truncate">{chat.title}</span>
@@ -182,11 +182,11 @@ export function AICompanion() {
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(99,102,241,0.06)_0%,transparent_60%)] pointer-events-none" />
 
         {/* Header */}
-        <header className="h-14 flex items-center justify-between px-4 border-b border-white/5 bg-[#0f1115]/80 backdrop-blur-sm flex-shrink-0 relative z-10">
+        <header className="h-14 flex items-center justify-between px-4 border-b border-border bg-[#0f1115]/80 backdrop-blur-sm flex-shrink-0 relative z-10">
           <div className="flex items-center gap-3">
             <button
               onClick={() => setSidebarOpen(!sidebarOpen)}
-              className="p-2 hover:bg-white/10 rounded-lg text-slate-400 hover:text-white transition-colors"
+              className="p-2 hover:bg-accent rounded-lg text-muted-foreground hover:text-foreground transition-colors"
               title="Toggle sidebar"
             >
               <Menu className="w-5 h-5" />
@@ -201,10 +201,10 @@ export function AICompanion() {
             </div>
           </div>
           <div className="flex items-center gap-1">
-            <button className="p-2 hover:bg-white/10 rounded-lg text-slate-400 hover:text-white transition-colors">
+            <button className="p-2 hover:bg-accent rounded-lg text-muted-foreground hover:text-foreground transition-colors">
               <Search className="w-4 h-4" />
             </button>
-            <button className="p-2 hover:bg-white/10 rounded-lg text-slate-400 hover:text-white transition-colors">
+            <button className="p-2 hover:bg-accent rounded-lg text-muted-foreground hover:text-foreground transition-colors">
               <MoreVertical className="w-4 h-4" />
             </button>
           </div>
@@ -218,10 +218,10 @@ export function AICompanion() {
               <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-2xl shadow-indigo-500/30 mb-6">
                 <Bot className="w-8 h-8 text-white" />
               </div>
-              <h2 className="text-2xl font-bold text-white mb-2">
+              <h2 className="text-2xl font-bold text-foreground mb-2">
                 How can I help?
               </h2>
-              <p className="text-slate-400 mb-10 max-w-sm text-sm leading-relaxed">
+              <p className="text-muted-foreground mb-10 max-w-sm text-sm leading-relaxed">
                 I'm your Enterprise HR AI Copilot — ask me anything about HR
                 policy, case resolution, compliance, or documentation.
               </p>
@@ -230,7 +230,7 @@ export function AICompanion() {
                   <button
                     key={i}
                     onClick={() => handleSend(s.text)}
-                    className="flex items-start gap-3 p-4 bg-white/[0.03] hover:bg-white/[0.07] border border-white/[0.08] hover:border-indigo-500/30 rounded-xl text-left text-sm text-slate-300 hover:text-white transition-all group"
+                    className="flex items-start gap-3 p-4 bg-white/[0.03] hover:bg-white/[0.07] border border-white/[0.08] hover:border-indigo-500/30 rounded-xl text-left text-sm text-slate-300 hover:text-foreground transition-all group"
                   >
                     <span className="text-indigo-400 mt-0.5 flex-shrink-0 group-hover:scale-110 transition-transform">
                       {s.icon}
@@ -273,7 +273,7 @@ export function AICompanion() {
                     </div>
 
                     {message.role === 'user' && (
-                      <div className="w-8 h-8 flex-shrink-0 rounded-lg bg-slate-700 border border-white/10 flex items-center justify-center mt-0.5 text-sm font-bold text-slate-300">
+                      <div className="w-8 h-8 flex-shrink-0 rounded-lg bg-slate-700 border border-border flex items-center justify-center mt-0.5 text-sm font-bold text-slate-300">
                         {user?.name?.[0]?.toUpperCase() || <User size={14} />}
                       </div>
                     )}
@@ -308,7 +308,7 @@ export function AICompanion() {
             {/* Glow ring behind input */}
             <div className="relative">
               <div className="absolute -inset-px bg-gradient-to-r from-indigo-500/20 to-purple-500/20 rounded-2xl blur-md pointer-events-none" />
-              <div className="relative bg-[#1c1e26] border border-white/10 rounded-2xl shadow-2xl flex items-end p-2 transition-all focus-within:border-indigo-500/40 focus-within:shadow-indigo-500/10">
+              <div className="relative bg-[#1c1e26] border border-border rounded-2xl shadow-2xl flex items-end p-2 transition-all focus-within:border-indigo-500/40 focus-within:shadow-indigo-500/10">
                 <button className="p-2.5 text-slate-500 hover:text-slate-300 transition-colors mb-0.5 flex-shrink-0">
                   <Paperclip className="w-4 h-4" />
                 </button>
@@ -320,7 +320,7 @@ export function AICompanion() {
                   onKeyDown={handleKeyDown}
                   placeholder="Message Copilot…"
                   rows={1}
-                  className="flex-1 bg-transparent text-white placeholder-slate-500 resize-none outline-none py-2.5 px-2 text-[14.5px] min-h-[40px] max-h-52 overflow-y-auto"
+                  className="flex-1 bg-transparent text-foreground placeholder-slate-500 resize-none outline-none py-2.5 px-2 text-[14.5px] min-h-[40px] max-h-52 overflow-y-auto"
                   onInput={(e) => {
                     const t = e.target as HTMLTextAreaElement;
                     t.style.height = 'auto';

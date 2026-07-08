@@ -129,7 +129,7 @@ export function ElrCopilotContent() {
   };
 
   return (
-    <div className="flex-1 flex flex-col bg-[#06070a] text-white p-6 h-full overflow-hidden">
+    <div className="flex-1 flex flex-col bg-background text-foreground p-6 h-full overflow-hidden">
       {/* Top Header */}
       <div className="flex items-center justify-between mb-6 flex-none">
         <div className="flex items-center gap-3">
@@ -138,13 +138,13 @@ export function ElrCopilotContent() {
           </div>
           <div>
             <h1 className="text-xl font-bold font-['Space_Grotesk']">ELR Labor Relations Copilot</h1>
-            <p className="text-sm text-gray-400">Philippine labor law Q&A grounded on DOLE references and SC jurisprudence</p>
+            <p className="text-sm text-muted-foreground">Philippine labor law Q&A grounded on DOLE references and SC jurisprudence</p>
           </div>
         </div>
         {transcript.length > 0 && (
           <button 
             onClick={() => setTranscript([])}
-            className="flex items-center gap-1.5 px-3 py-1.5 bg-white/5 hover:bg-red-500/15 hover:text-red-400 border border-white/10 hover:border-red-500/20 rounded-lg text-xs text-gray-400 transition-all cursor-pointer font-sans"
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-white/5 hover:bg-red-500/15 hover:text-red-400 border border-border hover:border-red-500/20 rounded-lg text-xs text-muted-foreground transition-all cursor-pointer font-sans"
           >
             <Trash2 size={13} /> Clear Session
           </button>
@@ -152,7 +152,7 @@ export function ElrCopilotContent() {
       </div>
 
       {/* Main Workspace (Split / Scrollable view) */}
-      <div className="flex-1 flex flex-col overflow-hidden bg-[#0d0f19] border border-white/5 rounded-2xl relative shadow-2xl">
+      <div className="flex-1 flex flex-col overflow-hidden bg-[#0d0f19] border border-border rounded-2xl relative shadow-2xl">
         
         {/* Transcript History */}
         <div className="flex-1 overflow-y-auto p-6 space-y-6 scrollbar-thin">
@@ -174,7 +174,7 @@ export function ElrCopilotContent() {
                 <div className="w-8 h-8 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 flex items-center justify-center flex-shrink-0">
                   <Bot size={15} />
                 </div>
-                <div className="flex-1 p-5 rounded-2xl bg-white/[0.02] border border-white/5 rounded-tl-sm shadow-md space-y-4">
+                <div className="flex-1 p-5 rounded-2xl bg-white/[0.02] border border-border rounded-tl-sm shadow-md space-y-4">
                   
                   {/* Markdown Answer */}
                   <div className="space-y-1">
@@ -194,7 +194,7 @@ export function ElrCopilotContent() {
 
                   {/* Sources cited */}
                   {qa.sources.length > 0 && (
-                    <div className="border-t border-white/5 pt-3 mt-3">
+                    <div className="border-t border-border pt-3 mt-3">
                       {qa.web_fallback && (
                         <div className="mb-3 p-3 bg-amber-500/10 border border-amber-500/20 text-amber-500 text-[10px] font-bold rounded-lg uppercase tracking-wide inline-flex items-center gap-1.5 font-sans">
                           <AlertTriangle size={12} className="flex-shrink-0" />
@@ -204,7 +204,7 @@ export function ElrCopilotContent() {
                       <span className="text-[10px] font-bold text-gray-500 uppercase tracking-wider block mb-2">Sources Cited:</span>
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         {qa.sources.map((src, srcIdx) => (
-                          <div key={srcIdx} className="bg-black/20 border border-white/5 p-3 rounded-lg flex flex-col justify-between gap-1 hover:border-cyan-500/20 transition-all">
+                          <div key={srcIdx} className="bg-input border-border border border-border p-3 rounded-lg flex flex-col justify-between gap-1 hover:border-cyan-500/20 transition-all">
                             <div>
                               <div className="flex items-center gap-1.5">
                                 {src.type === "reference" ? (
@@ -215,7 +215,7 @@ export function ElrCopilotContent() {
                                 <span className="text-[9px] font-bold text-gray-500 uppercase tracking-wider">{src.type}</span>
                               </div>
                               <div className="text-xs font-bold text-white leading-tight mt-1 line-clamp-2">{src.title}</div>
-                              <div className="text-[10px] text-gray-400 mt-0.5 line-clamp-1">{src.reference}</div>
+                              <div className="text-[10px] text-muted-foreground mt-0.5 line-clamp-1">{src.reference}</div>
                             </div>
 
                             {src.type === "reference" && src.url && (
@@ -253,7 +253,7 @@ export function ElrCopilotContent() {
               <div className="w-8 h-8 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 flex items-center justify-center flex-shrink-0">
                 <Bot size={15} />
               </div>
-              <div className="p-4 rounded-2xl bg-white/[0.02] border border-white/5 rounded-tl-sm text-gray-400 flex items-center gap-2 text-sm font-sans shadow-md">
+              <div className="p-4 rounded-2xl bg-white/[0.02] border border-border rounded-tl-sm text-muted-foreground flex items-center gap-2 text-sm font-sans shadow-md">
                 <Loader2 size={16} className="animate-spin text-cyan-400" /> Scanning labor law references...
               </div>
             </div>
@@ -278,7 +278,7 @@ export function ElrCopilotContent() {
         </div>
 
         {/* Persistent bottom input workspace */}
-        <div className="p-4 bg-[#0d0f19] border-t border-white/5 space-y-3 flex-none">
+        <div className="p-4 bg-[#0d0f19] border-t border-border space-y-3 flex-none">
           {/* Suggestions (only when empty) */}
           {transcript.length === 0 && (
             <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-thin">
@@ -290,7 +290,7 @@ export function ElrCopilotContent() {
                     handleAsk(sug);
                   }}
                   disabled={loading}
-                  className="whitespace-nowrap px-3 py-1.5 bg-white/5 hover:bg-white/10 border border-white/10 rounded-full text-xs text-gray-300 transition-all cursor-pointer disabled:opacity-50"
+                  className="whitespace-nowrap px-3 py-1.5 bg-white/5 hover:bg-accent border border-border rounded-full text-xs text-gray-300 transition-all cursor-pointer disabled:opacity-50"
                 >
                   {sug}
                 </button>
@@ -308,7 +308,7 @@ export function ElrCopilotContent() {
               onChange={(e) => setQuestion(e.target.value)}
               placeholder="Type your labor relations question..."
               rows={2}
-              className="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white placeholder-gray-500 focus:outline-none focus:border-cyan-500/50 focus:bg-white/10 transition-all text-sm font-sans resize-none"
+              className="flex-1 bg-white/5 border border-border rounded-xl px-4 py-2.5 text-white placeholder-gray-500 focus:outline-none focus:border-cyan-500/50 focus:bg-white/10 transition-all text-sm font-sans resize-none"
               onKeyDown={(e) => {
                 if (e.key === "Enter" && !e.shiftKey) {
                   e.preventDefault();

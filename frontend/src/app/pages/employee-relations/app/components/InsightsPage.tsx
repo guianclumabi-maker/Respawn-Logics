@@ -66,7 +66,7 @@ export function InsightsPage({ onViewChange }: InsightsPageProps) {
   const graph = generateGraph();
 
   return (
-    <div className="flex-1 flex flex-col overflow-y-auto px-8 py-6 text-white font-sans relative scrollbar-thin" style={{ backgroundColor: "#0d0f19" }}>
+    <div className="flex-1 flex flex-col overflow-y-auto px-8 py-6 text-foreground font-sans relative scrollbar-thin" style={{ backgroundColor: "#0d0f19" }}>
       {/* Background glows */}
       <div className="absolute top-[-100px] left-[-100px] w-[500px] h-[500px] rounded-full bg-[#8b5cf6] blur-[120px] opacity-10 pointer-events-none z-0" />
       <div className="absolute bottom-[-150px] right-[-100px] w-[600px] h-[600px] rounded-full bg-[#ec4899] blur-[140px] opacity-8 pointer-events-none z-0" />
@@ -77,7 +77,7 @@ export function InsightsPage({ onViewChange }: InsightsPageProps) {
           <h1 className="text-2xl font-bold tracking-tight bg-gradient-to-r from-white via-white to-gray-400 bg-clip-text text-transparent" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
             Relations Insights
           </h1>
-          <p className="text-xs text-[#9ca3af] mt-1">Case trends, issue categories performance, and resolution analytics.</p>
+          <p className="text-xs text-muted-foreground mt-1">Case trends, issue categories performance, and resolution analytics.</p>
         </div>
       </div>
 
@@ -85,7 +85,7 @@ export function InsightsPage({ onViewChange }: InsightsPageProps) {
       <div className="relative z-10 grid lg:grid-cols-3 gap-6 items-stretch mb-8">
         
         {/* Applications Trend SVG Chart */}
-        <div className="lg:col-span-2 p-6 rounded-2xl border bg-[#161922]/20 backdrop-blur-md flex flex-col justify-between" style={{ borderColor: "rgba(255, 255, 255, 0.06)" }}>
+        <div className="lg:col-span-2 p-6 rounded-2xl border bg-card text-card-foreground/20 backdrop-blur-md flex flex-col justify-between" style={{ borderColor: "rgba(255, 255, 255, 0.06)" }}>
           <div>
             <div className="flex justify-between items-start mb-6">
               <div>
@@ -158,7 +158,7 @@ export function InsightsPage({ onViewChange }: InsightsPageProps) {
         </div>
 
         {/* Source Channels Breakdown */}
-        <div className="p-6 rounded-2xl border bg-[#161922]/20 backdrop-blur-md flex flex-col justify-between" style={{ borderColor: "rgba(255, 255, 255, 0.06)" }}>
+        <div className="p-6 rounded-2xl border bg-card text-card-foreground/20 backdrop-blur-md flex flex-col justify-between" style={{ borderColor: "rgba(255, 255, 255, 0.06)" }}>
           <div>
             <h3 className="text-sm font-semibold tracking-wide mb-1">Report Channels</h3>
             <p className="text-[10px] text-gray-500 mb-5">Primary reporting distributions.</p>
@@ -194,7 +194,7 @@ export function InsightsPage({ onViewChange }: InsightsPageProps) {
 
       {/* Relations Efficiency Cards */}
       <div className="relative z-10 grid md:grid-cols-3 gap-5">
-        <div className="p-5 rounded-2xl border bg-[#161922]/20 backdrop-blur-md flex gap-4 items-start" style={{ borderColor: "rgba(255, 255, 255, 0.06)" }}>
+        <div className="p-5 rounded-2xl border bg-card text-card-foreground/20 backdrop-blur-md flex gap-4 items-start" style={{ borderColor: "rgba(255, 255, 255, 0.06)" }}>
           <div className="p-3 rounded-xl bg-purple-500/10 text-purple-400 border border-purple-500/20"><Target size={16} /></div>
           <div>
             <h4 className="text-xs font-bold mb-1.5">Resolution Quality</h4>
@@ -204,7 +204,7 @@ export function InsightsPage({ onViewChange }: InsightsPageProps) {
           </div>
         </div>
 
-        <div className="p-5 rounded-2xl border bg-[#161922]/20 backdrop-blur-md flex gap-4 items-start" style={{ borderColor: "rgba(255, 255, 255, 0.06)" }}>
+        <div className="p-5 rounded-2xl border bg-card text-card-foreground/20 backdrop-blur-md flex gap-4 items-start" style={{ borderColor: "rgba(255, 255, 255, 0.06)" }}>
           <div className="p-3 rounded-xl bg-cyan-500/10 text-cyan-400 border border-cyan-500/20"><Globe size={16} /></div>
           <div>
             <h4 className="text-xs font-bold mb-1.5">Department Distribution</h4>
@@ -214,7 +214,7 @@ export function InsightsPage({ onViewChange }: InsightsPageProps) {
           </div>
         </div>
 
-        <div className="p-5 rounded-2xl border bg-[#161922]/20 backdrop-blur-md flex gap-4 items-start" style={{ borderColor: "rgba(255, 255, 255, 0.06)" }}>
+        <div className="p-5 rounded-2xl border bg-card text-card-foreground/20 backdrop-blur-md flex gap-4 items-start" style={{ borderColor: "rgba(255, 255, 255, 0.06)" }}>
           <div className="p-3 rounded-xl bg-pink-500/10 text-pink-400 border border-pink-500/20"><Layers size={16} /></div>
           <div>
             <h4 className="text-xs font-bold mb-1.5">Resolution Velocity</h4>

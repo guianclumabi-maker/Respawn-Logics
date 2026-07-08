@@ -109,7 +109,7 @@ export function CaseDetail({ caseId, onBack }: CaseDetailProps) {
 
   if (loading && !caseData) {
     return (
-      <div className="flex flex-col items-center justify-center py-20 gap-3 text-gray-400">
+      <div className="flex flex-col items-center justify-center py-20 gap-3 text-muted-foreground">
         <Loader2 className="w-8 h-8 animate-spin text-[#00e07a]" />
         <p className="text-sm font-medium">Resolving investigation file...</p>
       </div>
@@ -121,10 +121,10 @@ export function CaseDetail({ caseId, onBack }: CaseDetailProps) {
       <div className="flex flex-col items-center justify-center py-16 px-6 bg-red-500/10 border border-red-500/20 rounded-xl max-w-xl mx-auto text-center space-y-3">
         <AlertCircle className="w-10 h-10 text-red-500" />
         <h3 className="text-lg font-bold text-white font-['Space_Grotesk']">Case Locked</h3>
-        <p className="text-sm text-gray-400">{error}</p>
+        <p className="text-sm text-muted-foreground">{error}</p>
         <button 
           onClick={onBack}
-          className="mt-2 px-4 py-2 bg-white/5 hover:bg-white/10 text-white rounded-lg text-xs transition-colors border border-white/10"
+          className="mt-2 px-4 py-2 bg-white/5 hover:bg-accent text-white rounded-lg text-xs transition-colors border border-border"
         >
           Return to Registry
         </button>
@@ -162,11 +162,11 @@ export function CaseDetail({ caseId, onBack }: CaseDetailProps) {
   };
 
   return (
-    <div className="flex-1 flex flex-col h-full bg-[#06070a] text-[#c8d0e0] overflow-hidden">
+    <div className="flex-1 flex flex-col h-full bg-background text-foreground overflow-hidden">
       
       {/* Header */}
-      <div className="p-8 border-b border-white/[0.04] flex items-center gap-4 shrink-0 bg-[#161922]/50 backdrop-blur-md">
-        <button onClick={onBack} className="p-2 hover:bg-white/5 rounded-lg transition-colors cursor-pointer text-white">
+      <div className="p-8 border-b border-white/[0.04] flex items-center gap-4 shrink-0 bg-card text-card-foreground/50 backdrop-blur-md">
+        <button onClick={onBack} className="p-2 hover:bg-accent rounded-lg transition-colors cursor-pointer text-foreground">
           <ArrowLeft size={20} />
         </button>
         <div>
@@ -181,7 +181,7 @@ export function CaseDetail({ caseId, onBack }: CaseDetailProps) {
               {caseData.status}
             </span>
           </div>
-          <p className="text-gray-400 text-sm mt-1">{caseData.case_type_name || "General"} • {caseData.department}</p>
+          <p className="text-muted-foreground text-sm mt-1">{caseData.case_type_name || "General"} • {caseData.department}</p>
         </div>
       </div>
 
@@ -189,25 +189,25 @@ export function CaseDetail({ caseId, onBack }: CaseDetailProps) {
         
         {/* Main Content Area */}
         <div className="flex-1 flex flex-col gap-6">
-          <div className="bg-[#161922]/70 border border-white/5 p-6 rounded-2xl space-y-4">
-            <h2 className="text-base font-bold text-white uppercase tracking-wider border-b border-white/5 pb-2">Investigation Narrative</h2>
+          <div className="bg-card text-card-foreground/70 border border-border p-6 rounded-2xl space-y-4">
+            <h2 className="text-base font-bold text-white uppercase tracking-wider border-b border-border pb-2">Investigation Narrative</h2>
             <p className="text-gray-300 whitespace-pre-wrap text-sm leading-relaxed font-sans">
               {caseData.description || "No description provided."}
             </p>
           </div>
 
           {/* Timeline details */}
-          <div className="bg-[#161922]/70 border border-white/5 p-6 rounded-2xl flex-1 overflow-auto">
-            <h3 className="text-base font-bold text-white uppercase tracking-wider border-b border-white/5 pb-2 mb-4 flex items-center gap-2">
+          <div className="bg-card text-card-foreground/70 border border-border p-6 rounded-2xl flex-1 overflow-auto">
+            <h3 className="text-base font-bold text-white uppercase tracking-wider border-b border-border pb-2 mb-4 flex items-center gap-2">
               <Clock size={16} className="text-[#00e07a]" /> Investigation Activity Log
             </h3>
             
-            <div className="space-y-6 pl-4 border-l border-white/5">
+            <div className="space-y-6 pl-4 border-l border-border">
               {timeline.map((event) => (
                 <div key={event.id} className="relative pl-6 last:border-transparent">
                   <div className="absolute -left-[29px] top-1.5 w-2 h-2 rounded-full bg-[#00e07a] shadow-[0_0_10px_rgba(0,224,122,0.5)]"></div>
                   <p className="text-sm font-semibold text-white">{event.event_type}</p>
-                  <p className="text-xs text-gray-400 mt-1 mb-2 font-sans">{event.description}</p>
+                  <p className="text-xs text-muted-foreground mt-1 mb-2 font-sans">{event.description}</p>
                   <p className="text-[10px] text-gray-500 font-mono">
                     {new Date(event.created_at).toLocaleString()} • by {event.actor || 'System'}
                   </p>
@@ -225,8 +225,8 @@ export function CaseDetail({ caseId, onBack }: CaseDetailProps) {
           
           {/* Edit Form */}
           {canInvestigate && (
-            <div className="bg-[#161922]/70 border border-white/5 p-6 rounded-2xl space-y-4">
-              <h3 className="text-sm font-bold text-white uppercase tracking-wider border-b border-white/5 pb-2">Investigation Controls</h3>
+            <div className="bg-card text-card-foreground/70 border border-border p-6 rounded-2xl space-y-4">
+              <h3 className="text-sm font-bold text-white uppercase tracking-wider border-b border-border pb-2">Investigation Controls</h3>
               
               {updateSuccess && (
                 <div className="p-3 bg-[#00e07a]/15 border border-[#00e07a]/25 rounded-xl text-[#00e07a] text-xs flex items-start gap-2">
@@ -243,12 +243,12 @@ export function CaseDetail({ caseId, onBack }: CaseDetailProps) {
 
               <form onSubmit={handleUpdate} className="space-y-4">
                 <div>
-                  <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1.5">Case Status</label>
+                  <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-1.5">Case Status</label>
                   <select
                     value={status}
                     onChange={(e) => setStatus(e.target.value)}
                     disabled={caseData.status === 'Closed'}
-                    className="w-full bg-[#0b0f1a] border border-white/10 rounded-lg py-2 px-3 text-white text-xs focus:outline-none focus:border-[#00e07a]/50 disabled:opacity-50"
+                    className="w-full bg-background border border-border rounded-lg py-2 px-3 text-white text-xs focus:outline-none focus:border-[#00e07a]/50 disabled:opacity-50"
                   >
                     {getAllowedStatusOptions().map(opt => (
                       <option key={opt} value={opt}>{opt}</option>
@@ -257,11 +257,11 @@ export function CaseDetail({ caseId, onBack }: CaseDetailProps) {
                 </div>
 
                 <div>
-                  <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1.5">Severity</label>
+                  <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-1.5">Severity</label>
                   <select
                     value={severity}
                     onChange={(e) => setSeverity(e.target.value)}
-                    className="w-full bg-[#0b0f1a] border border-white/10 rounded-lg py-2 px-3 text-white text-xs focus:outline-none focus:border-[#00e07a]/50"
+                    className="w-full bg-background border border-border rounded-lg py-2 px-3 text-white text-xs focus:outline-none focus:border-[#00e07a]/50"
                   >
                     <option value="Low">Low</option>
                     <option value="Medium">Medium</option>
@@ -271,12 +271,12 @@ export function CaseDetail({ caseId, onBack }: CaseDetailProps) {
                 </div>
 
                 <div>
-                  <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1.5">Investigator ID</label>
+                  <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-1.5">Investigator ID</label>
                   <input 
                     type="text" 
                     value={investigatorId}
                     onChange={(e) => setInvestigatorId(e.target.value)}
-                    className="w-full bg-[#0b0f1a] border border-white/10 rounded-lg py-2 px-3 text-white text-xs focus:outline-none focus:border-[#00e07a]/50" 
+                    className="w-full bg-background border border-border rounded-lg py-2 px-3 text-white text-xs focus:outline-none focus:border-[#00e07a]/50" 
                     placeholder="e.g. EMP-010"
                   />
                 </div>
@@ -294,14 +294,14 @@ export function CaseDetail({ caseId, onBack }: CaseDetailProps) {
           )}
 
           {/* Details Card */}
-          <div className="bg-[#161922]/70 border border-white/5 p-6 rounded-2xl text-xs space-y-4">
-            <h3 className="text-sm font-bold text-white uppercase tracking-wider border-b border-white/5 pb-2">Case Metadata</h3>
+          <div className="bg-card text-card-foreground/70 border border-border p-6 rounded-2xl text-xs space-y-4">
+            <h3 className="text-sm font-bold text-white uppercase tracking-wider border-b border-border pb-2">Case Metadata</h3>
             
             <div className="space-y-4 font-sans text-gray-300">
               <div>
                 <span className="text-gray-500 block mb-1 uppercase font-bold text-[9px] tracking-wider">Subject Employee ID</span>
                 <div className="flex items-center gap-2">
-                  <User size={14} className="text-gray-400" />
+                  <User size={14} className="text-muted-foreground" />
                   <span>{caseData.employee_id}</span>
                 </div>
               </div>
@@ -315,12 +315,12 @@ export function CaseDetail({ caseId, onBack }: CaseDetailProps) {
               </div>
               <div>
                 <span className="text-gray-500 block mb-1 uppercase font-bold text-[9px] tracking-wider">Created At</span>
-                <span className="font-mono text-gray-400">{new Date(caseData.created_at).toLocaleString()}</span>
+                <span className="font-mono text-muted-foreground">{new Date(caseData.created_at).toLocaleString()}</span>
               </div>
               {caseData.date_closed && (
                 <div>
                   <span className="text-gray-500 block mb-1 uppercase font-bold text-[9px] tracking-wider">Date Closed</span>
-                  <span className="font-mono text-gray-400">{new Date(caseData.date_closed).toLocaleString()}</span>
+                  <span className="font-mono text-muted-foreground">{new Date(caseData.date_closed).toLocaleString()}</span>
                 </div>
               )}
             </div>

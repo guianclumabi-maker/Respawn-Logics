@@ -344,7 +344,7 @@ export function ELRTemplates() {
           </div>
         ) : templates.length === 0 ? (
           <div className="bg-white dark:bg-[#0f1422]/80 border border-gray-200 dark:border-[#2a2d36] rounded-2xl p-12 text-center">
-            <FileText className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+            <FileText className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
             <h3 className="text-lg font-bold text-slate-800 dark:text-white mb-2">No templates found</h3>
             <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">Create your first document template to standardize ELR case communications.</p>
             <button 
@@ -380,7 +380,7 @@ export function ELRTemplates() {
                 </p>
                 
                 <div className="flex items-center justify-between pt-4 border-t border-gray-100 dark:border-white/[0.05]">
-                  <div className="text-xs text-gray-400">
+                  <div className="text-xs text-muted-foreground">
                     {tmpl.merge_fields && tmpl.merge_fields.length > 0 ? (
                       <span>{tmpl.merge_fields.length} dynamic fields</span>
                     ) : (

@@ -15,17 +15,17 @@ export function PerformanceAdmin() {
 
   return (
     <ThemeProvider attribute="data-theme" defaultTheme="dark">
-      <div className="h-full w-full flex-1 overflow-y-auto bg-[#0b0f1a] text-slate-200 p-8">
+      <div className="h-full w-full flex-1 overflow-y-auto bg-background text-slate-200 p-8">
         <div className="max-w-6xl mx-auto space-y-8">
           
           <div>
             <h1 className="text-3xl font-bold text-white mb-2" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>Performance & Talent Management</h1>
-            <p className="text-slate-400">Evaluate your team and calibrate talent.</p>
+            <p className="text-muted-foreground">Evaluate your team and calibrate talent.</p>
           </div>
 
-          <div className="flex border-b border-white/10 mb-6">
+          <div className="flex border-b border-border mb-6">
             <button 
-              className={`px-6 py-3 text-sm font-semibold border-b-2 transition-colors ${activeTab === 'team' ? 'text-[#00e07a] border-[#00e07a]' : 'text-slate-400 border-transparent hover:text-white'}`}
+              className={`px-6 py-3 text-sm font-semibold border-b-2 transition-colors ${activeTab === 'team' ? 'text-[#00e07a] border-[#00e07a]' : 'text-muted-foreground border-transparent hover:text-foreground'}`}
               onClick={() => setActiveTab('team')}
             >
               <div className="flex items-center gap-2"><Users size={18} /> Team Reviews</div>
@@ -33,13 +33,13 @@ export function PerformanceAdmin() {
             {isManager && (
               <>
                 <button 
-                  className={`px-6 py-3 text-sm font-semibold border-b-2 transition-colors ${activeTab === 'cycles' ? 'text-[#00e07a] border-[#00e07a]' : 'text-slate-400 border-transparent hover:text-white'}`}
+                  className={`px-6 py-3 text-sm font-semibold border-b-2 transition-colors ${activeTab === 'cycles' ? 'text-[#00e07a] border-[#00e07a]' : 'text-muted-foreground border-transparent hover:text-foreground'}`}
                   onClick={() => setActiveTab('cycles')}
                 >
                   <div className="flex items-center gap-2"><Calendar size={18} /> Review Cycles</div>
                 </button>
                 <button 
-                  className={`px-6 py-3 text-sm font-semibold border-b-2 transition-colors ${activeTab === 'ninebox' ? 'text-[#00e07a] border-[#00e07a]' : 'text-slate-400 border-transparent hover:text-white'}`}
+                  className={`px-6 py-3 text-sm font-semibold border-b-2 transition-colors ${activeTab === 'ninebox' ? 'text-[#00e07a] border-[#00e07a]' : 'text-muted-foreground border-transparent hover:text-foreground'}`}
                   onClick={() => setActiveTab('ninebox')}
                 >
                   <div className="flex items-center gap-2"><Activity size={18} /> 9-Box Calibration</div>
@@ -48,7 +48,7 @@ export function PerformanceAdmin() {
             )}
           </div>
 
-          <div className="bg-[#141929] border border-white/5 rounded-xl p-6">
+          <div className="bg-[#141929] border border-border rounded-xl p-6">
             {activeTab === 'team' && <TeamReviews />}
             {isManager && activeTab === 'cycles' && <ReviewCycles />}
             {isManager && activeTab === 'ninebox' && <NineBoxCalibration />}
@@ -95,18 +95,18 @@ function TeamReviews() {
         <table className="w-full text-left border-collapse">
           <thead>
             <tr>
-              <th className="p-4 text-xs font-semibold text-slate-400 uppercase border-b border-white/5">Employee</th>
-              <th className="p-4 text-xs font-semibold text-slate-400 uppercase border-b border-white/5">Cycle</th>
-              <th className="p-4 text-xs font-semibold text-slate-400 uppercase border-b border-white/5">Status</th>
-              <th className="p-4 text-xs font-semibold text-slate-400 uppercase border-b border-white/5 text-right">Actions</th>
+              <th className="p-4 text-xs font-semibold text-muted-foreground uppercase border-b border-border">Employee</th>
+              <th className="p-4 text-xs font-semibold text-muted-foreground uppercase border-b border-border">Cycle</th>
+              <th className="p-4 text-xs font-semibold text-muted-foreground uppercase border-b border-border">Status</th>
+              <th className="p-4 text-xs font-semibold text-muted-foreground uppercase border-b border-border text-right">Actions</th>
             </tr>
           </thead>
           <tbody>
             {reviews.map(r => (
-              <tr key={r.id} className="border-b border-white/5 hover:bg-white/5">
+              <tr key={r.id} className="border-b border-border hover:bg-accent">
                 <td className="p-4">
                   <div className="font-semibold text-white">{r.employee_name}</div>
-                  <div className="text-xs text-slate-400">{r.job_title || 'N/A'}</div>
+                  <div className="text-xs text-muted-foreground">{r.job_title || 'N/A'}</div>
                 </td>
                 <td className="p-4 text-sm text-slate-300">{r.cycle_name}</td>
                 <td className="p-4 text-sm">
@@ -150,33 +150,33 @@ function EvalModal({ review, onClose, onSubmit }: { review: any, onClose: () => 
 
   return (
     <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div className="bg-[#161922] border border-white/10 rounded-xl w-full max-w-lg flex flex-col max-h-[90vh]">
-        <div className="p-6 border-b border-white/10 flex justify-between items-center">
+      <div className="bg-card text-card-foreground border border-border rounded-xl w-full max-w-lg flex flex-col max-h-[90vh]">
+        <div className="p-6 border-b border-border flex justify-between items-center">
           <h3 className="text-lg font-bold text-white">Evaluate Employee</h3>
-          <button onClick={onClose} className="text-slate-400 hover:text-white"><X size={20}/></button>
+          <button onClick={onClose} className="text-muted-foreground hover:text-white"><X size={20}/></button>
         </div>
         <div className="p-6 overflow-y-auto">
           <div className="bg-white/5 p-4 rounded-lg mb-6">
             <h4 className="text-sm font-semibold text-white mb-2">Employee's Self Evaluation</h4>
-            <p className="text-sm text-slate-400 italic">{review.self_comments || 'No self evaluation submitted.'}</p>
+            <p className="text-sm text-muted-foreground italic">{review.self_comments || 'No self evaluation submitted.'}</p>
           </div>
           <form onSubmit={submit} className="space-y-4">
             <div>
-              <label className="block text-xs font-medium text-slate-400 mb-1">Overall Score (1.0 to 5.0)</label>
-              <input type="number" step="0.1" min="1" max="5" value={score} onChange={e=>setScore(e.target.value)} required className="w-full bg-black/20 border border-white/10 rounded-md p-3 text-sm text-white focus:outline-none focus:border-[#00e07a]/50" />
+              <label className="block text-xs font-medium text-muted-foreground mb-1">Overall Score (1.0 to 5.0)</label>
+              <input type="number" step="0.1" min="1" max="5" value={score} onChange={e=>setScore(e.target.value)} required className="w-full bg-input border-border border border-border rounded-md p-3 text-sm text-white focus:outline-none focus:border-[#00e07a]/50" />
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs font-medium text-slate-400 mb-1">9-Box: Performance</label>
-                <select value={perf} onChange={e=>setPerf(e.target.value)} required className="w-full bg-black/20 border border-white/10 rounded-md p-3 text-sm text-white focus:outline-none focus:border-[#00e07a]/50">
+                <label className="block text-xs font-medium text-muted-foreground mb-1">9-Box: Performance</label>
+                <select value={perf} onChange={e=>setPerf(e.target.value)} required className="w-full bg-input border-border border border-border rounded-md p-3 text-sm text-white focus:outline-none focus:border-[#00e07a]/50">
                   <option value="1">1 - Below</option>
                   <option value="2">2 - Meets</option>
                   <option value="3">3 - Exceeds</option>
                 </select>
               </div>
               <div>
-                <label className="block text-xs font-medium text-slate-400 mb-1">9-Box: Potential</label>
-                <select value={pot} onChange={e=>setPot(e.target.value)} required className="w-full bg-black/20 border border-white/10 rounded-md p-3 text-sm text-white focus:outline-none focus:border-[#00e07a]/50">
+                <label className="block text-xs font-medium text-muted-foreground mb-1">9-Box: Potential</label>
+                <select value={pot} onChange={e=>setPot(e.target.value)} required className="w-full bg-input border-border border border-border rounded-md p-3 text-sm text-white focus:outline-none focus:border-[#00e07a]/50">
                   <option value="1">1 - Low</option>
                   <option value="2">2 - Moderate</option>
                   <option value="3">3 - High</option>
@@ -184,8 +184,8 @@ function EvalModal({ review, onClose, onSubmit }: { review: any, onClose: () => 
               </div>
             </div>
             <div>
-              <label className="block text-xs font-medium text-slate-400 mb-1">Manager Comments (Final)</label>
-              <textarea rows={4} value={comments} onChange={e=>setComments(e.target.value)} required placeholder="Constructive feedback..." className="w-full bg-black/20 border border-white/10 rounded-md p-3 text-sm text-white focus:outline-none focus:border-[#00e07a]/50"></textarea>
+              <label className="block text-xs font-medium text-muted-foreground mb-1">Manager Comments (Final)</label>
+              <textarea rows={4} value={comments} onChange={e=>setComments(e.target.value)} required placeholder="Constructive feedback..." className="w-full bg-input border-border border border-border rounded-md p-3 text-sm text-white focus:outline-none focus:border-[#00e07a]/50"></textarea>
             </div>
             <button type="submit" className="w-full bg-[#00e07a] text-black font-bold py-3 rounded-md hover:bg-white transition-colors">Finalize Review</button>
           </form>
@@ -239,22 +239,22 @@ function ReviewCycles() {
         <table className="w-full text-left border-collapse">
           <thead>
             <tr>
-              <th className="p-4 text-xs font-semibold text-slate-400 uppercase border-b border-white/5">Name</th>
-              <th className="p-4 text-xs font-semibold text-slate-400 uppercase border-b border-white/5">Period</th>
-              <th className="p-4 text-xs font-semibold text-slate-400 uppercase border-b border-white/5">Status</th>
-              <th className="p-4 text-xs font-semibold text-slate-400 uppercase border-b border-white/5 text-right">Actions</th>
+              <th className="p-4 text-xs font-semibold text-muted-foreground uppercase border-b border-border">Name</th>
+              <th className="p-4 text-xs font-semibold text-muted-foreground uppercase border-b border-border">Period</th>
+              <th className="p-4 text-xs font-semibold text-muted-foreground uppercase border-b border-border">Status</th>
+              <th className="p-4 text-xs font-semibold text-muted-foreground uppercase border-b border-border text-right">Actions</th>
             </tr>
           </thead>
           <tbody>
             {cycles.map(c => (
-              <tr key={c.id} className="border-b border-white/5 hover:bg-white/5">
+              <tr key={c.id} className="border-b border-border hover:bg-accent">
                 <td className="p-4 font-semibold text-white">{c.name}</td>
                 <td className="p-4 text-sm text-slate-300">{c.start_date} to {c.end_date}</td>
                 <td className="p-4 text-sm">
                   <span className="px-3 py-1 rounded-full text-xs font-bold bg-[#00e07a]/10 text-[#00e07a] border border-[#00e07a]/20">{c.status}</span>
                 </td>
                 <td className="p-4 text-right">
-                  <button onClick={() => deploy(c.id)} className="bg-transparent border border-white/20 text-white px-3 py-1.5 rounded text-xs hover:bg-white/10 transition-colors">Deploy Reviews to Company</button>
+                  <button onClick={() => deploy(c.id)} className="bg-transparent border border-white/20 text-white px-3 py-1.5 rounded text-xs hover:bg-accent transition-colors">Deploy Reviews to Company</button>
                 </td>
               </tr>
             ))}
@@ -273,24 +273,24 @@ function CreateCycleModal({ onClose, onSubmit }: { onClose: () => void, onSubmit
   
   return (
     <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div className="bg-[#161922] border border-white/10 rounded-xl w-full max-w-sm flex flex-col">
-        <div className="p-6 border-b border-white/10 flex justify-between items-center">
+      <div className="bg-card text-card-foreground border border-border rounded-xl w-full max-w-sm flex flex-col">
+        <div className="p-6 border-b border-border flex justify-between items-center">
           <h3 className="text-lg font-bold text-white">Create Cycle</h3>
-          <button onClick={onClose} className="text-slate-400 hover:text-white"><X size={20}/></button>
+          <button onClick={onClose} className="text-muted-foreground hover:text-white"><X size={20}/></button>
         </div>
         <div className="p-6">
           <form onSubmit={e => onSubmit(e, { name, start_date: start, end_date: end })} className="space-y-4">
             <div>
-              <label className="block text-xs font-medium text-slate-400 mb-1">Cycle Name</label>
-              <input type="text" value={name} onChange={e=>setName(e.target.value)} required placeholder="e.g. Q3 2026 Annual" className="w-full bg-black/20 border border-white/10 rounded-md p-3 text-sm text-white focus:outline-none focus:border-[#00e07a]/50" />
+              <label className="block text-xs font-medium text-muted-foreground mb-1">Cycle Name</label>
+              <input type="text" value={name} onChange={e=>setName(e.target.value)} required placeholder="e.g. Q3 2026 Annual" className="w-full bg-input border-border border border-border rounded-md p-3 text-sm text-white focus:outline-none focus:border-[#00e07a]/50" />
             </div>
             <div>
-              <label className="block text-xs font-medium text-slate-400 mb-1">Start Date</label>
-              <input type="date" value={start} onChange={e=>setStart(e.target.value)} required className="w-full bg-black/20 border border-white/10 rounded-md p-3 text-sm text-white focus:outline-none focus:border-[#00e07a]/50" />
+              <label className="block text-xs font-medium text-muted-foreground mb-1">Start Date</label>
+              <input type="date" value={start} onChange={e=>setStart(e.target.value)} required className="w-full bg-input border-border border border-border rounded-md p-3 text-sm text-white focus:outline-none focus:border-[#00e07a]/50" />
             </div>
             <div>
-              <label className="block text-xs font-medium text-slate-400 mb-1">End Date</label>
-              <input type="date" value={end} onChange={e=>setEnd(e.target.value)} required className="w-full bg-black/20 border border-white/10 rounded-md p-3 text-sm text-white focus:outline-none focus:border-[#00e07a]/50" />
+              <label className="block text-xs font-medium text-muted-foreground mb-1">End Date</label>
+              <input type="date" value={end} onChange={e=>setEnd(e.target.value)} required className="w-full bg-input border-border border border-border rounded-md p-3 text-sm text-white focus:outline-none focus:border-[#00e07a]/50" />
             </div>
             <button type="submit" className="w-full bg-[#00e07a] text-black font-bold py-3 rounded-md hover:bg-white transition-colors">Create</button>
           </form>
@@ -337,7 +337,7 @@ function NineBoxCalibration() {
     <div className={`rounded-xl p-3 flex flex-wrap gap-2 content-start min-h-[140px] border ${color}`}>
       <div className="w-full text-center text-[0.65rem] font-bold uppercase tracking-wider text-white/50 mb-2">{title}</div>
       {getBoxEmps(p, pt).map((emp, i) => (
-        <div key={i} title={`${emp.full_name} - Score: ${emp.overall_score_1_to_5}`} className="w-8 h-8 rounded-full bg-[#222] text-white border-2 border-white flex items-center justify-center text-xs font-bold shadow-lg hover:scale-110 hover:z-10 transition-transform cursor-pointer">
+        <div key={i} title={`${emp.full_name} - Score: ${emp.overall_score_1_to_5}`} className="w-8 h-8 rounded-full bg-[#222] text-foreground border-2 border-white flex items-center justify-center text-xs font-bold shadow-lg hover:scale-110 hover:z-10 transition-transform cursor-pointer">
           {getInitials(emp.full_name)}
         </div>
       ))}
@@ -348,12 +348,12 @@ function NineBoxCalibration() {
     <div>
       <div className="flex justify-between items-center mb-6">
         <h3 className="text-lg font-semibold text-white">Talent Grid (9-Box)</h3>
-        <select value={selectedCycle} onChange={e=>setSelectedCycle(e.target.value)} className="bg-black/20 border border-white/10 rounded-md p-2 text-sm text-white focus:outline-none focus:border-[#00e07a]/50">
+        <select value={selectedCycle} onChange={e=>setSelectedCycle(e.target.value)} className="bg-input border-border border border-border rounded-md p-2 text-sm text-white focus:outline-none focus:border-[#00e07a]/50">
           {cycles.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
         </select>
       </div>
 
-      <div className="relative p-8 bg-black/20 rounded-xl border border-white/5 overflow-hidden">
+      <div className="relative p-8 bg-input border-border rounded-xl border border-border overflow-hidden">
         <div className="grid grid-cols-[50px_1fr_1fr_1fr] grid-rows-[1fr_1fr_1fr_50px] gap-3 h-[600px]">
           <div className="col-start-1 row-start-1 row-end-4 flex items-center justify-center">
             <div className="text-slate-500 font-bold uppercase tracking-widest text-xs -rotate-90 whitespace-nowrap">Potential (Future Leader)</div>

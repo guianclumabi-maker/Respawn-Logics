@@ -56,7 +56,7 @@ export function HRDirectory() {
       case "Terminated": return "bg-red-500/10 text-red-500 border-red-500/20";
       case "LOA": return "bg-amber-500/10 text-amber-500 border-amber-500/20";
       case "Probation": return "bg-[#c084fc]/10 text-[#c084fc] border-[#c084fc]/20";
-      default: return "bg-gray-500/10 text-gray-400 border-gray-500/20";
+      default: return "bg-gray-500/10 text-muted-foreground border-gray-500/20";
     }
   };
 
@@ -74,19 +74,19 @@ export function HRDirectory() {
   return (
     <div className="flex-1 flex flex-col h-full overflow-hidden">
       {/* Header */}
-      <div className="flex-none px-8 py-6 border-b border-white/5 bg-[#161922]/50 backdrop-blur-md">
+      <div className="flex-none px-8 py-6 border-b border-border bg-card text-card-foreground/50 backdrop-blur-md">
         <div className="flex justify-between items-start">
           <div>
-            <h1 className="text-2xl font-bold text-white mb-1" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+            <h1 className="text-2xl font-bold text-foreground mb-1" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
               Employee Master Directory
             </h1>
-            <p className="text-sm text-gray-400">Core HR &bull; Manage personnel records</p>
+            <p className="text-sm text-muted-foreground">Core HR &bull; Manage personnel records</p>
           </div>
           <div className="flex gap-3">
             {hasPermission("employees.view") && (
               <button 
                 onClick={handleExport}
-                className="px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/10 text-white rounded-lg text-sm font-medium transition-all flex items-center gap-2 cursor-pointer"
+                className="px-4 py-2 bg-white/5 hover:bg-accent border border-border text-foreground rounded-lg text-sm font-medium transition-all flex items-center gap-2 cursor-pointer"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
                 Export CSV
@@ -102,20 +102,20 @@ export function HRDirectory() {
 
       {/* Main Content */}
       <div className="flex-1 overflow-auto p-8">
-        <div className="bg-[#161922]/70 border border-white/5 rounded-xl flex flex-col max-h-full">
+        <div className="bg-card text-card-foreground/70 border border-border rounded-xl flex flex-col max-h-full">
           {/* Panel Header */}
-          <div className="flex-none p-5 border-b border-white/5 flex justify-between items-center">
+          <div className="flex-none p-5 border-b border-border flex justify-between items-center">
             <div className="relative w-72">
               <input
                 type="text"
                 placeholder="Search employees..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="w-full bg-[#1a1d27]/80 border border-white/10 rounded-lg py-2 pl-9 pr-4 text-white text-sm focus:outline-none focus:border-[#00e07a]/50 transition-colors"
+                className="w-full bg-[#1a1d27]/80 border border-border rounded-lg py-2 pl-9 pr-4 text-white text-sm focus:outline-none focus:border-[#00e07a]/50 transition-colors"
               />
               <svg className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
             </div>
-            <div className="text-sm text-gray-400">
+            <div className="text-sm text-muted-foreground">
               {filteredEmployees.length} record{filteredEmployees.length !== 1 ? "s" : ""}
             </div>
           </div>
@@ -123,17 +123,17 @@ export function HRDirectory() {
           {/* Table */}
           <div className="flex-1 overflow-auto">
             {loading ? (
-              <div className="p-8 text-center text-gray-400">Loading directory...</div>
+              <div className="p-8 text-center text-muted-foreground">Loading directory...</div>
             ) : filteredEmployees.length === 0 ? (
               <div className="p-8 text-center text-gray-500">No employees found.</div>
             ) : (
               <table className="w-full text-left border-collapse">
-                <thead className="sticky top-0 bg-[#161922] shadow-sm z-10">
+                <thead className="sticky top-0 bg-card text-card-foreground shadow-sm z-10">
                   <tr>
-                    <th className="py-3 px-5 text-xs font-semibold text-gray-500 uppercase tracking-wider border-b border-white/5">Employee</th>
-                    <th className="py-3 px-5 text-xs font-semibold text-gray-500 uppercase tracking-wider border-b border-white/5">Role & Department</th>
-                    <th className="py-3 px-5 text-xs font-semibold text-gray-500 uppercase tracking-wider border-b border-white/5">Status</th>
-                    <th className="py-3 px-5 text-xs font-semibold text-gray-500 uppercase tracking-wider border-b border-white/5 text-right">Actions</th>
+                    <th className="py-3 px-5 text-xs font-semibold text-gray-500 uppercase tracking-wider border-b border-border">Employee</th>
+                    <th className="py-3 px-5 text-xs font-semibold text-gray-500 uppercase tracking-wider border-b border-border">Role & Department</th>
+                    <th className="py-3 px-5 text-xs font-semibold text-gray-500 uppercase tracking-wider border-b border-border">Status</th>
+                    <th className="py-3 px-5 text-xs font-semibold text-gray-500 uppercase tracking-wider border-b border-border text-right">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -160,7 +160,7 @@ export function HRDirectory() {
                         </span>
                       </td>
                       <td className="py-4 px-5 align-middle text-right">
-                        <button className="px-3 py-1.5 bg-transparent border border-white/10 rounded text-xs font-medium text-white hover:bg-white/5 hover:border-white/20 transition-all">
+                        <button className="px-3 py-1.5 bg-transparent border border-border rounded text-xs font-medium text-white hover:bg-accent hover:border-white/20 transition-all">
                           View Master
                         </button>
                       </td>

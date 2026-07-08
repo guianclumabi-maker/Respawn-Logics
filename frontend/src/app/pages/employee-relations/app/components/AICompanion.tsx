@@ -116,7 +116,7 @@ export function AICompanion() {
   };
 
   return (
-    <div className="flex-1 flex flex-col bg-[#06070a] text-white p-6 h-full overflow-hidden">
+    <div className="flex-1 flex flex-col bg-background text-foreground p-6 h-full overflow-hidden">
       {/* Header */}
       <div className="flex items-center gap-3 mb-6">
         <div className="w-10 h-10 rounded-full bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center shadow-[0_0_15px_rgba(6,182,212,0.15)]">
@@ -124,7 +124,7 @@ export function AICompanion() {
         </div>
         <div>
           <h1 className="text-xl font-bold font-['Space_Grotesk']">ELR Labor Relations Copilot</h1>
-          <p className="text-sm text-gray-400">Grounded statutory legal reasoning and Supreme Court jurisprudence Q&A</p>
+          <p className="text-sm text-muted-foreground">Grounded statutory legal reasoning and Supreme Court jurisprudence Q&A</p>
         </div>
       </div>
 
@@ -132,7 +132,7 @@ export function AICompanion() {
       <div className="flex-1 flex flex-col gap-6 overflow-hidden">
         
         {/* Input panel */}
-        <div className="bg-[#0f121d]/40 border border-white/5 p-6 rounded-2xl space-y-4">
+        <div className="bg-[#0f121d]/40 border border-border p-6 rounded-2xl space-y-4">
           <form 
             onSubmit={(e) => { e.preventDefault(); handleAsk(question); }}
             className="flex gap-3"
@@ -142,7 +142,7 @@ export function AICompanion() {
               value={question}
               onChange={(e) => setQuestion(e.target.value)}
               placeholder="Ask a labor relations question (e.g., 'What are the steps for Twin Notice Rule?')"
-              className="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-cyan-500/50 focus:bg-white/10 transition-all text-sm font-sans"
+              className="flex-1 bg-white/5 border border-border rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-cyan-500/50 focus:bg-white/10 transition-all text-sm font-sans"
             />
             <button
               type="submit"
@@ -162,7 +162,7 @@ export function AICompanion() {
                   key={i}
                   onClick={() => handleAsk(sug)}
                   disabled={loading}
-                  className="px-3.5 py-1.5 bg-white/5 hover:bg-white/10 border border-white/10 rounded-full text-xs text-gray-300 transition-colors disabled:opacity-50"
+                  className="px-3.5 py-1.5 bg-white/5 hover:bg-accent border border-border rounded-full text-xs text-gray-300 transition-colors disabled:opacity-50"
                 >
                   {sug}
                 </button>
@@ -172,10 +172,10 @@ export function AICompanion() {
         </div>
 
         {/* Output Panel / Workspace */}
-        <div className="flex-1 bg-[#0d0f19] border border-white/5 rounded-2xl overflow-hidden flex flex-col relative shadow-2xl">
+        <div className="flex-1 bg-[#0d0f19] border border-border rounded-2xl overflow-hidden flex flex-col relative shadow-2xl">
           
           {loading ? (
-            <div className="flex-1 flex flex-col items-center justify-center gap-3 text-gray-400">
+            <div className="flex-1 flex flex-col items-center justify-center gap-3 text-muted-foreground">
               <Loader2 className="w-8 h-8 animate-spin text-cyan-400" />
               <p className="text-sm font-medium">Scanning Statutory Corpus & SC Decisions...</p>
             </div>
@@ -183,14 +183,14 @@ export function AICompanion() {
             <div className="flex-1 flex flex-col items-center justify-center p-6 text-center space-y-3">
               <AlertTriangle className="w-10 h-10 text-red-500" />
               <h3 className="text-lg font-bold text-white">Copilot Exception</h3>
-              <p className="text-sm text-gray-400 max-w-md">{error}</p>
+              <p className="text-sm text-muted-foreground max-w-md">{error}</p>
             </div>
           ) : result ? (
             <div className="flex-1 flex flex-col lg:flex-row overflow-hidden divide-y lg:divide-y-0 lg:divide-x divide-white/5">
               
               {/* Answer Column */}
               <div className="flex-1 p-6 overflow-y-auto space-y-4">
-                <div className="border-b border-white/5 pb-2">
+                <div className="border-b border-border pb-2">
                   <span className="text-xs font-bold text-cyan-400 uppercase tracking-wider block">Copilot Response</span>
                 </div>
 
@@ -212,8 +212,8 @@ export function AICompanion() {
 
               {/* Sources Column */}
               <div className="w-full lg:w-80 p-6 overflow-y-auto space-y-4 bg-black/10 flex-shrink-0">
-                <div className="border-b border-white/5 pb-2">
-                  <span className="text-xs font-bold text-gray-400 uppercase tracking-wider block">Grounded Sources</span>
+                <div className="border-b border-border pb-2">
+                  <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider block">Grounded Sources</span>
                 </div>
 
                 {result.web_fallback && (
@@ -225,7 +225,7 @@ export function AICompanion() {
 
                 <div className="space-y-3">
                   {result.sources.map((src, i) => (
-                    <div key={i} className="bg-white/[0.02] border border-white/5 p-3.5 rounded-xl space-y-2 hover:border-cyan-500/20 transition-all">
+                    <div key={i} className="bg-white/[0.02] border border-border p-3.5 rounded-xl space-y-2 hover:border-cyan-500/20 transition-all">
                       <div className="flex items-center gap-2">
                         {src.type === "reference" ? (
                           <BookOpen className="w-4 h-4 text-cyan-400 flex-shrink-0" />
@@ -237,11 +237,11 @@ export function AICompanion() {
                         </span>
                       </div>
                       
-                      <div className="text-xs font-bold text-white line-clamp-2">
+                      <div className="text-xs font-bold text-foreground line-clamp-2">
                         {src.title}
                       </div>
 
-                      <div className="text-[11px] text-gray-400">
+                      <div className="text-[11px] text-muted-foreground">
                         {src.reference}
                       </div>
 
@@ -282,7 +282,7 @@ export function AICompanion() {
           )}
 
           {/* Disclaimer / Bottom bar */}
-          <div className="p-4 bg-[#0d0f19] border-t border-white/5 flex items-center justify-center gap-1.5 text-center text-xs text-gray-500">
+          <div className="p-4 bg-[#0d0f19] border-t border-border flex items-center justify-center gap-1.5 text-center text-xs text-gray-500">
             <Info size={14} className="text-[#00e07a] flex-shrink-0" />
             <span>Guidance only, not legal advice. Avoid pasting sensitive employee details.</span>
           </div>

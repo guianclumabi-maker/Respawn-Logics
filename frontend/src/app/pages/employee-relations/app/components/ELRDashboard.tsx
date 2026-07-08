@@ -144,12 +144,12 @@ export function ELRDashboard({ onViewChange }: ELRDashboardProps) {
                     <div key={c.id} className="pt-4 first:pt-0 flex justify-between items-center">
                       <div>
                         <div className="flex items-center gap-2">
-                          <span className="font-semibold text-white hover:underline cursor-pointer" onClick={() => onViewChange("Cases")}>
+                          <span className="font-semibold text-foreground hover:underline cursor-pointer" onClick={() => onViewChange("Cases")}>
                             {c.case_number}
                           </span>
                           <span className="text-xs text-gray-500">({c.employee_id})</span>
                         </div>
-                        <p className="text-xs text-gray-400 mt-1">{c.case_type_name || "General Inquiry"} • {c.department}</p>
+                        <p className="text-xs text-muted-foreground mt-1">{c.case_type_name || "General Inquiry"} • {c.department}</p>
                       </div>
                       <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase border bg-blue-500/10 text-blue-400 border-blue-500/20`}>
                         {c.status}
@@ -183,7 +183,7 @@ export function ELRDashboard({ onViewChange }: ELRDashboardProps) {
                           <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: chan.color }}></div>
                           <span className="text-gray-300 font-medium">{chan.source}</span>
                         </div>
-                        <span className="font-mono text-gray-400 font-bold">{chan.applications} cases ({chan.percentage}%)</span>
+                        <span className="font-mono text-muted-foreground font-bold">{chan.applications} cases ({chan.percentage}%)</span>
                       </div>
                     ))}
                   </div>

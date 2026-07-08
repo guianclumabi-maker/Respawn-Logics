@@ -273,7 +273,7 @@ export function ELRPipelines() {
             <div className="flex justify-center py-20"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#00e07a]"></div></div>
           ) : pipelines.length === 0 ? (
             <div className="bg-white dark:bg-[#0f1422]/80 border border-gray-200 dark:border-[#2a2d36] rounded-2xl p-12 text-center">
-              <GitBranch className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+              <GitBranch className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
               <h3 className="text-lg font-bold mb-2">No pipelines configured</h3>
               <p className="text-sm text-gray-500 mb-6">Create a pipeline to structure your employee relations cases.</p>
               <button 
@@ -303,10 +303,10 @@ export function ELRPipelines() {
                   
                   <div className="flex items-center justify-between pt-4 border-t border-gray-100 dark:border-white/[0.05]">
                     <div className="flex gap-4">
-                      <div className="flex items-center gap-1.5 text-xs font-mono text-gray-400">
+                      <div className="flex items-center gap-1.5 text-xs font-mono text-muted-foreground">
                         <ListOrdered size={14} /> {pipe.stage_count || 0} stages
                       </div>
-                      <div className="flex items-center gap-1.5 text-xs font-mono text-gray-400">
+                      <div className="flex items-center gap-1.5 text-xs font-mono text-muted-foreground">
                         <CheckCircle size={14} /> {pipe.active_cases || 0} active
                       </div>
                     </div>
@@ -443,7 +443,7 @@ export function ELRPipelines() {
           <div className="flex justify-center py-20"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#00e07a]"></div></div>
         ) : stages.length === 0 ? (
           <div className="bg-white dark:bg-[#0f1422]/80 border border-gray-200 dark:border-[#2a2d36] rounded-2xl p-12 text-center">
-            <ListOrdered className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+            <ListOrdered className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
             <h3 className="text-lg font-bold mb-2">No stages defined</h3>
             <p className="text-sm text-gray-500 mb-6">Build your workflow by adding the first stage.</p>
           </div>

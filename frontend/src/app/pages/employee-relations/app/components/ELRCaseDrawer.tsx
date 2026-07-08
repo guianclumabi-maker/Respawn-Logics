@@ -269,7 +269,7 @@ export function ELRCaseDrawer({ cardId, onClose, onUpdate }: ELRCaseDrawerProps)
               <div>
                 <h3 className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-3 border-b border-gray-100 dark:border-white/5 pb-2 flex items-center gap-2"><FileText size={14}/> Documents & Issuances ({cardDetails.documents.length})</h3>
                 {cardDetails.documents.length === 0 ? (
-                  <p className="text-sm text-gray-400 italic">No documents generated yet.</p>
+                  <p className="text-sm text-muted-foreground italic">No documents generated yet.</p>
                 ) : (
                   <div className="space-y-4">
                     {cardDetails.documents.map(doc => (
@@ -277,7 +277,7 @@ export function ELRCaseDrawer({ cardId, onClose, onUpdate }: ELRCaseDrawerProps)
                         <div className="px-4 py-3 border-b border-gray-200 dark:border-[#2a2d36] flex justify-between items-center bg-white dark:bg-[#1a1f2e]">
                           <div>
                             <div className="font-bold text-sm text-slate-900 dark:text-white">{doc.title}</div>
-                            <div className="text-[10px] text-gray-400 font-mono mt-0.5">{new Date(doc.generated_at).toLocaleString()} • {doc.doc_type}</div>
+                            <div className="text-[10px] text-muted-foreground font-mono mt-0.5">{new Date(doc.generated_at).toLocaleString()} • {doc.doc_type}</div>
                           </div>
                           <button 
                             onClick={() => handlePrint(doc.content, doc.title)}
@@ -366,7 +366,7 @@ export function ELRCaseDrawer({ cardId, onClose, onUpdate }: ELRCaseDrawerProps)
                 )}
 
                 {hearings.length === 0 && !showHearingForm ? (
-                  <p className="text-sm text-gray-400 italic">No hearings scheduled.</p>
+                  <p className="text-sm text-muted-foreground italic">No hearings scheduled.</p>
                 ) : (
                   <div className="space-y-3">
                     {hearings.map(h => (
@@ -417,7 +417,7 @@ export function ELRCaseDrawer({ cardId, onClose, onUpdate }: ELRCaseDrawerProps)
                 )}
 
                 {approvals.length === 0 && !showApprovalForm ? (
-                  <p className="text-sm text-gray-400 italic">No approvals requested.</p>
+                  <p className="text-sm text-muted-foreground italic">No approvals requested.</p>
                 ) : (
                   <div className="space-y-3">
                     {approvals.map(a => (
@@ -480,7 +480,7 @@ export function ELRCaseDrawer({ cardId, onClose, onUpdate }: ELRCaseDrawerProps)
         {/* Global Toast */}
         {toast && (
           <div className={`absolute bottom-6 left-1/2 -translate-x-1/2 px-4 py-2 rounded-lg text-sm font-bold shadow-lg z-50 animate-in slide-in-from-bottom flex items-center gap-2 ${
-            toast.isError ? "bg-red-500 text-white" : "bg-[#00e07a] text-black"
+            toast.isError ? "bg-red-500 text-foreground" : "bg-[#00e07a] text-black"
           }`}>
             {toast.isError ? <AlertCircle size={16} /> : <CheckCircle size={16} />}
             {toast.message}

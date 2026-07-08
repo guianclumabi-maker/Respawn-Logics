@@ -73,7 +73,7 @@ export function ExpensesAdmin() {
   if (loading) return <div className="p-8 text-white">Loading...</div>;
 
   return (
-    <div className="flex flex-col h-full bg-[#0b0f19] text-[#8899b4] p-6 relative font-['Inter',sans-serif]">
+    <div className="flex flex-col h-full bg-background text-muted-foreground p-6 relative font-['Inter',sans-serif]">
       {/* Ambient Glow */}
       <div className="absolute top-0 right-1/4 w-96 h-96 bg-green-500/5 blur-[120px] pointer-events-none rounded-full" />
 
@@ -81,21 +81,21 @@ export function ExpensesAdmin() {
       <div className="flex justify-between items-start mb-6 z-10">
         <div>
           <h1 className="text-2xl font-bold text-white mb-1">Expense & Claims Console</h1>
-          <p className="text-sm text-slate-400">Approve employee reimbursements and queue for payroll.</p>
+          <p className="text-sm text-muted-foreground">Approve employee reimbursements and queue for payroll.</p>
         </div>
       </div>
 
       {/* Tabs */}
-      <div className="flex border-b border-white/10 mb-6 z-10">
+      <div className="flex border-b border-border mb-6 z-10">
         <button 
-          className={`px-6 py-3 text-sm font-semibold transition-all border-b-2 ${activeTab === 'manager' ? 'text-[#00e07a] border-[#00e07a]' : 'text-slate-400 border-transparent hover:text-white'}`}
+          className={`px-6 py-3 text-sm font-semibold transition-all border-b-2 ${activeTab === 'manager' ? 'text-[#00e07a] border-[#00e07a]' : 'text-muted-foreground border-transparent hover:text-foreground'}`}
           onClick={() => setActiveTab('manager')}
         >
           Manager Approvals (My Team)
         </button>
         {hasPermission('expenses.manage') && (
           <button 
-            className={`px-6 py-3 text-sm font-semibold transition-all border-b-2 ${activeTab === 'finance' ? 'text-[#00e07a] border-[#00e07a]' : 'text-slate-400 border-transparent hover:text-white'}`}
+            className={`px-6 py-3 text-sm font-semibold transition-all border-b-2 ${activeTab === 'finance' ? 'text-[#00e07a] border-[#00e07a]' : 'text-muted-foreground border-transparent hover:text-foreground'}`}
             onClick={() => setActiveTab('finance')}
           >
             Finance Approvals (All Teams)
@@ -105,8 +105,8 @@ export function ExpensesAdmin() {
 
       {/* Panel */}
       <div className="flex-1 overflow-y-auto z-10">
-        <div className="bg-[#161922]/70 border border-white/10 rounded-xl p-5">
-          <h3 className="text-lg text-white font-medium mb-5">
+        <div className="bg-card text-card-foreground/70 border border-border rounded-xl p-5">
+          <h3 className="text-lg text-foreground font-medium mb-5">
             {activeTab === 'manager' ? 'Pending Manager Approval' : 'Pending Finance Approval'}
           </h3>
           
@@ -114,50 +114,50 @@ export function ExpensesAdmin() {
             <table className="w-full border-collapse min-w-[800px]">
               <thead>
                 <tr>
-                  <th className="text-left p-3 text-xs font-semibold uppercase text-slate-400 border-b border-white/10">Employee</th>
-                  <th className="text-left p-3 text-xs font-semibold uppercase text-slate-400 border-b border-white/10">Date / Category</th>
-                  <th className="text-left p-3 text-xs font-semibold uppercase text-slate-400 border-b border-white/10">Amount</th>
-                  <th className="text-left p-3 text-xs font-semibold uppercase text-slate-400 border-b border-white/10">Receipt</th>
-                  <th className="text-right p-3 text-xs font-semibold uppercase text-slate-400 border-b border-white/10">Actions</th>
+                  <th className="text-left p-3 text-xs font-semibold uppercase text-muted-foreground border-b border-border">Employee</th>
+                  <th className="text-left p-3 text-xs font-semibold uppercase text-muted-foreground border-b border-border">Date / Category</th>
+                  <th className="text-left p-3 text-xs font-semibold uppercase text-muted-foreground border-b border-border">Amount</th>
+                  <th className="text-left p-3 text-xs font-semibold uppercase text-muted-foreground border-b border-border">Receipt</th>
+                  <th className="text-right p-3 text-xs font-semibold uppercase text-muted-foreground border-b border-border">Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {isLoading ? (
-                  <tr><td colSpan={5} className="text-center p-8 text-slate-400">Loading claims...</td></tr>
+                  <tr><td colSpan={5} className="text-center p-8 text-muted-foreground">Loading claims...</td></tr>
                 ) : claims.length === 0 ? (
-                  <tr><td colSpan={5} className="text-center p-8 text-slate-400">
+                  <tr><td colSpan={5} className="text-center p-8 text-muted-foreground">
                     {activeTab === 'manager' ? 'No pending team claims.' : 'No pending finance approvals.'}
                   </td></tr>
                 ) : (
                   claims.map(e => (
                     <tr key={e.id} className="hover:bg-white/[0.02]">
-                      <td className="p-4 border-b border-white/5 text-white text-sm align-middle">
+                      <td className="p-4 border-b border-border text-foreground text-sm align-middle">
                         <strong>{e.employee_name}</strong>
                       </td>
-                      <td className="p-4 border-b border-white/5 align-middle">
+                      <td className="p-4 border-b border-border align-middle">
                         <div className="text-white text-sm">{e.expense_date}</div>
-                        <div className="text-xs text-slate-400">{e.category_name}</div>
+                        <div className="text-xs text-muted-foreground">{e.category_name}</div>
                       </td>
-                      <td className="p-4 border-b border-white/5 text-[#00e07a] font-bold text-sm align-middle">
+                      <td className="p-4 border-b border-border text-[#00e07a] font-bold text-sm align-middle">
                         ${parseFloat(e.amount).toLocaleString()}
                       </td>
-                      <td className="p-4 border-b border-white/5 align-middle">
+                      <td className="p-4 border-b border-border align-middle">
                         {e.receipt_path ? (
                           <a href={`${API_BASE}${e.receipt_path.startsWith('/') ? '' : '/'}${e.receipt_path}`} target="_blank" rel="noreferrer" className="text-[#00e07a] hover:underline text-sm">
                             View File
                           </a>
                         ) : <span className="text-sm text-slate-500">None</span>}
                       </td>
-                      <td className="p-4 border-b border-white/5 text-right align-middle">
+                      <td className="p-4 border-b border-border text-right align-middle">
                         <div className="flex gap-2 justify-end">
                           <button 
-                            className="bg-[#00e07a]/10 hover:bg-[#00e07a] text-[#00e07a] hover:text-white border border-[#00e07a] px-3 py-1.5 rounded text-xs transition-colors"
+                            className="bg-[#00e07a]/10 hover:bg-[#00e07a] text-[#00e07a] hover:text-foreground border border-[#00e07a] px-3 py-1.5 rounded text-xs transition-colors"
                             onClick={() => approveClaim(e.id, 'Approve')}
                           >
                             {activeTab === 'finance' ? 'Clear for Payout' : 'Approve'}
                           </button>
                           <button 
-                            className="bg-red-500/10 hover:bg-red-500 text-red-500 hover:text-white border border-red-500 px-3 py-1.5 rounded text-xs transition-colors"
+                            className="bg-red-500/10 hover:bg-red-500 text-red-500 hover:text-foreground border border-red-500 px-3 py-1.5 rounded text-xs transition-colors"
                             onClick={() => approveClaim(e.id, 'Reject')}
                           >
                             Reject

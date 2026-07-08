@@ -66,12 +66,12 @@ export function LoginPage() {
             <i className="fa-solid fa-gamepad text-black text-2xl" />
           </div>
           <h1
-            className="text-2xl font-bold text-white tracking-tight"
+            className="text-2xl font-bold text-foreground tracking-tight"
             style={{ fontFamily: "'Space Grotesk', sans-serif" }}
           >
             Respawn Logics
           </h1>
-          <p className="text-slate-400 text-sm mt-1">Sign in to your workspace</p>
+          <p className="text-muted-foreground text-sm mt-1">Sign in to your workspace</p>
         </div>
 
         {/* Card */}
@@ -90,7 +90,7 @@ export function LoginPage() {
 
             {/* Email */}
             <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
+              <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                 Email address
               </label>
               <input
@@ -100,13 +100,13 @@ export function LoginPage() {
                 placeholder="you@company.com"
                 required
                 autoComplete="email"
-                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-slate-600 text-sm outline-none focus:border-[#00e07a]/50 focus:ring-1 focus:ring-[#00e07a]/20 transition-all"
+                className="w-full bg-white/5 border border-border rounded-xl px-4 py-3 text-white placeholder-slate-600 text-sm outline-none focus:border-[#00e07a]/50 focus:ring-1 focus:ring-[#00e07a]/20 transition-all"
               />
             </div>
 
             {/* Password */}
             <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
+              <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                 Password
               </label>
               <div className="relative">
@@ -117,7 +117,7 @@ export function LoginPage() {
                   placeholder="••••••••"
                   required
                   autoComplete="current-password"
-                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 pr-11 text-white placeholder-slate-600 text-sm outline-none focus:border-[#00e07a]/50 focus:ring-1 focus:ring-[#00e07a]/20 transition-all"
+                  className="w-full bg-white/5 border border-border rounded-xl px-4 py-3 pr-11 text-white placeholder-slate-600 text-sm outline-none focus:border-[#00e07a]/50 focus:ring-1 focus:ring-[#00e07a]/20 transition-all"
                 />
                 <button
                   type="button"
@@ -157,7 +157,7 @@ export function LoginPage() {
           <div className="mt-5 text-center">
             <a
               href={`${window.location.origin}${window.location.hostname === "localhost" ? "/respawn-logics" : ""}/forgot-password.php`}
-              className="text-xs text-slate-400 hover:text-[#00e07a] transition-colors"
+              className="text-xs text-muted-foreground hover:text-[#00e07a] transition-colors"
             >
               Forgot your password?
             </a>

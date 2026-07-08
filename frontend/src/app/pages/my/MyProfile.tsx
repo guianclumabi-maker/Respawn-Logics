@@ -97,21 +97,21 @@ export function MyProfile() {
   };
 
   return (
-    <div className="flex-1 flex flex-col h-full overflow-hidden bg-[#06070a] text-[#c8d0e0]">
+    <div className="flex-1 flex flex-col h-full overflow-hidden bg-background text-foreground">
       {/* Header */}
-      <div className="flex-none px-8 py-6 border-b border-white/5 bg-[#161922]/50 backdrop-blur-md">
+      <div className="flex-none px-8 py-6 border-b border-border bg-card text-card-foreground/50 backdrop-blur-md">
         <div>
-          <h1 className="text-2xl font-bold text-white mb-1 font-['Space_Grotesk']">
+          <h1 className="text-2xl font-bold text-foreground mb-1 font-['Space_Grotesk']">
             My Profile
           </h1>
-          <p className="text-sm text-gray-400">View corporate metadata and edit self-service contact details</p>
+          <p className="text-sm text-muted-foreground">View corporate metadata and edit self-service contact details</p>
         </div>
       </div>
 
       {/* Main Body */}
       <div className="flex-1 overflow-auto p-8 space-y-6">
         {loading ? (
-          <div className="flex flex-col items-center justify-center py-20 gap-3 text-gray-400">
+          <div className="flex flex-col items-center justify-center py-20 gap-3 text-muted-foreground">
             <Loader2 className="w-8 h-8 animate-spin text-[#00e07a]" />
             <p className="text-sm font-medium">Decrypting employee node profile...</p>
           </div>
@@ -119,10 +119,10 @@ export function MyProfile() {
           <div className="flex flex-col items-center justify-center py-16 px-6 bg-red-500/10 border border-red-500/20 rounded-xl max-w-xl mx-auto text-center space-y-3">
             <AlertCircle className="w-10 h-10 text-red-500" />
             <h3 className="text-lg font-bold text-white">Connection Error</h3>
-            <p className="text-sm text-gray-400">{error}</p>
+            <p className="text-sm text-muted-foreground">{error}</p>
             <button 
               onClick={fetchProfile}
-              className="mt-2 px-4 py-2 bg-white/5 hover:bg-white/10 text-white rounded-lg text-xs transition-colors border border-white/10"
+              className="mt-2 px-4 py-2 bg-white/5 hover:bg-accent text-white rounded-lg text-xs transition-colors border border-border"
             >
               Retry Connection
             </button>
@@ -147,7 +147,7 @@ export function MyProfile() {
             )}
 
             {/* Profile Intro Banner */}
-            <div className="bg-[#161922]/70 border border-white/5 rounded-xl p-6 shadow-lg flex flex-col md:flex-row items-center gap-6 relative overflow-hidden">
+            <div className="bg-card text-card-foreground/70 border border-border rounded-xl p-6 shadow-lg flex flex-col md:flex-row items-center gap-6 relative overflow-hidden">
               <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-[#00e07a]/5 to-[#00b8ff]/5 rounded-bl-full pointer-events-none"></div>
               
               <div className="w-20 h-20 rounded-full bg-gradient-to-tr from-[#00e07a] to-[#00b8ff] flex items-center justify-center text-black font-extrabold text-2xl uppercase shadow-[0_0_20px_rgba(0,224,122,0.2)]">
@@ -164,8 +164,8 @@ export function MyProfile() {
             {/* Grid for forms */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* Read Only Corporate Meta */}
-              <div className="bg-[#161922]/70 border border-white/5 rounded-xl p-6 shadow-lg space-y-4">
-                <h3 className="text-sm font-bold text-white uppercase tracking-wider border-b border-white/5 pb-2 flex items-center gap-2">
+              <div className="bg-card text-card-foreground/70 border border-border rounded-xl p-6 shadow-lg space-y-4">
+                <h3 className="text-sm font-bold text-white uppercase tracking-wider border-b border-border pb-2 flex items-center gap-2">
                   <User size={16} className="text-gray-500" /> Corporate Metadata
                 </h3>
                 
@@ -194,41 +194,41 @@ export function MyProfile() {
               </div>
 
               {/* Editable Fields */}
-              <div className="bg-[#161922]/70 border border-white/5 rounded-xl p-6 shadow-lg space-y-4">
-                <h3 className="text-sm font-bold text-white uppercase tracking-wider border-b border-white/5 pb-2 flex items-center gap-2">
+              <div className="bg-card text-card-foreground/70 border border-border rounded-xl p-6 shadow-lg space-y-4">
+                <h3 className="text-sm font-bold text-white uppercase tracking-wider border-b border-border pb-2 flex items-center gap-2">
                   <Phone size={16} className="text-[#00e07a]" /> Contact & Emergency Details
                 </h3>
 
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">Personal Phone</label>
+                    <label className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">Personal Phone</label>
                     <input 
                       type="text" 
                       value={phone}
                       onChange={(e) => setPhone(e.target.value)}
-                      className="w-full bg-[#0b0f1a] border border-white/10 rounded-lg py-2.5 px-3 text-white text-sm focus:outline-none focus:border-[#00e07a]/50 focus:ring-1 focus:ring-[#00e07a]/20" 
+                      className="w-full bg-background border border-border rounded-lg py-2.5 px-3 text-white text-sm focus:outline-none focus:border-[#00e07a]/50 focus:ring-1 focus:ring-[#00e07a]/20" 
                       placeholder="e.g. +63 917 123 4567"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">Emergency Contact Name</label>
+                    <label className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">Emergency Contact Name</label>
                     <input 
                       type="text" 
                       value={emergencyName}
                       onChange={(e) => setEmergencyName(e.target.value)}
-                      className="w-full bg-[#0b0f1a] border border-white/10 rounded-lg py-2.5 px-3 text-white text-sm focus:outline-none focus:border-[#00e07a]/50 focus:ring-1 focus:ring-[#00e07a]/20" 
+                      className="w-full bg-background border border-border rounded-lg py-2.5 px-3 text-white text-sm focus:outline-none focus:border-[#00e07a]/50 focus:ring-1 focus:ring-[#00e07a]/20" 
                       placeholder="e.g. Maria Clara"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">Emergency Contact Phone</label>
+                    <label className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">Emergency Contact Phone</label>
                     <input 
                       type="text" 
                       value={emergencyPhone}
                       onChange={(e) => setEmergencyPhone(e.target.value)}
-                      className="w-full bg-[#0b0f1a] border border-white/10 rounded-lg py-2.5 px-3 text-white text-sm focus:outline-none focus:border-[#00e07a]/50 focus:ring-1 focus:ring-[#00e07a]/20" 
+                      className="w-full bg-background border border-border rounded-lg py-2.5 px-3 text-white text-sm focus:outline-none focus:border-[#00e07a]/50 focus:ring-1 focus:ring-[#00e07a]/20" 
                       placeholder="e.g. +63 917 987 6543"
                     />
                   </div>
@@ -237,31 +237,31 @@ export function MyProfile() {
             </div>
 
             {/* Profile Bio Field */}
-            <div className="bg-[#161922]/70 border border-white/5 rounded-xl p-6 shadow-lg space-y-4">
-              <h3 className="text-sm font-bold text-white uppercase tracking-wider border-b border-white/5 pb-2 flex items-center gap-2">
+            <div className="bg-card text-card-foreground/70 border border-border rounded-xl p-6 shadow-lg space-y-4">
+              <h3 className="text-sm font-bold text-white uppercase tracking-wider border-b border-border pb-2 flex items-center gap-2">
                 <BookOpen size={16} className="text-[#00b8ff]" /> Professional Biography
               </h3>
               
               <div>
-                <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">Tell us about yourself</label>
+                <label className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">Tell us about yourself</label>
                 <textarea 
                   value={bio}
                   onChange={(e) => setBio(e.target.value)}
                   rows={4}
-                  className="w-full bg-[#0b0f1a] border border-white/10 rounded-lg py-2.5 px-3 text-white text-sm focus:outline-none focus:border-[#00e07a]/50 focus:ring-1 focus:ring-[#00e07a]/20 resize-none" 
+                  className="w-full bg-background border border-border rounded-lg py-2.5 px-3 text-white text-sm focus:outline-none focus:border-[#00e07a]/50 focus:ring-1 focus:ring-[#00e07a]/20 resize-none" 
                   placeholder="Share details regarding your skills, past projects, or hobbies..."
                 ></textarea>
               </div>
             </div>
 
             {/* Security Policy */}
-            <div className="bg-[#161922]/70 border border-white/5 rounded-xl p-6 shadow-lg space-y-4">
-              <h3 className="text-sm font-bold text-white uppercase tracking-wider border-b border-white/5 pb-2 flex items-center gap-2">
+            <div className="bg-card text-card-foreground/70 border border-border rounded-xl p-6 shadow-lg space-y-4">
+              <h3 className="text-sm font-bold text-white uppercase tracking-wider border-b border-border pb-2 flex items-center gap-2">
                 <ShieldAlert size={16} className="text-red-500" /> Security & Authentication
               </h3>
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div className="space-y-1">
-                  <span className="block text-xs text-gray-400 font-semibold uppercase tracking-wider">Two-Factor Authentication (2FA)</span>
+                  <span className="block text-xs text-muted-foreground font-semibold uppercase tracking-wider">Two-Factor Authentication (2FA)</span>
                   <p className="text-xs text-gray-500 font-sans leading-relaxed">
                     Protect your account with an extra layer of security. Enforcing 2FA requires entering a dynamic verification code from your authenticator app upon logging in.
                   </p>
@@ -273,7 +273,7 @@ export function MyProfile() {
                     const basePath = isLocal ? "/respawn-logics" : "";
                     window.location.href = `${window.location.origin}${basePath}/setup_2fa.php`;
                   }}
-                  className="px-4 py-2.5 bg-white/5 hover:bg-white/10 border border-white/10 text-white rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 self-start sm:self-center cursor-pointer"
+                  className="px-4 py-2.5 bg-white/5 hover:bg-accent border border-border text-foreground rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 self-start sm:self-center cursor-pointer"
                 >
                   Enable / Manage Two-Factor Authentication
                 </button>

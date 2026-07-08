@@ -31,10 +31,10 @@ export function PlatformAdminImpersonate() {
             <UserCog size={24} className="text-violet-400" />
           </div>
           
-          <h1 className="text-2xl font-bold text-white mb-2" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
+          <h1 className="text-2xl font-bold text-foreground mb-2" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
             Impersonate Tenant
           </h1>
-          <p className="text-slate-400 text-sm mb-8 max-w-lg leading-relaxed">
+          <p className="text-muted-foreground text-sm mb-8 max-w-lg leading-relaxed">
             Directly log in as the primary Super Admin of any tenant. 
             The tenant must have explicitly granted you support access in their settings. 
             All actions taken while impersonating will be logged in the audit trail under your name.
@@ -65,7 +65,7 @@ export function PlatformAdminImpersonate() {
 
             <button
               type="submit"
-              className="w-full flex items-center justify-center gap-2 bg-violet-600 hover:bg-violet-500 text-white font-medium py-3 rounded-xl transition-all shadow-[0_0_20px_rgba(124,58,237,0.15)] hover:shadow-[0_0_25px_rgba(124,58,237,0.25)] cursor-pointer"
+              className="w-full flex items-center justify-center gap-2 bg-violet-600 hover:bg-violet-500 text-foreground font-medium py-3 rounded-xl transition-all shadow-[0_0_20px_rgba(124,58,237,0.15)] hover:shadow-[0_0_25px_rgba(124,58,237,0.25)] cursor-pointer"
             >
               <UserCog size={18} />
               Start Impersonation Session

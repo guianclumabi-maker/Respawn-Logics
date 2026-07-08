@@ -15,13 +15,13 @@ type Stats = {
 
 function StatCard({ icon: Icon, label, value, sub, color }: { icon: any; label: string; value: string | number; sub?: string; color: string }) {
   return (
-    <div className={`bg-[#0c1018] border border-white/[0.05] rounded-2xl p-6 flex items-start gap-4 relative overflow-hidden group hover:border-white/10 transition-all`}>
+    <div className={`bg-[#0c1018] border border-white/[0.05] rounded-2xl p-6 flex items-start gap-4 relative overflow-hidden group hover:border-border transition-all`}>
       <div className={`w-11 h-11 rounded-xl ${color} flex items-center justify-center flex-shrink-0`}>
         <Icon size={20} className="text-white" />
       </div>
       <div>
         <p className="text-3xl font-bold text-white leading-tight">{value}</p>
-        <p className="text-sm text-slate-400 mt-0.5">{label}</p>
+        <p className="text-sm text-muted-foreground mt-0.5">{label}</p>
         {sub && <p className="text-xs text-slate-600 mt-1">{sub}</p>}
       </div>
       <div className={`absolute right-0 top-0 w-24 h-24 rounded-full ${color} opacity-5 translate-x-6 -translate-y-6`} />
@@ -51,7 +51,7 @@ export function PlatformAdminOverview() {
     <div className="p-8 max-w-6xl mx-auto">
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-white" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
+        <h1 className="text-2xl font-bold text-foreground" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
           Platform Overview
         </h1>
         <p className="text-slate-500 text-sm mt-1">Live snapshot across all tenants on the platform.</p>
@@ -89,7 +89,7 @@ export function PlatformAdminOverview() {
             <TrendingUp size={28} className="text-violet-400" />
             <div>
               <p className="text-xs text-slate-500 uppercase tracking-widest mb-0.5">Monthly Recurring Revenue</p>
-              <p className="text-3xl font-bold text-white">
+              <p className="text-3xl font-bold text-foreground">
                 ${stats.mockMRR?.toLocaleString() ?? "—"}
               </p>
             </div>

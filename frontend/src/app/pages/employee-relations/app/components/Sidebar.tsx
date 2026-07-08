@@ -220,7 +220,7 @@ export function Sidebar({ activeView, onViewChange, mode = "admin", onStartTour 
                   
                   {/* Indented submenu */}
                   {!collapsed && hasChildren && isExpanded && (
-                    <div className="ml-8 mt-1.5 pl-3 border-l border-white/5 space-y-1">
+                    <div className="ml-8 mt-1.5 pl-3 border-l border-border space-y-1">
                       {item.children!.map((child) => {
                         const viewName = child === "Cases List" ? "Cases" : child;
                         const isSubActive = activeView === viewName;

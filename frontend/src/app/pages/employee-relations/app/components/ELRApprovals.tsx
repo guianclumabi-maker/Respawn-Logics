@@ -146,7 +146,7 @@ export function ELRApprovals() {
                       >
                         <FileText size={14}/> View Case Details
                       </button>
-                      <span className="text-xs text-gray-400">Requested on {new Date(approval.created_at).toLocaleDateString()}</span>
+                      <span className="text-xs text-muted-foreground">Requested on {new Date(approval.created_at).toLocaleDateString()}</span>
                     </div>
                   </div>
 
@@ -201,7 +201,7 @@ export function ELRApprovals() {
       {/* Global Toast */}
       {toast && (
         <div className={`absolute bottom-6 left-1/2 -translate-x-1/2 px-4 py-2 rounded-lg text-sm font-bold shadow-lg z-50 animate-in slide-in-from-bottom flex items-center gap-2 ${
-          toast.isError ? "bg-red-500 text-white" : "bg-[#00e07a] text-black"
+          toast.isError ? "bg-red-500 text-foreground" : "bg-[#00e07a] text-black"
         }`}>
           {toast.isError ? <AlertCircle size={16} /> : <CheckCircle size={16} />}
           {toast.message}
