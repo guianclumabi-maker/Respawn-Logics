@@ -148,15 +148,15 @@ export function ELRDailyReport() {
   });
 
   return (
-    <div className="flex-1 flex flex-col h-full overflow-hidden bg-[#06070a] text-[#c8d0e0]">
+    <div className="flex-1 flex flex-col h-full overflow-hidden bg-background text-foreground">
       {/* Header */}
-      <div className="flex-none px-8 py-6 border-b border-white/5 bg-[#161922]/50 backdrop-blur-md">
+      <div className="flex-none px-8 py-6 border-b border-border bg-card text-card-foreground/50 backdrop-blur-md">
         <div className="flex justify-between items-start">
           <div>
-            <h1 className="text-2xl font-bold text-white mb-1 font-['Space_Grotesk']">
+            <h1 className="text-2xl font-bold text-foreground mb-1 font-['Space_Grotesk']">
               Daily Digest Report
             </h1>
-            <p className="text-sm text-gray-400">Review newly filed cases and automation outcomes.</p>
+            <p className="text-sm text-muted-foreground">Review newly filed cases and automation outcomes.</p>
           </div>
           <div className="flex items-center gap-3">
             <div className="relative flex gap-2">
@@ -166,7 +166,7 @@ export function ELRDailyReport() {
                     type="date" 
                     value={filters.start_date}
                     onChange={e => setFilters({...filters, start_date: e.target.value})}
-                    className="w-full bg-[#0b0f1a] border border-[#2a2d36] rounded px-3 py-1.5 text-xs focus:outline-none focus:border-[#00e07a] text-white"
+                    className="w-full bg-background border border-border rounded px-3 py-1.5 text-xs focus:outline-none focus:border-[#00e07a] text-foreground"
                   />
                 </div>
                 <div>
@@ -175,13 +175,13 @@ export function ELRDailyReport() {
                     type="date" 
                     value={filters.end_date}
                     onChange={e => setFilters({...filters, end_date: e.target.value})}
-                    className="w-full bg-[#0b0f1a] border border-[#2a2d36] rounded px-3 py-1.5 text-xs focus:outline-none focus:border-[#00e07a] text-white"
+                    className="w-full bg-background border border-border rounded px-3 py-1.5 text-xs focus:outline-none focus:border-[#00e07a] text-foreground"
                   />
                 </div>
             </div>
             <button 
               onClick={() => window.print()}
-              className="p-2.5 bg-white/5 hover:bg-white/10 rounded-lg text-white transition-colors"
+              className="p-2.5 bg-white/5 hover:bg-accent rounded-lg text-foreground transition-colors"
               title="Print Digest"
             >
               <Printer size={16} />
@@ -205,26 +205,26 @@ export function ELRDailyReport() {
             {/* Summary Header */}
             {summary && (
               <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-                <div className="bg-[#161922]/70 border border-white/5 rounded-xl p-5 shadow-lg relative overflow-hidden">
+                <div className="bg-card text-card-foreground/70 border border-border rounded-xl p-5 shadow-lg relative overflow-hidden">
                   <div className="absolute top-0 left-0 w-1 h-full bg-[#00e07a]"></div>
                   <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Total Filed Today</h3>
                   <div className="text-2xl font-bold font-mono text-white mb-1">{summary.total}</div>
                 </div>
                 
-                <div className="bg-[#161922]/70 border border-white/5 rounded-xl p-5 shadow-lg relative overflow-hidden">
+                <div className="bg-card text-card-foreground/70 border border-border rounded-xl p-5 shadow-lg relative overflow-hidden">
                   <div className="absolute top-0 left-0 w-1 h-full bg-blue-500"></div>
                   <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Automated (System)</h3>
                   <div className="text-2xl font-bold font-mono text-white mb-1">{summary.auto}</div>
                 </div>
                 
-                <div className="bg-[#161922]/70 border border-white/5 rounded-xl p-5 shadow-lg relative overflow-hidden">
+                <div className="bg-card text-card-foreground/70 border border-border rounded-xl p-5 shadow-lg relative overflow-hidden">
                   <div className="absolute top-0 left-0 w-1 h-full bg-purple-500"></div>
                   <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Manual Filing</h3>
                   <div className="text-2xl font-bold font-mono text-white mb-1">{summary.manual}</div>
                 </div>
 
-                <div className="bg-[#161922]/70 border border-white/5 rounded-xl p-4 shadow-lg overflow-hidden flex flex-col justify-center">
-                  <h3 className="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-2 border-b border-white/5 pb-1">Top Departments</h3>
+                <div className="bg-card text-card-foreground/70 border border-border rounded-xl p-4 shadow-lg overflow-hidden flex flex-col justify-center">
+                  <h3 className="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-2 border-b border-border pb-1">Top Departments</h3>
                   <div className="space-y-1.5 text-xs">
                     {Object.entries(summary.by_department).slice(0, 3).map(([dept, count]) => (
                       <div key={dept} className="flex justify-between text-gray-300">
@@ -241,7 +241,7 @@ export function ELRDailyReport() {
             )}
 
             {/* Filters */}
-            <div className="bg-[#161922]/40 border border-white/5 p-4 rounded-xl flex flex-wrap gap-4 items-center justify-between shadow-sm">
+            <div className="bg-card text-card-foreground/40 border border-border p-4 rounded-xl flex flex-wrap gap-4 items-center justify-between shadow-sm">
               <div className="flex flex-wrap gap-3 items-center flex-1">
                 <div className="relative w-64">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" size={15} />
@@ -250,14 +250,14 @@ export function ELRDailyReport() {
                     placeholder="Search employee..."
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
-                    className="w-full bg-[#0b0f1a] border border-white/10 rounded-lg py-2 pl-9 pr-3 text-white text-sm focus:outline-none focus:border-[#00e07a]/50"
+                    className="w-full bg-background border border-border rounded-lg py-2 pl-9 pr-3 text-white text-sm focus:outline-none focus:border-[#00e07a]/50"
                   />
                 </div>
 
                 <select
                   value={sourceFilter}
                   onChange={(e) => setSourceFilter(e.target.value)}
-                  className="bg-[#0b0f1a] border border-white/10 rounded-lg py-2 px-3 text-sm text-white focus:outline-none focus:border-[#00e07a]/50"
+                  className="bg-background border border-border rounded-lg py-2 px-3 text-sm text-white focus:outline-none focus:border-[#00e07a]/50"
                 >
                   <option value="">All Sources</option>
                   <option value="auto">Automated (System)</option>
@@ -267,7 +267,7 @@ export function ELRDailyReport() {
                 <select
                   value={pipelineFilter}
                   onChange={(e) => setPipelineFilter(e.target.value)}
-                  className="bg-[#0b0f1a] border border-white/10 rounded-lg py-2 px-3 text-sm text-white focus:outline-none focus:border-[#00e07a]/50"
+                  className="bg-background border border-border rounded-lg py-2 px-3 text-sm text-white focus:outline-none focus:border-[#00e07a]/50"
                 >
                   <option value="">All Pipelines</option>
                   {pipelines.map(p => <option key={p} value={p}>{p}</option>)}
@@ -276,7 +276,7 @@ export function ELRDailyReport() {
                 <select
                   value={deptFilter}
                   onChange={(e) => setDeptFilter(e.target.value)}
-                  className="bg-[#0b0f1a] border border-white/10 rounded-lg py-2 px-3 text-sm text-white focus:outline-none focus:border-[#00e07a]/50"
+                  className="bg-background border border-border rounded-lg py-2 px-3 text-sm text-white focus:outline-none focus:border-[#00e07a]/50"
                 >
                   <option value="">All Departments</option>
                   {departments.map(d => <option key={d} value={d}>{d}</option>)}
@@ -288,7 +288,7 @@ export function ELRDailyReport() {
             </div>
 
             {/* Table */}
-            <div className="bg-[#161922]/70 border border-white/5 rounded-xl overflow-hidden shadow-2xl">
+            <div className="bg-card text-card-foreground/70 border border-border rounded-xl overflow-hidden shadow-2xl">
               <div className="overflow-x-auto">
                 <table className="w-full text-left border-collapse">
                   <thead className="bg-black/25 text-gray-500 text-xs font-semibold uppercase tracking-wider">
@@ -315,8 +315,8 @@ export function ELRDailyReport() {
                         </td>
                         <td className="py-4 px-6 text-xs text-gray-300">{c.department}</td>
                         <td className="py-4 px-6 text-xs font-bold text-gray-300">{c.pipeline_name}</td>
-                        <td className="py-4 px-6 text-xs text-gray-400">
-                          <span className="bg-white/5 px-2 py-1 rounded border border-white/10">{c.stage_name}</span>
+                        <td className="py-4 px-6 text-xs text-muted-foreground">
+                          <span className="bg-white/5 px-2 py-1 rounded border border-border">{c.stage_name}</span>
                         </td>
                         <td className="py-4 px-6 text-center">
                           <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${c.entered_via === 'auto' ? 'bg-purple-500/10 text-purple-400 border border-purple-500/20' : 'bg-blue-500/10 text-blue-400 border border-blue-500/20'}`}>
@@ -327,7 +327,7 @@ export function ELRDailyReport() {
                           {new Date(c.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                         </td>
                         <td className="py-4 px-6 text-center">
-                          <div className="flex items-center justify-center gap-1 text-[11px] font-bold text-gray-400">
+                          <div className="flex items-center justify-center gap-1 text-[11px] font-bold text-muted-foreground">
                             <FileText size={12} /> {c.doc_count || 0}
                           </div>
                         </td>

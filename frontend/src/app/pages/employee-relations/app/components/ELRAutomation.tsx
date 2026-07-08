@@ -301,7 +301,7 @@ export function ELRAutomation() {
                   <div key={idx} className="p-4 bg-gray-50 dark:bg-[#161922] rounded-xl border border-gray-200 dark:border-[#2a2d36]">
                     <div className="flex justify-between items-center mb-2">
                       <span className="font-bold text-sm text-[#00e07a]">{res.rule_name || "Rule"}</span>
-                      <span className="text-[10px] text-gray-500 font-mono uppercase bg-black/20 px-2 py-0.5 rounded border border-white/5">{res.rule_type}</span>
+                      <span className="text-[10px] text-gray-500 font-mono uppercase bg-input border-border px-2 py-0.5 rounded border border-border">{res.rule_type}</span>
                     </div>
                     <div className="flex gap-4">
                       <div>
@@ -323,7 +323,7 @@ export function ELRAutomation() {
         <div className="space-y-6">
           {rules.length === 0 ? (
             <div className="text-center py-16 bg-white dark:bg-[#0f1422]/50 border border-gray-200 dark:border-[#2a2d36] rounded-2xl border-dashed">
-              <Bot className="w-12 h-12 text-gray-400 mx-auto mb-4 opacity-50" />
+              <Bot className="w-12 h-12 text-muted-foreground mx-auto mb-4 opacity-50" />
               <h3 className="text-lg font-bold text-gray-700 dark:text-gray-300">No automation rules</h3>
               <p className="text-sm text-gray-500 mt-1">Add a rule to automatically flag incidents like AWOL or Tardiness.</p>
             </div>
@@ -368,7 +368,7 @@ export function ELRAutomation() {
                       <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:right-[22px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-[#00e07a]"></div>
                     </label>
 
-                    <button onClick={() => handleDeleteRule(idx)} className="p-2 text-gray-400 hover:text-red-500 transition-colors">
+                    <button onClick={() => handleDeleteRule(idx)} className="p-2 text-muted-foreground hover:text-red-500 transition-colors">
                       <Trash2 size={18} />
                     </button>
                   </div>
@@ -393,7 +393,7 @@ export function ELRAutomation() {
                       </div>
 
                       <div className="bg-gray-50 dark:bg-[#161922]/30 p-4 rounded-xl border border-gray-200 dark:border-white/5 space-y-4">
-                        <h4 className="text-xs font-bold uppercase text-gray-400 mb-2">Detector Parameters</h4>
+                        <h4 className="text-xs font-bold uppercase text-muted-foreground mb-2">Detector Parameters</h4>
                         {detectors.find(d => d.key === rule.rule_type)?.params.map(param => (
                           <div key={param.key}>
                             <label className="block text-xs text-gray-500 mb-1.5">{param.label}</label>
@@ -468,7 +468,7 @@ export function ELRAutomation() {
       {/* Global Toast */}
       {toast && (
         <div className={`absolute bottom-6 left-1/2 -translate-x-1/2 px-4 py-2 rounded-lg text-sm font-bold shadow-lg z-50 animate-in slide-in-from-bottom flex items-center gap-2 ${
-          toast.isError ? "bg-red-500 text-white" : "bg-[#00e07a] text-black"
+          toast.isError ? "bg-red-500 text-foreground" : "bg-[#00e07a] text-black"
         }`}>
           {toast.isError ? <AlertCircle size={16} /> : <CheckCircle size={16} />}
           {toast.message}

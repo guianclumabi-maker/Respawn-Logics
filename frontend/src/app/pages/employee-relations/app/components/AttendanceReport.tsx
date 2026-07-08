@@ -105,7 +105,7 @@ export function AttendanceReport() {
       case "Late": return "bg-amber-500/15 text-amber-400 border-amber-500/25";
       case "On Leave": return "bg-blue-500/15 text-blue-400 border-blue-500/25";
       case "Absent": return "bg-red-500/15 text-red-400 border-red-500/25";
-      default: return "bg-gray-500/15 text-gray-400 border-gray-500/25";
+      default: return "bg-gray-500/15 text-muted-foreground border-gray-500/25";
     }
   };
 
@@ -208,10 +208,10 @@ export function AttendanceReport() {
           <div className="flex flex-col items-center justify-center py-16 px-6 bg-red-500/10 border border-red-500/20 rounded-xl max-w-xl mx-auto text-center space-y-3">
             <AlertCircle className="w-10 h-10 text-red-500" />
             <h3 className="text-lg font-bold text-white">Report Generation Failed</h3>
-            <p className="text-sm text-gray-400">{error}</p>
+            <p className="text-sm text-muted-foreground">{error}</p>
             <button 
               onClick={fetchReport}
-              className="mt-2 px-4 py-2 bg-white/5 hover:bg-white/10 text-white border border-white/10 rounded-lg text-xs transition-all"
+              className="mt-2 px-4 py-2 bg-white/5 hover:bg-accent text-white border border-border rounded-lg text-xs transition-all"
             >
               Retry Generation
             </button>
@@ -269,9 +269,9 @@ export function AttendanceReport() {
               <div className="bg-white dark:bg-[#1a2035] border border-gray-200 dark:border-white/[0.04] p-4 rounded-xl flex items-center justify-between shadow-sm">
                 <div>
                   <span className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider">Rest Day</span>
-                  <span className="text-2xl font-bold text-gray-400 mt-1 block">{summary.rest_day}</span>
+                  <span className="text-2xl font-bold text-muted-foreground mt-1 block">{summary.rest_day}</span>
                 </div>
-                <div className="w-10 h-10 rounded-full bg-gray-500/10 flex items-center justify-center text-gray-400">
+                <div className="w-10 h-10 rounded-full bg-gray-500/10 flex items-center justify-center text-muted-foreground">
                   <Calendar size={18} />
                 </div>
               </div>

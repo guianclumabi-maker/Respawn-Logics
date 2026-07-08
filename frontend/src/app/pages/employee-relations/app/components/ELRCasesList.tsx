@@ -159,13 +159,13 @@ export function ELRCasesList({ onViewChange, onSelectCase, mine = false }: ELRCa
       case "Critical": return "bg-red-500/10 text-red-500 border border-red-500/20";
       case "High": return "bg-orange-500/10 text-orange-400 border border-orange-500/20";
       case "Medium": return "bg-blue-500/10 text-blue-400 border border-blue-500/20";
-      default: return "bg-gray-500/10 text-gray-400 border border-gray-500/20";
+      default: return "bg-gray-500/10 text-muted-foreground border border-gray-500/20";
     }
   };
 
   const getStatusStyle = (status: string) => {
     switch (status) {
-      case "Closed": return "bg-gray-500/10 text-gray-400 border border-gray-500/20";
+      case "Closed": return "bg-gray-500/10 text-muted-foreground border border-gray-500/20";
       case "Resolved": return "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20";
       case "Pending Approval": return "bg-purple-500/10 text-purple-400 border border-purple-500/20";
       default: return "bg-blue-500/10 text-blue-400 border border-blue-500/20";
@@ -187,16 +187,16 @@ export function ELRCasesList({ onViewChange, onSelectCase, mine = false }: ELRCa
   });
 
   return (
-    <div className="flex-1 flex flex-col h-full overflow-hidden bg-[#06070a] text-[#c8d0e0]">
+    <div className="flex-1 flex flex-col h-full overflow-hidden bg-background text-foreground">
       
       {/* Header */}
-      <div className="flex-none px-8 py-6 border-b border-white/5 bg-[#161922]/50 backdrop-blur-md">
+      <div className="flex-none px-8 py-6 border-b border-border bg-card text-card-foreground/50 backdrop-blur-md">
         <div className="flex justify-between items-start">
           <div>
-            <h1 className="text-2xl font-bold text-white mb-1 font-['Space_Grotesk']">
+            <h1 className="text-2xl font-bold text-foreground mb-1 font-['Space_Grotesk']">
               Investigation Registry
             </h1>
-            <p className="text-sm text-gray-400">Track and manage employee relations cases and incidents</p>
+            <p className="text-sm text-muted-foreground">Track and manage employee relations cases and incidents</p>
           </div>
           {canInvestigate && (
             <button 
@@ -213,7 +213,7 @@ export function ELRCasesList({ onViewChange, onSelectCase, mine = false }: ELRCa
       <div className="flex-1 overflow-auto p-8 space-y-6">
         
         {/* Filters */}
-        <div className="bg-[#161922]/40 border border-white/5 p-4 rounded-xl flex flex-wrap gap-4 items-center justify-between shadow-sm">
+        <div className="bg-card text-card-foreground/40 border border-border p-4 rounded-xl flex flex-wrap gap-4 items-center justify-between shadow-sm">
           <div className="flex flex-wrap gap-3 items-center flex-1">
             <div className="relative w-64">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" size={15} />
@@ -222,14 +222,14 @@ export function ELRCasesList({ onViewChange, onSelectCase, mine = false }: ELRCa
                 placeholder="Search case, ID, department..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="w-full bg-[#0b0f1a] border border-white/10 rounded-lg py-2 pl-9 pr-3 text-white text-sm focus:outline-none focus:border-[#00e07a]/50"
+                className="w-full bg-background border border-border rounded-lg py-2 pl-9 pr-3 text-white text-sm focus:outline-none focus:border-[#00e07a]/50"
               />
             </div>
 
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              className="bg-[#0b0f1a] border border-white/10 rounded-lg py-2 px-3 text-sm text-white focus:outline-none focus:border-[#00e07a]/50"
+              className="bg-background border border-border rounded-lg py-2 px-3 text-sm text-white focus:outline-none focus:border-[#00e07a]/50"
             >
               <option value="">All Statuses</option>
               <option value="Open">Open</option>
@@ -243,7 +243,7 @@ export function ELRCasesList({ onViewChange, onSelectCase, mine = false }: ELRCa
             <select
               value={severityFilter}
               onChange={(e) => setSeverityFilter(e.target.value)}
-              className="bg-[#0b0f1a] border border-white/10 rounded-lg py-2 px-3 text-sm text-white focus:outline-none focus:border-[#00e07a]/50"
+              className="bg-background border border-border rounded-lg py-2 px-3 text-sm text-white focus:outline-none focus:border-[#00e07a]/50"
             >
               <option value="">All Severities</option>
               <option value="Low">Low</option>
@@ -259,7 +259,7 @@ export function ELRCasesList({ onViewChange, onSelectCase, mine = false }: ELRCa
 
         {/* Content */}
         {loading ? (
-          <div className="flex flex-col items-center justify-center py-20 gap-3 text-gray-400">
+          <div className="flex flex-col items-center justify-center py-20 gap-3 text-muted-foreground">
             <Loader2 className="w-8 h-8 animate-spin text-[#00e07a]" />
             <p className="text-sm font-medium">Resolving case registry...</p>
           </div>
@@ -267,16 +267,16 @@ export function ELRCasesList({ onViewChange, onSelectCase, mine = false }: ELRCa
           <div className="flex flex-col items-center justify-center py-16 px-6 bg-red-500/10 border border-red-500/20 rounded-xl text-center space-y-3">
             <AlertCircle className="w-10 h-10 text-red-500" />
             <h3 className="text-lg font-bold text-white">Load Error</h3>
-            <p className="text-sm text-gray-400">{error}</p>
+            <p className="text-sm text-muted-foreground">{error}</p>
             <button 
               onClick={fetchCases}
-              className="mt-2 px-4 py-2 bg-white/5 hover:bg-white/10 text-white rounded-lg text-xs transition-colors border border-white/10"
+              className="mt-2 px-4 py-2 bg-white/5 hover:bg-accent text-white rounded-lg text-xs transition-colors border border-border"
             >
               Retry
             </button>
           </div>
         ) : (
-          <div className="bg-[#161922]/70 border border-white/5 rounded-xl overflow-hidden shadow-2xl">
+          <div className="bg-card text-card-foreground/70 border border-border rounded-xl overflow-hidden shadow-2xl">
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse">
                 <thead className="bg-black/25 text-gray-500 text-xs font-semibold uppercase tracking-wider">
@@ -317,7 +317,7 @@ export function ELRCasesList({ onViewChange, onSelectCase, mine = false }: ELRCa
                       <td className="py-4 px-6 text-center">
                         <button 
                           onClick={() => onSelectCase(c.id)}
-                          className="px-3 py-1 bg-white/5 hover:bg-white/10 text-white rounded text-xs font-semibold transition-colors flex items-center gap-1.5 mx-auto cursor-pointer border border-white/5"
+                          className="px-3 py-1 bg-white/5 hover:bg-accent text-white rounded text-xs font-semibold transition-colors flex items-center gap-1.5 mx-auto cursor-pointer border border-border"
                         >
                           <Eye size={12} /> View Details
                         </button>
@@ -342,12 +342,12 @@ export function ELRCasesList({ onViewChange, onSelectCase, mine = false }: ELRCa
       {/* New Case Modal */}
       {showModal && (
         <div className="fixed inset-0 bg-black/75 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-[#161922] border border-white/10 rounded-xl w-full max-w-md shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
-            <div className="p-5 border-b border-white/5 flex justify-between items-center bg-black/10">
-              <h3 className="text-base font-bold text-white uppercase tracking-wider">
+          <div className="bg-card text-card-foreground border border-border rounded-xl w-full max-w-md shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+            <div className="p-5 border-b border-border flex justify-between items-center bg-black/10">
+              <h3 className="text-base font-bold text-foreground uppercase tracking-wider">
                 Open Investigation Case
               </h3>
-              <button onClick={() => setShowModal(false)} className="text-gray-400 hover:text-white text-xl leading-none cursor-pointer">&times;</button>
+              <button onClick={() => setShowModal(false)} className="text-muted-foreground hover:text-white text-xl leading-none cursor-pointer">&times;</button>
             </div>
             
             <form onSubmit={handleSubmit} className="p-5 space-y-4">
@@ -360,24 +360,24 @@ export function ELRCasesList({ onViewChange, onSelectCase, mine = false }: ELRCa
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1.5">Employee ID</label>
+                  <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-1.5">Employee ID</label>
                   <input 
                     type="text" 
                     required
                     value={employeeId}
                     onChange={(e) => setEmployeeId(e.target.value)}
-                    className="w-full bg-[#0b0f1a] border border-white/10 rounded-lg py-2 px-3 text-white text-xs focus:outline-none focus:border-[#00e07a]/50" 
+                    className="w-full bg-background border border-border rounded-lg py-2 px-3 text-white text-xs focus:outline-none focus:border-[#00e07a]/50" 
                     placeholder="e.g. EMP-001"
                   />
                 </div>
                 <div>
-                  <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1.5">Department</label>
+                  <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-1.5">Department</label>
                   <input 
                     type="text" 
                     required
                     value={department}
                     onChange={(e) => setDepartment(e.target.value)}
-                    className="w-full bg-[#0b0f1a] border border-white/10 rounded-lg py-2 px-3 text-white text-xs focus:outline-none focus:border-[#00e07a]/50" 
+                    className="w-full bg-background border border-border rounded-lg py-2 px-3 text-white text-xs focus:outline-none focus:border-[#00e07a]/50" 
                     placeholder="e.g. Engineering"
                   />
                 </div>
@@ -385,12 +385,12 @@ export function ELRCasesList({ onViewChange, onSelectCase, mine = false }: ELRCa
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1.5">Case Type</label>
+                  <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-1.5">Case Type</label>
                   <select
                     required
                     value={caseTypeId}
                     onChange={(e) => setCaseTypeId(e.target.value)}
-                    className="w-full bg-[#0b0f1a] border border-white/10 rounded-lg py-2 px-3 text-white text-xs focus:outline-none focus:border-[#00e07a]/50"
+                    className="w-full bg-background border border-border rounded-lg py-2 px-3 text-white text-xs focus:outline-none focus:border-[#00e07a]/50"
                   >
                     <option value="">Select Type</option>
                     {caseTypes.map(t => (
@@ -399,11 +399,11 @@ export function ELRCasesList({ onViewChange, onSelectCase, mine = false }: ELRCa
                   </select>
                 </div>
                 <div>
-                  <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1.5">Severity</label>
+                  <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-1.5">Severity</label>
                   <select
                     value={severity}
                     onChange={(e) => setSeverity(e.target.value as any)}
-                    className="w-full bg-[#0b0f1a] border border-white/10 rounded-lg py-2 px-3 text-white text-xs focus:outline-none focus:border-[#00e07a]/50"
+                    className="w-full bg-background border border-border rounded-lg py-2 px-3 text-white text-xs focus:outline-none focus:border-[#00e07a]/50"
                   >
                     <option value="Low">Low</option>
                     <option value="Medium">Medium</option>
@@ -414,51 +414,51 @@ export function ELRCasesList({ onViewChange, onSelectCase, mine = false }: ELRCa
               </div>
 
               <div>
-                <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1.5">Reported By (Emp ID)</label>
+                <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-1.5">Reported By (Emp ID)</label>
                 <input 
                   type="text"
                   value={reportedBy}
                   onChange={(e) => setReportedBy(e.target.value)}
-                  className="w-full bg-[#0b0f1a] border border-white/10 rounded-lg py-2 px-3 text-white text-xs focus:outline-none focus:border-[#00e07a]/50" 
+                  className="w-full bg-background border border-border rounded-lg py-2 px-3 text-white text-xs focus:outline-none focus:border-[#00e07a]/50" 
                   placeholder="e.g. EMP-010 (Leave empty if none)"
                 />
               </div>
 
               <div>
-                <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1.5">Description</label>
+                <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-1.5">Description</label>
                 <textarea 
                   required
                   rows={4}
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
-                  className="w-full bg-[#0b0f1a] border border-white/10 rounded-lg py-2 px-3 text-white text-xs focus:outline-none focus:border-[#00e07a]/50 resize-none" 
+                  className="w-full bg-background border border-border rounded-lg py-2 px-3 text-white text-xs focus:outline-none focus:border-[#00e07a]/50 resize-none" 
                   placeholder="Provide objective documentation regarding this investigation..."
                 />
               </div>
 
               <div className="flex gap-6 items-center">
-                <label className="flex items-center gap-2 text-xs font-semibold text-gray-400 cursor-pointer">
+                <label className="flex items-center gap-2 text-xs font-semibold text-muted-foreground cursor-pointer">
                   <input 
                     type="checkbox" 
                     checked={isConfidential}
                     onChange={(e) => setIsConfidential(e.target.checked)}
-                    className="rounded bg-[#0b0f1a] border-white/10 text-[#00e07a] focus:ring-0"
+                    className="rounded bg-background border-border text-[#00e07a] focus:ring-0"
                   />
                   Confidential
                 </label>
-                <label className="flex items-center gap-2 text-xs font-semibold text-gray-400 cursor-pointer">
+                <label className="flex items-center gap-2 text-xs font-semibold text-muted-foreground cursor-pointer">
                   <input 
                     type="checkbox" 
                     checked={anonymousReport}
                     onChange={(e) => setAnonymousReport(e.target.checked)}
-                    className="rounded bg-[#0b0f1a] border-white/10 text-[#00e07a] focus:ring-0"
+                    className="rounded bg-background border-border text-[#00e07a] focus:ring-0"
                   />
                   Anonymous Report
                 </label>
               </div>
 
-              <div className="pt-2 flex justify-end gap-3 border-t border-white/5 mt-4">
-                <button type="button" onClick={() => setShowModal(false)} className="px-3 py-1.5 text-gray-400 hover:text-white text-xs font-semibold cursor-pointer">Cancel</button>
+              <div className="pt-2 flex justify-end gap-3 border-t border-border mt-4">
+                <button type="button" onClick={() => setShowModal(false)} className="px-3 py-1.5 text-muted-foreground hover:text-white text-xs font-semibold cursor-pointer">Cancel</button>
                 <button type="submit" disabled={submitting} className="px-4 py-2 bg-[#00e07a] hover:bg-[#00c96a] text-black font-extrabold rounded-lg text-xs transition-colors flex items-center gap-1.5 cursor-pointer">
                   {submitting && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
                   Open Case Registry

@@ -50,20 +50,20 @@ export function ELRAnalytics() {
   }, []);
 
   return (
-    <div className="flex-1 flex flex-col h-full overflow-hidden bg-[#06070a] text-[#c8d0e0]">
+    <div className="flex-1 flex flex-col h-full overflow-hidden bg-background text-foreground">
       {/* Header */}
-      <div className="flex-none px-8 py-6 border-b border-white/5 bg-[#161922]/50 backdrop-blur-md">
-        <h1 className="text-2xl font-bold text-white mb-1 font-['Space_Grotesk']">
+      <div className="flex-none px-8 py-6 border-b border-border bg-card text-card-foreground/50 backdrop-blur-md">
+        <h1 className="text-2xl font-bold text-foreground mb-1 font-['Space_Grotesk']">
           Relations Analytics
         </h1>
-        <p className="text-sm text-gray-400">Statistical distribution of investigations and case volume trend metrics</p>
+        <p className="text-sm text-muted-foreground">Statistical distribution of investigations and case volume trend metrics</p>
       </div>
 
       {/* Main Container */}
       <div className="flex-1 overflow-auto p-8 space-y-6">
         
         {loading ? (
-          <div className="flex flex-col items-center justify-center py-20 gap-3 text-gray-400">
+          <div className="flex flex-col items-center justify-center py-20 gap-3 text-muted-foreground">
             <Loader2 className="w-8 h-8 animate-spin text-[#00e07a]" />
             <p className="text-sm font-medium">Computing historical aggregates...</p>
           </div>
@@ -71,10 +71,10 @@ export function ELRAnalytics() {
           <div className="flex flex-col items-center justify-center py-16 px-6 bg-red-500/10 border border-red-500/20 rounded-xl text-center space-y-3">
             <AlertCircle className="w-10 h-10 text-red-500" />
             <h3 className="text-lg font-bold text-white">Load Error</h3>
-            <p className="text-sm text-gray-400">{error}</p>
+            <p className="text-sm text-muted-foreground">{error}</p>
             <button 
               onClick={fetchAnalytics}
-              className="mt-2 px-4 py-2 bg-white/5 hover:bg-white/10 text-white rounded-lg text-xs transition-colors border border-white/10"
+              className="mt-2 px-4 py-2 bg-white/5 hover:bg-accent text-white rounded-lg text-xs transition-colors border border-border"
             >
               Retry
             </button>
@@ -83,8 +83,8 @@ export function ELRAnalytics() {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
             
             {/* Chart 1: Case Volume Trend (Full Width / Col Span 2) */}
-            <div className="lg:col-span-2 bg-[#161922]/70 border border-white/5 p-6 rounded-2xl shadow-xl space-y-4">
-              <h3 className="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
+            <div className="lg:col-span-2 bg-card text-card-foreground/70 border border-border p-6 rounded-2xl shadow-xl space-y-4">
+              <h3 className="text-sm font-bold text-foreground uppercase tracking-wider flex items-center gap-2">
                 <TrendingUp size={16} className="text-[#00e07a]" /> Case Volume Trend (Last 6 Months)
               </h3>
               
@@ -114,8 +114,8 @@ export function ELRAnalytics() {
             </div>
 
             {/* Chart 2: Case Distribution Bar Chart (Right side) */}
-            <div className="bg-[#161922]/70 border border-white/5 p-6 rounded-2xl shadow-xl space-y-4">
-              <h3 className="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
+            <div className="bg-card text-card-foreground/70 border border-border p-6 rounded-2xl shadow-xl space-y-4">
+              <h3 className="text-sm font-bold text-foreground uppercase tracking-wider flex items-center gap-2">
                 <PieChart size={16} className="text-[#00b8ff]" /> Category Density
               </h3>
               

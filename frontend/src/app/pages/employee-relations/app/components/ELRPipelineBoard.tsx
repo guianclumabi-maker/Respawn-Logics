@@ -386,7 +386,7 @@ export function ELRPipelineBoard() {
       {/* Filter Bar */}
       <div className="flex-none px-6 py-3 border-b border-gray-200 dark:border-white/5 bg-gray-50/50 dark:bg-black/20 flex flex-wrap gap-4 items-center">
         <div className="relative">
-          <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+          <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
           <input 
             type="text" 
             placeholder="Search by name or ID..."
@@ -396,7 +396,7 @@ export function ELRPipelineBoard() {
           />
         </div>
         <div className="flex items-center gap-2">
-          <Filter size={14} className="text-gray-400" />
+          <Filter size={14} className="text-muted-foreground" />
           <select
             value={filterDepartment}
             onChange={(e) => setFilterDepartment(e.target.value)}
@@ -474,10 +474,10 @@ export function ELRPipelineBoard() {
                         {card.employee_id} • {card.department}
                       </div>
                       <div className="flex justify-between items-center pt-3 border-t border-gray-100 dark:border-white/5">
-                        <div className="flex items-center gap-1.5 text-[10px] uppercase font-bold text-gray-400">
+                        <div className="flex items-center gap-1.5 text-[10px] uppercase font-bold text-muted-foreground">
                           <FileText size={12} /> {card.doc_count || 0} Docs
                         </div>
-                        <span className="text-[10px] text-gray-400">
+                        <span className="text-[10px] text-muted-foreground">
                           {new Date(card.created_at).toLocaleDateString()}
                         </span>
                       </div>
@@ -512,7 +512,7 @@ export function ELRPipelineBoard() {
                   className="flex items-center justify-between p-3 bg-gray-50 dark:bg-[#0b0f1a] border border-gray-200 dark:border-[#2a2d36] rounded-lg cursor-grab active:cursor-grabbing"
                 >
                   <div className="flex items-center gap-3">
-                    <div className="text-gray-400 hover:text-white cursor-grab">
+                    <div className="text-muted-foreground hover:text-foreground cursor-grab">
                       <Move size={14} />
                     </div>
                     {editingStageId === stage.id ? (
@@ -541,13 +541,13 @@ export function ELRPipelineBoard() {
                       <div className="flex items-center gap-2">
                         <span className="font-semibold text-sm">{stage.name}</span>
                         {stage.is_terminal === 1 && <span className="text-[10px] bg-red-500/20 text-red-400 px-1.5 py-0.5 rounded font-bold uppercase">Terminal</span>}
-                        <button onClick={() => { setEditingStageId(stage.id); setEditStageName(stage.name); }} className="text-gray-400 hover:text-white ml-2">
+                        <button onClick={() => { setEditingStageId(stage.id); setEditStageName(stage.name); }} className="text-muted-foreground hover:text-foreground ml-2">
                           <Edit2 size={14} />
                         </button>
                       </div>
                     )}
                   </div>
-                  <button onClick={() => handleDeleteStage(stage.id)} className="text-gray-400 hover:text-red-500">
+                  <button onClick={() => handleDeleteStage(stage.id)} className="text-muted-foreground hover:text-red-500">
                     <Trash2 size={16} />
                   </button>
                 </div>
@@ -679,7 +679,7 @@ export function ELRPipelineBoard() {
       {/* Global Toast Notification */}
       {toast && (
         <div className={`absolute bottom-6 left-1/2 -translate-x-1/2 px-4 py-2 rounded-lg text-sm font-bold shadow-lg z-50 animate-in slide-in-from-bottom flex items-center gap-2 ${
-          toast.isError ? "bg-red-500 text-white" : "bg-[#00e07a] text-black"
+          toast.isError ? "bg-red-500 text-foreground" : "bg-[#00e07a] text-black"
         }`}>
           {toast.isError ? <AlertCircle size={16} /> : <CheckCircle size={16} />}
           {toast.message}
