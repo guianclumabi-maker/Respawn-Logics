@@ -1,3 +1,22 @@
+:root, [data-theme] {
+  --text-primary: var(--foreground);
+  --text-secondary: var(--muted-foreground);
+  --text-tertiary: var(--muted-foreground);
+  --border-color: var(--border);
+  --border-light: var(--border);
+  --bg-card: var(--card);
+  --bg-app: var(--background);
+  --bg-sidebar: var(--sidebar);
+  --bg-hover: var(--accent);
+  --bg-item: var(--muted);
+  --radius-md: var(--radius-sm);
+  --radius-lg: var(--radius-md);
+  --accent-blue: #3b82f6;
+  --accent-emerald: #10b981;
+  --accent-red: #ef4444;
+  --accent-amber: #f59e0b;
+}
+
 .app-container {
   display: flex;
   height: 100vh;
@@ -210,10 +229,26 @@
   gap: 1.5rem;
 }
 
+/* Card base class */
+.card {
+  background-color: var(--bg-card);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.text-tertiary {
+  color: var(--text-tertiary) !important;
+}
+
 /* Generation Card */
 .generation-card {
-  background: linear-gradient(180deg, var(--bg-card) 0%, rgba(28, 31, 38, 0.8) 100%);
-  border: 1px solid rgba(59, 130, 246, 0.3);
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
   position: relative;
   overflow: hidden;
 }

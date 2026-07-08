@@ -281,11 +281,9 @@ export function Sidebar({ activeView, onViewChange, mode = "admin", onStartTour 
       </div>
 
       {/* Theme Toggle Area */}
-      {!collapsed && (
-        <div className="px-4 py-3">
-          <GamifiedThemeToggle />
-        </div>
-      )}
+      <div className="px-4 py-3 border-t border-border flex-shrink-0">
+        <GamifiedThemeToggle collapsed={collapsed} />
+      </div>
 
       {/* User Footer Profile Block */}
       {!collapsed && (
