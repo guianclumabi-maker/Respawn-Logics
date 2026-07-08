@@ -171,7 +171,6 @@ const getSections = (hasPermission: (p: string) => boolean, hasRole: (r: string 
     icon: <Users size={20} />,
     hide: !isAtsContext,
     items: [
-      { label: "Back to Workspace", view: "Dashboard", icon: <ArrowLeft size={19} />, color: "#00b8ff" },
       { label: "ATS Dashboard", view: "ATS Dashboard", icon: <LayoutGrid size={19} /> },
       { label: "Jobs", view: "Jobs", icon: <Briefcase size={19} />, badgeKey: "urgentJobs" },
       { label: "Pipeline", view: "Pipeline", icon: <GitBranch size={19} /> },
@@ -187,6 +186,7 @@ const getSections = (hasPermission: (p: string) => boolean, hasRole: (r: string 
     title: "Account",
     icon: <UserCog size={20} />,
     items: [
+      ...(isAtsContext ? [{ label: "Back to Workspace", view: "Dashboard", icon: <ArrowLeft size={19} />, color: "#00b8ff" }] : []),
       ...(tenantId !== null ? [{
         label: "Give us Feedback",
         view: "Feedback",
@@ -445,12 +445,6 @@ export function Sidebar({ activeView, onViewChange, badges = {} }: SidebarProps)
             )}
           </div>
         )})}
-
-        {/* ── Gamified Theme Toggle ─────────────────────── */}
-        <div className="mt-4 pt-4 border-t border-border">
-          <GamifiedThemeToggle collapsed={collapsed} />
-        </div>
-
         {/* ── Platform Admin Command Center (Platform_Admin only) ── */}
         {(user?.role === "Platform_Admin" || user?.roles?.includes("Platform_Admin")) && (
           <div className="mt-3">
@@ -467,6 +461,11 @@ export function Sidebar({ activeView, onViewChange, badges = {} }: SidebarProps)
             </button>
           </div>
         )}
+      </div>
+
+      {/* ── Gamified Theme Toggle ─────────────────────── */}
+      <div className="px-3 py-2 border-t border-border flex-shrink-0">
+        <GamifiedThemeToggle collapsed={collapsed} />
       </div>
 
       {/* ── Profile Footer ────────────────────────────── */}

@@ -103,7 +103,7 @@ export function Scheduling() {
     }
   }, [currentDate, loading]);
 
-  if (loading) return <div className="p-8 text-white">Loading...</div>;
+  if (loading) return <div className="p-8 text-foreground">Loading...</div>;
   if (!hasPermission('shifts.manage')) return <Navigate to="/" />;
 
   const dates = getDatesForWeek(currentDate);
@@ -195,7 +195,7 @@ export function Scheduling() {
       {/* Header */}
       <div className="flex justify-between items-center mb-6 pb-4 border-b border-border">
         <div>
-          <h1 className="text-2xl font-bold text-white mb-1 font-['Space_Grotesk',sans-serif]">Shift Scheduler</h1>
+          <h1 className="text-2xl font-bold text-foreground mb-1 font-['Space_Grotesk',sans-serif]">Shift Scheduler</h1>
           <p className="text-sm text-muted-foreground">Manage your weekly team roster and automate shift notifications.</p>
         </div>
         <div className="flex gap-3">
@@ -219,7 +219,7 @@ export function Scheduling() {
         <div className="flex items-center gap-4">
           <button 
             onClick={prevWeek}
-            className="w-9 h-9 rounded-full border border-border flex items-center justify-center text-white hover:bg-accent transition-colors"
+            className="w-9 h-9 rounded-full border border-border flex items-center justify-center text-foreground hover:bg-accent transition-colors"
           >
             <ChevronLeft size={18} />
           </button>
@@ -228,7 +228,7 @@ export function Scheduling() {
           </div>
           <button 
             onClick={nextWeek}
-            className="w-9 h-9 rounded-full border border-border flex items-center justify-center text-white hover:bg-accent transition-colors"
+            className="w-9 h-9 rounded-full border border-border flex items-center justify-center text-foreground hover:bg-accent transition-colors"
           >
             <ChevronRight size={18} />
           </button>
@@ -274,7 +274,7 @@ export function Scheduling() {
                           ) : initials}
                         </div>
                         <div className="min-w-0">
-                          <div className="font-semibold text-sm text-white truncate">{emp.full_name}</div>
+                          <div className="font-semibold text-sm text-foreground truncate">{emp.full_name}</div>
                           <div className="text-xs text-muted-foreground truncate">{emp.job_title} &bull; {emp.department}</div>
                         </div>
                       </div>
@@ -316,7 +316,7 @@ export function Scheduling() {
         <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center">
           <div className="bg-card text-card-foreground w-[450px] rounded-xl border border-border shadow-2xl overflow-hidden flex flex-col">
             <div className="p-5 border-b border-border flex justify-between items-center">
-              <h3 className="text-lg font-bold text-white font-['Space_Grotesk',sans-serif] m-0">Manage Shift Types</h3>
+              <h3 className="text-lg font-bold text-foreground font-['Space_Grotesk',sans-serif] m-0">Manage Shift Types</h3>
               <button className="text-muted-foreground hover:text-foreground transition-colors" onClick={() => setShowShiftModal(false)}>
                 <X size={20} />
               </button>
@@ -328,7 +328,7 @@ export function Scheduling() {
                 ) : (
                   <ul className="list-none p-0 m-0 space-y-2">
                     {shiftTypes.map(s => (
-                      <li key={s.id} className="p-2 border border-border rounded-md text-sm text-slate-300 flex justify-between">
+                      <li key={s.id} className="p-2 border border-border rounded-md text-sm text-foreground flex justify-between">
                         <strong>{s.name}</strong> <span>{s.start_time.substring(0,5)} - {s.end_time.substring(0,5)}</span>
                       </li>
                     ))}
@@ -337,7 +337,7 @@ export function Scheduling() {
               </div>
               
               <hr className="border-border mb-4" />
-              <h4 className="text-white mb-3 text-sm font-semibold">Create New Shift</h4>
+              <h4 className="text-foreground mb-3 text-sm font-semibold">Create New Shift</h4>
               
               <div className="mb-3">
                 <label className="block text-xs text-muted-foreground mb-1">Shift Name (e.g. Morning Shift)</label>

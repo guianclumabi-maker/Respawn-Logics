@@ -254,19 +254,17 @@ function FilterDropdown({
   onChange: (v: string) => void;
 }) {
   const [open, setOpen] = useState(false);
+  const isActive = value && value !== "All";
 
   return (
     <div className="relative font-mono">
       <button
         onClick={() => setOpen(!open)}
-        className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium border transition-all cursor-pointer whitespace-nowrap"
-        style={{
-          backgroundColor: value
-            ? "rgba(0, 224, 122, 0.12)"
-            : "rgba(15, 20, 34, 0.5)",
-          borderColor: value ? "#00e07a" : "rgba(255,255,255,0.06)",
-          color: value ? "#00e07a" : "#8b95a8",
-        }}
+        className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium border transition-all cursor-pointer whitespace-nowrap ${
+          isActive
+            ? "bg-primary text-primary-foreground border-primary"
+            : "bg-card border-border text-foreground hover:bg-accent"
+        }`}
       >
         {value ? `[ ${label}: ${value} ]` : `[ ${label}: All ]`}
         <ChevronDown size={12} />
@@ -280,24 +278,23 @@ function FilterDropdown({
           <div
             className="absolute right-0 top-full mt-1 z-50 min-w-[140px] rounded-lg border py-1 shadow-xl bg-background border-border"
           >
-            {options.map((opt) => (
-              <button
-                key={opt}
-                onClick={() => {
-                  onChange(opt === "All" ? "" : opt);
-                  setOpen(false);
-                }}
-                className="w-full text-left px-3 py-1.5 text-xs cursor-pointer hover:bg-[#141929] hover:text-primary transition-colors border-0 bg-transparent"
-                style={{
-                  color:
-                    (opt === "All" && !value) || opt === value
-                      ? "#00e07a"
-                      : "#8b95a8",
-                }}
-              >
-                {opt}
-              </button>
-            ))}
+            {options.map((opt) => {
+              const isSelected = (opt === "All" && !value) || opt === value;
+              return (
+                <button
+                  key={opt}
+                  onClick={() => {
+                    onChange(opt === "All" ? "" : opt);
+                    setOpen(false);
+                  }}
+                  className={`w-full text-left px-3 py-1.5 text-xs cursor-pointer hover:bg-accent transition-colors border-0 bg-transparent ${
+                    isSelected ? "text-primary font-bold" : "text-foreground"
+                  }`}
+                >
+                  {opt}
+                </button>
+              );
+            })}
           </div>
         </>
       )}
@@ -551,12 +548,11 @@ export function JobsPage({ onViewChange }: Props) {
               <button
                 key={dept}
                 onClick={() => setSelectedDept(dept === "All" ? "" : dept)}
-                className="px-3 py-1.5 rounded-lg text-xs font-semibold border transition-all cursor-pointer whitespace-nowrap"
-                style={{
-                  backgroundColor: isSelected ? "rgba(0,224,122,0.12)" : "rgba(15,20,34,0.5)",
-                  borderColor: isSelected ? "#00e07a" : "rgba(255,255,255,0.06)",
-                  color: isSelected ? "#00e07a" : "#8b95a8",
-                }}
+                className={`px-3 py-1.5 rounded-lg text-xs font-semibold border transition-all cursor-pointer whitespace-nowrap ${
+                  isSelected
+                    ? "bg-primary text-primary-foreground border-primary"
+                    : "bg-card border-border text-foreground hover:bg-accent"
+                }`}
               >
                 {isSelected ? `[[ ${dept} ]]` : `[ ${dept} ]`}
               </button>
@@ -593,7 +589,7 @@ export function JobsPage({ onViewChange }: Props) {
           <div
             className="w-20 h-20 rounded-2xl flex items-center justify-center mb-5 bg-primary border border-[#00e07a]/10"
           >
-            <Briefcase size={36} className="text-primary" />
+            <Briefcase size={36} className="text-primary-foreground" />
           </div>
           <h3 className="text-lg font-bold text-foreground mb-1 font-['Space_Grotesk']">
             CREATE YOUR FIRST JOB
