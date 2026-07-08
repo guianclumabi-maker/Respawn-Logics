@@ -38,7 +38,7 @@ export function PlatformAdminHealth() {
     <div className="p-8 max-w-4xl mx-auto">
       <div className="mb-8 flex items-start justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-white" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
+          <h1 className="text-2xl font-bold text-foreground" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
             System Health
           </h1>
           <p className="text-slate-500 text-sm mt-1">
@@ -48,7 +48,7 @@ export function PlatformAdminHealth() {
         </div>
         <button
           onClick={run}
-          className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white/[0.03] border border-white/[0.07] text-slate-400 hover:text-slate-200 text-sm transition-colors"
+          className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white/[0.03] border border-white/[0.07] text-muted-foreground hover:text-slate-200 text-sm transition-colors"
         >
           <RefreshCw size={14} className={loading ? "animate-spin" : ""} /> Re-run Checks
         </button>

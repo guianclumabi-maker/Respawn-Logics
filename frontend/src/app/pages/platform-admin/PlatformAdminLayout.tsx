@@ -29,7 +29,7 @@ export function PlatformAdminLayout() {
     : "PA";
 
   return (
-    <div className="flex h-screen bg-[#080b12] text-[#c8d0e0] overflow-hidden">
+    <div className="flex h-screen bg-[#080b12] text-foreground overflow-hidden">
       {/* ── Sidebar ── */}
       <aside className="w-64 flex-shrink-0 flex flex-col bg-[#0c1018] border-r border-white/[0.05] h-full">
         {/* Brand */}
@@ -57,7 +57,7 @@ export function PlatformAdminLayout() {
                 `flex items-center gap-3 px-3 py-2.5 rounded-lg text-[0.85rem] font-medium transition-all cursor-pointer ${
                   isActive
                     ? "bg-violet-500/10 text-violet-300 border border-violet-500/20"
-                    : "text-slate-400 hover:text-slate-200 hover:bg-white/[0.03] border border-transparent"
+                    : "text-muted-foreground hover:text-slate-200 hover:bg-white/[0.03] border border-transparent"
                 }`
               }
             >

@@ -94,18 +94,18 @@ export function PlatformAdminStaff() {
     <div className="p-8 max-w-5xl mx-auto">
       <div className="mb-8 flex items-start justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-white" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
+          <h1 className="text-2xl font-bold text-foreground" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
             Internal Staff
           </h1>
           <p className="text-slate-500 text-sm mt-1">Manage Platform Admins, Support Agents, and Implementation Specialists.</p>
         </div>
         <div className="flex gap-2">
-          <button onClick={load} className="flex items-center gap-2 px-3 py-2 rounded-lg bg-white/[0.03] border border-white/[0.07] text-slate-400 hover:text-slate-200 text-sm transition-colors">
+          <button onClick={load} className="flex items-center gap-2 px-3 py-2 rounded-lg bg-white/[0.03] border border-white/[0.07] text-muted-foreground hover:text-slate-200 text-sm transition-colors">
             <RefreshCw size={14} className={loading ? "animate-spin" : ""} />
           </button>
           <button
             onClick={() => setShowModal(true)}
-            className="flex items-center gap-2 px-4 py-2 rounded-lg bg-violet-600 hover:bg-violet-500 text-white text-sm font-medium transition-colors"
+            className="flex items-center gap-2 px-4 py-2 rounded-lg bg-violet-600 hover:bg-violet-500 text-foreground text-sm font-medium transition-colors"
           >
             <Plus size={15} /> Add Staff
           </button>
@@ -130,7 +130,7 @@ export function PlatformAdminStaff() {
         {!loading && staff.map((s) => {
           const Icon = ROLE_ICONS[s.role] ?? Users;
           return (
-            <div key={s.id} className="bg-[#0c1018] border border-white/[0.05] rounded-xl px-5 py-4 flex items-center gap-4 hover:border-white/10 transition-all">
+            <div key={s.id} className="bg-[#0c1018] border border-white/[0.05] rounded-xl px-5 py-4 flex items-center gap-4 hover:border-border transition-all">
               <div className="w-10 h-10 rounded-full bg-violet-500/10 border border-violet-500/20 flex items-center justify-center flex-shrink-0">
                 <Icon size={16} className="text-violet-300" />
               </div>
@@ -141,7 +141,7 @@ export function PlatformAdminStaff() {
               <span className={`px-2.5 py-1 rounded-full text-xs font-medium border ${ROLE_COLORS[s.role] ?? "bg-slate-700 text-slate-300 border-slate-600"}`}>
                 {s.role.replace(/_/g, " ")}
               </span>
-              <span className={`px-2 py-0.5 rounded-full text-xs ${s.employment_status === "Active" ? "bg-emerald-500/10 text-emerald-400" : "bg-slate-700 text-slate-400"}`}>
+              <span className={`px-2 py-0.5 rounded-full text-xs ${s.employment_status === "Active" ? "bg-emerald-500/10 text-emerald-400" : "bg-slate-700 text-muted-foreground"}`}>
                 {s.employment_status}
               </span>
               <button
@@ -200,11 +200,11 @@ export function PlatformAdminStaff() {
               </div>
             </div>
             <div className="px-6 pb-5 flex justify-end gap-3">
-              <button onClick={() => setShowModal(false)} className="px-4 py-2 rounded-lg text-slate-400 hover:text-slate-200 text-sm transition-colors cursor-pointer">
+              <button onClick={() => setShowModal(false)} className="px-4 py-2 rounded-lg text-muted-foreground hover:text-slate-200 text-sm transition-colors cursor-pointer">
                 Cancel
               </button>
               <button onClick={handleCreate} disabled={saving}
-                className="px-5 py-2 rounded-lg bg-violet-600 hover:bg-violet-500 text-white text-sm font-medium transition-colors disabled:opacity-50 cursor-pointer">
+                className="px-5 py-2 rounded-lg bg-violet-600 hover:bg-violet-500 text-foreground text-sm font-medium transition-colors disabled:opacity-50 cursor-pointer">
                 {saving ? "Saving…" : "Create"}
               </button>
             </div>
