@@ -53,9 +53,27 @@ class ShiftController
 
     private function fetchShiftTypes()
     {
+        $this->ensureDefaultShiftTypes();
         $stmt = $this->pdo->prepare("SELECT * FROM shifts WHERE tenant_id = ? ORDER BY start_time ASC");
         $stmt->execute([$this->tenantId]);
         echo json_encode(['success' => true, 'data' => $stmt->fetchAll()]);
+    }
+
+    private function ensureDefaultShiftTypes()
+    {
+        $chk = $this->pdo->prepare("SELECT COUNT(*) FROM shifts WHERE tenant_id = ?");
+        $chk->execute([$this->tenantId]);
+        if ((int)$chk->fetchColumn() > 0) { return; }
+
+        $defaults = [
+            ['Morning Shift', '08:00:00', '17:00:00'],
+            ['Mid Shift',     '12:00:00', '21:00:00'],
+            ['Night Shift',   '22:00:00', '06:00:00'],
+        ];
+        $ins = $this->pdo->prepare("INSERT INTO shifts (tenant_id, name, start_time, end_time) VALUES (?, ?, ?, ?)");
+        foreach ($defaults as [$name, $start, $end]) {
+            $ins->execute([$this->tenantId, $name, $start, $end]);
+        }
     }
 
     private function createShiftType()
