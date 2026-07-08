@@ -248,7 +248,7 @@ export function ELRAutomation() {
   }
 
   return (
-    <main className="flex-1 flex flex-col h-full bg-[#f4f6f8] dark:bg-[#06070a] text-slate-900 dark:text-white overflow-y-auto transition-colors duration-300 scrollbar-thin">
+    <main className="flex-1 flex flex-col h-full bg-[#f4f6f8] dark:bg-[#06070a] text-foreground overflow-y-auto transition-colors duration-300 scrollbar-thin">
       <div className="p-8 max-w-5xl mx-auto w-full">
         
         <div className="flex items-center justify-between mb-8">
@@ -286,7 +286,7 @@ export function ELRAutomation() {
 
         {/* Scan Results Panel */}
         {scanResults && (
-          <div className="bg-white dark:bg-[#0f1422]/80 border border-blue-500/30 rounded-2xl p-6 shadow-lg mb-8 animate-in slide-in-from-top-4">
+          <div className="bg-card/80 border border-blue-500/30 rounded-2xl p-6 shadow-lg mb-8 animate-in slide-in-from-top-4">
             <div className="flex items-center gap-3 mb-4">
               <div className="p-2 bg-blue-500/10 rounded-lg">
                 <Activity className="text-blue-500 w-5 h-5" />
@@ -298,7 +298,7 @@ export function ELRAutomation() {
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {scanResults.map((res: any, idx: number) => (
-                  <div key={idx} className="p-4 bg-gray-50 dark:bg-[#161922] rounded-xl border border-gray-200 dark:border-[#2a2d36]">
+                  <div key={idx} className="p-4 bg-muted rounded-xl border border-border">
                     <div className="flex justify-between items-center mb-2">
                       <span className="font-bold text-sm text-[#00e07a]">{res.rule_name || "Rule"}</span>
                       <span className="text-[10px] text-gray-500 font-mono uppercase bg-input border-border px-2 py-0.5 rounded border border-border">{res.rule_type}</span>
@@ -322,17 +322,17 @@ export function ELRAutomation() {
 
         <div className="space-y-6">
           {rules.length === 0 ? (
-            <div className="text-center py-16 bg-white dark:bg-[#0f1422]/50 border border-gray-200 dark:border-[#2a2d36] rounded-2xl border-dashed">
+            <div className="text-center py-16 bg-card/50 border border-border rounded-2xl border-dashed">
               <Bot className="w-12 h-12 text-muted-foreground mx-auto mb-4 opacity-50" />
-              <h3 className="text-lg font-bold text-gray-700 dark:text-gray-300">No automation rules</h3>
+              <h3 className="text-lg font-bold text-foreground">No automation rules</h3>
               <p className="text-sm text-gray-500 mt-1">Add a rule to automatically flag incidents like AWOL or Tardiness.</p>
             </div>
           ) : (
             rules.map((rule, idx) => (
-              <div key={rule.id || `new-${idx}`} className="bg-white dark:bg-[#0f1422]/80 border border-gray-200 dark:border-[#2a2d36] rounded-2xl overflow-hidden shadow-sm">
+              <div key={rule.id || `new-${idx}`} className="bg-card/80 border border-border rounded-2xl overflow-hidden shadow-sm">
                 
                 {/* Rule Header */}
-                <div className="p-5 border-b border-gray-200 dark:border-[#2a2d36] bg-gray-50 dark:bg-[#161922]/50 flex justify-between items-center">
+                <div className="p-5 border-b border-border bg-muted flex justify-between items-center">
                   <div className="flex items-center gap-3 flex-1 mr-4">
                     <div className="w-10 h-10 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400 flex-shrink-0">
                       <Settings size={20} />
@@ -347,7 +347,7 @@ export function ELRAutomation() {
                           setRules(updated);
                         }}
                         placeholder="Rule Name"
-                        className="bg-transparent text-lg font-bold text-gray-900 dark:text-white border-none focus:outline-none focus:ring-0 p-0 w-full placeholder-gray-500"
+                        className="bg-transparent text-lg font-bold text-foreground border-none focus:outline-none focus:ring-0 p-0 w-full placeholder-gray-500"
                       />
                     </div>
                   </div>
@@ -385,14 +385,14 @@ export function ELRAutomation() {
                         <select
                           value={rule.rule_type}
                           onChange={(e) => handleDetectorChange(idx, e.target.value)}
-                          className="w-full bg-gray-50 dark:bg-[#0b0f1a] border border-gray-200 dark:border-[#2a2d36] rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#00e07a] focus:ring-1 focus:ring-[#00e07a]/50"
+                          className="w-full bg-background border border-border rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#00e07a] focus:ring-1 focus:ring-[#00e07a]/50"
                         >
                           {detectors.map(d => <option key={d.key} value={d.key}>{d.label}</option>)}
                         </select>
                         <p className="text-[11px] text-gray-500 mt-1.5">{detectors.find(d => d.key === rule.rule_type)?.desc}</p>
                       </div>
 
-                      <div className="bg-gray-50 dark:bg-[#161922]/30 p-4 rounded-xl border border-gray-200 dark:border-white/5 space-y-4">
+                      <div className="bg-muted p-4 rounded-xl border border-border space-y-4">
                         <h4 className="text-xs font-bold uppercase text-muted-foreground mb-2">Detector Parameters</h4>
                         {detectors.find(d => d.key === rule.rule_type)?.params.map(param => (
                           <div key={param.key}>
@@ -401,7 +401,7 @@ export function ELRAutomation() {
                               type={param.type}
                               value={rule.params[param.key] ?? ''}
                               onChange={(e) => updateRuleParam(idx, param.key, param.type === 'number' ? parseInt(e.target.value) || 0 : e.target.value)}
-                              className="w-full bg-white dark:bg-[#0b0f1a] border border-gray-200 dark:border-[#2a2d36] rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-[#00e07a]"
+                              className="w-full bg-background border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-[#00e07a]"
                             />
                           </div>
                         ))}
@@ -420,7 +420,7 @@ export function ELRAutomation() {
                             updated[idx].target_stage_id = ""; // reset stage
                             setRules(updated);
                           }}
-                          className="w-full bg-gray-50 dark:bg-[#0b0f1a] border border-gray-200 dark:border-[#2a2d36] rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#00e07a] focus:ring-1 focus:ring-[#00e07a]/50"
+                          className="w-full bg-background border border-border rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#00e07a] focus:ring-1 focus:ring-[#00e07a]/50"
                         >
                           <option value="">Select Pipeline...</option>
                           {pipelines.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
@@ -437,7 +437,7 @@ export function ELRAutomation() {
                             setRules(updated);
                           }}
                           disabled={!rule.target_pipeline_id}
-                          className="w-full bg-gray-50 dark:bg-[#0b0f1a] border border-gray-200 dark:border-[#2a2d36] rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#00e07a] focus:ring-1 focus:ring-[#00e07a]/50 disabled:opacity-50"
+                          className="w-full bg-background border border-border rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#00e07a] focus:ring-1 focus:ring-[#00e07a]/50 disabled:opacity-50"
                         >
                           <option value="">Select Stage...</option>
                           {(pipelineStages[rule.target_pipeline_id as number] || []).map(s => <option key={s.id} value={s.id}>{s.name}</option>)}

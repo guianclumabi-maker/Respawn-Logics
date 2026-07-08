@@ -239,11 +239,11 @@ export function ELRCaseDrawer({ cardId, onClose, onUpdate }: ELRCaseDrawerProps)
 
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex justify-end font-sans">
-      <div className="w-[500px] bg-white dark:bg-[#0f1422] h-full shadow-2xl border-l border-gray-200 dark:border-[#2a2d36] flex flex-col animate-in slide-in-from-right">
+      <div className="w-[500px] bg-card h-full shadow-2xl border-l border-border flex flex-col animate-in slide-in-from-right">
         
-        <div className="p-5 border-b border-gray-200 dark:border-[#2a2d36] flex justify-between items-center bg-gray-50 dark:bg-[#0b0f1a]">
-          <h2 className="text-lg font-bold font-['Space_Grotesk'] text-slate-900 dark:text-white">Case Management</h2>
-          <button onClick={onClose} className="text-gray-400 hover:text-slate-800 dark:hover:text-white p-1 transition-colors"><X size={20} /></button>
+        <div className="p-5 border-b border-border flex justify-between items-center bg-muted">
+          <h2 className="text-lg font-bold font-['Space_Grotesk'] text-foreground">Case Management</h2>
+          <button onClick={onClose} className="text-gray-400 hover:text-foreground p-1 transition-colors"><X size={20} /></button>
         </div>
         
         <div className="flex-1 overflow-y-auto p-6 space-y-8 scrollbar-thin text-slate-800 dark:text-[#c8d0e0]">
@@ -259,7 +259,7 @@ export function ELRCaseDrawer({ cardId, onClose, onUpdate }: ELRCaseDrawerProps)
                     {cardDetails.card.full_name.charAt(0)}
                   </div>
                   <div>
-                    <div className="font-bold text-slate-900 dark:text-white text-lg">{cardDetails.card.full_name}</div>
+                    <div className="font-bold text-foreground text-lg">{cardDetails.card.full_name}</div>
                     <div className="text-sm font-mono text-gray-500">{cardDetails.card.employee_id} • {cardDetails.card.department}</div>
                   </div>
                 </div>
@@ -273,22 +273,22 @@ export function ELRCaseDrawer({ cardId, onClose, onUpdate }: ELRCaseDrawerProps)
                 ) : (
                   <div className="space-y-4">
                     {cardDetails.documents.map(doc => (
-                      <div key={doc.id} className="bg-gray-50 dark:bg-[#161922] border border-gray-200 dark:border-[#2a2d36] rounded-xl overflow-hidden shadow-sm">
-                        <div className="px-4 py-3 border-b border-gray-200 dark:border-[#2a2d36] flex justify-between items-center bg-white dark:bg-[#1a1f2e]">
+                      <div key={doc.id} className="bg-muted border border-border rounded-xl overflow-hidden shadow-sm">
+                        <div className="px-4 py-3 border-b border-border flex justify-between items-center bg-card">
                           <div>
-                            <div className="font-bold text-sm text-slate-900 dark:text-white">{doc.title}</div>
+                            <div className="font-bold text-sm text-foreground">{doc.title}</div>
                             <div className="text-[10px] text-muted-foreground font-mono mt-0.5">{new Date(doc.generated_at).toLocaleString()} • {doc.doc_type}</div>
                           </div>
                           <button 
                             onClick={() => handlePrint(doc.content, doc.title)}
-                            className="p-1.5 bg-gray-100 dark:bg-white/5 hover:bg-gray-200 dark:hover:bg-white/10 rounded text-slate-600 dark:text-gray-300 transition-colors"
+                            className="p-1.5 bg-accent hover:bg-accent rounded text-slate-600 dark:text-gray-300 transition-colors"
                             title="Print / PDF"
                           >
                             <Printer size={16} />
                           </button>
                         </div>
                         
-                        <div className="p-3 bg-white dark:bg-[#0b0f1a] border-b border-gray-200 dark:border-[#2a2d36] flex gap-2">
+                        <div className="p-3 bg-card border-b border-border flex gap-2">
                           {doc.served_at ? (
                             <span className="text-[10px] font-bold uppercase flex items-center gap-1 text-[#00e07a] bg-[#00e07a]/10 px-2 py-1 rounded">
                               <CheckCircle size={12}/> Served {new Date(doc.served_at).toLocaleDateString()}
@@ -333,11 +333,11 @@ export function ELRCaseDrawer({ cardId, onClose, onUpdate }: ELRCaseDrawerProps)
                     <div className="grid grid-cols-2 gap-3">
                       <div>
                         <label className="block text-[10px] font-bold text-gray-500 uppercase mb-1">Date & Time</label>
-                        <input type="datetime-local" value={hearingForm.scheduled_at} onChange={e => setHearingForm({...hearingForm, scheduled_at: e.target.value})} className="w-full text-xs p-2 rounded bg-white dark:bg-[#0b0f1a] border border-gray-200 dark:border-[#2a2d36] focus:border-blue-500 focus:outline-none"/>
+                        <input type="datetime-local" value={hearingForm.scheduled_at} onChange={e => setHearingForm({...hearingForm, scheduled_at: e.target.value})} className="w-full text-xs p-2 rounded bg-card border border-border focus:border-blue-500 focus:outline-none"/>
                       </div>
                       <div>
                         <label className="block text-[10px] font-bold text-gray-500 uppercase mb-1">Status</label>
-                        <select value={hearingForm.status} onChange={e => setHearingForm({...hearingForm, status: e.target.value})} className="w-full text-xs p-2 rounded bg-white dark:bg-[#0b0f1a] border border-gray-200 dark:border-[#2a2d36] focus:border-blue-500 focus:outline-none">
+                        <select value={hearingForm.status} onChange={e => setHearingForm({...hearingForm, status: e.target.value})} className="w-full text-xs p-2 rounded bg-card border border-border focus:border-blue-500 focus:outline-none">
                           <option>Scheduled</option>
                           <option>Completed</option>
                           <option>Cancelled</option>
@@ -346,16 +346,16 @@ export function ELRCaseDrawer({ cardId, onClose, onUpdate }: ELRCaseDrawerProps)
                     </div>
                     <div>
                       <label className="block text-[10px] font-bold text-gray-500 uppercase mb-1">Location / Link</label>
-                      <input type="text" value={hearingForm.location} onChange={e => setHearingForm({...hearingForm, location: e.target.value})} className="w-full text-xs p-2 rounded bg-white dark:bg-[#0b0f1a] border border-gray-200 dark:border-[#2a2d36] focus:border-blue-500 focus:outline-none"/>
+                      <input type="text" value={hearingForm.location} onChange={e => setHearingForm({...hearingForm, location: e.target.value})} className="w-full text-xs p-2 rounded bg-card border border-border focus:border-blue-500 focus:outline-none"/>
                     </div>
                     <div>
                       <label className="block text-[10px] font-bold text-gray-500 uppercase mb-1">Notes</label>
-                      <textarea value={hearingForm.notes} onChange={e => setHearingForm({...hearingForm, notes: e.target.value})} className="w-full text-xs p-2 rounded bg-white dark:bg-[#0b0f1a] border border-gray-200 dark:border-[#2a2d36] focus:border-blue-500 focus:outline-none" rows={2}></textarea>
+                      <textarea value={hearingForm.notes} onChange={e => setHearingForm({...hearingForm, notes: e.target.value})} className="w-full text-xs p-2 rounded bg-card border border-border focus:border-blue-500 focus:outline-none" rows={2}></textarea>
                     </div>
                     {hearingForm.status === 'Completed' && (
                       <div>
                         <label className="block text-[10px] font-bold text-gray-500 uppercase mb-1">Outcome</label>
-                        <textarea value={hearingForm.outcome} onChange={e => setHearingForm({...hearingForm, outcome: e.target.value})} className="w-full text-xs p-2 rounded bg-white dark:bg-[#0b0f1a] border border-gray-200 dark:border-[#2a2d36] focus:border-blue-500 focus:outline-none" rows={2}></textarea>
+                        <textarea value={hearingForm.outcome} onChange={e => setHearingForm({...hearingForm, outcome: e.target.value})} className="w-full text-xs p-2 rounded bg-card border border-border focus:border-blue-500 focus:outline-none" rows={2}></textarea>
                       </div>
                     )}
                     <div className="flex justify-end gap-2 pt-2">
@@ -370,11 +370,11 @@ export function ELRCaseDrawer({ cardId, onClose, onUpdate }: ELRCaseDrawerProps)
                 ) : (
                   <div className="space-y-3">
                     {hearings.map(h => (
-                      <div key={h.id} className="bg-gray-50 dark:bg-[#161922] border border-gray-200 dark:border-[#2a2d36] rounded-xl p-4">
+                      <div key={h.id} className="bg-muted border border-border rounded-xl p-4">
                         <div className="flex justify-between items-start mb-2">
                           <div className="flex items-center gap-2">
                             <Calendar size={14} className="text-blue-500" />
-                            <span className="font-bold text-sm text-slate-900 dark:text-white">{new Date(h.scheduled_at).toLocaleString()}</span>
+                            <span className="font-bold text-sm text-foreground">{new Date(h.scheduled_at).toLocaleString()}</span>
                           </div>
                           <span className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded ${h.status === 'Completed' ? 'bg-[#00e07a]/10 text-[#00e07a]' : h.status === 'Cancelled' ? 'bg-red-500/10 text-red-500' : 'bg-blue-500/10 text-blue-500'}`}>
                             {h.status}
@@ -383,8 +383,8 @@ export function ELRCaseDrawer({ cardId, onClose, onUpdate }: ELRCaseDrawerProps)
                         <div className="flex items-center gap-1.5 text-xs text-gray-500 mb-2">
                           <MapPin size={12}/> {h.location || 'No location specified'}
                         </div>
-                        {h.notes && <div className="text-xs text-gray-600 dark:text-gray-400 mt-2 bg-white dark:bg-[#0b0f1a] p-2 rounded border border-gray-200 dark:border-white/5"><strong>Notes:</strong> {h.notes}</div>}
-                        {h.outcome && <div className="text-xs text-gray-600 dark:text-gray-400 mt-2 bg-white dark:bg-[#0b0f1a] p-2 rounded border border-gray-200 dark:border-white/5"><strong>Outcome:</strong> {h.outcome}</div>}
+                        {h.notes && <div className="text-xs text-muted-foreground mt-2 bg-card p-2 rounded border border-border"><strong>Notes:</strong> {h.notes}</div>}
+                        {h.outcome && <div className="text-xs text-muted-foreground mt-2 bg-card p-2 rounded border border-border"><strong>Outcome:</strong> {h.outcome}</div>}
                         <div className="mt-3 flex justify-end">
                           <button onClick={() => { setHearingForm(h as any); setShowHearingForm(true); }} className="text-[10px] text-gray-500 hover:text-blue-500 uppercase font-bold transition-colors">Edit</button>
                         </div>
@@ -407,7 +407,7 @@ export function ELRCaseDrawer({ cardId, onClose, onUpdate }: ELRCaseDrawerProps)
                   <div className="bg-purple-50 dark:bg-[#161922] border border-purple-100 dark:border-purple-500/30 rounded-xl p-4 mb-4 space-y-3">
                     <div>
                       <label className="block text-[10px] font-bold text-gray-500 uppercase mb-1">Subject / Reason for Approval</label>
-                      <input type="text" value={approvalSubject} onChange={e => setApprovalSubject(e.target.value)} placeholder="e.g. Approval for termination" className="w-full text-xs p-2 rounded bg-white dark:bg-[#0b0f1a] border border-gray-200 dark:border-[#2a2d36] focus:border-purple-500 focus:outline-none"/>
+                      <input type="text" value={approvalSubject} onChange={e => setApprovalSubject(e.target.value)} placeholder="e.g. Approval for termination" className="w-full text-xs p-2 rounded bg-background border border-border focus:border-purple-500 focus:outline-none"/>
                     </div>
                     <div className="flex justify-end gap-2 pt-2">
                       <button onClick={() => setShowApprovalForm(false)} className="px-3 py-1.5 text-xs text-gray-500">Cancel</button>
@@ -421,12 +421,12 @@ export function ELRCaseDrawer({ cardId, onClose, onUpdate }: ELRCaseDrawerProps)
                 ) : (
                   <div className="space-y-3">
                     {approvals.map(a => (
-                      <div key={a.id} className="bg-gray-50 dark:bg-[#161922] border border-gray-200 dark:border-[#2a2d36] rounded-xl p-4 flex justify-between items-center">
+                      <div key={a.id} className="bg-muted border border-border rounded-xl p-4 flex justify-between items-center">
                         <div>
-                          <div className="font-bold text-sm text-slate-900 dark:text-white mb-1">{a.subject}</div>
+                          <div className="font-bold text-sm text-foreground mb-1">{a.subject}</div>
                           <div className="text-[10px] text-gray-500">Requested: {new Date(a.created_at).toLocaleDateString()}</div>
                           {a.decision_note && (
-                            <div className="text-[11px] text-gray-600 dark:text-gray-400 mt-2 bg-white dark:bg-[#0b0f1a] p-2 rounded border border-gray-200 dark:border-white/5">
+                            <div className="text-[11px] text-muted-foreground mt-2 bg-card p-2 rounded border border-border">
                               {a.decision_note}
                             </div>
                           )}
@@ -452,11 +452,11 @@ export function ELRCaseDrawer({ cardId, onClose, onUpdate }: ELRCaseDrawerProps)
               {/* Timeline */}
               <div>
                 <h3 className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-3 border-b border-gray-100 dark:border-white/5 pb-2 flex items-center gap-2"><Clock size={14}/> Transition Timeline</h3>
-                <div className="relative pl-3 border-l-2 border-gray-200 dark:border-[#2a2d36] space-y-4 mt-4 ml-2">
+                <div className="relative pl-3 border-l-2 border-border space-y-4 mt-4 ml-2">
                   {cardDetails.transitions.map((trx, index) => (
                     <div key={trx.id || index} className="relative">
-                      <div className="absolute -left-[17px] top-1 w-3 h-3 bg-white dark:bg-[#0f1422] border-2 border-[#00e07a] rounded-full"></div>
-                      <div className="text-sm font-medium text-slate-900 dark:text-white">
+                      <div className="absolute -left-[17px] top-1 w-3 h-3 bg-card border-2 border-[#00e07a] rounded-full"></div>
+                      <div className="text-sm font-medium text-foreground">
                         Moved to <span className="text-[#00e07a]">{trx.to_stage_name}</span>
                       </div>
                       <div className="text-[11px] text-gray-500 mt-1">
@@ -465,8 +465,8 @@ export function ELRCaseDrawer({ cardId, onClose, onUpdate }: ELRCaseDrawerProps)
                     </div>
                   ))}
                   <div className="relative">
-                    <div className="absolute -left-[17px] top-1 w-3 h-3 bg-white dark:bg-[#0f1422] border-2 border-blue-400 rounded-full"></div>
-                    <div className="text-sm font-medium text-slate-900 dark:text-white">Case Created ({cardDetails.card.entered_via === 'auto' ? 'Automated' : 'Manual'})</div>
+                    <div className="absolute -left-[17px] top-1 w-3 h-3 bg-card border-2 border-blue-400 rounded-full"></div>
+                    <div className="text-sm font-medium text-foreground">Case Created ({cardDetails.card.entered_via === 'auto' ? 'Automated' : 'Manual'})</div>
                     <div className="text-[11px] text-gray-500 mt-1">
                       {new Date(cardDetails.card.created_at).toLocaleString()}
                     </div>

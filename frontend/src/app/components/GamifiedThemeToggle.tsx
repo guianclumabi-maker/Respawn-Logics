@@ -16,7 +16,7 @@ export function GamifiedThemeToggle({ collapsed }: { collapsed?: boolean }) {
   const isDark = theme === "dark";
 
   return (
-    <div className="flex items-center justify-between p-3 bg-white/[0.02] dark:bg-white/[0.02] border border-gray-200 dark:border-white/[0.06] rounded-xl relative overflow-hidden group">
+    <div className="flex items-center justify-between p-3 bg-white/[0.02] dark:bg-white/[0.02] border border-border rounded-xl relative overflow-hidden group">
       {/* Gamified Background Sweep */}
       <div className={`absolute inset-0 transition-all duration-500 opacity-20 ${isDark ? 'bg-gradient-to-r from-[#0b0f1a] to-[#00e07a]/20' : 'bg-gradient-to-r from-white to-cyan-500/20'}`} />
       
