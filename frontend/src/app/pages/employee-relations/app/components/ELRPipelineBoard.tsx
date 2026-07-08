@@ -1,23 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { apiFetch } from "../../../../lib/apiClient";
 import { 
-  Kanban, 
-  Plus, 
-  Settings, 
-  Trash2, 
-  Save, 
-  AlertCircle,
-  Clock,
-  CheckCircle,
-  FileText,
-  AlignLeft,
-  Type,
-  ListOrdered,
-  ArrowLeft,
-  Eye,
-  X,
-  FileDown,
-  Printer
+  Kanban, Plus, Settings, Trash2, Save, AlertCircle, Clock,
+  CheckCircle, FileText, AlignLeft, Type, ListOrdered, ArrowLeft,
+  Eye, X, FileDown, Printer, ChevronDown, Edit2, Check, Search, Filter,
+  ArrowUp, ArrowDown, Move
 } from "lucide-react";
 import { ELRCaseDrawer } from "./ELRCaseDrawer";
 
@@ -49,23 +36,6 @@ interface Card {
   created_at: string;
 }
 
-interface GeneratedDoc {
-  id: number;
-  card_id: number;
-  template_name: string;
-  doc_type: string;
-  body: string;
-  created_at: string;
-}
-
-interface Transition {
-  id: number;
-  from_stage: string | null;
-  to_stage: string;
-  created_at: string;
-  user_name: string;
-}
-
 export function ELRPipelineBoard() {
   const [pipelines, setPipelines] = useState<Pipeline[]>([]);
   const [currentPipelineId, setCurrentPipelineId] = useState<number | null>(null);
@@ -75,6 +45,11 @@ export function ELRPipelineBoard() {
   
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  // Filters
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filterDepartment, setFilterDepartment] = useState("");
+  const [filterStatus, setFilterStatus] = useState("");
 
   // Add Card Modal
   const [showAddCard, setShowAddCard] = useState(false);
@@ -89,6 +64,13 @@ export function ELRPipelineBoard() {
   const [transitionFields, setTransitionFields] = useState<{awol_start_date?: string, deadline_days?: string}>({});
   const [showTransitionModal, setShowTransitionModal] = useState(false);
 
+  // Manage Phases Modal
+  const [showManagePhases, setShowManagePhases] = useState(false);
+  const [manageStages, setManageStages] = useState<Stage[]>([]);
+  const [newStageName, setNewStageName] = useState("");
+  const [editingStageId, setEditingStageId] = useState<number | null>(null);
+  const [editStageName, setEditStageName] = useState("");
+
   // Toast
   const [toast, setToast] = useState<{message: string, isError: boolean} | null>(null);
 
@@ -102,6 +84,12 @@ export function ELRPipelineBoard() {
     }
   }, [currentPipelineId]);
 
+  useEffect(() => {
+    if (showManagePhases) {
+      setManageStages([...stages].sort((a, b) => a.order_index - b.order_index));
+    }
+  }, [showManagePhases, stages]);
+
   const showToast = (message: string, isError = false) => {
     setToast({ message, isError });
     setTimeout(() => setToast(null), 4000);
@@ -114,6 +102,9 @@ export function ELRPipelineBoard() {
       const data = await res.json();
       if (data.success) {
         setPipelines(data.pipelines || []);
+        if (data.pipelines && data.pipelines.length > 0 && !currentPipelineId) {
+          setCurrentPipelineId(data.pipelines[0].id);
+        }
       } else {
         setError(data.error || "Failed to fetch pipelines");
       }
@@ -160,16 +151,16 @@ export function ELRPipelineBoard() {
       });
       const data = await res.json();
       if (data.success) {
-        showToast("Employee added to pipeline");
+        showToast("Case created in pipeline");
         setShowAddCard(false);
         setAddCardEmployeeId("");
         setAddCardStageId("");
         fetchBoard(currentPipelineId);
       } else {
-        showToast(data.error || "Failed to add employee", true);
+        showToast(data.error || "Failed to create case", true);
       }
     } catch (err) {
-      showToast("Error adding employee", true);
+      showToast("Error creating case", true);
     }
   };
 
@@ -215,84 +206,102 @@ export function ELRPipelineBoard() {
         if (data.generated_document) {
           showToast(`Moved to ${toStage?.name}. Document generated: ${data.generated_document.title}`);
         } else {
-          showToast("Card moved successfully");
+          showToast("Case moved successfully");
         }
         if (currentPipelineId) fetchBoard(currentPipelineId);
       } else {
-        showToast(data.error || "Failed to move card", true);
+        showToast(data.error || "Failed to move case", true);
       }
     } catch (err) {
-      showToast("Error moving card", true);
+      showToast("Error moving case", true);
     } finally {
       setShowTransitionModal(false);
       setPendingMove(null);
     }
   };
 
-  // ------------------------------------------------------------------
-  // RENDER: INITIAL SELECTOR
-  // ------------------------------------------------------------------
-  if (!currentPipelineId) {
-    return (
-      <main className="flex-1 flex flex-col h-full bg-[#f4f6f8] dark:bg-[#0b0f1a] text-slate-900 dark:text-white overflow-y-auto transition-colors duration-300">
-        <div className="p-8 max-w-5xl mx-auto w-full">
-          <div className="flex items-center justify-between mb-8">
-            <div>
-              <h1 className="text-2xl font-bold tracking-tight bg-gradient-to-r from-white via-white to-gray-400 bg-clip-text text-transparent mb-1" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
-                Pipeline Boards
-              </h1>
-              <p className="text-slate-500 dark:text-slate-400 text-sm">Select a pipeline to view its active cases.</p>
-            </div>
-          </div>
+  const handleSaveStage = async (stage: Partial<Stage>) => {
+    try {
+      const res = await apiFetch("/api/index.php?route=elr_pipeline&action=save_stage", {
+        method: "POST",
+        body: JSON.stringify({
+          id: stage.id,
+          pipeline_id: currentPipelineId,
+          name: stage.name,
+          stage_order: stage.order_index,
+          is_terminal: stage.is_terminal ? 1 : 0
+        })
+      });
+      const data = await res.json();
+      if (data.success) {
+        if (currentPipelineId) fetchBoard(currentPipelineId);
+      } else {
+        showToast(data.error || "Failed to save stage", true);
+      }
+    } catch (err) {
+      showToast("Error saving stage", true);
+    }
+  };
 
-          {loading ? (
-            <div className="flex justify-center py-20"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#00e07a]"></div></div>
-          ) : pipelines.length === 0 ? (
-            <div className="bg-white dark:bg-[#0f1422]/80 border border-gray-200 dark:border-[#2a2d36] rounded-2xl p-12 text-center">
-              <Kanban className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-lg font-bold mb-2">No pipelines found</h3>
-              <p className="text-sm text-gray-500 mb-6">Create a pipeline in the Pipelines view first.</p>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {pipelines.map(pipe => (
-                <div 
-                  key={pipe.id} 
-                  className="bg-white dark:bg-[#0f1422]/80 border border-gray-200 dark:border-[#2a2d36] hover:border-[#00e07a]/50 dark:hover:border-[#00e07a]/50 rounded-2xl p-6 transition-all group flex flex-col cursor-pointer" 
-                  onClick={() => setCurrentPipelineId(pipe.id)}
-                >
-                  <div className="flex justify-between items-start mb-4">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-500/10 border border-blue-100 dark:border-blue-500/20 flex items-center justify-center text-blue-600 dark:text-blue-400">
-                        <Kanban size={20} />
-                      </div>
-                      <div>
-                        <h3 className="font-bold text-slate-800 dark:text-white group-hover:text-[#00e07a] transition-colors">{pipe.name}</h3>
-                      </div>
-                    </div>
-                  </div>
-                  <p className="text-sm text-gray-500 dark:text-gray-400 mb-6 flex-1 line-clamp-2">
-                    {pipe.description || "No description provided."}
-                  </p>
-                  
-                  <div className="flex items-center justify-between pt-4 border-t border-gray-100 dark:border-white/[0.05]">
-                    <div className="flex gap-4">
-                      <div className="flex items-center gap-1.5 text-xs font-mono text-gray-400">
-                        <ListOrdered size={14} /> {pipe.stage_count || 0} stages
-                      </div>
-                      <div className="flex items-center gap-1.5 text-xs font-mono text-gray-400">
-                        <CheckCircle size={14} /> {pipe.active_cases || 0} active
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      </main>
-    );
-  }
+  const handleDeleteStage = async (id: number) => {
+    if (!confirm("Are you sure you want to delete this stage? All cases in it might be orphaned.")) return;
+    try {
+      const res = await apiFetch("/api/index.php?route=elr_pipeline&action=delete_stage", {
+        method: "POST",
+        body: JSON.stringify({ id })
+      });
+      const data = await res.json();
+      if (data.success) {
+        if (currentPipelineId) fetchBoard(currentPipelineId);
+      } else {
+        showToast(data.error || "Failed to delete stage", true);
+      }
+    } catch (err) {
+      showToast("Error deleting stage", true);
+    }
+  };
+
+  const handleAddNewStage = async () => {
+    if (!newStageName.trim() || !currentPipelineId) return;
+    const order_index = manageStages.length > 0 ? Math.max(...manageStages.map(s => s.order_index)) + 1 : 1;
+    await handleSaveStage({
+      pipeline_id: currentPipelineId,
+      name: newStageName.trim(),
+      order_index,
+      is_terminal: 0
+    });
+    setNewStageName("");
+  };
+
+  const handleMoveStage = async (index: number, direction: "up" | "down") => {
+    const newStages = [...manageStages];
+    if (direction === "up" && index > 0) {
+      const temp = newStages[index].order_index;
+      newStages[index].order_index = newStages[index - 1].order_index;
+      newStages[index - 1].order_index = temp;
+      
+      const t = newStages[index];
+      newStages[index] = newStages[index - 1];
+      newStages[index - 1] = t;
+    } else if (direction === "down" && index < newStages.length - 1) {
+      const temp = newStages[index].order_index;
+      newStages[index].order_index = newStages[index + 1].order_index;
+      newStages[index + 1].order_index = temp;
+      
+      const t = newStages[index];
+      newStages[index] = newStages[index + 1];
+      newStages[index + 1] = t;
+    }
+    setManageStages(newStages);
+    
+    if (direction === "up" && index > 0) {
+      await handleSaveStage(newStages[index]);
+      await handleSaveStage(newStages[index - 1]);
+    } else if (direction === "down" && index < newStages.length - 1) {
+      await handleSaveStage(newStages[index]);
+      await handleSaveStage(newStages[index + 1]);
+    }
+  };
 
   // ------------------------------------------------------------------
   // RENDER: BOARD VIEW
@@ -300,35 +309,103 @@ export function ELRPipelineBoard() {
   const currentPipeline = pipelines.find(p => p.id === currentPipelineId);
   const grouped: Record<number, Card[]> = {};
 
+  const departments = Array.from(new Set(cards.map(c => c.department))).filter(Boolean);
+  
+  const filteredCards = cards.filter(card => {
+    const stage = stages.find(s => s.id === card.current_stage_id);
+    const isTerminal = stage?.is_terminal === 1 || stage?.is_terminal === true;
+    
+    if (searchQuery) {
+      const q = searchQuery.toLowerCase();
+      if (!card.full_name.toLowerCase().includes(q) && !card.employee_id.toLowerCase().includes(q)) return false;
+    }
+    if (filterDepartment && card.department !== filterDepartment) return false;
+    if (filterStatus) {
+      if (filterStatus === "active" && isTerminal) return false;
+      if (filterStatus === "closed" && !isTerminal) return false;
+    }
+    return true;
+  });
+
   return (
     <main className="flex-1 flex flex-col h-full bg-[#f4f6f8] dark:bg-[#06070a] text-slate-900 dark:text-white overflow-hidden transition-colors duration-300 relative">
       
       {/* Header */}
       <div className="flex-none px-6 py-4 border-b border-gray-200 dark:border-white/5 bg-white dark:bg-[#161922]/50 backdrop-blur-md flex items-center justify-between">
         <div className="flex items-center gap-4">
-          <button 
-            onClick={() => setCurrentPipelineId(null)}
-            className="p-2 bg-gray-100 dark:bg-white/[0.05] hover:bg-gray-200 dark:hover:bg-white/[0.1] rounded-lg text-gray-500 dark:text-gray-400 transition-colors"
-          >
-            <ArrowLeft size={18} />
-          </button>
           <div>
-            <h1 className="text-xl font-bold text-slate-900 dark:text-white font-['Space_Grotesk']">
-              {currentPipeline?.name}
+            <h1 className="text-xl font-bold text-slate-900 dark:text-white font-['Space_Grotesk'] flex items-center gap-3">
+              {pipelines.length > 1 ? (
+                <select
+                  value={currentPipelineId || ""}
+                  onChange={(e) => setCurrentPipelineId(parseInt(e.target.value))}
+                  className="bg-transparent font-bold border-none outline-none cursor-pointer focus:ring-0"
+                >
+                  {pipelines.map(p => (
+                    <option key={p.id} value={p.id} className="text-black dark:text-white">{p.name}</option>
+                  ))}
+                </select>
+              ) : (
+                currentPipeline?.name || "Pipeline Board"
+              )}
             </h1>
           </div>
         </div>
-        <button 
-          onClick={() => setShowAddCard(true)}
-          className="px-4 py-2 bg-[#00e07a] hover:bg-[#00c96a] text-black font-extrabold rounded-lg text-sm transition-all flex items-center gap-2 cursor-pointer shadow-sm"
-        >
-          <Plus size={16} /> Add Employee
-        </button>
+        <div className="flex items-center gap-3">
+          <button 
+            onClick={() => setShowManagePhases(true)}
+            className="px-4 py-2 bg-gray-100 dark:bg-white/10 hover:bg-gray-200 dark:hover:bg-white/20 font-semibold rounded-lg text-sm transition-all flex items-center gap-2 cursor-pointer shadow-sm"
+          >
+            <Settings size={16} /> Manage Phases
+          </button>
+          <button 
+            onClick={() => setShowAddCard(true)}
+            className="px-4 py-2 bg-[#00e07a] hover:bg-[#00c96a] text-black font-extrabold rounded-lg text-sm transition-all flex items-center gap-2 cursor-pointer shadow-sm"
+          >
+            <Plus size={16} /> Create Case
+          </button>
+        </div>
+      </div>
+
+      {/* Filter Bar */}
+      <div className="flex-none px-6 py-3 border-b border-gray-200 dark:border-white/5 bg-gray-50/50 dark:bg-black/20 flex flex-wrap gap-4 items-center">
+        <div className="relative">
+          <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+          <input 
+            type="text" 
+            placeholder="Search by name or ID..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="pl-9 pr-4 py-1.5 text-sm bg-white dark:bg-[#0b0f1a] border border-gray-200 dark:border-[#2a2d36] rounded-full focus:outline-none focus:border-[#00e07a] transition-colors w-64"
+          />
+        </div>
+        <div className="flex items-center gap-2">
+          <Filter size={14} className="text-gray-400" />
+          <select
+            value={filterDepartment}
+            onChange={(e) => setFilterDepartment(e.target.value)}
+            className="bg-white dark:bg-[#0b0f1a] border border-gray-200 dark:border-[#2a2d36] rounded-full px-3 py-1.5 text-sm focus:outline-none focus:border-[#00e07a]"
+          >
+            <option value="">All Departments</option>
+            {departments.map(d => <option key={d} value={d}>{d}</option>)}
+          </select>
+        </div>
+        <div className="flex items-center gap-2">
+          <select
+            value={filterStatus}
+            onChange={(e) => setFilterStatus(e.target.value)}
+            className="bg-white dark:bg-[#0b0f1a] border border-gray-200 dark:border-[#2a2d36] rounded-full px-3 py-1.5 text-sm focus:outline-none focus:border-[#00e07a]"
+          >
+            <option value="">All Cases</option>
+            <option value="active">Active Cases</option>
+            <option value="closed">Closed Cases (Terminal)</option>
+          </select>
+        </div>
       </div>
 
       {/* Board Scroll Area */}
       <div className="flex-1 overflow-x-auto overflow-y-hidden p-6 flex gap-6 select-none scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-[#2a2d36]">
-        {loading ? (
+        {loading && stages.length === 0 ? (
           <div className="flex-1 flex items-center justify-center">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#00e07a]"></div>
           </div>
@@ -343,7 +420,7 @@ export function ELRPipelineBoard() {
           </div>
         ) : (
           stages.map(stage => {
-            grouped[stage.id] = cards.filter((c: any) => c.current_stage_id === stage.id);
+            grouped[stage.id] = filteredCards.filter((c: any) => c.current_stage_id === stage.id);
             return (
               <div 
                 key={stage.id} 
@@ -399,12 +476,88 @@ export function ELRPipelineBoard() {
 
       {/* MODALS AND OVERLAYS */}
 
+      {/* Manage Phases Modal */}
+      {showManagePhases && (
+        <div className="absolute inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-white dark:bg-[#161922] border border-gray-200 dark:border-[#2a2d36] rounded-xl w-full max-w-lg shadow-2xl overflow-hidden flex flex-col max-h-[80vh]">
+            <div className="p-4 border-b border-gray-200 dark:border-[#2a2d36] flex justify-between items-center bg-gray-50 dark:bg-black/20">
+              <h3 className="font-bold text-slate-900 dark:text-white flex items-center gap-2"><Settings size={16} className="text-[#00e07a]" /> Manage Phases</h3>
+              <button onClick={() => setShowManagePhases(false)} className="text-gray-400 hover:text-slate-900 dark:hover:text-white"><X size={18} /></button>
+            </div>
+            
+            <div className="p-5 overflow-y-auto flex-1 space-y-3">
+              {manageStages.map((stage, index) => (
+                <div key={stage.id} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-[#0b0f1a] border border-gray-200 dark:border-[#2a2d36] rounded-lg">
+                  <div className="flex items-center gap-3">
+                    <div className="flex flex-col text-gray-400">
+                      <button disabled={index === 0} onClick={() => handleMoveStage(index, "up")} className="hover:text-white disabled:opacity-30"><ArrowUp size={14} /></button>
+                      <button disabled={index === manageStages.length - 1} onClick={() => handleMoveStage(index, "down")} className="hover:text-white disabled:opacity-30"><ArrowDown size={14} /></button>
+                    </div>
+                    {editingStageId === stage.id ? (
+                      <div className="flex items-center gap-2">
+                        <input 
+                          type="text" 
+                          value={editStageName}
+                          onChange={(e) => setEditStageName(e.target.value)}
+                          className="bg-white dark:bg-[#161922] border border-gray-200 dark:border-[#2a2d36] rounded px-2 py-1 text-sm focus:outline-none focus:border-[#00e07a]"
+                        />
+                        <button 
+                          onClick={() => {
+                            handleSaveStage({...stage, name: editStageName});
+                            setEditingStageId(null);
+                            setManageStages(manageStages.map(s => s.id === stage.id ? {...s, name: editStageName} : s));
+                          }} 
+                          className="text-[#00e07a] hover:text-[#00c96a]"
+                        >
+                          <Check size={16} />
+                        </button>
+                        <button onClick={() => setEditingStageId(null)} className="text-red-400 hover:text-red-300">
+                          <X size={16} />
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="flex items-center gap-2">
+                        <span className="font-semibold text-sm">{stage.name}</span>
+                        {stage.is_terminal === 1 && <span className="text-[10px] bg-red-500/20 text-red-400 px-1.5 py-0.5 rounded font-bold uppercase">Terminal</span>}
+                        <button onClick={() => { setEditingStageId(stage.id); setEditStageName(stage.name); }} className="text-gray-400 hover:text-white ml-2">
+                          <Edit2 size={14} />
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                  <button onClick={() => handleDeleteStage(stage.id)} className="text-gray-400 hover:text-red-500">
+                    <Trash2 size={16} />
+                  </button>
+                </div>
+              ))}
+            </div>
+
+            <div className="p-4 border-t border-gray-200 dark:border-[#2a2d36] bg-gray-50 dark:bg-black/20 flex items-center gap-3">
+              <input 
+                type="text" 
+                placeholder="New phase name..."
+                value={newStageName}
+                onChange={(e) => setNewStageName(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && handleAddNewStage()}
+                className="flex-1 bg-white dark:bg-[#0b0f1a] border border-gray-200 dark:border-[#2a2d36] rounded-lg py-2 px-3 text-sm focus:outline-none focus:border-[#00e07a]" 
+              />
+              <button 
+                onClick={handleAddNewStage}
+                className="px-4 py-2 bg-[#00e07a] hover:bg-[#00c96a] text-black font-extrabold rounded-lg text-sm transition-colors whitespace-nowrap"
+              >
+                Add Phase
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Add Card Modal */}
       {showAddCard && (
         <div className="absolute inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-white dark:bg-[#161922] border border-gray-200 dark:border-[#2a2d36] rounded-xl w-full max-w-sm shadow-2xl overflow-hidden">
             <div className="p-4 border-b border-gray-200 dark:border-[#2a2d36] flex justify-between items-center bg-gray-50 dark:bg-black/20">
-              <h3 className="font-bold text-slate-900 dark:text-white">Add Employee</h3>
+              <h3 className="font-bold text-slate-900 dark:text-white">Create Case</h3>
               <button onClick={() => setShowAddCard(false)} className="text-gray-400 hover:text-slate-900 dark:hover:text-white"><X size={18} /></button>
             </div>
             <form onSubmit={handleAddCard} className="p-5 space-y-4">
@@ -434,7 +587,7 @@ export function ELRPipelineBoard() {
               )}
               <div className="pt-2 flex justify-end gap-3">
                 <button type="button" onClick={() => setShowAddCard(false)} className="px-3 py-1.5 text-gray-500 dark:text-gray-400 hover:text-slate-900 dark:hover:text-white text-sm font-semibold">Cancel</button>
-                <button type="submit" className="px-4 py-2 bg-[#00e07a] hover:bg-[#00c96a] text-black font-extrabold rounded-lg text-sm transition-colors">Add</button>
+                <button type="submit" className="px-4 py-2 bg-[#00e07a] hover:bg-[#00c96a] text-black font-extrabold rounded-lg text-sm transition-colors">Create Case</button>
               </div>
             </form>
           </div>
