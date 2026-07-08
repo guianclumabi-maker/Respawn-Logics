@@ -273,33 +273,49 @@ export function ELRPipelineBoard() {
     setNewStageName("");
   };
 
-  const handleMoveStage = async (index: number, direction: "up" | "down") => {
+  const handleStageDragStart = (e: React.DragEvent, index: number) => {
+    e.dataTransfer.setData("stageIndex", index.toString());
+  };
+
+  const handleStageDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+  };
+
+  const handleStageDrop = (e: React.DragEvent, toIndex: number) => {
+    e.preventDefault();
+    const fromIndex = parseInt(e.dataTransfer.getData("stageIndex"));
+    if (isNaN(fromIndex) || fromIndex === toIndex) return;
+
     const newStages = [...manageStages];
-    if (direction === "up" && index > 0) {
-      const temp = newStages[index].order_index;
-      newStages[index].order_index = newStages[index - 1].order_index;
-      newStages[index - 1].order_index = temp;
-      
-      const t = newStages[index];
-      newStages[index] = newStages[index - 1];
-      newStages[index - 1] = t;
-    } else if (direction === "down" && index < newStages.length - 1) {
-      const temp = newStages[index].order_index;
-      newStages[index].order_index = newStages[index + 1].order_index;
-      newStages[index + 1].order_index = temp;
-      
-      const t = newStages[index];
-      newStages[index] = newStages[index + 1];
-      newStages[index + 1] = t;
-    }
-    setManageStages(newStages);
+    const [moved] = newStages.splice(fromIndex, 1);
+    newStages.splice(toIndex, 0, moved);
     
-    if (direction === "up" && index > 0) {
-      await handleSaveStage(newStages[index]);
-      await handleSaveStage(newStages[index - 1]);
-    } else if (direction === "down" && index < newStages.length - 1) {
-      await handleSaveStage(newStages[index]);
-      await handleSaveStage(newStages[index + 1]);
+    // Update order_index locally so they sort properly
+    newStages.forEach((s, idx) => {
+      s.order_index = idx;
+    });
+    setManageStages(newStages);
+  };
+
+  const handleSaveOrder = async () => {
+    if (!currentPipelineId) return;
+    try {
+      const res = await apiFetch("/api/index.php?route=elr_pipeline&action=reorder_stages", {
+        method: "POST",
+        body: JSON.stringify({
+          pipeline_id: currentPipelineId,
+          order: manageStages.map(s => s.id)
+        })
+      });
+      const data = await res.json();
+      if (data.success) {
+        showToast("Phase order saved");
+        fetchBoard(currentPipelineId);
+      } else {
+        showToast(data.error || "Failed to save order", true);
+      }
+    } catch (err) {
+      showToast("Error saving order", true);
     }
   };
 
@@ -487,11 +503,17 @@ export function ELRPipelineBoard() {
             
             <div className="p-5 overflow-y-auto flex-1 space-y-3">
               {manageStages.map((stage, index) => (
-                <div key={stage.id} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-[#0b0f1a] border border-gray-200 dark:border-[#2a2d36] rounded-lg">
+                <div 
+                  key={stage.id} 
+                  draggable
+                  onDragStart={(e) => handleStageDragStart(e, index)}
+                  onDragOver={handleStageDragOver}
+                  onDrop={(e) => handleStageDrop(e, index)}
+                  className="flex items-center justify-between p-3 bg-gray-50 dark:bg-[#0b0f1a] border border-gray-200 dark:border-[#2a2d36] rounded-lg cursor-grab active:cursor-grabbing"
+                >
                   <div className="flex items-center gap-3">
-                    <div className="flex flex-col text-gray-400">
-                      <button disabled={index === 0} onClick={() => handleMoveStage(index, "up")} className="hover:text-white disabled:opacity-30"><ArrowUp size={14} /></button>
-                      <button disabled={index === manageStages.length - 1} onClick={() => handleMoveStage(index, "down")} className="hover:text-white disabled:opacity-30"><ArrowDown size={14} /></button>
+                    <div className="text-gray-400 hover:text-white cursor-grab">
+                      <Move size={14} />
                     </div>
                     {editingStageId === stage.id ? (
                       <div className="flex items-center gap-2">
@@ -532,21 +554,32 @@ export function ELRPipelineBoard() {
               ))}
             </div>
 
-            <div className="p-4 border-t border-gray-200 dark:border-[#2a2d36] bg-gray-50 dark:bg-black/20 flex items-center gap-3">
-              <input 
-                type="text" 
-                placeholder="New phase name..."
-                value={newStageName}
-                onChange={(e) => setNewStageName(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && handleAddNewStage()}
-                className="flex-1 bg-white dark:bg-[#0b0f1a] border border-gray-200 dark:border-[#2a2d36] rounded-lg py-2 px-3 text-sm focus:outline-none focus:border-[#00e07a]" 
-              />
-              <button 
-                onClick={handleAddNewStage}
-                className="px-4 py-2 bg-[#00e07a] hover:bg-[#00c96a] text-black font-extrabold rounded-lg text-sm transition-colors whitespace-nowrap"
-              >
-                Add Phase
-              </button>
+            <div className="p-4 border-t border-gray-200 dark:border-[#2a2d36] bg-gray-50 dark:bg-black/20 flex flex-col gap-3">
+              <div className="flex justify-between items-center w-full mb-2">
+                <span className="text-xs text-gray-500">Drag to reorder, then click Save.</span>
+                <button 
+                  onClick={handleSaveOrder}
+                  className="px-4 py-1.5 bg-gray-200 dark:bg-white/10 hover:bg-gray-300 dark:hover:bg-white/20 text-slate-800 dark:text-white font-semibold rounded-lg text-sm transition-colors whitespace-nowrap"
+                >
+                  Save Order
+                </button>
+              </div>
+              <div className="flex items-center gap-3 w-full">
+                <input 
+                  type="text" 
+                  placeholder="New phase name..."
+                  value={newStageName}
+                  onChange={(e) => setNewStageName(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && handleAddNewStage()}
+                  className="flex-1 bg-white dark:bg-[#0b0f1a] border border-gray-200 dark:border-[#2a2d36] rounded-lg py-2 px-3 text-sm focus:outline-none focus:border-[#00e07a]" 
+                />
+                <button 
+                  onClick={handleAddNewStage}
+                  className="px-4 py-2 bg-[#00e07a] hover:bg-[#00c96a] text-black font-extrabold rounded-lg text-sm transition-colors whitespace-nowrap"
+                >
+                  Add Phase
+                </button>
+              </div>
             </div>
           </div>
         </div>
