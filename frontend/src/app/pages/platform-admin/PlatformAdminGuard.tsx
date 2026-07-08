@@ -9,7 +9,7 @@ export function PlatformAdminGuard({ children }: { children: React.ReactNode }) 
   const { user, loading } = useAuth();
   if (loading) return null;
   const isPlatformAdmin =
-    user?.roles?.includes("Platform_Admin") || user?.is_super === true;
+    user?.role === "Platform_Admin" || user?.roles?.includes("Platform_Admin");
   if (!user || !isPlatformAdmin) return <Navigate to="/dashboard" replace />;
   return <>{children}</>;
 }

@@ -1,4 +1,6 @@
 <?php
+require_once __DIR__ . '/../../bootstrap/app.php';
+
 // Secure context: only accessible via dashboard.php router
 if (!defined('ABSPATH') && empty($user)) {
     $user = getCurrentUser();
@@ -9,6 +11,11 @@ $current_page = 'dashboard.php';
 
 // AJAX Stats Handler
 if (isset($_GET['action']) && $_GET['action'] === 'get_vendor_stats') {
+    if (!hasRole('Platform_Admin')) {
+        http_response_code(403);
+        echo json_encode(['success'=>false,'error'=>'Forbidden']);
+        exit;
+    }
     header('Content-Type: application/json');
     try {
         $tenantCount = $pdo->query("SELECT COUNT(*) FROM `tenants` WHERE `status` = 'active' AND `id` != '1'")->fetchColumn();

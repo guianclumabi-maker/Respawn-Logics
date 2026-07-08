@@ -452,7 +452,7 @@ export function Sidebar({ activeView, onViewChange, badges = {} }: SidebarProps)
         </div>
 
         {/* ── Platform Admin Command Center (Platform_Admin only) ── */}
-        {(user?.roles?.includes("Platform_Admin") || user?.is_super) && (
+        {(user?.role === "Platform_Admin" || user?.roles?.includes("Platform_Admin")) && (
           <div className="mt-3">
             <button
               onClick={() => navigate("/platform-admin")}

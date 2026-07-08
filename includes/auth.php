@@ -136,4 +136,17 @@ if (!function_exists('hasRole')) {
     }
 }
 
+/**
+ * Checks if the current user is genuine platform staff, completely ignoring is_super.
+ * This is the ultimate gatekeeper for platform-level views.
+ */
+if (!function_exists('isPlatformStaff')) {
+    function isPlatformStaff() {
+        if (!isLoggedIn()) return false;
+        $user = getCurrentUser();
+        if (!$user) return false;
 
+        $platformRoles = ['Platform_Admin', 'Support_Agent', 'Implementation_Specialist'];
+        return in_array($user['role'], $platformRoles);
+    }
+}

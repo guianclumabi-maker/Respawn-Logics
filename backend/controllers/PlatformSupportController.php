@@ -24,7 +24,7 @@ class PlatformSupportController
 
     public function handleRequest($action)
     {
-        if (!hasRole('Super_Admin') && !hasRole('Platform_Admin')) {
+        if (!isPlatformStaff()) {
             http_response_code(403);
             echo json_encode(['success' => false, 'error' => 'Forbidden: Platform access required']);
             return;

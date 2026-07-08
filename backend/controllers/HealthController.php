@@ -7,7 +7,7 @@ class HealthController {
     }
 
     public function handleRequest($action, $input = null) {
-        if (!hasPermission('settings.manage') && !in_array('Super_Admin', $_SESSION['roles'] ?? [])) {
+        if (!hasRole('Platform_Admin')) {
             http_response_code(403);
             echo json_encode(['success' => false, 'error' => 'Denied']);
             return;
