@@ -177,7 +177,7 @@ export function ELRTemplates() {
 
   if (editingTemplate) {
     return (
-      <main className="flex-1 flex flex-col h-full bg-[#f4f6f8] dark:bg-[#0b0f1a] text-slate-900 dark:text-white overflow-y-auto transition-colors duration-300">
+      <main className="flex-1 flex flex-col h-full bg-[#f4f6f8] dark:bg-[#0b0f1a] text-foreground overflow-y-auto transition-colors duration-300">
         <div className="p-8 max-w-5xl mx-auto w-full">
           <div className="flex items-center justify-between mb-6">
             <div>
@@ -189,7 +189,7 @@ export function ELRTemplates() {
             <div className="flex gap-3">
               <button 
                 onClick={handleClose}
-                className="px-4 py-2 bg-gray-100 dark:bg-white/[0.05] hover:bg-gray-200 dark:hover:bg-white/[0.1] rounded-lg text-sm font-medium transition-colors"
+                className="px-4 py-2 bg-accent hover:bg-accent rounded-lg text-sm font-medium transition-colors"
               >
                 Cancel
               </button>
@@ -213,7 +213,7 @@ export function ELRTemplates() {
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <div className="lg:col-span-2 space-y-6">
-              <div className="bg-white dark:bg-[#0f1422]/80 border border-gray-200 dark:border-[#2a2d36] rounded-2xl p-6">
+              <div className="bg-card/80 border border-border rounded-2xl p-6">
                 <div className="space-y-4">
                   <div>
                     <label className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">
@@ -223,7 +223,7 @@ export function ELRTemplates() {
                       type="text" 
                       value={formData.name || ""} 
                       onChange={e => setFormData({ ...formData, name: e.target.value })}
-                      className="w-full bg-gray-50 dark:bg-[#0b0f1a] border border-gray-200 dark:border-[#2a2d36] rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#00e07a] focus:ring-1 focus:ring-[#00e07a]/50 text-slate-900 dark:text-white"
+                      className="w-full bg-background border border-border rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#00e07a] focus:ring-1 focus:ring-[#00e07a]/50 text-slate-900 dark:text-white"
                       placeholder="e.g. Return to Work Notice (Standard)"
                     />
                   </div>
@@ -237,7 +237,7 @@ export function ELRTemplates() {
                         type="text" 
                         value={formData.doc_type || ""} 
                         onChange={e => setFormData({ ...formData, doc_type: e.target.value })}
-                        className="w-full bg-gray-50 dark:bg-[#0b0f1a] border border-gray-200 dark:border-[#2a2d36] rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#00e07a] focus:ring-1 focus:ring-[#00e07a]/50 text-slate-900 dark:text-white"
+                        className="w-full bg-background border border-border rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#00e07a] focus:ring-1 focus:ring-[#00e07a]/50 text-slate-900 dark:text-white"
                         placeholder="e.g. RTWN, NTE, NOD"
                       />
                     </div>
@@ -249,7 +249,7 @@ export function ELRTemplates() {
                         type="text" 
                         value={formData.description || ""} 
                         onChange={e => setFormData({ ...formData, description: e.target.value })}
-                        className="w-full bg-gray-50 dark:bg-[#0b0f1a] border border-gray-200 dark:border-[#2a2d36] rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#00e07a] focus:ring-1 focus:ring-[#00e07a]/50 text-slate-900 dark:text-white"
+                        className="w-full bg-background border border-border rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#00e07a] focus:ring-1 focus:ring-[#00e07a]/50 text-slate-900 dark:text-white"
                         placeholder="Brief internal description"
                       />
                     </div>
@@ -263,7 +263,7 @@ export function ELRTemplates() {
                     </div>
                     
                     {/* Toolbar */}
-                    <div className="flex flex-wrap gap-2 mb-3 p-3 bg-gray-50 dark:bg-[#0b0f1a]/50 border border-gray-200 dark:border-[#2a2d36] rounded-xl">
+                    <div className="flex flex-wrap gap-2 mb-3 p-3 bg-muted border border-border rounded-xl">
                       {MERGE_FIELDS.map(field => (
                         <button
                           key={field}
@@ -280,7 +280,7 @@ export function ELRTemplates() {
                       ref={bodyRef}
                       value={formData.body || ""} 
                       onChange={e => setFormData({ ...formData, body: e.target.value })}
-                      className="w-full h-[400px] bg-gray-50 dark:bg-[#0b0f1a] border border-gray-200 dark:border-[#2a2d36] rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#00e07a] focus:ring-1 focus:ring-[#00e07a]/50 text-slate-900 dark:text-white font-mono leading-relaxed resize-none scrollbar-thin"
+                      className="w-full h-[400px] bg-background border border-border rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#00e07a] focus:ring-1 focus:ring-[#00e07a]/50 text-slate-900 dark:text-white font-mono leading-relaxed resize-none scrollbar-thin"
                       placeholder="Type your template here... click fields above to insert dynamic values."
                     />
                   </div>
@@ -289,10 +289,10 @@ export function ELRTemplates() {
             </div>
 
             <div className="space-y-6">
-              <div className="bg-white dark:bg-[#0f1422]/80 border border-gray-200 dark:border-[#2a2d36] rounded-2xl p-6">
+              <div className="bg-card/80 border border-border rounded-2xl p-6">
                 <h3 className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-4">Detected Fields</h3>
                 {detectedFields.length === 0 ? (
-                  <p className="text-xs text-gray-500 dark:text-gray-400 italic">No merge fields detected yet. Save the template to analyze.</p>
+                  <p className="text-xs text-muted-foreground italic">No merge fields detected yet. Save the template to analyze.</p>
                 ) : (
                   <div className="flex flex-wrap gap-2">
                     {detectedFields.map(field => (
@@ -311,7 +311,7 @@ export function ELRTemplates() {
   }
 
   return (
-    <main className="flex-1 flex flex-col h-full bg-[#f4f6f8] dark:bg-[#0b0f1a] text-slate-900 dark:text-white overflow-y-auto transition-colors duration-300">
+    <main className="flex-1 flex flex-col h-full bg-[#f4f6f8] dark:bg-[#0b0f1a] text-foreground overflow-y-auto transition-colors duration-300">
       <div className="p-8">
         
         {/* Header */}
@@ -343,13 +343,13 @@ export function ELRTemplates() {
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#00e07a]"></div>
           </div>
         ) : templates.length === 0 ? (
-          <div className="bg-white dark:bg-[#0f1422]/80 border border-gray-200 dark:border-[#2a2d36] rounded-2xl p-12 text-center">
+          <div className="bg-card/80 border border-border rounded-2xl p-12 text-center">
             <FileText className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
             <h3 className="text-lg font-bold text-slate-800 dark:text-white mb-2">No templates found</h3>
-            <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">Create your first document template to standardize ELR case communications.</p>
+            <p className="text-sm text-muted-foreground mb-6">Create your first document template to standardize ELR case communications.</p>
             <button 
               onClick={handleCreate}
-              className="px-4 py-2 bg-white dark:bg-white/[0.05] border border-gray-200 dark:border-white/[0.1] hover:bg-gray-50 dark:hover:bg-white/[0.1] rounded-lg text-sm font-medium transition-colors"
+              className="px-4 py-2 bg-card border border-border hover:bg-accent rounded-lg text-sm font-medium transition-colors"
             >
               Create Template
             </button>
@@ -359,7 +359,7 @@ export function ELRTemplates() {
             {templates.map(tmpl => (
               <div 
                 key={tmpl.id}
-                className="bg-white dark:bg-[#0f1422]/80 border border-gray-200 dark:border-[#2a2d36] hover:border-[#00e07a]/50 dark:hover:border-[#00e07a]/50 rounded-2xl p-6 transition-all group flex flex-col"
+                className="bg-card border border-border hover:border-[#00e07a]/50 dark:hover:border-[#00e07a]/50 rounded-2xl p-6 transition-all group flex flex-col"
               >
                 <div className="flex justify-between items-start mb-4">
                   <div className="flex items-center gap-3">
@@ -368,14 +368,14 @@ export function ELRTemplates() {
                     </div>
                     <div>
                       <h3 className="font-bold text-slate-800 dark:text-white group-hover:text-[#00e07a] transition-colors">{tmpl.name}</h3>
-                      <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase border bg-gray-100 dark:bg-white/5 text-gray-600 dark:text-gray-300 border-gray-200 dark:border-white/10 mt-1 inline-block">
+                      <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase border bg-accent text-gray-600 dark:text-gray-300 border-border mt-1 inline-block">
                         {tmpl.doc_type}
                       </span>
                     </div>
                   </div>
                 </div>
                 
-                <p className="text-sm text-gray-500 dark:text-gray-400 mb-6 flex-1 line-clamp-2">
+                <p className="text-sm text-muted-foreground mb-6 flex-1 line-clamp-2">
                   {tmpl.description || "No description provided."}
                 </p>
                 

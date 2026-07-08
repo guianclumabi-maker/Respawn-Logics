@@ -344,13 +344,13 @@ export function ELRPipelineBoard() {
   });
 
   return (
-    <main className="flex-1 flex flex-col h-full bg-[#f4f6f8] dark:bg-[#06070a] text-slate-900 dark:text-white overflow-hidden transition-colors duration-300 relative">
+    <main className="flex-1 flex flex-col h-full bg-[#f4f6f8] dark:bg-[#06070a] text-foreground overflow-hidden transition-colors duration-300 relative">
       
       {/* Header */}
-      <div className="flex-none px-6 py-4 border-b border-gray-200 dark:border-white/5 bg-white dark:bg-[#161922]/50 backdrop-blur-md flex items-center justify-between">
+      <div className="flex-none px-6 py-4 border-b border-border bg-card/50 backdrop-blur-md flex items-center justify-between">
         <div className="flex items-center gap-4">
           <div>
-            <h1 className="text-xl font-bold text-slate-900 dark:text-white font-['Space_Grotesk'] flex items-center gap-3">
+            <h1 className="text-xl font-bold text-foreground font-['Space_Grotesk'] flex items-center gap-3">
               {pipelines.length > 1 ? (
                 <select
                   value={currentPipelineId || ""}
@@ -370,7 +370,7 @@ export function ELRPipelineBoard() {
         <div className="flex items-center gap-3">
           <button 
             onClick={() => setShowManagePhases(true)}
-            className="px-4 py-2 bg-gray-100 dark:bg-white/10 hover:bg-gray-200 dark:hover:bg-white/20 font-semibold rounded-lg text-sm transition-all flex items-center gap-2 cursor-pointer shadow-sm"
+            className="px-4 py-2 bg-accent hover:bg-accent font-semibold rounded-lg text-sm transition-all flex items-center gap-2 cursor-pointer shadow-sm"
           >
             <Settings size={16} /> Manage Phases
           </button>
@@ -384,7 +384,7 @@ export function ELRPipelineBoard() {
       </div>
 
       {/* Filter Bar */}
-      <div className="flex-none px-6 py-3 border-b border-gray-200 dark:border-white/5 bg-gray-50/50 dark:bg-black/20 flex flex-wrap gap-4 items-center">
+      <div className="flex-none px-6 py-3 border-b border-border bg-gray-50/50 dark:bg-black/20 flex flex-wrap gap-4 items-center">
         <div className="relative">
           <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
           <input 
@@ -392,7 +392,7 @@ export function ELRPipelineBoard() {
             placeholder="Search by name or ID..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-9 pr-4 py-1.5 text-sm bg-white dark:bg-[#0b0f1a] border border-gray-200 dark:border-[#2a2d36] rounded-full focus:outline-none focus:border-[#00e07a] transition-colors w-64"
+            className="pl-9 pr-4 py-1.5 text-sm bg-background border border-border rounded-full focus:outline-none focus:border-[#00e07a] transition-colors w-64"
           />
         </div>
         <div className="flex items-center gap-2">
@@ -400,7 +400,7 @@ export function ELRPipelineBoard() {
           <select
             value={filterDepartment}
             onChange={(e) => setFilterDepartment(e.target.value)}
-            className="bg-white dark:bg-[#0b0f1a] border border-gray-200 dark:border-[#2a2d36] rounded-full px-3 py-1.5 text-sm focus:outline-none focus:border-[#00e07a]"
+            className="bg-background border border-border rounded-full px-3 py-1.5 text-sm focus:outline-none focus:border-[#00e07a]"
           >
             <option value="">All Departments</option>
             {departments.map(d => <option key={d} value={d}>{d}</option>)}
@@ -410,7 +410,7 @@ export function ELRPipelineBoard() {
           <select
             value={filterStatus}
             onChange={(e) => setFilterStatus(e.target.value)}
-            className="bg-white dark:bg-[#0b0f1a] border border-gray-200 dark:border-[#2a2d36] rounded-full px-3 py-1.5 text-sm focus:outline-none focus:border-[#00e07a]"
+            className="bg-background border border-border rounded-full px-3 py-1.5 text-sm focus:outline-none focus:border-[#00e07a]"
           >
             <option value="">All Cases</option>
             <option value="active">Active Cases</option>
@@ -440,15 +440,15 @@ export function ELRPipelineBoard() {
             return (
               <div 
                 key={stage.id} 
-                className="w-[320px] flex-shrink-0 flex flex-col max-h-full bg-gray-50 dark:bg-[#0f1422] rounded-xl border border-gray-200 dark:border-[#2a2d36]"
+                className="w-[320px] flex-shrink-0 flex flex-col max-h-full bg-muted rounded-xl border border-border"
                 onDragOver={handleDragOver}
                 onDrop={(e) => handleDrop(e, stage.id)}
               >
                 {/* Column Header */}
-                <div className="p-3 border-b border-gray-200 dark:border-[#2a2d36] flex justify-between items-center bg-white/50 dark:bg-[#161922]/50 rounded-t-xl">
+                <div className="p-3 border-b border-border flex justify-between items-center bg-white/50 dark:bg-[#161922]/50 rounded-t-xl">
                   <div className="flex items-center gap-2">
                     <h3 className="font-bold text-sm tracking-tight text-slate-800 dark:text-white uppercase">{stage.name}</h3>
-                    <span className="bg-gray-200 dark:bg-white/10 text-xs font-mono px-2 py-0.5 rounded-full text-slate-600 dark:text-gray-400">
+                    <span className="bg-accent text-xs font-mono px-2 py-0.5 rounded-full text-slate-600 dark:text-gray-400">
                       {grouped[stage.id].length}
                     </span>
                   </div>
@@ -465,7 +465,7 @@ export function ELRPipelineBoard() {
                       draggable
                       onDragStart={(e) => handleDragStart(e, card.id)}
                       onClick={() => setSelectedCardId(card.id)}
-                      className="bg-white dark:bg-[#1a1f2e] border border-gray-200 dark:border-[#2a2d36] hover:border-[#00e07a]/50 rounded-lg p-4 cursor-grab active:cursor-grabbing shadow-sm hover:shadow-md transition-all group"
+                      className="bg-card border border-border hover:border-[#00e07a]/50 rounded-lg p-4 cursor-grab active:cursor-grabbing shadow-sm hover:shadow-md transition-all group"
                     >
                       <div className="flex justify-between items-start mb-2">
                         <span className="font-bold text-sm text-slate-900 dark:text-white group-hover:text-[#00e07a] transition-colors">{card.full_name}</span>
@@ -495,10 +495,10 @@ export function ELRPipelineBoard() {
       {/* Manage Phases Modal */}
       {showManagePhases && (
         <div className="absolute inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-[#161922] border border-gray-200 dark:border-[#2a2d36] rounded-xl w-full max-w-lg shadow-2xl overflow-hidden flex flex-col max-h-[80vh]">
-            <div className="p-4 border-b border-gray-200 dark:border-[#2a2d36] flex justify-between items-center bg-gray-50 dark:bg-black/20">
+          <div className="bg-card border border-border rounded-xl w-full max-w-lg shadow-2xl overflow-hidden flex flex-col max-h-[80vh]">
+            <div className="p-4 border-b border-border flex justify-between items-center bg-muted">
               <h3 className="font-bold text-slate-900 dark:text-white flex items-center gap-2"><Settings size={16} className="text-[#00e07a]" /> Manage Phases</h3>
-              <button onClick={() => setShowManagePhases(false)} className="text-gray-400 hover:text-slate-900 dark:hover:text-white"><X size={18} /></button>
+              <button onClick={() => setShowManagePhases(false)} className="text-gray-400 hover:text-foreground"><X size={18} /></button>
             </div>
             
             <div className="p-5 overflow-y-auto flex-1 space-y-3">
@@ -509,7 +509,7 @@ export function ELRPipelineBoard() {
                   onDragStart={(e) => handleStageDragStart(e, index)}
                   onDragOver={handleStageDragOver}
                   onDrop={(e) => handleStageDrop(e, index)}
-                  className="flex items-center justify-between p-3 bg-gray-50 dark:bg-[#0b0f1a] border border-gray-200 dark:border-[#2a2d36] rounded-lg cursor-grab active:cursor-grabbing"
+                  className="flex items-center justify-between p-3 bg-muted border border-border rounded-lg cursor-grab active:cursor-grabbing"
                 >
                   <div className="flex items-center gap-3">
                     <div className="text-muted-foreground hover:text-foreground cursor-grab">
@@ -521,7 +521,7 @@ export function ELRPipelineBoard() {
                           type="text" 
                           value={editStageName}
                           onChange={(e) => setEditStageName(e.target.value)}
-                          className="bg-white dark:bg-[#161922] border border-gray-200 dark:border-[#2a2d36] rounded px-2 py-1 text-sm focus:outline-none focus:border-[#00e07a]"
+                          className="bg-card border border-border rounded px-2 py-1 text-sm focus:outline-none focus:border-[#00e07a]"
                         />
                         <button 
                           onClick={() => {
@@ -554,12 +554,12 @@ export function ELRPipelineBoard() {
               ))}
             </div>
 
-            <div className="p-4 border-t border-gray-200 dark:border-[#2a2d36] bg-gray-50 dark:bg-black/20 flex flex-col gap-3">
+            <div className="p-4 border-t border-border bg-muted flex flex-col gap-3">
               <div className="flex justify-between items-center w-full mb-2">
                 <span className="text-xs text-gray-500">Drag to reorder, then click Save.</span>
                 <button 
                   onClick={handleSaveOrder}
-                  className="px-4 py-1.5 bg-gray-200 dark:bg-white/10 hover:bg-gray-300 dark:hover:bg-white/20 text-slate-800 dark:text-white font-semibold rounded-lg text-sm transition-colors whitespace-nowrap"
+                  className="px-4 py-1.5 bg-accent hover:bg-accent text-slate-800 dark:text-white font-semibold rounded-lg text-sm transition-colors whitespace-nowrap"
                 >
                   Save Order
                 </button>
@@ -571,7 +571,7 @@ export function ELRPipelineBoard() {
                   value={newStageName}
                   onChange={(e) => setNewStageName(e.target.value)}
                   onKeyDown={(e) => e.key === "Enter" && handleAddNewStage()}
-                  className="flex-1 bg-white dark:bg-[#0b0f1a] border border-gray-200 dark:border-[#2a2d36] rounded-lg py-2 px-3 text-sm focus:outline-none focus:border-[#00e07a]" 
+                  className="flex-1 bg-background border border-border rounded-lg py-2 px-3 text-sm focus:outline-none focus:border-[#00e07a]" 
                 />
                 <button 
                   onClick={handleAddNewStage}
@@ -588,10 +588,10 @@ export function ELRPipelineBoard() {
       {/* Add Card Modal */}
       {showAddCard && (
         <div className="absolute inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-[#161922] border border-gray-200 dark:border-[#2a2d36] rounded-xl w-full max-w-sm shadow-2xl overflow-hidden">
-            <div className="p-4 border-b border-gray-200 dark:border-[#2a2d36] flex justify-between items-center bg-gray-50 dark:bg-black/20">
-              <h3 className="font-bold text-slate-900 dark:text-white">Create Case</h3>
-              <button onClick={() => setShowAddCard(false)} className="text-gray-400 hover:text-slate-900 dark:hover:text-white"><X size={18} /></button>
+          <div className="bg-card border border-border rounded-xl w-full max-w-sm shadow-2xl overflow-hidden">
+            <div className="p-4 border-b border-border flex justify-between items-center bg-muted">
+              <h3 className="font-bold text-foreground">Create Case</h3>
+              <button onClick={() => setShowAddCard(false)} className="text-gray-400 hover:text-foreground"><X size={18} /></button>
             </div>
             <form onSubmit={handleAddCard} className="p-5 space-y-4">
               <div>
@@ -601,7 +601,7 @@ export function ELRPipelineBoard() {
                   required
                   value={addCardEmployeeId}
                   onChange={(e) => setAddCardEmployeeId(e.target.value)}
-                  className="w-full bg-gray-50 dark:bg-[#0b0f1a] border border-gray-200 dark:border-[#2a2d36] rounded-lg py-2.5 px-3 text-sm focus:outline-none focus:border-[#00e07a]" 
+                  className="w-full bg-background border border-border rounded-lg py-2.5 px-3 text-sm focus:outline-none focus:border-[#00e07a]" 
                   placeholder="e.g. EMP-001"
                 />
               </div>
@@ -611,7 +611,7 @@ export function ELRPipelineBoard() {
                   <select 
                     value={addCardStageId}
                     onChange={(e) => setAddCardStageId(parseInt(e.target.value) || "")}
-                    className="w-full bg-gray-50 dark:bg-[#0b0f1a] border border-gray-200 dark:border-[#2a2d36] rounded-lg py-2.5 px-3 text-sm focus:outline-none focus:border-[#00e07a]" 
+                    className="w-full bg-background border border-border rounded-lg py-2.5 px-3 text-sm focus:outline-none focus:border-[#00e07a]" 
                   >
                     <option value="">-- Default (First Stage) --</option>
                     {stages.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
@@ -619,7 +619,7 @@ export function ELRPipelineBoard() {
                 </div>
               )}
               <div className="pt-2 flex justify-end gap-3">
-                <button type="button" onClick={() => setShowAddCard(false)} className="px-3 py-1.5 text-gray-500 dark:text-gray-400 hover:text-slate-900 dark:hover:text-white text-sm font-semibold">Cancel</button>
+                <button type="button" onClick={() => setShowAddCard(false)} className="px-3 py-1.5 text-muted-foreground hover:text-foreground text-sm font-semibold">Cancel</button>
                 <button type="submit" className="px-4 py-2 bg-[#00e07a] hover:bg-[#00c96a] text-black font-extrabold rounded-lg text-sm transition-colors">Create Case</button>
               </div>
             </form>
@@ -630,10 +630,10 @@ export function ELRPipelineBoard() {
       {/* Transition Modal (Collect extra fields) */}
       {showTransitionModal && pendingMove && (
         <div className="absolute inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-[#161922] border border-gray-200 dark:border-[#2a2d36] rounded-xl w-full max-w-sm shadow-2xl overflow-hidden animate-in fade-in zoom-in-95">
-            <div className="p-4 border-b border-gray-200 dark:border-[#2a2d36] flex justify-between items-center bg-gray-50 dark:bg-black/20">
+          <div className="bg-card border border-border rounded-xl w-full max-w-sm shadow-2xl overflow-hidden animate-in fade-in zoom-in-95">
+            <div className="p-4 border-b border-border flex justify-between items-center bg-muted">
               <h3 className="font-bold text-slate-900 dark:text-white flex items-center gap-2"><FileText size={16} className="text-[#00e07a]" /> Stage Requires Details</h3>
-              <button onClick={() => { setShowTransitionModal(false); setPendingMove(null); }} className="text-gray-400 hover:text-slate-900 dark:hover:text-white"><X size={18} /></button>
+              <button onClick={() => { setShowTransitionModal(false); setPendingMove(null); }} className="text-gray-400 hover:text-foreground"><X size={18} /></button>
             </div>
             <div className="p-5 space-y-4">
               <p className="text-xs text-gray-500 mb-2">This stage auto-generates a document. Please provide any required dynamic fields:</p>
@@ -644,7 +644,7 @@ export function ELRPipelineBoard() {
                   type="date" 
                   value={transitionFields.awol_start_date || ""}
                   onChange={(e) => setTransitionFields({...transitionFields, awol_start_date: e.target.value})}
-                  className="w-full bg-gray-50 dark:bg-[#0b0f1a] border border-gray-200 dark:border-[#2a2d36] rounded-lg py-2.5 px-3 text-sm focus:outline-none focus:border-[#00e07a]" 
+                  className="w-full bg-background border border-border rounded-lg py-2.5 px-3 text-sm focus:outline-none focus:border-[#00e07a]" 
                 />
               </div>
               <div>
@@ -654,7 +654,7 @@ export function ELRPipelineBoard() {
                   placeholder="e.g. 5"
                   value={transitionFields.deadline_days || ""}
                   onChange={(e) => setTransitionFields({...transitionFields, deadline_days: e.target.value})}
-                  className="w-full bg-gray-50 dark:bg-[#0b0f1a] border border-gray-200 dark:border-[#2a2d36] rounded-lg py-2.5 px-3 text-sm focus:outline-none focus:border-[#00e07a]" 
+                  className="w-full bg-background border border-border rounded-lg py-2.5 px-3 text-sm focus:outline-none focus:border-[#00e07a]" 
                 />
               </div>
               <div className="pt-2 flex justify-end gap-3">

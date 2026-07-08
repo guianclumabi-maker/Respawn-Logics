@@ -104,10 +104,10 @@ export function Sidebar({ activeView, onViewChange, mode = "admin", onStartTour 
       style={{
         width: collapsed ? 72 : 280,
       }}
-      className="h-full bg-white dark:bg-[#0b0f1a] flex flex-col flex-shrink-0 border-r border-gray-200 dark:border-border transition-all duration-300 overflow-hidden font-sans select-none"
+      className="h-full bg-background flex flex-col flex-shrink-0 border-r border-border transition-all duration-300 overflow-hidden font-sans select-none"
     >
       {/* Brand Logo Header */}
-      <div className="flex items-center justify-between h-[70px] px-6 border-b border-gray-200 dark:border-border flex-shrink-0">
+      <div className="flex items-center justify-between h-[70px] px-6 border-b border-border flex-shrink-0">
         {!collapsed && (
           <div className="flex items-center gap-3">
             {/* Gamepad logo icon */}
@@ -140,14 +140,14 @@ export function Sidebar({ activeView, onViewChange, mode = "admin", onStartTour 
             <button
               onClick={onStartTour}
               title="Replay the guided tour"
-              className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-accent transition-colors text-muted-foreground hover:text-primary cursor-pointer"
+              className="p-1.5 rounded-lg hover:bg-accent transition-colors text-muted-foreground hover:text-primary cursor-pointer"
             >
               <HelpCircle size={16} />
             </button>
           )}
           <button
             onClick={() => setCollapsed((c) => !c)}
-            className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-accent transition-colors text-muted-foreground hover:text-slate-800 dark:hover:text-foreground cursor-pointer"
+            className="p-1.5 rounded-lg hover:bg-accent transition-colors text-muted-foreground hover:text-slate-800 dark:hover:text-foreground cursor-pointer"
           >
             {collapsed ? <Menu size={16} /> : <Layers size={16} />}
           </button>
@@ -184,7 +184,7 @@ export function Sidebar({ activeView, onViewChange, mode = "admin", onStartTour 
                     className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all text-left group cursor-pointer ${
                       isActive
                         ? "bg-primary/10 border border-primary/20 shadow-[0_0_12px_rgba(0,224,122,0.08)]"
-                        : "hover:bg-gray-100 dark:hover:bg-accent border border-transparent"
+                        : "hover:bg-accent border border-transparent"
                     }`}
                   >
                     <span
@@ -231,7 +231,7 @@ export function Sidebar({ activeView, onViewChange, mode = "admin", onStartTour 
                             className={`w-full text-left px-4 py-2 rounded-lg text-[0.8rem] transition-all cursor-pointer ${
                               isSubActive 
                                 ? "text-[#00e07a] font-medium bg-[#00e07a]/5" 
-                                : "text-slate-500 dark:text-gray-500 hover:text-slate-800 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-white/[0.02]"
+                                : "text-muted-foreground hover:text-foreground hover:bg-accent"
                             }`}
                           >
                             {child}
@@ -263,7 +263,7 @@ export function Sidebar({ activeView, onViewChange, mode = "admin", onStartTour 
                 className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl border border-transparent transition-all group cursor-pointer text-left ${
                   item.highlight
                     ? "bg-[#00e07a]/5 hover:bg-[#00e07a]/10 text-[#00e07a] hover:text-[#00e07a] border-[#00e07a]/10"
-                    : "hover:bg-gray-100 dark:hover:bg-white/[0.03] text-slate-500 dark:text-[#9ca3af] hover:text-slate-800 dark:hover:text-white"
+                    : "hover:bg-accent text-muted-foreground hover:text-foreground"
                 }`}
               >
                 <span className={`flex-shrink-0 ${item.highlight ? "text-[#00e07a]" : "text-slate-500 dark:text-[#9ca3af] group-hover:text-slate-800 dark:group-hover:text-white"}`}>
@@ -289,7 +289,7 @@ export function Sidebar({ activeView, onViewChange, mode = "admin", onStartTour 
 
       {/* User Footer Profile Block */}
       {!collapsed && (
-        <div className="p-4 border-t border-gray-200 dark:border-white/[0.04] flex-shrink-0">
+        <div className="p-4 border-t border-border flex-shrink-0">
           <div 
             className="flex items-center gap-3 p-2.5 bg-gray-50 dark:bg-[#8b5cf6]/5 border border-gray-200 dark:border-[#8b5cf6]/10 rounded-xl"
           >

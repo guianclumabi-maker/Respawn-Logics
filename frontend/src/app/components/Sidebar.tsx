@@ -257,7 +257,7 @@ export function Sidebar({ activeView, onViewChange, badges = {} }: SidebarProps)
       style={{
         width: collapsed ? 72 : 280,
       }}
-      className="h-full bg-white dark:bg-[#0f172a] flex flex-col flex-shrink-0 border-r border-gray-200 dark:border-border transition-all duration-300 overflow-hidden select-none"
+      className="h-full bg-card flex flex-col flex-shrink-0 border-r border-border transition-all duration-300 overflow-hidden select-none"
     >
       {/* ── Brand header ──────────────────────────────── */}
       <div 
@@ -265,7 +265,7 @@ export function Sidebar({ activeView, onViewChange, badges = {} }: SidebarProps)
           collapsed 
             ? "flex-col items-center justify-center py-5 gap-4" 
             : "items-center justify-between h-[70px] px-5"
-        } border-b border-gray-200 dark:border-border flex-shrink-0`}
+        } border-b border-border flex-shrink-0`}
       >
         {!collapsed && (
           <div className="flex items-center gap-3">
@@ -306,7 +306,7 @@ export function Sidebar({ activeView, onViewChange, badges = {} }: SidebarProps)
         )}
         <button
           onClick={() => setCollapsed((c) => !c)}
-          className={`p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-white/5 transition-colors text-muted-foreground hover:text-slate-800 dark:hover:text-foreground cursor-pointer ${
+          className={`p-1.5 rounded-lg hover:bg-accent transition-colors text-muted-foreground hover:text-slate-800 dark:hover:text-foreground cursor-pointer ${
             collapsed ? "" : "ml-auto"
           }`}
           title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
@@ -334,7 +334,7 @@ export function Sidebar({ activeView, onViewChange, badges = {} }: SidebarProps)
                   side="right" 
                   sideOffset={20} 
                   align="start"
-                  className="bg-white dark:bg-[#16181d] border border-gray-200 dark:border-white/10 shadow-2xl p-2 w-56 rounded-xl z-50"
+                  className="bg-card border border-border shadow-2xl p-2 w-56 rounded-xl z-50"
                 >
                   <h4 className="text-[0.75rem] font-bold text-muted-foreground tracking-[1px] uppercase mb-2 px-2" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
                     {section.title}
@@ -425,7 +425,7 @@ export function Sidebar({ activeView, onViewChange, badges = {} }: SidebarProps)
                             ${
                               active
                                 ? "bg-primary/10 text-primary font-semibold dark:bg-[#00e07a]/10 dark:text-[#00e07a]"
-                                : "text-slate-600 dark:text-slate-400 hover:bg-slate-100 hover:text-slate-900 dark:hover:bg-white/5 dark:hover:text-white"
+                                : "text-muted-foreground hover:bg-slate-100 hover:text-slate-900 dark:hover:bg-white/5 dark:hover:text-white"
                             }
                           `}
                         >
@@ -447,7 +447,7 @@ export function Sidebar({ activeView, onViewChange, badges = {} }: SidebarProps)
         )})}
 
         {/* ── Gamified Theme Toggle ─────────────────────── */}
-        <div className="mt-4 pt-4 border-t border-gray-200 dark:border-border">
+        <div className="mt-4 pt-4 border-t border-border">
           <GamifiedThemeToggle collapsed={collapsed} />
         </div>
 
@@ -470,7 +470,7 @@ export function Sidebar({ activeView, onViewChange, badges = {} }: SidebarProps)
       </div>
 
       {/* ── Profile Footer ────────────────────────────── */}
-      <div className="border-t border-gray-200 dark:border-border p-3 flex-shrink-0 bg-slate-50/50 dark:bg-slate-900/50">
+      <div className="border-t border-border p-3 flex-shrink-0 bg-muted/50">
         <div className={`flex items-center ${collapsed ? "justify-center flex-col gap-3" : "justify-between"}`}>
           <div className="flex items-center gap-3 min-w-0">
             <div className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0 text-primary font-bold text-sm uppercase">

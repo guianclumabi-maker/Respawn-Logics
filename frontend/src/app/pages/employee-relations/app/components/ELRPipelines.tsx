@@ -244,7 +244,7 @@ export function ELRPipelines() {
   // ------------------------------------------------------------------
   if (view === 'list') {
     return (
-      <main className="flex-1 flex flex-col h-full bg-[#f4f6f8] dark:bg-[#0b0f1a] text-slate-900 dark:text-white overflow-y-auto transition-colors duration-300">
+      <main className="flex-1 flex flex-col h-full bg-[#f4f6f8] dark:bg-[#0b0f1a] text-foreground overflow-y-auto transition-colors duration-300">
         <div className="p-8">
           <div className="flex items-center justify-between mb-8">
             <div>
@@ -272,13 +272,13 @@ export function ELRPipelines() {
           {loading ? (
             <div className="flex justify-center py-20"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#00e07a]"></div></div>
           ) : pipelines.length === 0 ? (
-            <div className="bg-white dark:bg-[#0f1422]/80 border border-gray-200 dark:border-[#2a2d36] rounded-2xl p-12 text-center">
+            <div className="bg-card/80 border border-border rounded-2xl p-12 text-center">
               <GitBranch className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
               <h3 className="text-lg font-bold mb-2">No pipelines configured</h3>
               <p className="text-sm text-gray-500 mb-6">Create a pipeline to structure your employee relations cases.</p>
               <button 
                 onClick={handleCreatePipeline}
-                className="px-4 py-2 bg-white dark:bg-white/[0.05] border border-gray-200 dark:border-white/[0.1] hover:bg-gray-50 dark:hover:bg-white/[0.1] rounded-lg text-sm font-medium transition-colors"
+                className="px-4 py-2 bg-card border border-border hover:bg-accent rounded-lg text-sm font-medium transition-colors"
               >
                 Create Pipeline
               </button>
@@ -286,7 +286,7 @@ export function ELRPipelines() {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {pipelines.map(pipe => (
-                <div key={pipe.id} className="bg-white dark:bg-[#0f1422]/80 border border-gray-200 dark:border-[#2a2d36] hover:border-[#00e07a]/50 dark:hover:border-[#00e07a]/50 rounded-2xl p-6 transition-all group flex flex-col cursor-pointer" onClick={() => handleOpenStages(pipe)}>
+                <div key={pipe.id} className="bg-card border border-border hover:border-[#00e07a]/50 dark:hover:border-[#00e07a]/50 rounded-2xl p-6 transition-all group flex flex-col cursor-pointer" onClick={() => handleOpenStages(pipe)}>
                   <div className="flex justify-between items-start mb-4">
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 rounded-xl bg-purple-50 dark:bg-purple-500/10 border border-purple-100 dark:border-purple-500/20 flex items-center justify-center text-purple-600 dark:text-purple-400">
@@ -297,7 +297,7 @@ export function ELRPipelines() {
                       </div>
                     </div>
                   </div>
-                  <p className="text-sm text-gray-500 dark:text-gray-400 mb-6 flex-1 line-clamp-2">
+                  <p className="text-sm text-muted-foreground mb-6 flex-1 line-clamp-2">
                     {pipe.description || "No description provided."}
                   </p>
                   
@@ -339,7 +339,7 @@ export function ELRPipelines() {
   // ------------------------------------------------------------------
   if (view === 'edit_pipeline') {
     return (
-      <main className="flex-1 flex flex-col h-full bg-[#f4f6f8] dark:bg-[#0b0f1a] text-slate-900 dark:text-white overflow-y-auto transition-colors duration-300">
+      <main className="flex-1 flex flex-col h-full bg-[#f4f6f8] dark:bg-[#0b0f1a] text-foreground overflow-y-auto transition-colors duration-300">
         <div className="p-8 max-w-3xl mx-auto w-full">
           <div className="flex items-center justify-between mb-6">
             <div>
@@ -350,7 +350,7 @@ export function ELRPipelines() {
             <div className="flex gap-3">
               <button 
                 onClick={() => setView('list')}
-                className="px-4 py-2 bg-gray-100 dark:bg-white/[0.05] hover:bg-gray-200 dark:hover:bg-white/[0.1] rounded-lg text-sm font-medium transition-colors"
+                className="px-4 py-2 bg-accent hover:bg-accent rounded-lg text-sm font-medium transition-colors"
               >
                 Cancel
               </button>
@@ -372,7 +372,7 @@ export function ELRPipelines() {
             </div>
           )}
 
-          <div className="bg-white dark:bg-[#0f1422]/80 border border-gray-200 dark:border-[#2a2d36] rounded-2xl p-6 space-y-4">
+          <div className="bg-card/80 border border-border rounded-2xl p-6 space-y-4">
             <div>
               <label className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">
                 <Type size={14} /> Pipeline Name
@@ -381,7 +381,7 @@ export function ELRPipelines() {
                 type="text" 
                 value={currentPipeline.name || ""} 
                 onChange={e => setCurrentPipeline({ ...currentPipeline, name: e.target.value })}
-                className="w-full bg-gray-50 dark:bg-[#0b0f1a] border border-gray-200 dark:border-[#2a2d36] rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#00e07a] focus:ring-1 focus:ring-[#00e07a]/50 text-slate-900 dark:text-white"
+                className="w-full bg-background border border-border rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#00e07a] focus:ring-1 focus:ring-[#00e07a]/50 text-slate-900 dark:text-white"
                 placeholder="e.g. Standard Disciplinary Flow"
               />
             </div>
@@ -392,7 +392,7 @@ export function ELRPipelines() {
               <textarea 
                 value={currentPipeline.description || ""} 
                 onChange={e => setCurrentPipeline({ ...currentPipeline, description: e.target.value })}
-                className="w-full bg-gray-50 dark:bg-[#0b0f1a] border border-gray-200 dark:border-[#2a2d36] rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#00e07a] focus:ring-1 focus:ring-[#00e07a]/50 text-slate-900 dark:text-white resize-none h-32"
+                className="w-full bg-background border border-border rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#00e07a] focus:ring-1 focus:ring-[#00e07a]/50 text-slate-900 dark:text-white resize-none h-32"
                 placeholder="Brief internal description"
               />
             </div>
@@ -406,13 +406,13 @@ export function ELRPipelines() {
   // RENDER: EDIT STAGES
   // ------------------------------------------------------------------
   return (
-    <main className="flex-1 flex flex-col h-full bg-[#f4f6f8] dark:bg-[#0b0f1a] text-slate-900 dark:text-white overflow-y-auto transition-colors duration-300 relative">
+    <main className="flex-1 flex flex-col h-full bg-[#f4f6f8] dark:bg-[#0b0f1a] text-foreground overflow-y-auto transition-colors duration-300 relative">
       <div className="p-8 max-w-5xl mx-auto w-full">
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-4">
             <button 
               onClick={() => setView('list')}
-              className="p-2 bg-gray-100 dark:bg-white/[0.05] hover:bg-gray-200 dark:hover:bg-white/[0.1] rounded-lg text-gray-500 dark:text-gray-400 transition-colors"
+              className="p-2 bg-accent hover:bg-accent rounded-lg text-muted-foreground transition-colors"
             >
               <ArrowLeft size={20} />
             </button>
@@ -442,7 +442,7 @@ export function ELRPipelines() {
         {loading ? (
           <div className="flex justify-center py-20"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#00e07a]"></div></div>
         ) : stages.length === 0 ? (
-          <div className="bg-white dark:bg-[#0f1422]/80 border border-gray-200 dark:border-[#2a2d36] rounded-2xl p-12 text-center">
+          <div className="bg-card/80 border border-border rounded-2xl p-12 text-center">
             <ListOrdered className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
             <h3 className="text-lg font-bold mb-2">No stages defined</h3>
             <p className="text-sm text-gray-500 mb-6">Build your workflow by adding the first stage.</p>
@@ -450,7 +450,7 @@ export function ELRPipelines() {
         ) : (
           <div className="space-y-4 relative">
             {/* Connecting line */}
-            <div className="absolute left-[23px] top-6 bottom-6 w-[2px] bg-gray-200 dark:bg-[#2a2d36] z-0"></div>
+            <div className="absolute left-[23px] top-6 bottom-6 w-[2px] bg-accent z-0"></div>
             
             {stages.map((stage, idx) => (
               <div key={stage.id} className="relative z-10 flex gap-4 items-start group">
@@ -459,7 +459,7 @@ export function ELRPipelines() {
                     {idx + 1}
                   </div>
                 </div>
-                <div className="flex-1 bg-white dark:bg-[#0f1422]/80 border border-gray-200 dark:border-[#2a2d36] hover:border-[#00e07a]/50 rounded-xl p-5 transition-all">
+                <div className="flex-1 bg-card border border-border hover:border-[#00e07a]/50 rounded-xl p-5 transition-all">
                   <div className="flex justify-between items-start">
                     <div>
                       <div className="flex items-center gap-3 mb-1">
@@ -479,7 +479,7 @@ export function ELRPipelines() {
                     <div className="flex gap-2">
                       <button 
                         onClick={() => handleEditStage(stage)}
-                        className="px-3 py-1.5 bg-gray-100 dark:bg-white/[0.05] hover:bg-gray-200 dark:hover:bg-white/[0.1] rounded text-sm transition-colors font-medium"
+                        className="px-3 py-1.5 bg-accent hover:bg-accent rounded text-sm transition-colors font-medium"
                       >
                         Edit
                       </button>
@@ -501,8 +501,8 @@ export function ELRPipelines() {
       {/* STAGE EDIT MODAL (Slide Over / Overlay) */}
       {editingStage && (
         <div className="absolute inset-0 bg-black/50 backdrop-blur-sm z-50 flex justify-end">
-          <div className="w-[450px] bg-white dark:bg-[#0f1422] h-full shadow-2xl border-l border-gray-200 dark:border-[#2a2d36] flex flex-col transform transition-transform duration-300">
-            <div className="p-6 border-b border-gray-200 dark:border-[#2a2d36] flex justify-between items-center bg-gray-50 dark:bg-[#0b0f1a]">
+          <div className="w-[450px] bg-card h-full shadow-2xl border-l border-border flex flex-col transform transition-transform duration-300">
+            <div className="p-6 border-b border-border flex justify-between items-center bg-muted">
               <h2 className="text-lg font-bold" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
                 {editingStage.id ? 'Edit Stage' : 'Add Stage'}
               </h2>
@@ -522,7 +522,7 @@ export function ELRPipelines() {
                   type="text" 
                   value={editingStage.name || ""} 
                   onChange={e => setEditingStage({ ...editingStage, name: e.target.value })}
-                  className="w-full bg-gray-50 dark:bg-[#0b0f1a] border border-gray-200 dark:border-[#2a2d36] rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:border-[#00e07a] focus:ring-1 focus:ring-[#00e07a]/50"
+                  className="w-full bg-background border border-border rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:border-[#00e07a] focus:ring-1 focus:ring-[#00e07a]/50"
                   placeholder="e.g. Notice to Explain"
                 />
               </div>
@@ -534,7 +534,7 @@ export function ELRPipelines() {
                     type="number"
                     value={editingStage.order_index}
                     onChange={e => setEditingStage({...editingStage, order_index: parseInt(e.target.value) || 0})}
-                    className="w-full bg-gray-50 dark:bg-[#0b0f1a] border border-gray-200 dark:border-[#2a2d36] rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:border-[#00e07a]"
+                    className="w-full bg-background border border-border rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:border-[#00e07a]"
                   />
                 </div>
                 <div>
@@ -543,7 +543,7 @@ export function ELRPipelines() {
                     type="number" 
                     value={editingStage.sla_days || 0} 
                     onChange={e => setEditingStage({ ...editingStage, sla_days: parseInt(e.target.value) || 0 })}
-                    className="w-full bg-gray-50 dark:bg-[#0b0f1a] border border-gray-200 dark:border-[#2a2d36] rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:border-[#00e07a]"
+                    className="w-full bg-background border border-border rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:border-[#00e07a]"
                   />
                 </div>
               </div>
@@ -553,7 +553,7 @@ export function ELRPipelines() {
                 <select 
                   value={editingStage.template_id}
                   onChange={e => setEditingStage({...editingStage, template_id: parseInt(e.target.value) || ""})}
-                  className="w-full bg-gray-50 dark:bg-[#0b0f1a] border border-gray-200 dark:border-[#2a2d36] rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:border-[#00e07a]"
+                  className="w-full bg-background border border-border rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:border-[#00e07a]"
                 >
                   <option value="">None (Manual processing)</option>
                   {templates.map(t => (
@@ -564,7 +564,7 @@ export function ELRPipelines() {
               </div>
 
               <div className="pt-2">
-                <label className="flex items-center gap-3 cursor-pointer p-3 bg-gray-50 dark:bg-[#0b0f1a] border border-gray-200 dark:border-[#2a2d36] rounded-lg">
+                <label className="flex items-center gap-3 cursor-pointer p-3 bg-muted border border-border rounded-lg">
                   <input 
                     type="checkbox" 
                     checked={!!editingStage.is_terminal} 
@@ -580,10 +580,10 @@ export function ELRPipelines() {
 
             </div>
 
-            <div className="p-5 border-t border-gray-200 dark:border-[#2a2d36] bg-gray-50 dark:bg-[#0b0f1a] flex justify-end gap-3">
+            <div className="p-5 border-t border-border bg-muted flex justify-end gap-3">
               <button 
                 onClick={() => { setEditingStage(null); setError(null); }}
-                className="px-4 py-2 bg-gray-200 dark:bg-white/[0.05] hover:bg-gray-300 dark:hover:bg-white/[0.1] rounded-lg text-sm font-medium transition-colors"
+                className="px-4 py-2 bg-accent hover:bg-accent rounded-lg text-sm font-medium transition-colors"
               >
                 Cancel
               </button>
