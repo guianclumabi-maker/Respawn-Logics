@@ -89,6 +89,13 @@ class ELRPipelineController
                         echo json_encode(['success' => false, 'error' => 'Invalid method']);
                     }
                     break;
+                case 'reorder_stages':
+                    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+                        $this->reorderStages($input);
+                    } else {
+                        echo json_encode(['success' => false, 'error' => 'Invalid method']);
+                    }
+                    break;
                 case 'delete_stage':
                     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         $this->deleteStage($input);
@@ -308,9 +315,51 @@ class ELRPipelineController
     //  Each stage may map to a document template (fired on entry in Phase 3).
     // ─────────────────────────────────────────────────────────────
 
+    /**
+     * Lazily guarantee every tenant has a working board out of the box (ATS-style):
+     * if this tenant has no pipeline yet, create a default "Disciplinary Process" with the
+     * standard PH due-process phases. Idempotent (only fires when zero pipelines exist) and
+     * tenant-scoped, so it covers both existing tenants and any created later — without
+     * touching onboarding. Phase names are fully editable afterward via save_stage.
+     */
+    private function ensureDefaultPipeline()
+    {
+        $chk = $this->pdo->prepare("SELECT COUNT(*) FROM `elr_pipelines` WHERE `tenant_id` = ?");
+        $chk->execute([$this->tenantId]);
+        if ((int)$chk->fetchColumn() > 0) {
+            return; // tenant already has at least one board — never override their setup
+        }
+
+        $createdBy = is_array($this->currentUser) ? ($this->currentUser['email'] ?? 'system') : 'system';
+
+        $this->pdo->prepare(
+            "INSERT INTO `elr_pipelines` (`tenant_id`, `name`, `description`, `is_active`, `created_by`)
+             VALUES (?, 'Disciplinary Process', 'Default employee-relations case workflow. Rename or add phases anytime.', 1, ?)"
+        )->execute([$this->tenantId, $createdBy]);
+        $pipelineId = (int)$this->pdo->lastInsertId();
+
+        // Standard PH due-process phases; last one is terminal. All names editable via save_stage.
+        $defaults = [
+            ['AWOL Pool',              0, 0],
+            ['Return-to-Work Notice',  1, 0],
+            ['NTE',                    2, 0],
+            ['Hearing',                3, 0],
+            ['Notice of Decision',     4, 0],
+            ['Resolved',               5, 1],
+        ];
+        $ins = $this->pdo->prepare(
+            "INSERT INTO `elr_pipeline_stages` (`tenant_id`, `pipeline_id`, `name`, `stage_order`, `is_terminal`)
+             VALUES (?, ?, ?, ?, ?)"
+        );
+        foreach ($defaults as [$name, $order, $terminal]) {
+            $ins->execute([$this->tenantId, $pipelineId, $name, $order, $terminal]);
+        }
+    }
+
     /** List pipelines with their stage counts. */
     private function listPipelines()
     {
+        $this->ensureDefaultPipeline();
         $stmt = $this->pdo->prepare(
             "SELECT p.`id`, p.`name`, p.`description`, p.`is_active`, p.`created_by`, p.`created_at`, p.`updated_at`,
                     (SELECT COUNT(*) FROM `elr_pipeline_stages` s WHERE s.`pipeline_id` = p.`id`) AS stage_count,
@@ -464,6 +513,52 @@ class ELRPipelineController
         $stmt = $this->pdo->prepare("DELETE FROM `elr_pipeline_stages` WHERE `id` = ? AND `tenant_id` = ?");
         $stmt->execute([$id, $this->tenantId]);
         echo json_encode(['success' => true, 'message' => 'Stage deleted.']);
+    }
+
+    /**
+     * Persist a whole new phase order in ONE atomic call. The UI reorders phases locally
+     * (drag/drop) and hits Save once, instead of firing a request per swap — avoiding the
+     * rapid-fire calls and partial-save races of arrow-by-arrow reordering.
+     * Input: { pipeline_id, order: [stageId1, stageId2, ...] }. Only stages belonging to
+     * this tenant + pipeline are touched; each gets stage_order = its index in the array.
+     */
+    private function reorderStages($input)
+    {
+        $this->requireManage();
+        $pipelineId = (int)($input['pipeline_id'] ?? 0);
+        $order = $input['order'] ?? null;
+        if (!$pipelineId || !is_array($order) || empty($order)) {
+            echo json_encode(['success' => false, 'error' => 'pipeline_id and a non-empty order[] are required.']);
+            return;
+        }
+
+        // Confirm the pipeline is this tenant's before touching anything.
+        $own = $this->pdo->prepare("SELECT 1 FROM `elr_pipelines` WHERE `id` = ? AND `tenant_id` = ?");
+        $own->execute([$pipelineId, $this->tenantId]);
+        if (!$own->fetchColumn()) {
+            http_response_code(404);
+            echo json_encode(['success' => false, 'error' => 'Pipeline not found']);
+            return;
+        }
+
+        $this->pdo->beginTransaction();
+        try {
+            // Tenant + pipeline scoped, so a forged stage id from another tenant updates nothing.
+            $upd = $this->pdo->prepare(
+                "UPDATE `elr_pipeline_stages` SET `stage_order` = ?
+                 WHERE `id` = ? AND `pipeline_id` = ? AND `tenant_id` = ?"
+            );
+            foreach (array_values($order) as $index => $stageId) {
+                $upd->execute([(int)$index, (int)$stageId, $pipelineId, $this->tenantId]);
+            }
+            $this->pdo->commit();
+            echo json_encode(['success' => true, 'message' => 'Phase order saved.']);
+        } catch (\Throwable $e) {
+            $this->pdo->rollBack();
+            error_log('[' . __CLASS__ . '] reorderStages failed: ' . $e->getMessage());
+            http_response_code(500);
+            echo json_encode(['success' => false, 'error' => 'Failed to save phase order.']);
+        }
     }
 
     // ─────────────────────────────────────────────────────────────
