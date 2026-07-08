@@ -51,6 +51,7 @@ $migrationScripts = [
     'migrate_compensation.php',
     'migrate_esm.php',
     'migrate_elr.php',
+    'migrate_elr_cases.php',
     'migrate_elr_knowledge.php',
     'migrate_elr_pipeline.php',
     'migrate_elr_auto_rules.php',

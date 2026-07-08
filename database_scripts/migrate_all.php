@@ -18,6 +18,7 @@ $scripts = [
     'migrate_benefits.php',
     'migrate_compensation.php',
     'migrate_elr.php',
+    'migrate_elr_cases.php',
     'migrate_elr_knowledge.php',
     'migrate_elr_pipeline.php',
     'migrate_elr_auto_rules.php',
