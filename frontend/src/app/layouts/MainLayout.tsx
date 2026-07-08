@@ -127,7 +127,7 @@ export default function MainLayout() {
           badges={badges}
         />
       )}
-      <main className="flex-1 flex flex-col min-w-0 overflow-hidden relative z-10 bg-slate-50 dark:bg-[#0f1422]">
+      <main className="flex-1 flex flex-col min-w-0 overflow-hidden relative z-10 bg-background">
         <Outlet context={{ setBadges }} />
       </main>
     </div>
