@@ -19,8 +19,8 @@ if (is_resource($process)) {
         $branch = trim(shell_exec('git rev-parse --abbrev-ref HEAD'));
         
         $data = [
-            'title' => 'fix(auth): fix missing is_super on page refresh',
-            'body' => 'Added `is_super` and `roles` to the `/auth/me` endpoint. Previously, if a Platform Admin refreshed their browser, these fields were dropped from the session rehydration, causing the frontend to hide the Command Center button.',
+            'title' => 'feat: ATS-style ELR pipeline board and phase management',
+            'body' => 'Reworks the ELR Pipeline Board to use a case-first ATS-style view with client-side filtering and an integrated Manage Phases modal.',
             'head' => $branch,
             'base' => 'main'
         ];

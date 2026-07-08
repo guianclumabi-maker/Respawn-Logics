@@ -7,16 +7,8 @@ $action = $_GET['action'] ?? '';
 if ($action === 'start') {
     // 1. Verify current user is allowed to impersonate (exemption for Platform Admin / internal staff)
     $currentUser = getCurrentUser();
-    $isStaff = false;
-    if ($currentUser) {
-        $allowed_roles = ['Platform_Admin', 'Support_Agent', 'Implementation_Specialist', 'Super_Admin'];
-        if (in_array($currentUser['role'], $allowed_roles) || empty($currentUser['tenant_id']) || $currentUser['tenant_id'] == '1') {
-            $isStaff = true;
-        }
-    }
-    
-    if (!$isStaff && !hasPermission('users.manage')) {
-        die("Unauthorized. Missing users.manage permission.");
+    if (!isPlatformStaff()) {
+        die("Unauthorized. Only platform staff can initiate impersonation.");
     }
     
     $tenant_id = $_GET['tenant_id'] ?? null;

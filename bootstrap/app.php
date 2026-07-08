@@ -302,6 +302,17 @@ if (!function_exists('hasRole')) {
     }
 }
 
+if (!function_exists('isPlatformStaff')) {
+    function isPlatformStaff() {
+        if (!isLoggedIn()) return false;
+        $user = getCurrentUser();
+        if (!$user) return false;
+
+        $platformRoles = ['Platform_Admin', 'Support_Agent', 'Implementation_Specialist'];
+        return in_array($user['role'], $platformRoles);
+    }
+}
+
 if (!function_exists('sendNotification')) {
     function sendNotification($pdo, $tenant_id, $user_email, $title, $message, $type = 'info', $link = null) {
         try {

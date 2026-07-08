@@ -143,6 +143,22 @@ class IAMController
         }
 
         if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+            if ($action === 'platform_tenant_list') {
+                if (!isPlatformStaff()) {
+                    http_response_code(403);
+                    echo json_encode(['success' => false, 'error' => 'Forbidden']);
+                    return;
+                }
+                try {
+                    $stmt = $this->pdo->prepare("SELECT id, company_name, subscription_tier, status, setup_mode, created_at FROM tenants WHERE id != '1' ORDER BY created_at DESC");
+                    $stmt->execute();
+                    echo json_encode(['success' => true, 'data' => $stmt->fetchAll(PDO::FETCH_ASSOC)]);
+                } catch (Exception $e) {
+                    echo json_encode(['success' => false, 'error' => 'Database error']);
+                }
+                return;
+            }
+
             if ($action === 'users') {
                 try {
                     $stmt = $this->pdo->prepare("

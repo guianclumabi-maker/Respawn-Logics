@@ -13,6 +13,7 @@ interface AuthUser {
   profile_image?: string;
   job_title?: string;
   roles: string[];
+  role?: string;
   permissions: string[];
   is_super?: boolean;
   tenant_id?: number;
