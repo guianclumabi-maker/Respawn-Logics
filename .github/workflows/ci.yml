@@ -74,4 +74,4 @@ jobs:
           DB_PASS: ""
           DB_NAME: employee_system_test
           APP_ENV: testing
-        run: phpunit --testdox
+        run: phpunit --testdox || (cat php_error.log && exit 1)
