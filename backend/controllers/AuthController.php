@@ -131,6 +131,7 @@ class AuthController
                             'tenant_id' => $user['tenant_id']
                         ];
 
+                        logAudit('Login', 'User signed in successfully.', $user['email'], $user['tenant_id']);
                         echo json_encode(['success' => true, 'user' => $fullUser]);
                     } else {
                         http_response_code(401);
@@ -144,6 +145,7 @@ class AuthController
             }
 
             if ($action === 'logout') {
+                logAudit('Logout', 'User signed out.'); // uses session actor/tenant, before destroy
                 session_destroy();
                 echo json_encode(['success' => true]);
                 return;

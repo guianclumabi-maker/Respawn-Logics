@@ -155,6 +155,7 @@ class IAMController
                     $stmt->execute();
                     echo json_encode(['success' => true, 'data' => $stmt->fetchAll(PDO::FETCH_ASSOC)]);
                 } catch (Exception $e) {
+                    error_log('[' . __CLASS__ . '] ' . $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine());
                     echo json_encode(['success' => false, 'error' => 'Database error']);
                 }
                 return;

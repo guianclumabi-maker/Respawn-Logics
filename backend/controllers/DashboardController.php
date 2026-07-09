@@ -123,6 +123,7 @@ class DashboardController {
                 echo json_encode(['success' => false, 'error' => 'Task not found']);
             }
         } catch (PDOException $e) {
+            error_log('[' . __CLASS__ . '] ' . $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine());
             echo json_encode(['success' => false, 'error' => 'Database error']);
         }
     }
@@ -153,6 +154,7 @@ class DashboardController {
                 'is_completed' => 0
             ]]);
         } catch (PDOException $e) {
+            error_log('[' . __CLASS__ . '] ' . $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine());
             echo json_encode(['success' => false, 'error' => 'Database error']);
         }
     }
