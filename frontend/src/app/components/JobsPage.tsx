@@ -548,10 +548,10 @@ export function JobsPage({ onViewChange }: Props) {
               <button
                 key={dept}
                 onClick={() => setSelectedDept(dept === "All" ? "" : dept)}
-                className={`px-3 py-1.5 rounded-lg text-xs font-semibold border transition-all cursor-pointer whitespace-nowrap ${
+                className={`px-3 py-1.5 rounded-full text-xs font-mono border transition-colors cursor-pointer whitespace-nowrap ${
                   isSelected
                     ? "bg-primary text-primary-foreground border-primary"
-                    : "bg-card border-border text-foreground hover:bg-accent"
+                    : "bg-card text-foreground border-border hover:bg-accent"
                 }`}
               >
                 {isSelected ? `[[ ${dept} ]]` : `[ ${dept} ]`}
@@ -586,10 +586,8 @@ export function JobsPage({ onViewChange }: Props) {
       ) : jobs.length === 0 ? (
         /* Empty State */
         <div className="relative z-10 flex-1 flex flex-col items-center justify-center py-20 font-mono">
-          <div
-            className="w-20 h-20 rounded-2xl flex items-center justify-center mb-5 bg-primary border border-[#00e07a]/10"
-          >
-            <Briefcase size={36} className="text-primary-foreground" />
+          <div className="w-16 h-16 rounded-2xl bg-primary/15 flex items-center justify-center mx-auto mb-4">
+            <Briefcase size={28} className="text-primary" />
           </div>
           <h3 className="text-lg font-bold text-foreground mb-1 font-['Space_Grotesk']">
             CREATE YOUR FIRST JOB
