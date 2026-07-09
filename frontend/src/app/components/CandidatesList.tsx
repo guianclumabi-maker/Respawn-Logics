@@ -68,7 +68,7 @@ export function CandidatesList({ onViewChange }: { onViewChange: (v: ViewState) 
   };
 
   return (
-    <div className="flex-1 flex flex-col h-full bg-[#0b0f1a] text-foreground p-8 relative overflow-hidden font-sans">
+    <div className="flex-1 flex flex-col h-full bg-background text-foreground p-8 relative overflow-hidden font-sans">
       <style>{`
         .blink {
           animation: blink-anim 1.1s step-start infinite;

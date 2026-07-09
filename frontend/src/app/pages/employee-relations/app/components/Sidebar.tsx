@@ -245,92 +245,69 @@ export function Sidebar({ activeView, onViewChange, mode = "admin", onStartTour 
             })}
           </nav>
         </div>
+      </div>
 
-        {/* Account section */}
-        <div>
-          {!collapsed && (
-            <p className="pl-3 text-[0.75rem] font-bold text-gray-500 tracking-[1px] uppercase mb-1.5" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
-              Account
-            </p>
-          )}
-          <nav className="space-y-1.5">
-            {bottomItems.map((item) => (
-              <button
-                key={item.label}
-                onClick={() => {
-                  window.location.href = item.path;
-                }}
-                className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl border border-transparent transition-all group cursor-pointer text-left ${
-                  item.highlight
-                    ? "bg-[#00e07a]/5 hover:bg-[#00e07a]/10 text-[#00e07a] hover:text-[#00e07a] border-[#00e07a]/10"
-                    : "hover:bg-accent text-muted-foreground hover:text-foreground"
-                }`}
-              >
-                <span className={`flex-shrink-0 ${item.highlight ? "text-[#00e07a]" : "text-slate-500 dark:text-[#9ca3af] group-hover:text-slate-800 dark:group-hover:text-white"}`}>
-                  {item.icon}
-                </span>
-                {!collapsed && (
-                  <span className={`text-[0.9rem] font-medium ${item.highlight ? "text-[#00e07a] font-semibold" : "group-hover:text-slate-800 dark:group-hover:text-white"}`}>
-                    {item.label}
+      {/* ── mt-auto container ─────────────────────────── */}
+      <div className="mt-auto flex-shrink-0">
+        {/* ACCOUNT section header */}
+        <p className="px-3 text-[0.7rem] font-bold text-muted-foreground tracking-widest uppercase mb-1">Account</p>
+
+        {/* Back to Workspace button */}
+        <button
+          onClick={() => {
+            window.location.href = `${basePath}/frontend/dist/index.html#/dashboard`;
+          }}
+          className="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-primary hover:bg-accent text-left cursor-pointer transition-all"
+        >
+          <ArrowLeft size={18} className="text-primary flex-shrink-0" />
+          {!collapsed && <span className="text-[0.9rem] font-semibold">Back to Workspace</span>}
+        </button>
+
+        {/* Theme toggle, right above the user */}
+        <div className="mt-2 px-3">
+          <GamifiedThemeToggle collapsed={collapsed} />
+        </div>
+
+        {/* User profile footer */}
+        <div className="border-t border-border p-3 mt-2">
+          {!collapsed ? (
+            <div className="flex items-center gap-3 p-2 bg-muted/30 border border-border rounded-xl">
+              <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0 overflow-hidden">
+                {sessionUser?.profile_image ? (
+                  <img src={`${window.location.hostname === 'localhost' ? '/respawn-logics' : ''}/api/index.php?route=auth&action=download_avatar&file=${sessionUser.profile_image}`} alt="Profile" className="w-full h-full object-cover" />
+                ) : (
+                  <span className="text-primary font-bold text-[0.95rem]">
+                    {sessionUser ? sessionUser.initials : "GC"}
                   </span>
                 )}
-              </button>
-            ))}
-          </nav>
-        </div>
-      </div>
-
-      {/* Theme Toggle Area */}
-      <div className="px-4 py-3 border-t border-border flex-shrink-0">
-        <GamifiedThemeToggle collapsed={collapsed} />
-      </div>
-
-      {/* User Footer Profile Block */}
-      {!collapsed && (
-        <div className="p-4 border-t border-border flex-shrink-0">
-          <div 
-            className="flex items-center gap-3 p-2.5 bg-gray-50 dark:bg-[#8b5cf6]/5 border border-gray-200 dark:border-[#8b5cf6]/10 rounded-xl"
-          >
-            {/* User Initials Avatar */}
-            <div className="w-10 h-10 rounded-full bg-gray-200 dark:bg-[#a855f7]/20 border border-gray-300 dark:border-[#a855f7]/30 flex items-center justify-center flex-shrink-0 overflow-hidden">
-              {sessionUser?.profile_image ? (
-                <img src={`${window.location.hostname === 'localhost' ? '/respawn-logics' : ''}/api/index.php?route=auth&action=download_avatar&file=${sessionUser.profile_image}`} alt="Profile" className="w-full h-full object-cover" />
-              ) : (
-                <span className="text-slate-600 dark:text-[#00e07a] font-bold text-[0.95rem]">
-                  {sessionUser ? sessionUser.initials : "GC"}
-                </span>
-              )}
-            </div>
-            
-            <div className="min-w-0 flex-1">
-              <div className="text-[0.85rem] font-semibold text-slate-800 dark:text-white truncate">
-                {sessionUser ? sessionUser.full_name : "Jane Doe"}
               </div>
-              <div className="text-[10px] text-gray-500 font-mono mt-0.5 truncate uppercase">
-                {sessionUser ? sessionUser.role : "Employee"}
+              <div className="min-w-0 flex-1">
+                <div className="text-[0.85rem] font-semibold text-foreground truncate">
+                  {sessionUser ? sessionUser.full_name : "Jane Doe"}
+                </div>
+                <div className="text-[10px] text-muted-foreground font-mono mt-0.5 truncate uppercase">
+                  {sessionUser ? sessionUser.role : "Employee"}
+                </div>
               </div>
             </div>
-          </div>
+          ) : (
+            <div className="flex justify-center">
+              <div
+                className="w-10 h-10 rounded-full bg-primary/10 border border-border flex items-center justify-center overflow-hidden"
+                title={sessionUser ? sessionUser.full_name : "Jane Doe"}
+              >
+                {sessionUser?.profile_image ? (
+                  <img src={`${window.location.hostname === 'localhost' ? '/respawn-logics' : ''}/api/index.php?route=auth&action=download_avatar&file=${sessionUser.profile_image}`} alt="Profile" className="w-full h-full object-cover" />
+                ) : (
+                  <span className="text-primary font-bold text-[0.85rem]">
+                    {sessionUser ? sessionUser.initials : "JD"}
+                  </span>
+                )}
+              </div>
+            </div>
+          )}
         </div>
-      )}
-
-      {/* Collapsed user avatar */}
-      {collapsed && (
-        <div className="p-3 border-t border-white/[0.04] flex-shrink-0 flex justify-center">
-          <div
-            className="w-10 h-10 rounded-full bg-[#a855f7]/20 border border-[#a855f7]/30 flex items-center justify-center overflow-hidden"
-            title={sessionUser ? sessionUser.full_name : "Jane Doe"}
-          >
-            {sessionUser?.profile_image ? (
-              <img src={`${window.location.hostname === 'localhost' ? '/respawn-logics' : ''}/api/index.php?route=auth&action=download_avatar&file=${sessionUser.profile_image}`} alt="Profile" className="w-full h-full object-cover" />
-            ) : (
-              <span className="text-[#c084fc] font-bold text-[0.85rem]">
-                {sessionUser ? sessionUser.initials : "JD"}
-              </span>
-            )}
-          </div>
-        </div>
-      )}
+      </div>
     </aside>
   );
 }

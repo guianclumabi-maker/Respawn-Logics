@@ -40,16 +40,16 @@ export function PoolDetail({ onViewChange, poolId }: { onViewChange: (v: ViewSta
 
   if (loading) {
     return (
-      <div className="flex-1 flex items-center justify-center bg-[#0b0f1a]">
+      <div className="flex-1 flex items-center justify-center bg-background">
         <div className="animate-spin w-8 h-8 border-2 border-[#00e07a] border-t-transparent rounded-full" />
       </div>
     );
   }
 
-  if (!pool) return <div className="text-foreground p-8 font-mono bg-[#0b0f1a]">[ ERROR: TALENT POOL RECORD OFFLINE ]</div>;
+  if (!pool) return <div className="text-foreground p-8 font-mono bg-background">[ ERROR: TALENT POOL RECORD OFFLINE ]</div>;
 
   return (
-    <div className="flex-1 flex flex-col h-full bg-[#0b0f1a] text-foreground p-8 relative overflow-hidden font-sans">
+    <div className="flex-1 flex flex-col h-full bg-background text-foreground p-8 relative overflow-hidden font-sans">
       <style>{`
         .blink {
           animation: blink-anim 1.1s step-start infinite;

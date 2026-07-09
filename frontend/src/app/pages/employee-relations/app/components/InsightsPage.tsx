@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { apiFetch } from "../../../../lib/apiClient";
 import { useState, useEffect } from "react";
 import { 
   TrendingUp, 
@@ -22,8 +23,7 @@ export function InsightsPage({ onViewChange }: InsightsPageProps) {
   const [filterPeriod, setFilterPeriod] = useState("Last 6 Months");
 
   useEffect(() => {
-    const basePath = window.location.hostname === 'localhost' ? '/respawn-logics' : '';
-    fetch(`${basePath}/api/index.php?route=elr&action=analytics`, { credentials: 'include' })
+    apiFetch("/api/index.php?route=elr&action=analytics")
       .then(res => res.json())
       .then(data => {
         if (data.success) {

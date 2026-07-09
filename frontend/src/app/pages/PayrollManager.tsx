@@ -45,31 +45,29 @@ import { useTour } from '../lib/useTour';
 import { HelpCircle } from 'lucide-react';
 import './PayrollManager.css';
 
-const API_BASE = window.location.origin + (window.location.hostname === 'localhost' ? '/respawn-logics' : '') + '/api/index.php?route=payroll_engine';
-
 const API = {
-  fetchDashboardInfo: () => fetch(`${API_BASE}&action=dashboard_kpis`).then(r => r.json()).then(d => d.data || {
+  fetchDashboardInfo: () => apiFetch('/api/index.php?route=payroll_engine&action=dashboard_kpis').then(r => r.json()).then(d => d.data || {
     nextDate: 'N/A', estimatedCost: 0, costIncrease: 0, readiness: 'N/A', activeRunName: 'None', activeRunTotalEmployees: 0, activeRunProcessed: 0
   }),
-  fetchChartData: () => fetch(`${API_BASE}&action=chart_data`).then(r => r.json()).then(d => d.data || []),
-  fetchExceptions: () => fetch(`${API_BASE}&action=exceptions_list`).then(r => r.json()).then(d => d.data || []),
-  fetchQueue: () => fetch(`${API_BASE}&action=runs`).then(r => r.json()).then(d => {
+  fetchChartData: () => apiFetch('/api/index.php?route=payroll_engine&action=chart_data').then(r => r.json()).then(d => d.data || []),
+  fetchExceptions: () => apiFetch('/api/index.php?route=payroll_engine&action=exceptions_list').then(r => r.json()).then(d => d.data || []),
+  fetchQueue: () => apiFetch('/api/index.php?route=payroll_engine&action=runs').then(r => r.json()).then(d => {
     return (d.data || []).map((r:any) => ({
       id: `PR-${r.id}`, origin: r.schedule_name || 'Manual', period: `${r.payroll_period_start} to ${r.payroll_period_end}`, status: r.status, employees: 0, cost: 'Pending'
     }));
   }),
-  fetchCompHistory: () => fetch(`${API_BASE}&action=comp_history`).then(r => r.json()).then(d => d.data || { history: [], audits: [] }),
-  fetchSettings: () => fetch(`${API_BASE}&action=settings`).then(r => r.json()).then(d => d.data || {}),
-  saveSettings: (data: any) => fetch(`${API_BASE}&action=save_settings`, { method: 'POST', body: JSON.stringify(data) }).then(r => r.json()),
-  fetchComponents: () => fetch(`${API_BASE}&action=components_list`).then(r => r.json()).then(d => d.data || []),
-  saveComponent: (data: any) => fetch(`${API_BASE}&action=component_save`, { method: 'POST', body: JSON.stringify(data) }).then(r => r.json()),
-  deleteComponent: (id: number) => fetch(`${API_BASE}&action=component_delete`, { method: 'POST', body: JSON.stringify({id}) }).then(r => r.json()),
-  fetchPayslipsList: () => fetch(`${API_BASE}&action=payslips_admin`).then(r => r.json()).then(d => {
+  fetchCompHistory: () => apiFetch('/api/index.php?route=payroll_engine&action=comp_history').then(r => r.json()).then(d => d.data || { history: [], audits: [] }),
+  fetchSettings: () => apiFetch('/api/index.php?route=payroll_engine&action=settings').then(r => r.json()).then(d => d.data || {}),
+  saveSettings: (data: any) => apiFetch('/api/index.php?route=payroll_engine&action=save_settings', { method: 'POST', body: JSON.stringify(data) }).then(r => r.json()),
+  fetchComponents: () => apiFetch('/api/index.php?route=payroll_engine&action=components_list').then(r => r.json()).then(d => d.data || []),
+  saveComponent: (data: any) => apiFetch('/api/index.php?route=payroll_engine&action=component_save', { method: 'POST', body: JSON.stringify(data) }).then(r => r.json()),
+  deleteComponent: (id: number) => apiFetch('/api/index.php?route=payroll_engine&action=component_delete', { method: 'POST', body: JSON.stringify({id}) }).then(r => r.json()),
+  fetchPayslipsList: () => apiFetch('/api/index.php?route=payroll_engine&action=payslips_admin').then(r => r.json()).then(d => {
     return (d.data || []).map((ps:any) => ({ id: `PS-${ps.id}`, emp: ps.empName, period: ps.period, net: ps.net, status: ps.status }));
   }),
   fetchPayslipDetails: (id: string) => {
     const rawId = id.replace('PS-', '');
-    return fetch(`${API_BASE}&action=payslip_details&id=${rawId}`).then(r => r.json()).then(d => {
+    return apiFetch(`/api/index.php?route=payroll_engine&action=payslip_details&id=${rawId}`).then(r => r.json()).then(d => {
       const p = d.data;
       if(!p) return null;
       return {
@@ -78,7 +76,7 @@ const API = {
       };
     });
   },
-  fetchGovReports: () => fetch(`${API_BASE}&action=gov_reports`).then(r => r.json()).then(d => d.data || [])
+  fetchGovReports: () => apiFetch('/api/index.php?route=payroll_engine&action=gov_reports').then(r => r.json()).then(d => d.data || [])
 };
 
 export function PayrollManager() {
@@ -526,79 +524,79 @@ export function PayrollManager() {
   // View Renders
   const renderDashboard = () => (
     <div className="dashboard-content animate-slide-up">
-      <div className="card generation-card">
+      <div className="bg-card text-foreground border border-border rounded-xl p-5 mb-6">
         <div className="flex justify-between items-center mb-4">
           <div className="flex items-center gap-3">
-            <div className="pulse-indicator"></div>
-            <h2 className="text-xl">Active Payroll Generation</h2>
+            <div className="w-2 h-2 rounded-full bg-blue-500 animate-ping"></div>
+            <h2 className="text-xl font-bold text-foreground">Active Payroll Generation</h2>
           </div>
-          <span className="badge badge-blue">Processing: {dashInfo.activeRunName}</span>
+          <span className="px-2 py-0.5 rounded text-xs font-mono font-bold bg-blue-500/10 text-blue-500">Processing: {dashInfo.activeRunName}</span>
         </div>
-        <div className="progress-section mt-2">
+        <div className="mt-2">
           <div className="flex justify-between items-end mb-3">
             <div className="flex flex-col">
               <div className="flex items-baseline gap-3">
                 <span className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-emerald-400">
                   {progress}%
                 </span>
-                <span className="text-sm font-medium text-tertiary">
+                <span className="text-sm font-medium text-muted-foreground">
                   {processedEmployees.toLocaleString()} / {dashInfo.activeRunTotalEmployees.toLocaleString()} Employees
                 </span>
               </div>
             </div>
-            <span className="text-sm font-medium text-emerald-400 flex items-center gap-2">
-              <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></div>
+            <span className="text-sm font-medium text-emerald-500 flex items-center gap-2">
+              <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
               Processing without errors
             </span>
           </div>
-          <div className="progress-container">
-            <div className="progress-bar-fill" style={{ width: `${progress}%` }}></div>
+          <div className="w-full h-2 bg-muted rounded-full overflow-hidden">
+            <div className="h-full bg-gradient-to-r from-blue-500 to-emerald-500 transition-all duration-300" style={{ width: `${progress}%` }}></div>
           </div>
         </div>
       </div>
 
-      <div className="kpi-grid">
-        <div className="card kpi-card">
-          <div className="kpi-header">
-            <div className="kpi-icon bg-blue-glow"><CalendarClock size={20} color="var(--accent-blue)" /></div>
-            <span className="badge badge-emerald">On Track</span>
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <div className="bg-card text-card-foreground border border-border rounded-xl p-5 flex flex-col gap-2">
+          <div className="flex justify-between items-center">
+            <div className="w-8 h-8 rounded-lg bg-blue-500/10 flex items-center justify-center"><CalendarClock size={18} className="text-blue-400" /></div>
+            <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/10 text-emerald-500">On Track</span>
           </div>
-          <div className="kpi-body">
-            <span className="kpi-value">{dashInfo.nextDate}</span>
-            <span className="kpi-label">Next Payroll Date</span>
+          <div className="flex flex-col mt-1">
+            <span className="text-xl font-bold font-mono text-foreground">{dashInfo.nextDate}</span>
+            <span className="text-xs text-muted-foreground">Next Payroll Date</span>
           </div>
         </div>
         
-        <div className="card kpi-card">
-          <div className="kpi-header">
-            <div className="kpi-icon bg-amber-glow"><TrendingUp size={20} color="var(--accent-amber)" /></div>
-            <span className="text-xs text-amber-500">+{dashInfo.costIncrease}% from last</span>
+        <div className="bg-card text-card-foreground border border-border rounded-xl p-5 flex flex-col gap-2">
+          <div className="flex justify-between items-center">
+            <div className="w-8 h-8 rounded-lg bg-amber-500/10 flex items-center justify-center"><TrendingUp size={18} className="text-amber-400" /></div>
+            <span className="text-[10px] font-bold text-amber-500">+{dashInfo.costIncrease}% from last</span>
           </div>
-          <div className="kpi-body">
-            <span className="kpi-value">{formatCurrency(dashInfo.estimatedCost)}</span>
-            <span className="kpi-label">Estimated Payroll Cost</span>
-          </div>
-        </div>
-
-        <div className="card kpi-card exception-kpi border-red-glow cursor-pointer hover:border-red-500" onClick={() => setActiveTab('exceptions')}>
-          <div className="kpi-header">
-            <div className="kpi-icon bg-red-glow"><AlertCircle size={20} color="var(--accent-red)" /></div>
-            <span className="badge badge-red">Needs Review</span>
-          </div>
-          <div className="kpi-body">
-            <span className="kpi-value text-red-400">{exceptions.filter(e => e.severity === 'Critical').length}</span>
-            <span className="kpi-label">Critical Exceptions</span>
+          <div className="flex flex-col mt-1">
+            <span className="text-xl font-bold font-mono text-foreground">{formatCurrency(dashInfo.estimatedCost)}</span>
+            <span className="text-xs text-muted-foreground">Estimated Payroll Cost</span>
           </div>
         </div>
 
-        <div className="card kpi-card">
-          <div className="kpi-header">
-            <div className="kpi-icon bg-emerald-glow"><CheckCircle2 size={20} color="var(--accent-emerald)" /></div>
-            <span className="text-xs text-emerald-400">100% Ready</span>
+        <div className="bg-card text-card-foreground border border-red-500/30 rounded-xl p-5 flex flex-col gap-2 cursor-pointer hover:bg-accent/50 transition-colors" onClick={() => setActiveTab('exceptions')}>
+          <div className="flex justify-between items-center">
+            <div className="w-8 h-8 rounded-lg bg-red-500/10 flex items-center justify-center"><AlertCircle size={18} className="text-red-400" /></div>
+            <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-red-500/10 text-red-500">Needs Review</span>
           </div>
-          <div className="kpi-body">
-            <span className="kpi-value">{dashInfo.readiness}</span>
-            <span className="kpi-label">Payroll Readiness</span>
+          <div className="flex flex-col mt-1">
+            <span className="text-xl font-bold font-mono text-red-400">{exceptions.filter(e => e.severity === 'Critical').length}</span>
+            <span className="text-xs text-muted-foreground">Critical Exceptions</span>
+          </div>
+        </div>
+
+        <div className="bg-card text-card-foreground border border-border rounded-xl p-5 flex flex-col gap-2">
+          <div className="flex justify-between items-center">
+            <div className="w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center"><CheckCircle2 size={18} className="text-emerald-400" /></div>
+            <span className="text-[10px] font-bold text-emerald-400">100% Ready</span>
+          </div>
+          <div className="flex flex-col mt-1">
+            <span className="text-xl font-bold font-mono text-foreground">{dashInfo.readiness}</span>
+            <span className="text-xs text-muted-foreground">Payroll Readiness</span>
           </div>
         </div>
       </div>

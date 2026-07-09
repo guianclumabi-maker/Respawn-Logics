@@ -49,11 +49,11 @@ export function TalentSearch({ onViewChange }: { onViewChange: (v: ViewState) =>
     setHasSearched(false);
   };
 
-  const inputCls = "w-full bg-card border border-white/10 rounded-xl pl-9 pr-3 py-2 text-xs font-mono outline-none focus:border-[#00e07a] focus:shadow-[0_0_10px_rgba(0,224,122,0.15)] transition-all";
+  const inputCls = "w-full bg-card border border-border rounded-xl pl-9 pr-3 py-2 text-xs font-mono outline-none focus:border-[#00e07a] focus:shadow-[0_0_10px_rgba(0,224,122,0.15)] transition-all";
   const labelCls = "text-[9px] font-mono font-bold uppercase text-muted-foreground tracking-wide block mb-1";
 
   return (
-    <div className="flex-1 flex flex-col h-full bg-[#0b0f1a] text-foreground p-8 relative overflow-hidden font-sans">
+    <div className="flex-1 flex flex-col h-full bg-background text-foreground p-8 relative overflow-hidden font-sans">
       <style>{`
         .blink {
           animation: blink-anim 1.1s step-start infinite;
@@ -122,7 +122,7 @@ export function TalentSearch({ onViewChange }: { onViewChange: (v: ViewState) =>
               <select
                 value={query.source}
                 onChange={(e) => setQuery({ ...query, source: e.target.value })}
-                className="w-full bg-card border border-white/10 rounded-xl pl-9 pr-3 py-2 text-xs text-gray-300 outline-none focus:border-[#00e07a] appearance-none cursor-pointer"
+                className="w-full bg-card border border-border rounded-xl pl-9 pr-3 py-2 text-xs text-gray-300 outline-none focus:border-[#00e07a] appearance-none cursor-pointer"
               >
                 <option value="" className="bg-background">Any Source</option>
                 <option value="Direct" className="bg-background">Direct</option>
@@ -138,7 +138,7 @@ export function TalentSearch({ onViewChange }: { onViewChange: (v: ViewState) =>
               <button
                 type="button"
                 onClick={handleClear}
-                className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold text-muted-foreground hover:text-foreground hover:bg-white/5 transition-colors bg-transparent border-0"
+                className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold text-muted-foreground hover:text-foreground hover:bg-accent transition-colors bg-transparent border-0"
               >
                 <X size={14} /> [ CLEAR QUERY ]
               </button>
@@ -155,7 +155,7 @@ export function TalentSearch({ onViewChange }: { onViewChange: (v: ViewState) =>
         </form>
       </div>
 
-      <div className="flex-1 border border-white/5 bg-background/40 rounded-2xl overflow-hidden relative z-10 flex flex-col font-mono">
+      <div className="flex-1 border border-border bg-background/40 rounded-2xl overflow-hidden relative z-10 flex flex-col font-mono">
         {!hasSearched ? (
           <div className="flex-1 flex flex-col items-center justify-center text-muted-foreground p-8 text-center py-20">
             <Search size={36} className="mb-4 opacity-30 text-primary" />
@@ -211,7 +211,7 @@ export function TalentSearch({ onViewChange }: { onViewChange: (v: ViewState) =>
                       )}
                     </div>
                   </div>
-                  <div className="flex items-center justify-center pl-4 border-l border-white/5 ml-4 text-muted-foreground group-hover:text-foreground transition-colors shrink-0">
+                  <div className="flex items-center justify-center pl-4 border-l border-border ml-4 text-muted-foreground group-hover:text-foreground transition-colors shrink-0">
                     <ChevronRight size={20} />
                   </div>
                 </div>

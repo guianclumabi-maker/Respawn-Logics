@@ -336,7 +336,7 @@ function JobHealthCard({
           )}
           {job.priority && (
             <span
-              className={`text-[10px] font-mono px-2 py-0.5 rounded border ${priorityConfig[job.priority] || "bg-white/5 text-muted-foreground border-white/10"}`}
+              className={`text-[10px] font-mono px-2 py-0.5 rounded border ${priorityConfig[job.priority] || "bg-white/5 text-muted-foreground border-border"}`}
             >
               {`PRIORITY: ${job.priority}`}
             </span>
