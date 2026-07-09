@@ -30,31 +30,6 @@ class AuthController
                     $stmt->execute([$email]);
                     $user = $stmt->fetch();
 
-                    // ── TEMP DEBUG — 401 investigation. File-log ONLY (no stdout). Remove after. ──
-                    try {
-                        $dbgDb  = $this->pdo->query('SELECT DATABASE()')->fetchColumn();
-                        $dbgCntStmt = $this->pdo->prepare('SELECT COUNT(*) FROM `users` WHERE `email` = ?');
-                        $dbgCntStmt->execute([$email]);
-                        $dbgCnt = $dbgCntStmt->fetchColumn();
-                        $dbgPv  = ($user && !empty($user['password_hash']))
-                            ? (password_verify($password, $user['password_hash']) ? 'TRUE' : 'FALSE')
-                            : 'N/A(' . ($user ? 'row-has-no-hash' : 'no-user-row') . ')';
-                        error_log(sprintf(
-                            "[%s] LOGIN email=%s | getenv(DB_NAME)=%s | config.database.name=%s | SELECT DATABASE()=%s | users_count_for_email=%s | user_row=%s | password_verify=%s | sapi=%s | session_id=%s\n",
-                            date('c'),
-                            $email,
-                            var_export(getenv('DB_NAME'), true),
-                            $GLOBALS['config']['database']['name'] ?? '(unset)',
-                            var_export($dbgDb, true),
-                            var_export($dbgCnt, true),
-                            $user ? ('FOUND(id=' . $user['id'] . ',tenant=' . ($user['tenant_id'] ?? 'null') . ')') : 'NOT-FOUND',
-                            $dbgPv,
-                            PHP_SAPI,
-                            session_id()
-                        ), 3, __DIR__ . '/../../debug_login.log');
-                    } catch (\Throwable $dbgE) { /* never break login */ }
-                    // ── END TEMP DEBUG ─────────────────────────────────────────────────────────
-
                     if ($user && !empty($user['password_hash']) && password_verify($password, $user['password_hash'])) {
                         // 1. Check for 2FA
                         if (!empty($user['totp_enabled'])) {
