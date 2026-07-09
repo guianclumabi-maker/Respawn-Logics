@@ -79,8 +79,8 @@ function AiScoreBadge({ score, breakdown }: { score: number | null, breakdown?: 
       <span className="text-[10px] font-bold cursor-help" style={{ color }}>{`SCORE: ${score}%`}</span>
       
       {breakdown && (
-        <div className="absolute left-0 bottom-full mb-2 hidden group-hover:block z-50 bg-popover/95 border border-white/10 rounded-lg p-3 text-xs w-48 shadow-xl backdrop-blur-xl pointer-events-none">
-          <div className="font-bold mb-2 text-white/90 pb-2 border-b border-white/10">Score Breakdown</div>
+        <div className="absolute left-0 bottom-full mb-2 hidden group-hover:block z-50 bg-popover/95 border border-border rounded-lg p-3 text-xs w-48 shadow-xl backdrop-blur-xl pointer-events-none">
+          <div className="font-bold mb-2 text-white/90 pb-2 border-b border-border">Score Breakdown</div>
           <div className="space-y-1.5">
             <div className="flex justify-between"><span>Skill Match</span><span className="text-white/80">{breakdown.skill}%</span></div>
             <div className="flex justify-between"><span>Experience</span><span className="text-white/80">{breakdown.experience}%</span></div>
@@ -142,16 +142,16 @@ function AddCandidateModal({ jobId, onClose, onSuccess }: { jobId: number; onClo
     <div>
       <label className="text-[10px] uppercase font-mono font-bold text-muted-foreground block mb-1">{label}{required && " *"}</label>
       <input value={(form as Record<string, string>)[key]} onChange={e => set(key, e.target.value)} placeholder={placeholder}
-        className="w-full px-3 py-2 rounded-xl border text-xs font-mono outline-none bg-card border-white/10 text-foreground placeholder-gray-600 focus:border-[#00e07a]" />
+        className="w-full px-3 py-2 rounded-xl border text-xs font-mono outline-none bg-card border-border text-foreground placeholder-gray-600 focus:border-[#00e07a]" />
     </div>
   );
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm">
-      <div className="bg-background border border-white/10 rounded-2xl shadow-2xl w-full max-w-md p-6 text-foreground max-h-[90vh] overflow-y-auto scrollbar-thin">
+      <div className="bg-background border border-border rounded-2xl shadow-2xl w-full max-w-md p-6 text-foreground max-h-[90vh] overflow-y-auto scrollbar-thin">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-sm font-bold font-['Space_Grotesk'] tracking-wide">ADD NEW CANDIDATE</h3>
-          <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-white/5 text-muted-foreground hover:text-foreground cursor-pointer border-0 bg-transparent"><X size={16} /></button>
+          <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-accent text-muted-foreground hover:text-foreground cursor-pointer border-0 bg-transparent"><X size={16} /></button>
         </div>
         <div className="space-y-3">
           {field("Name", "name", "Full name...", true)}
@@ -168,14 +168,14 @@ function AddCandidateModal({ jobId, onClose, onSuccess }: { jobId: number; onClo
           <div>
             <label className="text-[10px] uppercase font-mono font-bold text-muted-foreground block mb-1">Source</label>
             <select value={form.source} onChange={e => set("source", e.target.value)}
-              className="w-full px-3 py-2 rounded-xl border text-xs font-mono outline-none bg-card border-white/10 text-foreground focus:border-[#00e07a]">
+              className="w-full px-3 py-2 rounded-xl border text-xs font-mono outline-none bg-card border-border text-foreground focus:border-[#00e07a]">
               {SOURCES.map(s => <option key={s} value={s}>{s}</option>)}
             </select>
           </div>
           {field("Tags", "tags", "Senior, Remote (comma-separated)")}
         </div>
         <div className="flex gap-2 mt-5 font-mono">
-          <button onClick={onClose} className="flex-1 px-4 py-2 rounded-xl border text-xs font-bold bg-transparent hover:bg-white/5 cursor-pointer text-muted-foreground border-white/10">[ CANCEL ]</button>
+          <button onClick={onClose} className="flex-1 px-4 py-2 rounded-xl border text-xs font-bold bg-transparent hover:bg-accent cursor-pointer text-muted-foreground border-border">[ CANCEL ]</button>
           <button disabled={!form.name.trim() || saving} onClick={submit}
             className="flex-1 px-4 py-2 rounded-xl text-xs font-bold bg-primary hover:opacity-90 text-primary-foreground hover:opacity-90 disabled:opacity-40 cursor-pointer border-0">
             {saving ? "[ SAVING... ]" : "[ ADD CANDIDATE ]"}
@@ -260,10 +260,10 @@ function BulkBar({ count, onAdvance, onReject, onDelete }: {
           [ ADVANCE STAGE ] <ChevronDown size={14} />
         </button>
         {showStages && (
-          <div className="absolute bottom-full mb-3 left-0 w-48 bg-[#0d0f19] border border-white/10 rounded-xl shadow-2xl z-50 py-2">
+          <div className="absolute bottom-full mb-3 left-0 w-48 bg-[#0d0f19] border border-border rounded-xl shadow-2xl z-50 py-2">
             {STAGES.map(s => (
               <button key={s} onClick={() => { onAdvance(s); setShowStages(false); }}
-                className="w-full text-left px-4 py-2.5 text-xs font-bold text-gray-300 hover:bg-white/5 transition-colors cursor-pointer border-0 bg-transparent">{s}</button>
+                className="w-full text-left px-4 py-2.5 text-xs font-bold text-gray-300 hover:bg-accent transition-colors cursor-pointer border-0 bg-transparent">{s}</button>
             ))}
           </div>
         )}

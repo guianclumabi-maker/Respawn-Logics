@@ -41,7 +41,7 @@ export function RecruitingCopilot({ onViewChange }: { onViewChange: (v: ViewStat
   };
 
   return (
-    <div className="flex-1 flex flex-col h-full bg-[#0b0f1a] text-foreground p-8 relative overflow-hidden font-sans">
+    <div className="flex-1 flex flex-col h-full bg-background text-foreground p-8 relative overflow-hidden font-sans">
       <style>{`
         .blink {
           animation: blink-anim 1.1s step-start infinite;
@@ -76,7 +76,7 @@ export function RecruitingCopilot({ onViewChange }: { onViewChange: (v: ViewStat
             <div className="animate-spin w-8 h-8 border-2 border-[#00e07a] border-t-transparent rounded-full" />
           </div>
         ) : actions.length === 0 ? (
-          <div className="bg-background border border-white/5 rounded-2xl p-12 text-center flex flex-col items-center py-20">
+          <div className="bg-background border border-border rounded-2xl p-12 text-center flex flex-col items-center py-20">
             <CheckCircle size={36} className="text-primary opacity-60 mb-4" />
             <h3 className="text-sm font-bold text-foreground uppercase tracking-wider mb-2">STATUS: DIAGNOSTICS CLEAR</h3>
             <p className="text-xs text-muted-foreground max-w-md mx-auto leading-relaxed">
