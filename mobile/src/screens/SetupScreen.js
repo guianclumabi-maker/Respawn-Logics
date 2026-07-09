@@ -23,7 +23,7 @@ export default function SetupScreen() {
     } catch (e) {
       Alert.alert(
         'Cannot reach server',
-        'No Respawn Logics API found at that address.\n\nChecklist:\n• XAMPP Apache is running on the PC\n• Phone and PC are on the same Wi-Fi\n• Use the PC’s LAN IP (run "ipconfig"), not localhost\n• Windows Firewall allows Apache (port 80)'
+        'Error details: ' + e.message + '\n\nNo Respawn Logics API found at that address.\n\nChecklist:\n• Ensure the URL starts with https:// (or http://)\n• Check that your live site is up and loading in your browser\n• If local, ensure phone and PC are on the same Wi-Fi'
       );
     } finally {
       setBusy(false);
