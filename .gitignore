@@ -14,3 +14,13 @@ vendor/
 # Local DB backups (contain data / connection details — never commit)
 backup_db.bat
 respawn_backup_*.sql
+
+# Additional build/test/temporary exclusions
+phpunit_*.txt
+test_output.txt
+debug_*.php
+composer.phar
+phpunit.phar
+*.zip
+*.sql
+mobile/node_modules/
