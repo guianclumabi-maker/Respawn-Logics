@@ -726,7 +726,11 @@ class CandidatesController
 
     private function currentUserAction() {
         if ($this->currentUser) {
-            $userPayload = buildUserPayload($this->currentUser);
+            // Superset: the full user row (full_name, department, employee_id, etc. that the
+            // profile UI reads) PLUS the canonical auth fields (name/role/permissions/is_super/theme).
+            // buildUserPayload keys win on overlap, so login and current_user stay consistent.
+            $userPayload = array_merge($this->currentUser, buildUserPayload($this->currentUser));
+            unset($userPayload['password_hash']);
             echo json_encode(['success' => true, 'user' => $userPayload]);
         } else {
             if (isset($_SESSION['user_name'])) {
