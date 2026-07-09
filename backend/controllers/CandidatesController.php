@@ -726,16 +726,7 @@ class CandidatesController
 
     private function currentUserAction() {
         if ($this->currentUser) {
-            $userPayload = $this->currentUser;
-            unset($userPayload['password_hash']);
-            // Expose RBAC flags so this matches the login response exactly (single source of truth).
-            $userPayload['permissions'] = $_SESSION['permissions'] ?? [];
-            $userPayload['is_super']    = !empty($_SESSION['is_super']);
-            $userPayload['name']        = $this->currentUser['full_name'] ?? ($userPayload['name'] ?? null);
-            // Alias theme_preference -> theme so the frontend re-applies the saved per-user
-            // theme on every reload (AuthContext reads user.theme). Without this the DB
-            // preference is only honored right after login, not on subsequent reloads.
-            $userPayload['theme']       = $this->currentUser['theme_preference'] ?? ($userPayload['theme'] ?? null);
+            $userPayload = buildUserPayload($this->currentUser);
             echo json_encode(['success' => true, 'user' => $userPayload]);
         } else {
             if (isset($_SESSION['user_name'])) {

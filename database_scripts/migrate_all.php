@@ -9,39 +9,12 @@ echo "====================================\n";
 // Disable foreign key checks to prevent lock/constraint errors during table creation
 $pdo->exec("SET FOREIGN_KEY_CHECKS = 0;");
 
-$scripts = [
-    'migrate_tenants.php',
-    'migrate_core_hr.php',
-    'migrate_ats_tables.php',
-    'migrate_ats_queries.php',
-    'migrate_ats_indexes.php',
-    'migrate_benefits.php',
-    'migrate_compensation.php',
-    'migrate_elr.php',
-    'migrate_elr_cases.php',
-    'migrate_elr_knowledge.php',
-    'migrate_elr_pipeline.php',
-    'migrate_elr_auto_rules.php',
-    'migrate_elr_phase5.php',
-    'migrate_esm.php',
-    'migrate_expenses.php',
-    'migrate_global_cache.php',
-    'migrate_knowledge_base.php',
-    'migrate_onboarding.php',
-    'migrate_payroll.php',
-    'migrate_timesheets.php',
-    'migrate_holidays.php',
-    'migrate_tour_progress.php',
-    'migrate_performance.php',
-    'migrate_security.php',
+$coreScripts = require __DIR__ . '/schema_migrations.php';
+$scripts = array_merge($coreScripts, [
     'setup_db.php',
     'iam_seed.php',
-    'setup_platform_tickets.php',
-    'migrate_notifications.php',
-    'migrate_permissions_sync.php',
-    'migrate_must_change_password.php',
-    'migrate_candidate_privacy.php'
-];
+    'setup_platform_tickets.php'
+]);
 
 foreach ($scripts as $script) {
     $path = __DIR__ . '/' . $script;

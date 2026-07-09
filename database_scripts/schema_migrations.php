@@ -1,0 +1,39 @@
+<?php
+/**
+ * Shared core schema migrations list.
+ * Any new core migration should be added here so that both production and test suites run it.
+ */
+return [
+    'migrate_tenants.php',
+    'migrate_core_hr.php',
+    'migrate_core_hr_columns.php',
+    'migrate_ats_tables.php',
+    'migrate_ats_queries.php',
+    'migrate_ats_indexes.php',
+    'migrate_benefits.php',
+    'migrate_compensation.php',
+    'migrate_esm.php',
+    'migrate_elr.php',
+    'migrate_elr_cases.php',
+    'migrate_elr_knowledge.php',
+    'migrate_elr_pipeline.php',
+    'migrate_elr_auto_rules.php',
+    'migrate_elr_phase5.php',
+    'migrate_expenses.php',
+    'migrate_global_cache.php',
+    'migrate_knowledge_base.php',
+    'migrate_onboarding.php',
+    'migrate_payroll.php',
+    'migrate_timesheets.php',
+    'migrate_holidays.php',
+    'migrate_tour_progress.php',
+    'migrate_performance.php',
+    'migrate_score_breakdown.php',
+    'migrate_scoring_columns.php',
+    'migrate_security.php',
+    'migrate_support_access.php',
+    'migrate_candidate_privacy.php',
+    'migrate_permissions_sync.php',
+    'migrate_must_change_password.php',
+    'migrate_notifications.php'
+];

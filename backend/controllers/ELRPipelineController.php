@@ -784,6 +784,7 @@ class ELRPipelineController
         $upd->execute([$toStageId, $newStatus, $cardId, $this->tenantId]);
 
         $this->logTransition($cardId, $fromStageId, $toStageId, $actor, $input['note'] ?? null);
+        logAudit('ELR Stage Move', "Case Card #{$cardId} moved from Stage {$fromStageId} to {$toStageId}.");
         $doc = $this->generateDocumentForStage($cardId, $card['employee_id'], $toStageId, $actor, $extra);
 
         echo json_encode([
@@ -852,6 +853,7 @@ class ELRPipelineController
             $this->tenantId, $cardId, (int)$stage['template_id'], $stageId,
             $stage['doc_type'], $title, $rendered, $actor
         ]);
+        logAudit('ELR Document Generated', "Document '{$title}' generated for Case Card #{$cardId} by {$actor}.");
 
         return [
             'id'       => (int)$this->pdo->lastInsertId(),

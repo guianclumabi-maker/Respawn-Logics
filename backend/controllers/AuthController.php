@@ -115,22 +115,9 @@ class AuthController
                         $setupMode = $stmtTier->fetchColumn() ?: 'Solo';
                         $tierConfig = RoleSeederService::getTierConfig($setupMode);
 
-                        $fullUser = [
-                            'id' => $user['id'],
-                            'name' => $user['full_name'],
-                            'profile_image' => $user['profile_image'] ?? null,
-                            'job_title' => $user['job_title'] ?? null,
-                            'roles' => $roles,
-                            'role' => $user['role'] ?? null,
-                            'permissions' => $_SESSION['permissions'] ?? [],
-                            'is_super' => !empty($_SESSION['is_super']),
-                            'must_change_password' => !empty($user['must_change_password']),
-                            'tier_config' => $tierConfig,
-                            'theme' => $user['theme_preference'] ?? null,
-                            'email' => $user['email'],
-                            'tenant_id' => $user['tenant_id']
-                        ];
+                        $fullUser = array_merge(buildUserPayload($user, $roles), ['tier_config' => $tierConfig]);
 
+                        logAudit('Login', 'User signed in successfully.', $user['email'], $user['tenant_id']);
                         echo json_encode(['success' => true, 'user' => $fullUser]);
                     } else {
                         http_response_code(401);
@@ -144,6 +131,7 @@ class AuthController
             }
 
             if ($action === 'logout') {
+                logAudit('Logout', 'User signed out.'); // uses session actor/tenant, before destroy
                 session_destroy();
                 echo json_encode(['success' => true]);
                 return;

@@ -64,6 +64,7 @@ class CoreHRController
                     break;
             }
         } catch (\Exception $e) {
+            error_log('[' . __CLASS__ . '] ' . $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine());
             echo json_encode(['success' => false, 'error' => 'Database error']);
         }
     }
