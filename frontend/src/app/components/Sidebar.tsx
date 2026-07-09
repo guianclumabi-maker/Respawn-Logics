@@ -463,36 +463,42 @@ export function Sidebar({ activeView, onViewChange, badges = {} }: SidebarProps)
         )}
       </div>
 
-      {/* ── Gamified Theme Toggle ─────────────────────── */}
-      <div className="px-3 py-2 border-t border-border flex-shrink-0">
-        <GamifiedThemeToggle collapsed={collapsed} />
-      </div>
+      {/* ── mt-auto container ─────────────────────────── */}
+      <div className="mt-auto flex-shrink-0">
+        {/* ACCOUNT section header */}
+        <p className="px-3 text-[0.7rem] font-bold text-muted-foreground tracking-widest uppercase mb-1">Account</p>
 
-      {/* ── Profile Footer ────────────────────────────── */}
-      <div className="border-t border-border p-3 flex-shrink-0 bg-muted/50">
-        <div className={`flex items-center ${collapsed ? "justify-center flex-col gap-3" : "justify-between"}`}>
-          <div className="flex items-center gap-3 min-w-0">
-            <div className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0 text-primary font-bold text-sm uppercase">
-              {user?.name?.charAt(0) || "U"}
-            </div>
-            {!collapsed && (
-              <div className="min-w-0 flex-1">
-                <div className="text-[13px] font-bold text-slate-900 dark:text-slate-100 truncate">
-                  {user?.name || "User"}
-                </div>
-                <div className="text-[11px] text-slate-500 truncate">
-                  {user?.email || "user@example.com"}
-                </div>
+        {/* Theme toggle, right above the user */}
+        <div className="mt-2 px-3">
+          <GamifiedThemeToggle collapsed={collapsed} />
+        </div>
+
+        {/* User profile footer */}
+        <div className="border-t border-border p-3 mt-2 bg-muted/50">
+          <div className={`flex items-center ${collapsed ? "justify-center flex-col gap-3" : "justify-between"}`}>
+            <div className="flex items-center gap-3 min-w-0">
+              <div className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0 text-primary font-bold text-sm uppercase">
+                {user?.name?.charAt(0) || "U"}
               </div>
-            )}
+              {!collapsed && (
+                <div className="min-w-0 flex-1">
+                  <div className="text-[13px] font-bold text-slate-900 dark:text-slate-100 truncate">
+                    {user?.name || "User"}
+                  </div>
+                  <div className="text-[11px] text-slate-500 truncate">
+                    {user?.email || "user@example.com"}
+                  </div>
+                </div>
+              )}
+            </div>
+            <button
+              onClick={() => logout()}
+              className="p-2 text-slate-500 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-lg transition-colors flex-shrink-0"
+              title="Log out"
+            >
+              <LogOut size={16} />
+            </button>
           </div>
-          <button
-            onClick={() => logout()}
-            className="p-2 text-slate-500 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-lg transition-colors flex-shrink-0"
-            title="Log out"
-          >
-            <LogOut size={16} />
-          </button>
         </div>
       </div>
     </aside>
