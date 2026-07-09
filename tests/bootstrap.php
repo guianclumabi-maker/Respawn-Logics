@@ -44,28 +44,10 @@ $migrationScripts = array_merge(
     array_diff($coreMigrations, ['migrate_tenants.php'])
 );
 
-foreach ($migrationScripts as $script) {
-    $path = __DIR__ . '/../database_scripts/' . $script;
-    if (file_exists($path)) {
-        // Output buffering to hide successful migration echoes
-        ob_start();
-        require $path;
-        ob_end_clean();
-    }
-}
-
 $databaseMigrations = [
     'rbac_phase1.php',
     'rbac_phase2.php'
 ];
-foreach ($databaseMigrations as $script) {
-    $path = __DIR__ . '/../database/migrations/' . $script;
-    if (file_exists($path)) {
-        ob_start();
-        require $path;
-        ob_end_clean();
-    }
-}
 
 // Additional specific backend migrations
 $backendMigrations = [
@@ -74,14 +56,14 @@ $backendMigrations = [
     'migrate_schema_updates.php',
     'migrate_statutory_rates.php'
 ];
-foreach ($backendMigrations as $script) {
-    $path = __DIR__ . '/../backend/migrations/' . $script;
-    if (file_exists($path)) {
-        ob_start();
-        require $path;
-        ob_end_clean();
-    }
-}
+
+require_once __DIR__ . '/../database_scripts/Migrator.php';
+$migrator = new Migrator($pdo);
+$migrator->ensureTable();
+
+$migrator->runAlways($migrationScripts, __DIR__ . '/../database_scripts');
+$migrator->runAlways($databaseMigrations, __DIR__ . '/../database/migrations');
+$migrator->runAlways($backendMigrations, __DIR__ . '/../backend/migrations');
 
 $pdo->exec("SET FOREIGN_KEY_CHECKS = 1;");
 echo "Test database setup complete.\n\n";

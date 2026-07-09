@@ -16,38 +16,28 @@ $scripts = array_merge($coreScripts, [
     'setup_platform_tickets.php'
 ]);
 
-foreach ($scripts as $script) {
-    $path = __DIR__ . '/' . $script;
-    if (file_exists($path)) {
-        echo "[RUNNING] $script\n";
-        try {
-            // Obfuscate duplicate bootstrap/app.php load if necessary
-            // since require_once is used inside them, it is safe to include.
-            include $path;
-            echo "\n------------------------------------\n";
-        } catch (Throwable $e) {
-            echo "[ERROR] Failed running $script: " . $e->getMessage() . "\n";
-            echo "------------------------------------\n";
-        }
-    } else {
-        echo "[WARNING] Migration file not found: $script\n";
-        echo "------------------------------------\n";
-    }
-}
-
 $extraMigrations = [
-    __DIR__ . '/../database/migrations/rbac_phase1.php',
-    __DIR__ . '/../database/migrations/rbac_phase2.php',
-    __DIR__ . '/../backend/migrations/migrate_statutory_rates.php',
+    '../database/migrations/rbac_phase1.php',
+    '../database/migrations/rbac_phase2.php',
+    '../backend/migrations/migrate_statutory_rates.php',
 ];
-foreach ($extraMigrations as $path) {
-    if (file_exists($path)) {
-        echo "[RUNNING] " . basename($path) . "\n";
-        try { include $path; echo "\n------------------------------------\n"; }
-        catch (Throwable $e) { echo "[ERROR] " . basename($path) . ": " . $e->getMessage() . "\n------------------------------------\n"; }
-    } else {
-        echo "[WARNING] not found: $path\n";
+
+require_once __DIR__ . '/Migrator.php';
+$migrator = new Migrator($pdo);
+
+echo "Running migrations with tracking...\n";
+try {
+    $ranScripts = $migrator->run($scripts, __DIR__);
+    foreach ($ranScripts as $s) {
+        echo "[MIGRATED] $s\n";
     }
+    
+    $ranExtra = $migrator->run($extraMigrations, __DIR__);
+    foreach ($ranExtra as $s) {
+        echo "[MIGRATED] " . basename($s) . "\n";
+    }
+} catch (Throwable $e) {
+    echo "[ERROR] Migration failed: " . $e->getMessage() . "\n";
 }
 
 $pdo->exec("SET FOREIGN_KEY_CHECKS = 1;");
