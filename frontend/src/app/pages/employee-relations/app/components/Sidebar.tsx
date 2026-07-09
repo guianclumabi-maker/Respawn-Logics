@@ -244,25 +244,22 @@ export function Sidebar({ activeView, onViewChange, mode = "admin", onStartTour 
               );
             })}
           </nav>
+
+          {/* Back to Workspace — directly below the last nav item (Analytics) */}
+          <button
+            onClick={() => {
+              window.location.href = `${basePath}/frontend/dist/index.html#/dashboard`;
+            }}
+            className="w-full flex items-center gap-3 px-4 py-3 mt-1.5 rounded-xl text-primary hover:bg-accent text-left cursor-pointer transition-all"
+          >
+            <ArrowLeft size={20} className="text-primary flex-shrink-0" />
+            {!collapsed && <span className="text-[0.9rem] font-semibold">Back to Workspace</span>}
+          </button>
         </div>
       </div>
 
-      {/* ── mt-auto container ─────────────────────────── */}
+      {/* ── mt-auto container (toggle + user) ─────────── */}
       <div className="mt-auto flex-shrink-0">
-        {/* ACCOUNT section header */}
-        <p className="px-3 text-[0.7rem] font-bold text-muted-foreground tracking-widest uppercase mb-1">Account</p>
-
-        {/* Back to Workspace button */}
-        <button
-          onClick={() => {
-            window.location.href = `${basePath}/frontend/dist/index.html#/dashboard`;
-          }}
-          className="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-primary hover:bg-accent text-left cursor-pointer transition-all"
-        >
-          <ArrowLeft size={18} className="text-primary flex-shrink-0" />
-          {!collapsed && <span className="text-[0.9rem] font-semibold">Back to Workspace</span>}
-        </button>
-
         {/* Theme toggle, right above the user */}
         <div className="mt-2 px-3">
           <GamifiedThemeToggle collapsed={collapsed} />
