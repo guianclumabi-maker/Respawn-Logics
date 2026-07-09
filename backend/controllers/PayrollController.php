@@ -107,6 +107,12 @@ class PayrollController
                         $this->currentUser['id']
                     );
 
+                    if ($result['success'] ?? false) {
+                        $runId = $result['run_id'];
+                        $period = "{$start} to {$end}";
+                        logAudit('Payroll Run', "Run #{$runId} generated for {$period}.");
+                    }
+
                     echo json_encode($result);
                     break;
 
@@ -233,6 +239,7 @@ class PayrollController
 
                     $stmt = $this->pdo->prepare("UPDATE `payroll_runs` SET `status` = ? WHERE `id` = ? AND `tenant_id` = ?");
                     $stmt->execute([$status, $runId, $this->tenantId]);
+                    logAudit('Payroll Run', "Run #{$runId} status updated to {$status}.");
                     echo json_encode(['success' => true]);
                     break;
 

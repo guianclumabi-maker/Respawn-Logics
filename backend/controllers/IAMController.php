@@ -133,6 +133,7 @@ class IAMController
                 $params[] = $this->tenantId;
                 $sql = "UPDATE `tenants` SET " . implode(', ', $sets) . " WHERE `id` = ?";
                 $this->pdo->prepare($sql)->execute($params);
+                logAudit('Tenant Settings Saved', 'Workspace settings updated.');
                 echo json_encode(['success' => true, 'message' => 'Settings updated']);
             } catch (Exception $e) {
                 http_response_code(500);
@@ -471,7 +472,7 @@ class IAMController
                     $emailStmt = $this->pdo->prepare("SELECT email FROM users WHERE id = ?");
                     $emailStmt->execute([$user_id]);
                     $uEmail = $emailStmt->fetchColumn();
-                    logAction($uEmail, 'Role Removed', "Removed role_id {$role_id}");
+                    logAudit('Role Removed', "Role ID {$role_id} removed from {$uEmail}.");
 
                     // Increment permission_version
                     $this->pdo->prepare("UPDATE tenants SET permission_version = permission_version + 1 WHERE id = ?")->execute([$this->tenantId]);
@@ -632,7 +633,7 @@ class IAMController
                     }
 
                     $this->pdo->commit();
-                    logAction($this->currentUser['email'], 'ROLE_UPDATED', "Permissions updated for role ID $role_id");
+                    logAudit('Role Permissions Updated', "Permissions updated for Role ID {$role_id}.");
                     echo json_encode(['success' => true]);
                 } catch (Exception $e) {
                     $this->pdo->rollBack();
@@ -702,7 +703,7 @@ class IAMController
         $emailStmt = $this->pdo->prepare("SELECT email FROM users WHERE id = ?");
         $emailStmt->execute([$userId]);
         $uEmail = $emailStmt->fetchColumn();
-        logAction($uEmail, 'Role Assigned/Updated', "Role ID {$roleId} assigned with scope {$scope}");
+        logAudit('Role Assigned', "Role ID {$roleId} assigned to {$uEmail} with scope {$scope}.");
     }
 }
 
