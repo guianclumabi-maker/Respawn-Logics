@@ -45,31 +45,29 @@ import { useTour } from '../lib/useTour';
 import { HelpCircle } from 'lucide-react';
 import './PayrollManager.css';
 
-const API_BASE = window.location.origin + (window.location.hostname === 'localhost' ? '/respawn-logics' : '') + '/api/index.php?route=payroll_engine';
-
 const API = {
-  fetchDashboardInfo: () => fetch(`${API_BASE}&action=dashboard_kpis`).then(r => r.json()).then(d => d.data || {
+  fetchDashboardInfo: () => apiFetch('/api/index.php?route=payroll_engine&action=dashboard_kpis').then(r => r.json()).then(d => d.data || {
     nextDate: 'N/A', estimatedCost: 0, costIncrease: 0, readiness: 'N/A', activeRunName: 'None', activeRunTotalEmployees: 0, activeRunProcessed: 0
   }),
-  fetchChartData: () => fetch(`${API_BASE}&action=chart_data`).then(r => r.json()).then(d => d.data || []),
-  fetchExceptions: () => fetch(`${API_BASE}&action=exceptions_list`).then(r => r.json()).then(d => d.data || []),
-  fetchQueue: () => fetch(`${API_BASE}&action=runs`).then(r => r.json()).then(d => {
+  fetchChartData: () => apiFetch('/api/index.php?route=payroll_engine&action=chart_data').then(r => r.json()).then(d => d.data || []),
+  fetchExceptions: () => apiFetch('/api/index.php?route=payroll_engine&action=exceptions_list').then(r => r.json()).then(d => d.data || []),
+  fetchQueue: () => apiFetch('/api/index.php?route=payroll_engine&action=runs').then(r => r.json()).then(d => {
     return (d.data || []).map((r:any) => ({
       id: `PR-${r.id}`, origin: r.schedule_name || 'Manual', period: `${r.payroll_period_start} to ${r.payroll_period_end}`, status: r.status, employees: 0, cost: 'Pending'
     }));
   }),
-  fetchCompHistory: () => fetch(`${API_BASE}&action=comp_history`).then(r => r.json()).then(d => d.data || { history: [], audits: [] }),
-  fetchSettings: () => fetch(`${API_BASE}&action=settings`).then(r => r.json()).then(d => d.data || {}),
-  saveSettings: (data: any) => fetch(`${API_BASE}&action=save_settings`, { method: 'POST', body: JSON.stringify(data) }).then(r => r.json()),
-  fetchComponents: () => fetch(`${API_BASE}&action=components_list`).then(r => r.json()).then(d => d.data || []),
-  saveComponent: (data: any) => fetch(`${API_BASE}&action=component_save`, { method: 'POST', body: JSON.stringify(data) }).then(r => r.json()),
-  deleteComponent: (id: number) => fetch(`${API_BASE}&action=component_delete`, { method: 'POST', body: JSON.stringify({id}) }).then(r => r.json()),
-  fetchPayslipsList: () => fetch(`${API_BASE}&action=payslips_admin`).then(r => r.json()).then(d => {
+  fetchCompHistory: () => apiFetch('/api/index.php?route=payroll_engine&action=comp_history').then(r => r.json()).then(d => d.data || { history: [], audits: [] }),
+  fetchSettings: () => apiFetch('/api/index.php?route=payroll_engine&action=settings').then(r => r.json()).then(d => d.data || {}),
+  saveSettings: (data: any) => apiFetch('/api/index.php?route=payroll_engine&action=save_settings', { method: 'POST', body: JSON.stringify(data) }).then(r => r.json()),
+  fetchComponents: () => apiFetch('/api/index.php?route=payroll_engine&action=components_list').then(r => r.json()).then(d => d.data || []),
+  saveComponent: (data: any) => apiFetch('/api/index.php?route=payroll_engine&action=component_save', { method: 'POST', body: JSON.stringify(data) }).then(r => r.json()),
+  deleteComponent: (id: number) => apiFetch('/api/index.php?route=payroll_engine&action=component_delete', { method: 'POST', body: JSON.stringify({id}) }).then(r => r.json()),
+  fetchPayslipsList: () => apiFetch('/api/index.php?route=payroll_engine&action=payslips_admin').then(r => r.json()).then(d => {
     return (d.data || []).map((ps:any) => ({ id: `PS-${ps.id}`, emp: ps.empName, period: ps.period, net: ps.net, status: ps.status }));
   }),
   fetchPayslipDetails: (id: string) => {
     const rawId = id.replace('PS-', '');
-    return fetch(`${API_BASE}&action=payslip_details&id=${rawId}`).then(r => r.json()).then(d => {
+    return apiFetch(`/api/index.php?route=payroll_engine&action=payslip_details&id=${rawId}`).then(r => r.json()).then(d => {
       const p = d.data;
       if(!p) return null;
       return {
@@ -78,7 +76,7 @@ const API = {
       };
     });
   },
-  fetchGovReports: () => fetch(`${API_BASE}&action=gov_reports`).then(r => r.json()).then(d => d.data || [])
+  fetchGovReports: () => apiFetch('/api/index.php?route=payroll_engine&action=gov_reports').then(r => r.json()).then(d => d.data || [])
 };
 
 export function PayrollManager() {
