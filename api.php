@@ -125,22 +125,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         echo json_encode([
             'success' => true,
             'csrf_token' => $_SESSION['csrf_token'],
-            'user' => [
-                'id' => $user['id'],
-                'name' => $user['full_name'],
-                'profile_image' => $user['profile_image'] ?? null,
-                'job_title' => $user['job_title'] ?? null,
-                'roles' => $roles,
-                'role' => $user['role'] ?? null,
-                'permissions' => $_SESSION['permissions'] ?? [],
-                'is_super' => !empty($_SESSION['is_super']),
-                // Per-user theme so the SPA re-applies the saved preference on every reload
-                // (AuthContext reads user.theme). Without this the DB value is only honored
-                // right after login, not on subsequent boots.
-                'theme' => $user['theme_preference'] ?? null,
-                'must_change_password' => !empty($_SESSION['must_change_password']),
-                'tier_config' => $tierConfig
-            ]
+            'user' => array_merge(buildUserPayload($user, $roles), ['tier_config' => $tierConfig])
         ]);
         exit;
     }
