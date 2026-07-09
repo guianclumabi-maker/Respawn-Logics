@@ -324,3 +324,70 @@ if (!function_exists('sendNotification')) {
         }
     }
 }
+
+if (!function_exists('logAudit')) {
+    /**
+     * Central audit-trail writer. Records a security/business-relevant event into audit_logs,
+     * resolving tenant/actor from session if not explicitly provided. Safe against DB errors.
+     */
+    function logAudit($action, $details = '', $userEmail = null, $tenantId = null) {
+        global $pdo;
+        try {
+            // Resolve defaults from session if not passed
+            if ($userEmail === null) {
+                $userEmail = $_SESSION['user_email'] ?? 'System';
+            }
+            if ($tenantId === null) {
+                $tenantId = $_SESSION['tenant_id'] ?? null;
+            }
+            if ($tenantId === null) {
+                // Cannot log audit without a valid tenant
+                return false;
+            }
+            $stmt = $pdo->prepare(
+                "INSERT INTO `audit_logs` (`tenant_id`, `user_email`, `action`, `details`, `created_at`)
+                 VALUES (?, ?, ?, ?, NOW())"
+            );
+            $stmt->execute([$tenantId, $userEmail, $action, $details]);
+            return true;
+        } catch (\Throwable $e) {
+            error_log('[logAudit] failed: ' . $e->getMessage());
+            return false;
+        }
+    }
+}
+
+if (!function_exists('logAction')) {
+    /** Back-compat shim for existing callers: logAction($email, $action, $details). */
+    function logAction($userEmail, $action, $details = '') {
+        return logAudit($action, $details, $userEmail);
+    }
+}
+
+if (!function_exists('buildUserPayload')) {
+    /**
+     * Canonical user payload shape returned by BOTH the login response and current_user, so the
+     * two can never drift again (that drift caused the "admin sidebar missing until reload" and
+     * "theme not persisting" bugs). RBAC flags are read from the session (populated by
+     * loadPermissions()). Callers may merge extras like tier_config afterwards.
+     *
+     * @param array $user  A users-table row (must include at least id/email/full_name/tenant_id)
+     * @param array $roles Role names from user_roles (optional)
+     */
+    function buildUserPayload(array $user, array $roles = []) {
+        return [
+            'id'                   => $user['id'] ?? null,
+            'name'                 => $user['full_name'] ?? ($user['name'] ?? null),
+            'email'                => $user['email'] ?? null,
+            'tenant_id'            => $user['tenant_id'] ?? null,
+            'role'                 => $user['role'] ?? null,
+            'roles'                => $roles,
+            'permissions'          => $_SESSION['permissions'] ?? [],
+            'is_super'             => !empty($_SESSION['is_super']),
+            'theme'                => $user['theme_preference'] ?? null,
+            'profile_image'        => $user['profile_image'] ?? null,
+            'job_title'            => $user['job_title'] ?? null,
+            'must_change_password' => !empty($user['must_change_password']),
+        ];
+    }
+}
