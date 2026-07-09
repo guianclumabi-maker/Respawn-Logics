@@ -36,6 +36,14 @@ class AuthLoginTest extends TestCase
     public function testLoginReturnsFullProfileForSuperAdmin(): void
     {
         $r = self::loginAs('auth.super@test.com');
+        if (!($r['json']['success'] ?? false)) {
+            $logPath = __DIR__ . '/../../php_error.log';
+            if (file_exists($logPath)) {
+                echo "\n--- php_error.log ---\n" . file_get_contents($logPath) . "\n--------------------\n";
+            } else {
+                echo "\n--- php_error.log NOT FOUND ---\n";
+            }
+        }
         $this->assertTrue($r['json']['success'] ?? false, 'login should succeed: ' . $r['body']);
 
         $user = $r['json']['user'] ?? [];
