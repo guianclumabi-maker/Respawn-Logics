@@ -207,11 +207,11 @@ export function AttendanceReport() {
         {error ? (
           <div className="flex flex-col items-center justify-center py-16 px-6 bg-red-500/10 border border-red-500/20 rounded-xl max-w-xl mx-auto text-center space-y-3">
             <AlertCircle className="w-10 h-10 text-red-500" />
-            <h3 className="text-lg font-bold text-white">Report Generation Failed</h3>
+            <h3 className="text-lg font-bold text-foreground">Report Generation Failed</h3>
             <p className="text-sm text-muted-foreground">{error}</p>
-            <button 
+            <button
               onClick={fetchReport}
-              className="mt-2 px-4 py-2 bg-white/5 hover:bg-accent text-white border border-border rounded-lg text-xs transition-all"
+              className="mt-2 px-4 py-2 bg-white/5 hover:bg-accent text-foreground border border-border rounded-lg text-xs transition-all"
             >
               Retry Generation
             </button>

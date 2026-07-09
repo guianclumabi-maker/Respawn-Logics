@@ -51,10 +51,10 @@ export function AttendanceDashboard() {
     }
   };
 
-  if (loading && !status) return <div className="text-white p-8">Loading...</div>;
+  if (loading && !status) return <div className="text-slate-900 dark:text-white p-8">Loading...</div>;
 
   return (
-    <div className="flex-1 overflow-auto bg-[#06070a] text-white p-8 space-y-8">
+    <div className="flex-1 overflow-auto bg-[#06070a] text-slate-900 dark:text-white p-8 space-y-8">
       <div>
         <h1 className="text-3xl font-bold bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent mb-2" style={{ fontFamily: "'Outfit', 'Inter', sans-serif" }}>
           Attendance Dashboard
@@ -81,7 +81,7 @@ export function AttendanceDashboard() {
         {status?.state === "out" && (
           <button
             onClick={() => handleClockAction("clock_in")}
-            className="px-8 py-3 bg-gradient-to-r from-[#8b5cf6] to-[#ec4899] rounded-xl font-semibold text-white shadow-[0_0_20px_rgba(139,92,246,0.3)] hover:shadow-[0_0_30px_rgba(139,92,246,0.5)] transition-all"
+            className="px-8 py-3 bg-gradient-to-r from-[#8b5cf6] to-[#ec4899] rounded-xl font-semibold text-slate-900 dark:text-white shadow-[0_0_20px_rgba(139,92,246,0.3)] hover:shadow-[0_0_30px_rgba(139,92,246,0.5)] transition-all"
           >
             Clock In Now
           </button>
@@ -90,7 +90,7 @@ export function AttendanceDashboard() {
         {status?.state === "in" && (
           <button
             onClick={() => handleClockAction("clock_out")}
-            className="px-8 py-3 bg-white/5 border border-white/10 hover:bg-white/10 rounded-xl font-semibold text-white transition-all"
+            className="px-8 py-3 bg-white/5 border border-white/10 hover:bg-white/10 rounded-xl font-semibold text-slate-900 dark:text-white transition-all"
           >
             Clock Out
           </button>
@@ -113,7 +113,7 @@ export function AttendanceDashboard() {
             <tbody className="divide-y divide-white/[0.04]">
               {logs.map((log) => (
                 <tr key={log.id} className="hover:bg-white/[0.02] transition-colors">
-                  <td className="px-6 py-4 text-white font-medium">
+                  <td className="px-6 py-4 text-slate-900 dark:text-white font-medium">
                     {new Date(log.time_in).toLocaleDateString()}
                   </td>
                   <td className="px-6 py-4">

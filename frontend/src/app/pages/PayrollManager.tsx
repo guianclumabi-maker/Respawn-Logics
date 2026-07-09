@@ -642,7 +642,7 @@ export function PayrollManager() {
             <button className="btn btn-secondary"><Filter size={16}/> Filter</button>
             <div className="search-bar">
               <Search size={16} className="text-muted" />
-              <input type="text" placeholder="Search origins..." className="bg-transparent border-none text-white outline-none" />
+              <input type="text" placeholder="Search origins..." className="bg-transparent border-none text-slate-900 dark:text-white outline-none" />
             </div>
           </div>
         </div>
@@ -695,7 +695,7 @@ export function PayrollManager() {
         </div>
         <div className="flex gap-2">
           <button className="btn btn-secondary">Export Log</button>
-          <button className="btn btn-primary bg-red-600 hover:bg-red-700 shadow-none text-white">Resolve Selected</button>
+          <button className="btn btn-primary bg-red-600 hover:bg-red-700 shadow-none text-slate-900 dark:text-white">Resolve Selected</button>
         </div>
       </div>
 
@@ -773,7 +773,7 @@ export function PayrollManager() {
         <div className="flex justify-between items-center mb-6">
           <div>
             <h2 className="text-2xl font-bold">Employee Compensation</h2>
-            <p className="text-muted mt-1">Viewing salary history for: <strong className="text-white">{compData.employeeName} ({compData.employeeId})</strong></p>
+            <p className="text-muted mt-1">Viewing salary history for: <strong className="text-slate-900 dark:text-white">{compData.employeeName} ({compData.employeeId})</strong></p>
           </div>
           <button className="btn btn-primary"><Plus size={18} /> New Compensation Record</button>
         </div>
@@ -836,11 +836,11 @@ export function PayrollManager() {
               <div className="mt-4 pt-4 border-t border-emerald-500/20 text-sm">
                 <div className="flex justify-between mb-2">
                   <span className="text-tertiary">Daily Rate:</span>
-                  <span className="text-white">{formatCurrency(dailyRate)}</span>
+                  <span className="text-slate-900 dark:text-white">{formatCurrency(dailyRate)}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-tertiary">Hourly Rate:</span>
-                  <span className="text-white">{formatCurrency(hourlyRate)}</span>
+                  <span className="text-slate-900 dark:text-white">{formatCurrency(hourlyRate)}</span>
                 </div>
               </div>
             </div>
@@ -1311,7 +1311,7 @@ export function PayrollManager() {
               </div>
 
               <div className="flex justify-end gap-3 mt-6">
-                <button type="button" className="btn bg-slate-700 hover:bg-slate-600 text-white" onClick={() => setShowComponentModal(false)}>Cancel</button>
+                <button type="button" className="btn bg-slate-700 hover:bg-slate-600 text-slate-900 dark:text-white" onClick={() => setShowComponentModal(false)}>Cancel</button>
                 <button type="submit" className="btn btn-primary">Save Component</button>
               </div>
             </form>
@@ -1473,7 +1473,7 @@ export function PayrollManager() {
           <div>
             <button
               onClick={() => setShowHolidays(!showHolidays)}
-              className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all border border-border ${showHolidays ? 'bg-blue-600 text-white' : 'bg-white/5 hover:bg-accent text-foreground cursor-pointer'}`}
+              className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all border border-border ${showHolidays ? 'bg-blue-600 text-slate-900 dark:text-white' : 'bg-white/5 hover:bg-accent text-foreground cursor-pointer'}`}
             >
               {showHolidays ? "Hide Holiday Calendar" : "Show Holiday Calendar"}
             </button>
@@ -1560,7 +1560,7 @@ export function PayrollManager() {
                         holidays.map(h => (
                           <tr key={h.id} className="border-b border-border hover:bg-accent">
                             <td className="p-3 font-mono text-gray-300">{h.holiday_date}</td>
-                            <td className="p-3 font-semibold text-white">{h.name}</td>
+                            <td className="p-3 font-semibold text-slate-900 dark:text-white">{h.name}</td>
                             <td className="p-3">
                               <span className={`badge ${h.type === 'Regular Holiday' ? 'badge-blue' : 'badge-amber'}`}>
                                 {h.type}
@@ -1734,7 +1734,7 @@ export function PayrollManager() {
                           />
                         </td>
                         <td className="p-3">
-                          <span className="font-semibold text-white block">{ts.full_name || 'N/A'}</span>
+                          <span className="font-semibold text-slate-900 dark:text-white block">{ts.full_name || 'N/A'}</span>
                           <span className="text-xs text-gray-500">{ts.department || 'Staff'}</span>
                         </td>
                         <td className="p-3 font-mono text-sm text-gray-300">{ts.timesheet_date}</td>

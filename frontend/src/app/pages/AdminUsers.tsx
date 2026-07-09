@@ -62,7 +62,7 @@ export function AdminUsers() {
           <h1 className="text-2xl font-bold text-gray-900 tracking-tight mb-2">User Management</h1>
           <p className="text-gray-500">Manage platform users, roles, and access status.</p>
         </div>
-        <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors shadow-sm flex items-center gap-2">
+        <button className="bg-blue-600 hover:bg-blue-700 text-slate-900 dark:text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors shadow-sm flex items-center gap-2">
           <User className="w-4 h-4" />
           Add User
         </button>

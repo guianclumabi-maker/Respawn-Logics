@@ -70,7 +70,7 @@ export function ExpensesAdmin() {
     }
   };
 
-  if (loading) return <div className="p-8 text-white">Loading...</div>;
+  if (loading) return <div className="p-8 text-slate-900 dark:text-white">Loading...</div>;
 
   return (
     <div className="flex flex-col h-full bg-background text-muted-foreground p-6 relative font-['Inter',sans-serif]">
@@ -80,7 +80,7 @@ export function ExpensesAdmin() {
       {/* Header */}
       <div className="flex justify-between items-start mb-6 z-10">
         <div>
-          <h1 className="text-2xl font-bold text-white mb-1">Expense & Claims Console</h1>
+          <h1 className="text-2xl font-bold text-slate-900 dark:text-white mb-1">Expense & Claims Console</h1>
           <p className="text-sm text-muted-foreground">Approve employee reimbursements and queue for payroll.</p>
         </div>
       </div>
@@ -135,7 +135,7 @@ export function ExpensesAdmin() {
                         <strong>{e.employee_name}</strong>
                       </td>
                       <td className="p-4 border-b border-border align-middle">
-                        <div className="text-white text-sm">{e.expense_date}</div>
+                        <div className="text-slate-900 dark:text-white text-sm">{e.expense_date}</div>
                         <div className="text-xs text-muted-foreground">{e.category_name}</div>
                       </td>
                       <td className="p-4 border-b border-border text-[#00e07a] font-bold text-sm align-middle">

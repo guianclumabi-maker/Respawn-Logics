@@ -196,7 +196,7 @@ export function AttendanceImportContent() {
             <div className="p-5 bg-white/[0.02] border border-border rounded-xl space-y-4">
               <div className="flex items-center gap-2.5">
                 <CheckCircle className="w-5 h-5 text-[#00e07a] flex-shrink-0" />
-                <h3 className="text-sm font-bold text-white uppercase tracking-wider">Import Processing Complete</h3>
+                <h3 className="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-wider">Import Processing Complete</h3>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="bg-input border-border p-4 rounded-lg border border-border text-center">
@@ -259,7 +259,7 @@ export function AttendanceImportContent() {
                 </div>
               ) : (
                 <div className="space-y-1 font-sans">
-                  <p className="text-sm font-semibold text-white">Drag and drop your biometric CSV log here</p>
+                  <p className="text-sm font-semibold text-slate-900 dark:text-white">Drag and drop your biometric CSV log here</p>
                   <p className="text-xs text-gray-500">or click to browse local files (Accepts .csv format)</p>
                 </div>
               )}

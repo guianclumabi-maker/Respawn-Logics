@@ -345,11 +345,11 @@ export function KnowledgeAdmin() {
         ) : error ? (
           <div className="flex flex-col items-center justify-center py-16 px-6 bg-red-500/10 border border-red-500/20 rounded-xl max-w-xl mx-auto text-center space-y-3">
             <AlertCircle className="w-10 h-10 text-red-500" />
-            <h3 className="text-lg font-bold text-white">Load Error</h3>
+            <h3 className="text-lg font-bold text-slate-900 dark:text-white">Load Error</h3>
             <p className="text-sm text-muted-foreground">{error}</p>
             <button 
               onClick={fetchData}
-              className="mt-2 px-4 py-2 bg-white/5 hover:bg-accent text-white rounded-lg text-xs transition-colors border border-border cursor-pointer"
+              className="mt-2 px-4 py-2 bg-white/5 hover:bg-accent text-slate-900 dark:text-white rounded-lg text-xs transition-colors border border-border cursor-pointer"
             >
               Retry
             </button>
@@ -404,7 +404,7 @@ export function KnowledgeAdmin() {
                       {references.map((ref) => (
                         <tr key={ref.id} className="hover:bg-white/[0.02] transition-colors">
                           <td className="py-4 px-6 max-w-xs">
-                            <div className="text-sm font-bold text-white leading-tight">{ref.title}</div>
+                            <div className="text-sm font-bold text-slate-900 dark:text-white leading-tight">{ref.title}</div>
                             <div className="text-[10px] text-cyan-400 font-semibold uppercase mt-1">{ref.category}</div>
                           </td>
                           <td className="py-4 px-6 text-sm text-muted-foreground max-w-md line-clamp-3" title={ref.summary}>
@@ -481,7 +481,7 @@ export function KnowledgeAdmin() {
                       {precedents.map((prec) => (
                         <tr key={prec.id} className="hover:bg-white/[0.02] transition-colors">
                           <td className="py-4 px-6 max-w-xs">
-                            <div className="text-sm font-bold text-white leading-tight">{prec.title}</div>
+                            <div className="text-sm font-bold text-slate-900 dark:text-white leading-tight">{prec.title}</div>
                             <div className="text-[10px] text-gray-500 font-mono mt-1">{prec.source_reference}</div>
                             <div className="text-xs text-muted-foreground mt-2 line-clamp-3">{prec.summary}</div>
                           </td>
@@ -520,7 +520,7 @@ export function KnowledgeAdmin() {
                 <div className="bg-card text-card-foreground/70 border border-border p-6 rounded-2xl shadow-xl space-y-4">
                   <div className="flex items-center gap-2 mb-2">
                     <Globe size={18} className="text-[#00e07a]" />
-                    <h3 className="text-sm font-bold text-white uppercase tracking-wider">Search Authoritative Web Corpus</h3>
+                    <h3 className="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-wider">Search Authoritative Web Corpus</h3>
                   </div>
 
                   <form onSubmit={handleSearchSources} className="space-y-4">
@@ -535,7 +535,7 @@ export function KnowledgeAdmin() {
                             placeholder="e.g. Twin notice rule termination procedure..."
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
-                            className="w-full bg-background border border-border rounded-lg py-2.5 pl-9 pr-3 text-white text-sm focus:outline-none focus:border-[#00e07a]/50"
+                            className="w-full bg-background border border-border rounded-lg py-2.5 pl-9 pr-3 text-slate-900 dark:text-white text-sm focus:outline-none focus:border-[#00e07a]/50"
                           />
                         </div>
                       </div>
@@ -546,7 +546,7 @@ export function KnowledgeAdmin() {
                           placeholder="e.g. Dismissals, Maternity, Overtime Pay..."
                           value={searchCategory}
                           onChange={(e) => setSearchCategory(e.target.value)}
-                          className="w-full bg-background border border-border rounded-lg py-2.5 px-3 text-white text-sm focus:outline-none focus:border-[#00e07a]/50"
+                          className="w-full bg-background border border-border rounded-lg py-2.5 px-3 text-slate-900 dark:text-white text-sm focus:outline-none focus:border-[#00e07a]/50"
                         />
                       </div>
                     </div>
@@ -635,7 +635,7 @@ export function KnowledgeAdmin() {
                               </span>
                               <span className="text-[10px] font-bold text-gray-500 font-mono uppercase">{cand.entry_type || "reference"}</span>
                             </div>
-                            <h4 className="text-sm font-bold text-white leading-snug">{cand.title}</h4>
+                            <h4 className="text-sm font-bold text-slate-900 dark:text-white leading-snug">{cand.title}</h4>
                             <p className="text-xs text-muted-foreground leading-relaxed font-sans">{cand.summary}</p>
                           </div>
 
@@ -683,7 +683,7 @@ export function KnowledgeAdmin() {
         <div className="fixed inset-0 bg-black/75 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <div className="bg-card text-card-foreground border border-border rounded-xl w-full max-w-lg shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200 text-foreground">
             <div className="p-5 border-b border-border flex justify-between items-center bg-black/10">
-              <h3 className="text-base font-bold text-white uppercase tracking-wider">Add Knowledge Entry</h3>
+              <h3 className="text-base font-bold text-slate-900 dark:text-white uppercase tracking-wider">Add Knowledge Entry</h3>
               <button 
                 onClick={() => setShowAddModal(false)} 
                 className="text-muted-foreground hover:text-foreground text-xl leading-none cursor-pointer"
@@ -733,7 +733,7 @@ export function KnowledgeAdmin() {
                   required
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
-                  className="w-full bg-background border border-border rounded-lg py-2 px-3 text-white text-sm focus:outline-none focus:border-[#00e07a]/50" 
+                  className="w-full bg-background border border-border rounded-lg py-2 px-3 text-slate-900 dark:text-white text-sm focus:outline-none focus:border-[#00e07a]/50" 
                   placeholder="e.g. DOLE Advisory No. 17-15"
                 />
               </div>
@@ -745,7 +745,7 @@ export function KnowledgeAdmin() {
                   value={summary}
                   onChange={(e) => setSummary(e.target.value)}
                   rows={4}
-                  className="w-full bg-background border border-border rounded-lg py-2 px-3 text-white text-sm focus:outline-none focus:border-[#00e07a]/50 resize-none font-sans" 
+                  className="w-full bg-background border border-border rounded-lg py-2 px-3 text-slate-900 dark:text-white text-sm focus:outline-none focus:border-[#00e07a]/50 resize-none font-sans" 
                   placeholder="Summarize the core guidelines or implications of this advisory..."
                 ></textarea>
               </div>
@@ -761,7 +761,7 @@ export function KnowledgeAdmin() {
                         required
                         value={category}
                         onChange={(e) => setCategory(e.target.value)}
-                        className="w-full bg-background border border-border rounded-lg py-2 px-3 text-white text-sm focus:outline-none focus:border-[#00e07a]/50" 
+                        className="w-full bg-background border border-border rounded-lg py-2 px-3 text-slate-900 dark:text-white text-sm focus:outline-none focus:border-[#00e07a]/50" 
                         placeholder="e.g. Contracting / Subcontracting"
                       />
                     </div>
@@ -772,7 +772,7 @@ export function KnowledgeAdmin() {
                         required
                         value={sourceType}
                         onChange={(e) => setSourceType(e.target.value)}
-                        className="w-full bg-background border border-border rounded-lg py-2 px-3 text-white text-sm focus:outline-none focus:border-[#00e07a]/50" 
+                        className="w-full bg-background border border-border rounded-lg py-2 px-3 text-slate-900 dark:text-white text-sm focus:outline-none focus:border-[#00e07a]/50" 
                         placeholder="e.g. DOLE Advisory"
                       />
                     </div>
@@ -785,7 +785,7 @@ export function KnowledgeAdmin() {
                         type="url" 
                         value={officialUrl}
                         onChange={(e) => setOfficialUrl(e.target.value)}
-                        className="w-full bg-background border border-border rounded-lg py-2 px-3 text-white text-sm focus:outline-none focus:border-[#00e07a]/50" 
+                        className="w-full bg-background border border-border rounded-lg py-2 px-3 text-slate-900 dark:text-white text-sm focus:outline-none focus:border-[#00e07a]/50" 
                         placeholder="https://..."
                       />
                     </div>
@@ -795,7 +795,7 @@ export function KnowledgeAdmin() {
                         type="date" 
                         value={effectiveDate}
                         onChange={(e) => setEffectiveDate(e.target.value)}
-                        className="w-full bg-background border border-border rounded-lg py-2 px-3 text-white text-sm focus:outline-none focus:border-[#00e07a]/50 [color-scheme:dark]" 
+                        className="w-full bg-background border border-border rounded-lg py-2 px-3 text-slate-900 dark:text-white text-sm focus:outline-none focus:border-[#00e07a]/50 [color-scheme:dark]" 
                       />
                     </div>
                   </div>
@@ -813,7 +813,7 @@ export function KnowledgeAdmin() {
                         required
                         value={caseType}
                         onChange={(e) => setCaseType(e.target.value)}
-                        className="w-full bg-background border border-border rounded-lg py-2 px-3 text-white text-sm focus:outline-none focus:border-[#00e07a]/50" 
+                        className="w-full bg-background border border-border rounded-lg py-2 px-3 text-slate-900 dark:text-white text-sm focus:outline-none focus:border-[#00e07a]/50" 
                         placeholder="e.g. SC Jurisprudence"
                       />
                     </div>
@@ -822,7 +822,7 @@ export function KnowledgeAdmin() {
                       <select 
                         value={riskLevel}
                         onChange={(e) => setRiskLevel(e.target.value as any)}
-                        className="w-full bg-background border border-border rounded-lg py-2 px-3 text-white text-sm focus:outline-none focus:border-[#00e07a]/50"
+                        className="w-full bg-background border border-border rounded-lg py-2 px-3 text-slate-900 dark:text-white text-sm focus:outline-none focus:border-[#00e07a]/50"
                       >
                         <option value="Low">Low</option>
                         <option value="Medium">Medium</option>
@@ -839,7 +839,7 @@ export function KnowledgeAdmin() {
                       required
                       value={sourceReference}
                       onChange={(e) => setSourceReference(e.target.value)}
-                      className="w-full bg-background border border-border rounded-lg py-2 px-3 text-white text-sm focus:outline-none focus:border-[#00e07a]/50" 
+                      className="w-full bg-background border border-border rounded-lg py-2 px-3 text-slate-900 dark:text-white text-sm focus:outline-none focus:border-[#00e07a]/50" 
                       placeholder="e.g. G.R. No. 123456 (2020)"
                     />
                   </div>
@@ -851,7 +851,7 @@ export function KnowledgeAdmin() {
                       value={keyPrinciples}
                       onChange={(e) => setKeyPrinciples(e.target.value)}
                       rows={2}
-                      className="w-full bg-background border border-border rounded-lg py-2 px-3 text-white text-sm focus:outline-none focus:border-[#00e07a]/50 resize-none font-sans" 
+                      className="w-full bg-background border border-border rounded-lg py-2 px-3 text-slate-900 dark:text-white text-sm focus:outline-none focus:border-[#00e07a]/50 resize-none font-sans" 
                       placeholder="Core legal standards established by the SC in this case..."
                     ></textarea>
                   </div>
@@ -863,7 +863,7 @@ export function KnowledgeAdmin() {
                       value={recommendedProcess}
                       onChange={(e) => setRecommendedProcess(e.target.value)}
                       rows={2}
-                      className="w-full bg-background border border-border rounded-lg py-2 px-3 text-white text-sm focus:outline-none focus:border-[#00e07a]/50 resize-none font-sans" 
+                      className="w-full bg-background border border-border rounded-lg py-2 px-3 text-slate-900 dark:text-white text-sm focus:outline-none focus:border-[#00e07a]/50 resize-none font-sans" 
                       placeholder="What should HR do operationally based on this ruling..."
                     ></textarea>
                   </div>

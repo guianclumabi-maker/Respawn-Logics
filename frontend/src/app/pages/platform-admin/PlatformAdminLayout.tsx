@@ -35,10 +35,10 @@ export function PlatformAdminLayout() {
         {/* Brand */}
         <div className="px-5 py-5 border-b border-white/[0.05] flex items-center gap-3">
           <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-violet-500 to-fuchsia-600 flex items-center justify-center flex-shrink-0">
-            <ShieldCheck size={16} className="text-white" />
+            <ShieldCheck size={16} className="text-slate-900 dark:text-white" />
           </div>
           <div>
-            <p className="text-[0.8rem] font-bold text-white tracking-wide leading-tight">Command Center</p>
+            <p className="text-[0.8rem] font-bold text-slate-900 dark:text-white tracking-wide leading-tight">Command Center</p>
             <p className="text-[0.7rem] text-violet-400/80">Platform Admin</p>
           </div>
         </div>

@@ -89,7 +89,7 @@ export function ELRDashboard({ onViewChange }: ELRDashboardProps) {
           </div>
           <button 
             onClick={() => onViewChange("Cases")}
-            className="px-4 py-2 bg-card border border-border rounded-lg text-sm font-medium hover:border-[#00e07a]/50 dark:hover:bg-white/[0.04] transition-all flex items-center gap-2 shadow-sm text-white cursor-pointer"
+            className="px-4 py-2 bg-card border border-border rounded-lg text-sm font-medium hover:border-[#00e07a]/50 dark:hover:bg-white/[0.04] transition-all flex items-center gap-2 shadow-sm text-foreground cursor-pointer"
           >
             View Cases Board
             <ArrowRight size={16} />
@@ -108,7 +108,7 @@ export function ELRDashboard({ onViewChange }: ELRDashboardProps) {
           {metrics.map((metric, i) => (
             <div key={i} className="p-5 bg-card border border-border rounded-2xl relative overflow-hidden shadow-sm hover:border-[#00e07a]/20 transition-all">
               <div className="flex justify-between items-start mb-4 relative z-10">
-                <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${metric.color} flex items-center justify-center text-white shadow-lg shadow-black/20`}>
+                <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${metric.color} flex items-center justify-center text-slate-900 dark:text-white shadow-lg shadow-black/20`}>
                   {metric.icon}
                 </div>
               </div>

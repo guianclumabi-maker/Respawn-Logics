@@ -48,10 +48,10 @@ export function ManagerApprovals() {
     }
   };
 
-  if (loading) return <div className="text-white p-8">Loading...</div>;
+  if (loading) return <div className="text-slate-900 dark:text-white p-8">Loading...</div>;
 
   return (
-    <div className="flex-1 overflow-auto bg-[#06070a] text-white p-8 space-y-8">
+    <div className="flex-1 overflow-auto bg-[#06070a] text-slate-900 dark:text-white p-8 space-y-8">
       <div>
         <h1 className="text-3xl font-bold bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent mb-2" style={{ fontFamily: "'Outfit', 'Inter', sans-serif" }}>
           Timesheet Approvals
@@ -76,11 +76,11 @@ export function ManagerApprovals() {
               <tr key={log.id} className="hover:bg-white/[0.02] transition-colors">
                 <td className="px-6 py-4">
                   <div className="flex flex-col">
-                    <span className="text-white font-medium">{log.full_name}</span>
+                    <span className="text-slate-900 dark:text-white font-medium">{log.full_name}</span>
                     <span className="text-xs text-gray-500">{log.department}</span>
                   </div>
                 </td>
-                <td className="px-6 py-4 text-white">
+                <td className="px-6 py-4 text-slate-900 dark:text-white">
                   {new Date(log.time_in).toLocaleDateString()}
                 </td>
                 <td className="px-6 py-4">

@@ -188,7 +188,7 @@ function AddNoteModal({
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm" onClick={onClose}>
       <div className="bg-background border border-border rounded-2xl shadow-2xl w-full max-w-md p-6 text-foreground" onClick={e => e.stopPropagation()}>
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-sm font-bold font-semibold tracking-tight text-white tracking-wide">Add Collaboration Note</h3>
+          <h3 className="text-sm font-bold font-semibold tracking-tight text-foreground tracking-wide">Add Collaboration Note</h3>
           <button
             onClick={onClose}
             className="p-1 rounded bg-white/10 text-muted-foreground hover:text-foreground cursor-pointer border-0"
@@ -272,7 +272,7 @@ function AddToPoolModal({
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm" onClick={onClose}>
       <div className="bg-background border border-border rounded-2xl shadow-2xl w-full max-w-md p-6 text-foreground font-medium" onClick={e => e.stopPropagation()}>
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-sm font-bold font-semibold tracking-tight text-white tracking-wide text-foreground">Add to Talent Pool</h3>
+          <h3 className="text-sm font-bold font-semibold tracking-tight text-foreground tracking-wide text-foreground">Add to Talent Pool</h3>
           <button
             onClick={onClose}
             className="p-1 rounded bg-white/10 text-muted-foreground hover:text-foreground cursor-pointer border-0"
@@ -661,10 +661,10 @@ export function CandidateProfile({ onViewChange, candidateId }: Props) {
           <div className="w-full max-w-md rounded-2xl border border-border bg-background shadow-2xl overflow-hidden font-sans">
             <div className="p-5 border-b border-border flex items-center justify-between">
               <div>
-                <h3 className="text-sm font-bold text-white tracking-wide">Hire Candidate</h3>
+                <h3 className="text-sm font-bold text-foreground tracking-wide">Hire Candidate</h3>
                 <p className="text-[10px] text-muted-foreground mt-1">Enroll this candidate into the Core HR system</p>
               </div>
-              <button onClick={() => setShowHireModal(false)} className="p-1 rounded-md text-muted-foreground hover:text-white hover:bg-accent transition-colors">
+              <button onClick={() => setShowHireModal(false)} className="p-1 rounded-md text-muted-foreground hover:text-foreground hover:bg-accent transition-colors">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
               </button>
             </div>
@@ -674,14 +674,14 @@ export function CandidateProfile({ onViewChange, candidateId }: Props) {
                   <div className="w-12 h-12 rounded-full bg-[#00e07a]/20 border border-[#00e07a]/40 flex items-center justify-center mx-auto text-[#00e07a] mb-2">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
                   </div>
-                  <h4 className="text-lg font-bold text-white">Employee Enrolled!</h4>
+                  <h4 className="text-lg font-bold text-foreground">Employee Enrolled!</h4>
                   <p className="text-xs text-muted-foreground">
                     Temporary password — copy and give this to the employee. It won't be shown again.
                   </p>
-                  <div className="bg-[#111827] border border-border rounded-lg p-4 space-y-3 mt-4 text-left">
+                  <div className="bg-input border border-border rounded-lg p-4 space-y-3 mt-4 text-left">
                     <div>
                       <div className="text-[10px] font-bold text-muted-foreground uppercase mb-1">Email</div>
-                      <div className="text-sm font-mono text-white">{hireSuccessData.email}</div>
+                      <div className="text-sm font-mono text-foreground">{hireSuccessData.email}</div>
                     </div>
                     <div>
                       <div className="text-[10px] font-bold text-muted-foreground uppercase mb-1">Temporary Password</div>
@@ -719,29 +719,29 @@ export function CandidateProfile({ onViewChange, candidateId }: Props) {
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-1.5">
                       <label className="text-[10px] font-bold text-muted-foreground uppercase">Employee ID *</label>
-                      <input type="text" required value={hireData.employeeId} onChange={e => setHireData({...hireData, employeeId: e.target.value})} className="w-full bg-[#111827] border border-border rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-primary/50 transition-colors" placeholder="e.g. EMP-001" />
+                      <input type="text" required value={hireData.employeeId} onChange={e => setHireData({...hireData, employeeId: e.target.value})} className="w-full bg-input border border-border rounded-lg px-3 py-2 text-xs text-foreground focus:outline-none focus:border-primary/50 transition-colors" placeholder="e.g. EMP-001" />
                     </div>
                     <div className="space-y-1.5">
                       <label className="text-[10px] font-bold text-muted-foreground uppercase">Hire Date *</label>
-                      <input type="date" required value={hireData.hireDate} onChange={e => setHireData({...hireData, hireDate: e.target.value})} className="w-full bg-[#111827] border border-border rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-primary/50 transition-colors" />
+                      <input type="date" required value={hireData.hireDate} onChange={e => setHireData({...hireData, hireDate: e.target.value})} className="w-full bg-input border border-border rounded-lg px-3 py-2 text-xs text-foreground focus:outline-none focus:border-primary/50 transition-colors" />
                     </div>
                   </div>
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-1.5">
                       <label className="text-[10px] font-bold text-muted-foreground uppercase">Job Title</label>
-                      <input type="text" value={hireData.jobTitle} onChange={e => setHireData({...hireData, jobTitle: e.target.value})} className="w-full bg-[#111827] border border-border rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-primary/50 transition-colors" placeholder="Software Engineer" />
+                      <input type="text" value={hireData.jobTitle} onChange={e => setHireData({...hireData, jobTitle: e.target.value})} className="w-full bg-input border border-border rounded-lg px-3 py-2 text-xs text-foreground focus:outline-none focus:border-primary/50 transition-colors" placeholder="Software Engineer" />
                     </div>
                     <div className="space-y-1.5">
                       <label className="text-[10px] font-bold text-muted-foreground uppercase">Department</label>
-                      <input type="text" value={hireData.department} onChange={e => setHireData({...hireData, department: e.target.value})} className="w-full bg-[#111827] border border-border rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-primary/50 transition-colors" placeholder="Engineering" />
+                      <input type="text" value={hireData.department} onChange={e => setHireData({...hireData, department: e.target.value})} className="w-full bg-input border border-border rounded-lg px-3 py-2 text-xs text-foreground focus:outline-none focus:border-primary/50 transition-colors" placeholder="Engineering" />
                     </div>
                   </div>
                   <div className="space-y-1.5">
                     <label className="text-[10px] font-bold text-muted-foreground uppercase">Base Salary (Optional)</label>
-                    <input type="number" step="0.01" value={hireData.baseSalary} onChange={e => setHireData({...hireData, baseSalary: e.target.value})} className="w-full bg-[#111827] border border-border rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-primary/50 transition-colors" placeholder="85000" />
+                    <input type="number" step="0.01" value={hireData.baseSalary} onChange={e => setHireData({...hireData, baseSalary: e.target.value})} className="w-full bg-input border border-border rounded-lg px-3 py-2 text-xs text-foreground focus:outline-none focus:border-primary/50 transition-colors" placeholder="85000" />
                   </div>
                   <div className="pt-2 flex items-center justify-end gap-3">
-                    <button type="button" onClick={() => setShowHireModal(false)} className="px-4 py-2 text-xs font-bold text-muted-foreground hover:text-white transition-colors cursor-pointer">Cancel</button>
+                    <button type="button" onClick={() => setShowHireModal(false)} className="px-4 py-2 text-xs font-bold text-muted-foreground hover:text-foreground transition-colors cursor-pointer">Cancel</button>
                     <button type="submit" disabled={hiring} className="px-5 py-2 text-xs font-bold text-black bg-[#00e07a] hover:bg-[#00c9b1] rounded-lg transition-colors disabled:opacity-50 cursor-pointer">
                       {hiring ? 'Hiring...' : 'Enroll Employee'}
                     </button>
@@ -761,7 +761,7 @@ export function CandidateProfile({ onViewChange, candidateId }: Props) {
                 <h3 className="text-sm font-bold text-red-500 tracking-wide">Anonymize Candidate Data</h3>
                 <p className="text-[10px] text-muted-foreground mt-1">Right to be Forgotten Request</p>
               </div>
-              <button onClick={() => setShowAnonymizeModal(false)} className="p-1 rounded-md text-muted-foreground hover:text-white hover:bg-accent transition-colors cursor-pointer">
+              <button onClick={() => setShowAnonymizeModal(false)} className="p-1 rounded-md text-muted-foreground hover:text-foreground hover:bg-accent transition-colors cursor-pointer">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
               </button>
             </div>
@@ -784,7 +784,7 @@ export function CandidateProfile({ onViewChange, candidateId }: Props) {
                 />
               </div>
               <div className="flex items-center justify-end gap-3">
-                <button onClick={() => setShowAnonymizeModal(false)} className="px-4 py-2 text-xs font-bold text-muted-foreground hover:text-white transition-colors cursor-pointer">Cancel</button>
+                <button onClick={() => setShowAnonymizeModal(false)} className="px-4 py-2 text-xs font-bold text-muted-foreground hover:text-foreground transition-colors cursor-pointer">Cancel</button>
                 <button 
                   onClick={handleAnonymize} 
                   disabled={anonymizeConfirmText !== 'ANONYMIZE' || isAnonymizing} 
@@ -908,7 +908,7 @@ export function CandidateProfile({ onViewChange, candidateId }: Props) {
           <div
             className="p-5 rounded-xl border bg-background border-border"
           >
-            <h3 className="text-xs font-bold tracking-wide text-muted-foreground font-semibold tracking-tight text-white uppercase mb-3 border-b border-border pb-2">
+            <h3 className="text-xs font-bold tracking-wide text-muted-foreground font-semibold tracking-tight text-foreground uppercase mb-3 border-b border-border pb-2">
               Application Timeline
             </h3>
             {c.applications.length === 0 ? (
@@ -968,7 +968,7 @@ export function CandidateProfile({ onViewChange, candidateId }: Props) {
           <div
             className="p-5 rounded-xl border bg-background border-border"
           >
-            <h3 className="text-xs font-bold tracking-wide text-muted-foreground font-semibold tracking-tight text-white uppercase mb-3 border-b border-border pb-2">
+            <h3 className="text-xs font-bold tracking-wide text-muted-foreground font-semibold tracking-tight text-foreground uppercase mb-3 border-b border-border pb-2">
               Interview Sessions
             </h3>
             {c.interviews.length === 0 ? (

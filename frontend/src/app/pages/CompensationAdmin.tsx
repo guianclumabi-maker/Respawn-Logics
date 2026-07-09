@@ -373,11 +373,11 @@ export function CompensationAdminContent() {
           ) : error ? (
             <div className="flex flex-col items-center justify-center py-16 px-6 bg-red-500/10 border border-red-500/20 rounded-xl text-center space-y-3">
               <AlertCircle className="w-10 h-10 text-red-500" />
-              <h3 className="text-lg font-bold text-white">Load Error</h3>
+              <h3 className="text-lg font-bold text-slate-900 dark:text-white">Load Error</h3>
               <p className="text-sm text-muted-foreground">{error}</p>
               <button 
                 onClick={loadData}
-                className="mt-2 px-4 py-2 bg-white/5 hover:bg-accent text-white rounded-lg text-xs transition-colors border border-border"
+                className="mt-2 px-4 py-2 bg-white/5 hover:bg-accent text-slate-900 dark:text-white rounded-lg text-xs transition-colors border border-border"
               >
                 Retry
               </button>
@@ -399,7 +399,7 @@ export function CompensationAdminContent() {
                   <tbody className="divide-y divide-white/[0.03]">
                     {bands.map((b) => (
                       <tr key={b.id} className="hover:bg-white/[0.02] transition-colors">
-                        <td className="py-4 px-6 font-semibold text-white">{b.job_title}</td>
+                        <td className="py-4 px-6 font-semibold text-slate-900 dark:text-white">{b.job_title}</td>
                         <td className="py-4 px-6 text-right font-mono text-xs text-gray-300">
                           {formatCurrency(b.min_salary, b.currency)}
                         </td>
@@ -463,7 +463,7 @@ export function CompensationAdminContent() {
                       return (
                         <tr key={eq.id} className="hover:bg-white/[0.02] transition-colors">
                           <td className="py-4 px-6">
-                            <div className="font-semibold text-white">{eq.employee_name}</div>
+                            <div className="font-semibold text-slate-900 dark:text-white">{eq.employee_name}</div>
                             <div className="text-[10px] text-gray-500 font-mono mt-0.5">Granted: {eq.grant_date}</div>
                           </td>
                           <td className="py-4 px-6">
@@ -472,7 +472,7 @@ export function CompensationAdminContent() {
                             </span>
                           </td>
                           <td className="py-4 px-6 text-right font-mono text-xs">
-                            <span className="text-white font-bold">{eq.vested_shares.toLocaleString()}</span>
+                            <span className="text-slate-900 dark:text-white font-bold">{eq.vested_shares.toLocaleString()}</span>
                             <span className="text-gray-500"> / {eq.total_shares.toLocaleString()}</span>
                           </td>
                           <td className="py-4 px-6 text-xs text-muted-foreground max-w-[150px] truncate" title={eq.vesting_schedule}>
@@ -545,7 +545,7 @@ export function CompensationAdminContent() {
                   required
                   value={jobTitle}
                   onChange={(e) => setJobTitle(e.target.value)}
-                  className="w-full bg-background border border-border rounded-lg py-2.5 px-3 text-white text-sm focus:outline-none focus:border-[#00e07a]/50" 
+                  className="w-full bg-background border border-border rounded-lg py-2.5 px-3 text-slate-900 dark:text-white text-sm focus:outline-none focus:border-[#00e07a]/50" 
                   placeholder="e.g. Senior Software Engineer"
                 />
               </div>
@@ -557,7 +557,7 @@ export function CompensationAdminContent() {
                     required
                     value={minSalary}
                     onChange={(e) => setMinSalary(e.target.value)}
-                    className="w-full bg-background border border-border rounded-lg py-2.5 px-3 text-white text-sm focus:outline-none focus:border-[#00e07a]/50" 
+                    className="w-full bg-background border border-border rounded-lg py-2.5 px-3 text-slate-900 dark:text-white text-sm focus:outline-none focus:border-[#00e07a]/50" 
                     placeholder="Min"
                   />
                 </div>
@@ -568,7 +568,7 @@ export function CompensationAdminContent() {
                     required
                     value={midSalary}
                     onChange={(e) => setMidSalary(e.target.value)}
-                    className="w-full bg-background border border-border rounded-lg py-2.5 px-3 text-white text-sm focus:outline-none focus:border-[#00e07a]/50" 
+                    className="w-full bg-background border border-border rounded-lg py-2.5 px-3 text-slate-900 dark:text-white text-sm focus:outline-none focus:border-[#00e07a]/50" 
                     placeholder="Mid"
                   />
                 </div>
@@ -581,7 +581,7 @@ export function CompensationAdminContent() {
                     required
                     value={maxSalary}
                     onChange={(e) => setMaxSalary(e.target.value)}
-                    className="w-full bg-background border border-border rounded-lg py-2.5 px-3 text-white text-sm focus:outline-none focus:border-[#00e07a]/50" 
+                    className="w-full bg-background border border-border rounded-lg py-2.5 px-3 text-slate-900 dark:text-white text-sm focus:outline-none focus:border-[#00e07a]/50" 
                     placeholder="Max"
                   />
                 </div>
@@ -592,7 +592,7 @@ export function CompensationAdminContent() {
                     required
                     value={currency}
                     onChange={(e) => setCurrency(e.target.value.toUpperCase())}
-                    className="w-full bg-background border border-border rounded-lg py-2.5 px-3 text-white text-sm focus:outline-none focus:border-[#00e07a]/50" 
+                    className="w-full bg-background border border-border rounded-lg py-2.5 px-3 text-slate-900 dark:text-white text-sm focus:outline-none focus:border-[#00e07a]/50" 
                     placeholder="PHP"
                   />
                 </div>
@@ -627,7 +627,7 @@ export function CompensationAdminContent() {
                   required
                   value={employeeName}
                   onChange={(e) => setEmployeeName(e.target.value)}
-                  className="w-full bg-background border border-border rounded-lg py-2.5 px-3 text-white text-sm focus:outline-none focus:border-[#00e07a]/50" 
+                  className="w-full bg-background border border-border rounded-lg py-2.5 px-3 text-slate-900 dark:text-white text-sm focus:outline-none focus:border-[#00e07a]/50" 
                   placeholder="e.g. Juan dela Cruz"
                 />
               </div>
@@ -637,7 +637,7 @@ export function CompensationAdminContent() {
                   <select 
                     value={grantType}
                     onChange={(e) => setGrantType(e.target.value as any)}
-                    className="w-full bg-background border border-border rounded-lg py-2.5 px-3 text-white text-sm focus:outline-none focus:border-[#00e07a]/50"
+                    className="w-full bg-background border border-border rounded-lg py-2.5 px-3 text-slate-900 dark:text-white text-sm focus:outline-none focus:border-[#00e07a]/50"
                   >
                     <option value="ESOP">ESOP</option>
                     <option value="RSU">RSU</option>
@@ -651,7 +651,7 @@ export function CompensationAdminContent() {
                     required
                     value={grantDate}
                     onChange={(e) => setGrantDate(e.target.value)}
-                    className="w-full bg-background border border-border rounded-lg py-2.5 px-3 text-white text-sm focus:outline-none focus:border-[#00e07a]/50 [color-scheme:dark]" 
+                    className="w-full bg-background border border-border rounded-lg py-2.5 px-3 text-slate-900 dark:text-white text-sm focus:outline-none focus:border-[#00e07a]/50 [color-scheme:dark]" 
                   />
                 </div>
               </div>
@@ -663,7 +663,7 @@ export function CompensationAdminContent() {
                     required
                     value={totalShares}
                     onChange={(e) => setTotalShares(e.target.value)}
-                    className="w-full bg-background border border-border rounded-lg py-2.5 px-3 text-white text-sm focus:outline-none focus:border-[#00e07a]/50" 
+                    className="w-full bg-background border border-border rounded-lg py-2.5 px-3 text-slate-900 dark:text-white text-sm focus:outline-none focus:border-[#00e07a]/50" 
                     placeholder="e.g. 10000"
                   />
                 </div>
@@ -674,7 +674,7 @@ export function CompensationAdminContent() {
                     required
                     value={vestedShares}
                     onChange={(e) => setVestedShares(e.target.value)}
-                    className="w-full bg-background border border-border rounded-lg py-2.5 px-3 text-white text-sm focus:outline-none focus:border-[#00e07a]/50" 
+                    className="w-full bg-background border border-border rounded-lg py-2.5 px-3 text-slate-900 dark:text-white text-sm focus:outline-none focus:border-[#00e07a]/50" 
                     placeholder="e.g. 2500"
                   />
                 </div>
@@ -686,7 +686,7 @@ export function CompensationAdminContent() {
                   required
                   value={vestingSchedule}
                   onChange={(e) => setVestingSchedule(e.target.value)}
-                  className="w-full bg-background border border-border rounded-lg py-2.5 px-3 text-white text-sm focus:outline-none focus:border-[#00e07a]/50" 
+                  className="w-full bg-background border border-border rounded-lg py-2.5 px-3 text-slate-900 dark:text-white text-sm focus:outline-none focus:border-[#00e07a]/50" 
                   placeholder="e.g. 4-year monthly vesting, 1-year cliff"
                 />
               </div>

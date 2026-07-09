@@ -167,7 +167,7 @@ export function InsightsPage({ onViewChange }: InsightsPageProps) {
               {channels.map((c, idx) => (
                 <div key={idx}>
                   <div className="flex justify-between items-center text-xs mb-1.5 font-medium">
-                    <span className="text-white">{c.source}</span>
+                    <span className="text-slate-900 dark:text-white">{c.source}</span>
                     <span className="text-gray-500">{c.percentage}%</span>
                   </div>
                   <div className="flex items-center gap-2">
