@@ -38,38 +38,11 @@ if (!$pdo) {
 // 4. Run all migrations
 echo "Running schema migrations...\n";
 $pdo->exec("SET FOREIGN_KEY_CHECKS = 0;");
-$migrationScripts = [
-    'migrate_tenants.php',
-    'seed_admin.php',
-    'setup_db.php',
-    'iam_seed.php',
-    'migrate_core_hr.php',
-    'migrate_core_hr_columns.php',
-    'migrate_ats_tables.php',
-    'migrate_ats_queries.php',
-    'migrate_benefits.php',
-    'migrate_compensation.php',
-    'migrate_esm.php',
-    'migrate_elr.php',
-    'migrate_elr_cases.php',
-    'migrate_elr_knowledge.php',
-    'migrate_elr_pipeline.php',
-    'migrate_elr_auto_rules.php',
-    'migrate_elr_phase5.php',
-    'migrate_expenses.php',
-    'migrate_global_cache.php',
-    'migrate_knowledge_base.php',
-    'migrate_onboarding.php',
-    'migrate_payroll.php',
-    'migrate_timesheets.php',
-    'migrate_holidays.php',
-    'migrate_tour_progress.php',
-    'migrate_performance.php',
-    'migrate_score_breakdown.php',
-    'migrate_scoring_columns.php',
-    'migrate_security.php',
-    'migrate_support_access.php'
-];
+$coreMigrations = require __DIR__ . '/../database_scripts/schema_migrations.php';
+$migrationScripts = array_merge(
+    ['migrate_tenants.php', 'seed_admin.php', 'setup_db.php', 'iam_seed.php'],
+    array_diff($coreMigrations, ['migrate_tenants.php'])
+);
 
 foreach ($migrationScripts as $script) {
     $path = __DIR__ . '/../database_scripts/' . $script;
