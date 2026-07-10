@@ -63,17 +63,17 @@ export function AdminRoles() {
     };
 
     if (user?.tenant_setup_mode === 'Solo') {
-        return <div className="p-8 text-center text-gray-500">Roles are hidden in Solo mode.</div>;
+        return <div className="p-8 text-center text-muted-foreground">Roles are hidden in Solo mode.</div>;
     }
 
-    if (loading) return <div className="p-8 text-slate-900 dark:text-white">Loading...</div>;
+    if (loading) return <div className="p-8 text-foreground">Loading...</div>;
 
     return (
-        <div className="p-8 bg-background min-h-screen text-gray-300">
-            <h1 className="text-2xl font-bold text-slate-900 dark:text-white mb-6">Manage Roles & Scopes</h1>
+        <div className="p-8 bg-background min-h-screen text-foreground">
+            <h1 className="text-2xl font-bold text-foreground mb-6">Manage Roles & Scopes</h1>
             
-            <div className="bg-white/5 border border-border rounded-lg p-6 mb-8">
-                <h2 className="text-lg font-semibold text-slate-900 dark:text-white mb-4">Assign / Update Role Scope</h2>
+            <div className="bg-card/50 border border-border rounded-lg p-6 mb-8">
+                <h2 className="text-lg font-semibold text-foreground mb-4">Assign / Update Role Scope</h2>
                 <form onSubmit={handleAssignRole} className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                         <label className="block text-sm mb-1">User</label>
@@ -145,12 +145,12 @@ export function AdminRoles() {
                 </form>
             </div>
 
-            <div className="bg-white/5 border border-border rounded-lg p-6">
-                <h2 className="text-lg font-semibold text-slate-900 dark:text-white mb-4">Current Assignments</h2>
+            <div className="bg-card/50 border border-border rounded-lg p-6">
+                <h2 className="text-lg font-semibold text-foreground mb-4">Current Assignments</h2>
                 <div className="space-y-4">
                     {users.map(u => (
-                        <div key={u.id} className="bg-white/5 p-4 rounded border border-border">
-                            <div className="font-medium text-slate-900 dark:text-white mb-2">{u.full_name} <span className="text-sm text-gray-500">({u.email})</span></div>
+                        <div key={u.id} className="bg-card/50 p-4 rounded border border-border">
+                            <div className="font-medium text-foreground mb-2">{u.full_name} <span className="text-sm text-muted-foreground">({u.email})</span></div>
                             {u.roles && u.roles.length > 0 ? (
                                 <div className="flex flex-wrap gap-2">
                                     {u.roles.map((r: any, i: number) => (
@@ -160,7 +160,7 @@ export function AdminRoles() {
                                     ))}
                                 </div>
                             ) : (
-                                <span className="text-xs text-gray-500">No roles assigned</span>
+                                <span className="text-xs text-muted-foreground">No roles assigned</span>
                             )}
                         </div>
                     ))}

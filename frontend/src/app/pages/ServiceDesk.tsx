@@ -4,7 +4,7 @@ import "./service-desk/styles/index.css";
 
 export function ServiceDesk() {
   return (
-    <ThemeProvider attribute="data-theme" defaultTheme="dark">
+    <ThemeProvider attribute="data-theme" defaultTheme="system">
       <div className="h-full w-full flex-1 overflow-hidden relative" style={{ isolation: 'isolate' }}>
         <ServiceDeskApp />
       </div>

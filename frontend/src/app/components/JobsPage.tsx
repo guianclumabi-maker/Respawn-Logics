@@ -170,7 +170,7 @@ function HealthBadge({ status }: { status: string }) {
 
 function PriorityBadge({ priority }: { priority: string }) {
   const styles: Record<string, string> = {
-    Normal: "bg-white/[0.05] text-muted-foreground border-border",
+    Normal: "bg-card/[0.05] text-muted-foreground border-border",
     Urgent: "bg-amber-500/10 text-amber-400 border-amber-500/20",
     Critical: "bg-red-500/10 text-red-400 border-red-500/20",
   };
@@ -188,7 +188,7 @@ function StatusBadge({ status }: { status: string }) {
     Open: "border-[#00e07a]/20 bg-primary text-primary",
     Paused: "border-amber-500/20 bg-amber-500/10 text-amber-400",
     Closed: "border-red-500/20 bg-red-500/10 text-red-400",
-    Draft: "border-border bg-white/[0.05] text-muted-foreground",
+    Draft: "border-border bg-card/[0.05] text-muted-foreground",
   };
   return (
     <span
@@ -528,7 +528,7 @@ export function JobsPage({ onViewChange }: Props) {
       <div className="relative z-10 flex flex-col sm:flex-row gap-3 mb-6 items-stretch sm:items-center">
         {/* Search */}
         <div
-          className="flex-1 flex items-center gap-2 px-3 py-2 rounded-lg border bg-white/[0.03] transition-all focus-within:border-[#00e07a]/40"
+          className="flex-1 flex items-center gap-2 px-3 py-2 rounded-lg border bg-card/[0.03] transition-all focus-within:border-[#00e07a]/40"
           style={{ borderColor: "var(--border)" }}
         >
           <Search size={14} className="text-muted-foreground" />
@@ -624,7 +624,7 @@ export function JobsPage({ onViewChange }: Props) {
             ))}
           </div>
           {!loading && !error && jobs.length > 0 && (
-            <div className="p-4 mt-auto border-t border-border bg-[#121625]/50 flex justify-between items-center text-xs text-muted-foreground font-mono rounded-b-xl">
+            <div className="p-4 mt-auto border-t border-border bg-card/50 flex justify-between items-center text-xs text-muted-foreground font-mono rounded-b-xl">
               <div>PAGE {page} OF {totalPages}</div>
               <div className="flex gap-2">
                 <button 
@@ -701,7 +701,7 @@ function JobCard({
 }) {
   return (
     <div
-      className="bg-card border border-border rounded-xl p-5 hover:border-[#9b6dff]/40 hover:bg-purple-500/5 dark:hover:bg-[#141929] hover:shadow-[0_0_15px_rgba(155,109,255,0.1)] transition-all flex flex-col justify-between group"
+      className="bg-card border border-border rounded-xl p-5 hover:border-[#9b6dff]/40 hover:bg-purple-500/5 dark:hover:bg-card hover:shadow-[0_0_15px_rgba(155,109,255,0.1)] transition-all flex flex-col justify-between group"
     >
       {/* Top badges */}
       <div>

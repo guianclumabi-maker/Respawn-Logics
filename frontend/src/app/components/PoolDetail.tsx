@@ -90,7 +90,7 @@ export function PoolDetail({ onViewChange, poolId }: { onViewChange: (v: ViewSta
         ) : (
           <div className="flex-1 overflow-y-auto scrollbar-thin">
             <table className="w-full text-left border-collapse">
-              <thead className="sticky top-0 bg-[#121625] z-10 text-[9px] uppercase font-bold text-muted-foreground tracking-wider border-b border-border shadow-md shadow-black/10">
+              <thead className="sticky top-0 bg-card z-10 text-[9px] uppercase font-bold text-muted-foreground tracking-wider border-b border-border shadow-md shadow-black/10">
                 <tr>
                   <th className="px-6 py-4">// CANDIDATE</th>
                   <th className="px-6 py-4">// DETAILS</th>

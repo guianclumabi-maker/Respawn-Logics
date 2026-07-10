@@ -81,7 +81,7 @@ export function BenefitsAdmin() {
     }
   }, [activeTab, loading]);
 
-  if (loading) return <div className="p-8 text-slate-900 dark:text-white">Loading...</div>;
+  if (loading) return <div className="p-8 text-foreground">Loading...</div>;
   if (!hasPermission('benefits.manage')) return <Navigate to="/" />;
 
   const submitPlan = async (e: React.FormEvent) => {
@@ -127,7 +127,7 @@ export function BenefitsAdmin() {
       {/* Header */}
       <div className="flex justify-between items-start mb-6 z-10">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900 dark:text-white mb-1">Benefits Administration</h1>
+          <h1 className="text-2xl font-bold text-foreground mb-1">Benefits Administration</h1>
           <p className="text-sm text-muted-foreground">Manage company-sponsored HMO plans, De Minimis allowances, and track employee enrollments.</p>
         </div>
       </div>
@@ -135,13 +135,13 @@ export function BenefitsAdmin() {
       {/* Tabs */}
       <div className="flex gap-4 mb-6 border-b border-border pb-3 z-10">
         <button 
-          className={`px-4 py-2 text-sm rounded-md transition-colors ${activeTab === 'plans' ? 'bg-white/5 text-foreground' : 'text-muted-foreground hover:text-foreground'}`}
+          className={`px-4 py-2 text-sm rounded-md transition-colors ${activeTab === 'plans' ? 'bg-card/50 text-foreground' : 'text-muted-foreground hover:text-foreground'}`}
           onClick={() => setActiveTab('plans')}
         >
           Benefit Plans
         </button>
         <button 
-          className={`px-4 py-2 text-sm rounded-md transition-colors ${activeTab === 'enrollments' ? 'bg-white/5 text-foreground' : 'text-muted-foreground hover:text-foreground'}`}
+          className={`px-4 py-2 text-sm rounded-md transition-colors ${activeTab === 'enrollments' ? 'bg-card/50 text-foreground' : 'text-muted-foreground hover:text-foreground'}`}
           onClick={() => setActiveTab('enrollments')}
         >
           Employee Enrollments
@@ -153,7 +153,7 @@ export function BenefitsAdmin() {
         {activeTab === 'plans' ? (
           <div className="bg-card text-card-foreground/70 border border-border rounded-xl p-6">
             <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg text-slate-900 dark:text-white font-medium">Active Benefit Plans</h3>
+              <h3 className="text-lg text-foreground font-medium">Active Benefit Plans</h3>
               <button 
                 className="flex items-center gap-1 bg-blue-600 hover:bg-blue-700 text-foreground px-3 py-1.5 rounded text-xs font-medium transition-colors"
                 onClick={() => setShowPlanModal(true)}
@@ -186,12 +186,12 @@ export function BenefitsAdmin() {
                           <strong>{p.name}</strong><br/>
                           <span className="text-xs text-muted-foreground">{p.description}</span>
                         </td>
-                        <td className="p-3 border-b border-border text-slate-900 dark:text-white text-sm">{p.provider}</td>
+                        <td className="p-3 border-b border-border text-foreground text-sm">{p.provider}</td>
                         <td className="p-3 border-b border-border text-foreground text-sm">
-                          <span className="bg-white/10 px-2 py-1 rounded text-xs">{p.type}</span>
+                          <span className="bg-card/10 px-2 py-1 rounded text-xs">{p.type}</span>
                         </td>
-                        <td className="p-3 border-b border-border text-slate-900 dark:text-white text-sm">${parseFloat(p.company_cost).toLocaleString()}</td>
-                        <td className="p-3 border-b border-border text-slate-900 dark:text-white text-sm">${parseFloat(p.employee_cost).toLocaleString()}</td>
+                        <td className="p-3 border-b border-border text-foreground text-sm">${parseFloat(p.company_cost).toLocaleString()}</td>
+                        <td className="p-3 border-b border-border text-foreground text-sm">${parseFloat(p.employee_cost).toLocaleString()}</td>
                         <td className="p-3 border-b border-border text-foreground text-sm flex items-center gap-1">
                           {p.enrolled_count} <Users size={12} className="text-muted-foreground" />
                         </td>
@@ -204,7 +204,7 @@ export function BenefitsAdmin() {
           </div>
         ) : (
           <div className="bg-card text-card-foreground/70 border border-border rounded-xl p-6">
-            <h3 className="text-lg text-slate-900 dark:text-white font-medium mb-4">Company-wide Enrollments</h3>
+            <h3 className="text-lg text-foreground font-medium mb-4">Company-wide Enrollments</h3>
             <div className="overflow-x-auto">
               <table className="w-full border-collapse">
                 <thead>
@@ -229,9 +229,9 @@ export function BenefitsAdmin() {
                           <strong>{e.full_name}</strong><br/>
                           <span className="text-xs text-muted-foreground">{e.employee_number}</span>
                         </td>
-                        <td className="p-3 border-b border-border text-slate-900 dark:text-white text-sm">{e.plan_name}</td>
-                        <td className="p-3 border-b border-border text-slate-900 dark:text-white text-sm">{e.type}</td>
-                        <td className="p-3 border-b border-border text-slate-900 dark:text-white text-sm">{e.dependent_count}</td>
+                        <td className="p-3 border-b border-border text-foreground text-sm">{e.plan_name}</td>
+                        <td className="p-3 border-b border-border text-foreground text-sm">{e.type}</td>
+                        <td className="p-3 border-b border-border text-foreground text-sm">{e.dependent_count}</td>
                         <td className="p-3 border-b border-border text-red-400 text-sm">
                           ${(parseFloat(e.employee_cost) * e.dependent_count).toLocaleString()}
                         </td>
@@ -251,7 +251,7 @@ export function BenefitsAdmin() {
         <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-card text-card-foreground w-full max-w-[450px] rounded-xl border border-border overflow-hidden shadow-2xl">
             <div className="p-5 border-b border-border flex justify-between items-center">
-              <h3 className="text-lg font-bold text-slate-900 dark:text-white m-0">Create Benefit Plan</h3>
+              <h3 className="text-lg font-bold text-foreground m-0">Create Benefit Plan</h3>
               <button className="text-muted-foreground hover:text-foreground" onClick={() => setShowPlanModal(false)}>
                 <X size={20} />
               </button>

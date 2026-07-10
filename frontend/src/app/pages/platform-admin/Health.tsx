@@ -48,7 +48,7 @@ export function PlatformAdminHealth() {
         </div>
         <button
           onClick={run}
-          className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white/[0.03] border border-white/[0.07] text-muted-foreground hover:text-slate-200 text-sm transition-colors"
+          className="flex items-center gap-2 px-4 py-2 rounded-lg bg-card/[0.03] border border-white/[0.07] text-muted-foreground hover:text-foreground text-sm transition-colors"
         >
           <RefreshCw size={14} className={loading ? "animate-spin" : ""} /> Re-run Checks
         </button>
@@ -71,7 +71,7 @@ export function PlatformAdminHealth() {
             </p>
           </div>
           {/* Mini progress bar */}
-          <div className="flex-1 h-1.5 bg-white/5 rounded-full ml-4 overflow-hidden">
+          <div className="flex-1 h-1.5 bg-card/50 rounded-full ml-4 overflow-hidden">
             <div
               className={`h-full rounded-full transition-all ${allGreen ? "bg-emerald-500" : "bg-red-500"}`}
               style={{ width: `${(passing / checks.length) * 100}%` }}
@@ -95,7 +95,7 @@ export function PlatformAdminHealth() {
             key={i}
             className={`flex items-start gap-4 px-5 py-4 rounded-xl border transition-all ${
               c.status === "pass"
-                ? "bg-[#0c1018] border-white/[0.04] hover:border-white/[0.08]"
+                ? "bg-background border-border hover:border-white/[0.08]"
                 : "bg-red-500/5 border-red-500/20"
             }`}
           >
@@ -105,7 +105,7 @@ export function PlatformAdminHealth() {
               <XCircle size={18} className="text-red-400 flex-shrink-0 mt-0.5" />
             )}
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-slate-200">{c.name}</p>
+              <p className="text-sm font-medium text-foreground">{c.name}</p>
               <p className={`text-xs mt-0.5 ${c.status === "pass" ? "text-slate-500" : "text-red-400/80"}`}>{c.detail}</p>
             </div>
             <span className={`text-xs font-bold uppercase tracking-wider px-2.5 py-1 rounded-full border flex-shrink-0 ${

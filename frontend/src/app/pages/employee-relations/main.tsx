@@ -38,7 +38,7 @@
   })();
 
   createRoot(document.getElementById("root")!).render(
-    <ThemeProvider attribute="data-theme" defaultTheme="dark" storageKey="theme">
+    <ThemeProvider attribute="data-theme" defaultTheme="system" storageKey="theme">
       <App />
     </ThemeProvider>
   );

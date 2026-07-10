@@ -241,14 +241,14 @@ export function ELRAutomation() {
 
   if (loading) {
     return (
-      <main className="flex-1 flex items-center justify-center h-full bg-[#f4f6f8] dark:bg-[#06070a]">
+      <main className="flex-1 flex items-center justify-center h-full bg-[#f4f6f8] dark:bg-background">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#00e07a]"></div>
       </main>
     );
   }
 
   return (
-    <main className="flex-1 flex flex-col h-full bg-[#f4f6f8] dark:bg-[#06070a] text-foreground overflow-y-auto transition-colors duration-300 scrollbar-thin">
+    <main className="flex-1 flex flex-col h-full bg-[#f4f6f8] dark:bg-background text-foreground overflow-y-auto transition-colors duration-300 scrollbar-thin">
       <div className="p-8 max-w-5xl mx-auto w-full">
         
         <div className="flex items-center justify-between mb-8">
@@ -256,7 +256,7 @@ export function ELRAutomation() {
             <h1 className="text-2xl font-bold tracking-tight bg-gradient-to-r from-white via-white to-gray-400 bg-clip-text text-transparent mb-1" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
               Automation & Triggers
             </h1>
-            <p className="text-slate-500 dark:text-slate-400 text-sm">Configure multiple detection rules to automatically flag and process HR incidents.</p>
+            <p className="text-slate-500 dark:text-muted-foreground text-sm">Configure multiple detection rules to automatically flag and process HR incidents.</p>
           </div>
           <div className="flex gap-3">
             <button 
@@ -294,23 +294,23 @@ export function ELRAutomation() {
               <h3 className="font-bold text-lg">Scan Results Summary</h3>
             </div>
             {scanResults.length === 0 ? (
-              <p className="text-sm text-gray-500">No active rules to scan, or no matches found.</p>
+              <p className="text-sm text-muted-foreground">No active rules to scan, or no matches found.</p>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {scanResults.map((res: any, idx: number) => (
                   <div key={idx} className="p-4 bg-muted rounded-xl border border-border">
                     <div className="flex justify-between items-center mb-2">
                       <span className="font-bold text-sm text-[#00e07a]">{res.rule_name || "Rule"}</span>
-                      <span className="text-[10px] text-gray-500 font-mono uppercase bg-input border-border px-2 py-0.5 rounded border border-border">{res.rule_type}</span>
+                      <span className="text-[10px] text-muted-foreground font-mono uppercase bg-input border-border px-2 py-0.5 rounded border border-border">{res.rule_type}</span>
                     </div>
                     <div className="flex gap-4">
                       <div>
                         <div className="text-lg font-bold font-mono text-orange-400">{res.detected}</div>
-                        <div className="text-[10px] text-gray-500 uppercase tracking-wider font-bold">Detected</div>
+                        <div className="text-[10px] text-muted-foreground uppercase tracking-wider font-bold">Detected</div>
                       </div>
                       <div>
                         <div className="text-lg font-bold font-mono text-blue-400">{res.cards_added}</div>
-                        <div className="text-[10px] text-gray-500 uppercase tracking-wider font-bold">Cards Added</div>
+                        <div className="text-[10px] text-muted-foreground uppercase tracking-wider font-bold">Cards Added</div>
                       </div>
                     </div>
                   </div>
@@ -325,7 +325,7 @@ export function ELRAutomation() {
             <div className="text-center py-16 bg-card/50 border border-border rounded-2xl border-dashed">
               <Bot className="w-12 h-12 text-muted-foreground mx-auto mb-4 opacity-50" />
               <h3 className="text-lg font-bold text-foreground">No automation rules</h3>
-              <p className="text-sm text-gray-500 mt-1">Add a rule to automatically flag incidents like AWOL or Tardiness.</p>
+              <p className="text-sm text-muted-foreground mt-1">Add a rule to automatically flag incidents like AWOL or Tardiness.</p>
             </div>
           ) : (
             rules.map((rule, idx) => (
@@ -354,7 +354,7 @@ export function ELRAutomation() {
                   
                   <div className="flex items-center gap-4">
                     <label className="flex items-center gap-2 cursor-pointer relative">
-                      <span className="text-sm font-bold text-gray-500">{rule.enabled ? 'Enabled' : 'Disabled'}</span>
+                      <span className="text-sm font-bold text-muted-foreground">{rule.enabled ? 'Enabled' : 'Disabled'}</span>
                       <input 
                         type="checkbox" 
                         className="sr-only peer" 
@@ -365,7 +365,7 @@ export function ELRAutomation() {
                           setRules(updated);
                         }} 
                       />
-                      <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:right-[22px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-[#00e07a]"></div>
+                      <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:right-[22px] after:bg-card after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-[#00e07a]"></div>
                     </label>
 
                     <button onClick={() => handleDeleteRule(idx)} className="p-2 text-muted-foreground hover:text-red-500 transition-colors">
@@ -389,14 +389,14 @@ export function ELRAutomation() {
                         >
                           {detectors.map(d => <option key={d.key} value={d.key}>{d.label}</option>)}
                         </select>
-                        <p className="text-[11px] text-gray-500 mt-1.5">{detectors.find(d => d.key === rule.rule_type)?.desc}</p>
+                        <p className="text-[11px] text-muted-foreground mt-1.5">{detectors.find(d => d.key === rule.rule_type)?.desc}</p>
                       </div>
 
                       <div className="bg-muted p-4 rounded-xl border border-border space-y-4">
                         <h4 className="text-xs font-bold uppercase text-muted-foreground mb-2">Detector Parameters</h4>
                         {detectors.find(d => d.key === rule.rule_type)?.params.map(param => (
                           <div key={param.key}>
-                            <label className="block text-xs text-gray-500 mb-1.5">{param.label}</label>
+                            <label className="block text-xs text-muted-foreground mb-1.5">{param.label}</label>
                             <input 
                               type={param.type}
                               value={rule.params[param.key] ?? ''}

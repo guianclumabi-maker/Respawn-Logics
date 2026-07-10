@@ -124,7 +124,7 @@ export function AICompanion() {
 
   return (
     /* Use h-full so we fill the parent shell pane, not force viewport height */
-    <div className="flex h-full bg-[#0f1115] text-slate-200 overflow-hidden font-sans">
+    <div className="flex h-full bg-background text-foreground overflow-hidden font-sans">
 
       {/* ── Sidebar ── */}
       <div
@@ -162,7 +162,7 @@ export function AICompanion() {
                     .map((chat) => (
                       <button
                         key={chat.id}
-                        className="w-full flex items-center gap-3 px-3 py-2.5 text-sm text-slate-300 hover:text-white hover:bg-accent rounded-lg transition-colors group"
+                        className="w-full flex items-center gap-3 px-3 py-2.5 text-sm text-slate-300 hover:text-foreground hover:bg-accent rounded-lg transition-colors group"
                       >
                         <MessageSquare className="w-4 h-4 text-slate-500 group-hover:text-indigo-400 flex-shrink-0" />
                         <span className="truncate">{chat.title}</span>
@@ -182,7 +182,7 @@ export function AICompanion() {
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(99,102,241,0.06)_0%,transparent_60%)] pointer-events-none" />
 
         {/* Header */}
-        <header className="h-14 flex items-center justify-between px-4 border-b border-border bg-[#0f1115]/80 backdrop-blur-sm flex-shrink-0 relative z-10">
+        <header className="h-14 flex items-center justify-between px-4 border-b border-border bg-background/80 backdrop-blur-sm flex-shrink-0 relative z-10">
           <div className="flex items-center gap-3">
             <button
               onClick={() => setSidebarOpen(!sidebarOpen)}
@@ -216,7 +216,7 @@ export function AICompanion() {
             /* Empty state */
             <div className="h-full flex flex-col items-center justify-center px-6 text-center">
               <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-2xl shadow-indigo-500/30 mb-6">
-                <Bot className="w-8 h-8 text-slate-900 dark:text-white" />
+                <Bot className="w-8 h-8 text-foreground" />
               </div>
               <h2 className="text-2xl font-bold text-foreground mb-2">
                 How can I help?
@@ -230,7 +230,7 @@ export function AICompanion() {
                   <button
                     key={i}
                     onClick={() => handleSend(s.text)}
-                    className="flex items-start gap-3 p-4 bg-white/[0.03] hover:bg-white/[0.07] border border-white/[0.08] hover:border-indigo-500/30 rounded-xl text-left text-sm text-slate-300 hover:text-foreground transition-all group"
+                    className="flex items-start gap-3 p-4 bg-card/[0.03] hover:bg-card/[0.07] border border-white/[0.08] hover:border-indigo-500/30 rounded-xl text-left text-sm text-slate-300 hover:text-foreground transition-all group"
                   >
                     <span className="text-indigo-400 mt-0.5 flex-shrink-0 group-hover:scale-110 transition-transform">
                       {s.icon}
@@ -252,15 +252,15 @@ export function AICompanion() {
                   >
                     {message.role === 'assistant' && (
                       <div className="w-8 h-8 flex-shrink-0 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-500/20 mt-0.5">
-                        <Bot className="w-4 h-4 text-slate-900 dark:text-white" />
+                        <Bot className="w-4 h-4 text-foreground" />
                       </div>
                     )}
 
                     <div
                       className={`max-w-[78%] rounded-2xl px-5 py-3.5 shadow-sm text-[14.5px] leading-relaxed whitespace-pre-wrap ${
                         message.role === 'user'
-                          ? 'bg-indigo-600 text-slate-900 dark:text-white shadow-indigo-600/20 rounded-tr-sm'
-                          : 'bg-white/[0.05] border border-white/[0.08] text-slate-200 rounded-tl-sm'
+                          ? 'bg-indigo-600 text-foreground shadow-indigo-600/20 rounded-tr-sm'
+                          : 'bg-card/[0.05] border border-white/[0.08] text-foreground rounded-tl-sm'
                       }`}
                     >
                       {message.content}
@@ -273,7 +273,7 @@ export function AICompanion() {
                     </div>
 
                     {message.role === 'user' && (
-                      <div className="w-8 h-8 flex-shrink-0 rounded-lg bg-slate-700 border border-border flex items-center justify-center mt-0.5 text-sm font-bold text-slate-300">
+                      <div className="w-8 h-8 flex-shrink-0 rounded-lg bg-muted border border-border flex items-center justify-center mt-0.5 text-sm font-bold text-slate-300">
                         {user?.name?.[0]?.toUpperCase() || <User size={14} />}
                       </div>
                     )}
@@ -283,9 +283,9 @@ export function AICompanion() {
                 {isLoading && (
                   <div className="flex gap-3 justify-start">
                     <div className="w-8 h-8 flex-shrink-0 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-500/20 mt-0.5">
-                      <Bot className="w-4 h-4 text-slate-900 dark:text-white" />
+                      <Bot className="w-4 h-4 text-foreground" />
                     </div>
-                    <div className="bg-white/[0.05] border border-white/[0.08] rounded-2xl rounded-tl-sm px-5 py-4 flex items-center gap-1.5">
+                    <div className="bg-card/[0.05] border border-white/[0.08] rounded-2xl rounded-tl-sm px-5 py-4 flex items-center gap-1.5">
                       {[0, 150, 300].map((delay) => (
                         <div
                           key={delay}
@@ -308,8 +308,8 @@ export function AICompanion() {
             {/* Glow ring behind input */}
             <div className="relative">
               <div className="absolute -inset-px bg-gradient-to-r from-indigo-500/20 to-purple-500/20 rounded-2xl blur-md pointer-events-none" />
-              <div className="relative bg-[#1c1e26] border border-border rounded-2xl shadow-2xl flex items-end p-2 transition-all focus-within:border-indigo-500/40 focus-within:shadow-indigo-500/10">
-                <button className="p-2.5 text-slate-500 hover:text-slate-300 transition-colors mb-0.5 flex-shrink-0">
+              <div className="relative bg-input border border-border rounded-2xl shadow-2xl flex items-end p-2 transition-all focus-within:border-indigo-500/40 focus-within:shadow-indigo-500/10">
+                <button className="p-2.5 text-slate-500 hover:text-foreground transition-colors mb-0.5 flex-shrink-0">
                   <Paperclip className="w-4 h-4" />
                 </button>
 
@@ -328,14 +328,14 @@ export function AICompanion() {
                   }}
                 />
 
-                <button className="p-2.5 text-slate-500 hover:text-slate-300 transition-colors mb-0.5 flex-shrink-0">
+                <button className="p-2.5 text-slate-500 hover:text-foreground transition-colors mb-0.5 flex-shrink-0">
                   <Mic className="w-4 h-4" />
                 </button>
 
                 <button
                   onClick={() => handleSend()}
                   disabled={!input.trim() || isLoading}
-                  className="p-2.5 bg-indigo-600 hover:bg-indigo-500 disabled:bg-slate-800 disabled:text-slate-600 text-slate-900 dark:text-white rounded-xl transition-all shadow-lg shadow-indigo-600/20 disabled:shadow-none mb-0.5 ml-1 flex-shrink-0"
+                  className="p-2.5 bg-indigo-600 hover:bg-indigo-500 disabled:bg-muted disabled:text-muted-foreground text-foreground rounded-xl transition-all shadow-lg shadow-indigo-600/20 disabled:shadow-none mb-0.5 ml-1 flex-shrink-0"
                 >
                   <Send className="w-4 h-4" />
                 </button>

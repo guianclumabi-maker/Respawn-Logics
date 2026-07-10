@@ -100,7 +100,7 @@ export function PlatformAdminStaff() {
           <p className="text-slate-500 text-sm mt-1">Manage Platform Admins, Support Agents, and Implementation Specialists.</p>
         </div>
         <div className="flex gap-2">
-          <button onClick={load} className="flex items-center gap-2 px-3 py-2 rounded-lg bg-white/[0.03] border border-white/[0.07] text-muted-foreground hover:text-slate-200 text-sm transition-colors">
+          <button onClick={load} className="flex items-center gap-2 px-3 py-2 rounded-lg bg-card/[0.03] border border-white/[0.07] text-muted-foreground hover:text-foreground text-sm transition-colors">
             <RefreshCw size={14} className={loading ? "animate-spin" : ""} />
           </button>
           <button
@@ -130,18 +130,18 @@ export function PlatformAdminStaff() {
         {!loading && staff.map((s) => {
           const Icon = ROLE_ICONS[s.role] ?? Users;
           return (
-            <div key={s.id} className="bg-[#0c1018] border border-white/[0.05] rounded-xl px-5 py-4 flex items-center gap-4 hover:border-border transition-all">
+            <div key={s.id} className="bg-background border border-white/[0.05] rounded-xl px-5 py-4 flex items-center gap-4 hover:border-border transition-all">
               <div className="w-10 h-10 rounded-full bg-violet-500/10 border border-violet-500/20 flex items-center justify-center flex-shrink-0">
                 <Icon size={16} className="text-violet-300" />
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-slate-200 font-medium text-sm">{s.full_name}</p>
+                <p className="text-foreground font-medium text-sm">{s.full_name}</p>
                 <p className="text-slate-500 text-xs">{s.email}</p>
               </div>
-              <span className={`px-2.5 py-1 rounded-full text-xs font-medium border ${ROLE_COLORS[s.role] ?? "bg-slate-700 text-slate-300 border-slate-600"}`}>
+              <span className={`px-2.5 py-1 rounded-full text-xs font-medium border ${ROLE_COLORS[s.role] ?? "bg-muted text-slate-300 border-slate-600"}`}>
                 {s.role.replace(/_/g, " ")}
               </span>
-              <span className={`px-2 py-0.5 rounded-full text-xs ${s.employment_status === "Active" ? "bg-emerald-500/10 text-emerald-400" : "bg-slate-700 text-muted-foreground"}`}>
+              <span className={`px-2 py-0.5 rounded-full text-xs ${s.employment_status === "Active" ? "bg-emerald-500/10 text-emerald-400" : "bg-muted text-muted-foreground"}`}>
                 {s.employment_status}
               </span>
               <button
@@ -158,10 +158,10 @@ export function PlatformAdminStaff() {
       {/* Add Staff Modal */}
       {showModal && (
         <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-[#0c1018] border border-white/[0.08] rounded-2xl w-full max-w-md shadow-2xl">
+          <div className="bg-background border border-white/[0.08] rounded-2xl w-full max-w-md shadow-2xl">
             <div className="px-6 py-5 border-b border-white/[0.05] flex items-center justify-between">
-              <h2 className="text-base font-semibold text-slate-900 dark:text-white">Add Internal Staff</h2>
-              <button onClick={() => setShowModal(false)} className="text-slate-500 hover:text-slate-300 cursor-pointer">
+              <h2 className="text-base font-semibold text-foreground">Add Internal Staff</h2>
+              <button onClick={() => setShowModal(false)} className="text-slate-500 hover:text-foreground cursor-pointer">
                 <X size={18} />
               </button>
             </div>
@@ -171,28 +171,28 @@ export function PlatformAdminStaff() {
                 <div>
                   <label className="block text-xs text-slate-500 mb-1.5">First Name</label>
                   <input value={form.first_name} onChange={(e) => setForm((f) => ({ ...f, first_name: e.target.value }))}
-                    className="w-full px-3 py-2.5 bg-[#080b12] border border-white/[0.07] rounded-lg text-sm text-slate-200 focus:outline-none focus:border-violet-500/40" />
+                    className="w-full px-3 py-2.5 bg-background border border-white/[0.07] rounded-lg text-sm text-foreground focus:outline-none focus:border-violet-500/40" />
                 </div>
                 <div>
                   <label className="block text-xs text-slate-500 mb-1.5">Last Name</label>
                   <input value={form.last_name} onChange={(e) => setForm((f) => ({ ...f, last_name: e.target.value }))}
-                    className="w-full px-3 py-2.5 bg-[#080b12] border border-white/[0.07] rounded-lg text-sm text-slate-200 focus:outline-none focus:border-violet-500/40" />
+                    className="w-full px-3 py-2.5 bg-background border border-white/[0.07] rounded-lg text-sm text-foreground focus:outline-none focus:border-violet-500/40" />
                 </div>
               </div>
               <div>
                 <label className="block text-xs text-slate-500 mb-1.5">Email</label>
                 <input type="email" value={form.email} onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))}
-                  className="w-full px-3 py-2.5 bg-[#080b12] border border-white/[0.07] rounded-lg text-sm text-slate-200 focus:outline-none focus:border-violet-500/40" />
+                  className="w-full px-3 py-2.5 bg-background border border-white/[0.07] rounded-lg text-sm text-foreground focus:outline-none focus:border-violet-500/40" />
               </div>
               <div>
                 <label className="block text-xs text-slate-500 mb-1.5">Password</label>
                 <input type="password" value={form.password} onChange={(e) => setForm((f) => ({ ...f, password: e.target.value }))}
-                  className="w-full px-3 py-2.5 bg-[#080b12] border border-white/[0.07] rounded-lg text-sm text-slate-200 focus:outline-none focus:border-violet-500/40" />
+                  className="w-full px-3 py-2.5 bg-background border border-white/[0.07] rounded-lg text-sm text-foreground focus:outline-none focus:border-violet-500/40" />
               </div>
               <div>
                 <label className="block text-xs text-slate-500 mb-1.5">Role</label>
                 <select value={form.role} onChange={(e) => setForm((f) => ({ ...f, role: e.target.value }))}
-                  className="w-full px-3 py-2.5 bg-[#080b12] border border-white/[0.07] rounded-lg text-sm text-slate-200 focus:outline-none focus:border-violet-500/40">
+                  className="w-full px-3 py-2.5 bg-background border border-white/[0.07] rounded-lg text-sm text-foreground focus:outline-none focus:border-violet-500/40">
                   <option value="Support_Agent">Support Agent</option>
                   <option value="Implementation_Specialist">Implementation Specialist</option>
                   <option value="Platform_Admin">Platform Admin</option>
@@ -200,7 +200,7 @@ export function PlatformAdminStaff() {
               </div>
             </div>
             <div className="px-6 pb-5 flex justify-end gap-3">
-              <button onClick={() => setShowModal(false)} className="px-4 py-2 rounded-lg text-muted-foreground hover:text-slate-200 text-sm transition-colors cursor-pointer">
+              <button onClick={() => setShowModal(false)} className="px-4 py-2 rounded-lg text-muted-foreground hover:text-foreground text-sm transition-colors cursor-pointer">
                 Cancel
               </button>
               <button onClick={handleCreate} disabled={saving}

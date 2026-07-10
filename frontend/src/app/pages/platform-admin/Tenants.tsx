@@ -15,7 +15,7 @@ type Tenant = {
 };
 
 const TIER_COLORS: Record<string, string> = {
-  starter: "bg-slate-700 text-slate-300",
+  starter: "bg-muted text-slate-300",
   professional: "bg-blue-500/20 text-blue-300",
   enterprise: "bg-violet-500/20 text-violet-300",
 };
@@ -64,7 +64,7 @@ export function PlatformAdminTenants() {
           </h1>
           <p className="text-slate-500 text-sm mt-1">All organizations on the platform.</p>
         </div>
-        <button onClick={load} className="flex items-center gap-2 px-3 py-2 rounded-lg bg-white/[0.03] border border-white/[0.07] text-muted-foreground hover:text-slate-200 text-sm transition-colors">
+        <button onClick={load} className="flex items-center gap-2 px-3 py-2 rounded-lg bg-card/[0.03] border border-white/[0.07] text-muted-foreground hover:text-foreground text-sm transition-colors">
           <RefreshCw size={14} className={loading ? "animate-spin" : ""} /> Refresh
         </button>
       </div>
@@ -76,7 +76,7 @@ export function PlatformAdminTenants() {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Search by name, email or tenant ID…"
-          className="w-full pl-10 pr-4 py-2.5 bg-[#0c1018] border border-white/[0.07] rounded-xl text-sm text-slate-200 placeholder-slate-600 focus:outline-none focus:border-violet-500/40 transition-colors"
+          className="w-full pl-10 pr-4 py-2.5 bg-background border border-white/[0.07] rounded-xl text-sm text-foreground placeholder-slate-600 focus:outline-none focus:border-violet-500/40 transition-colors"
         />
       </div>
 
@@ -84,7 +84,7 @@ export function PlatformAdminTenants() {
         <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-4 text-red-400 text-sm mb-6">{error}</div>
       )}
 
-      <div className="bg-[#0c1018] border border-white/[0.05] rounded-2xl overflow-hidden">
+      <div className="bg-background border border-white/[0.05] rounded-2xl overflow-hidden">
         <table className="w-full text-sm">
           <thead>
             <tr className="text-xs text-slate-600 uppercase tracking-widest border-b border-white/[0.05]">
@@ -116,19 +116,19 @@ export function PlatformAdminTenants() {
               </tr>
             )}
             {!loading && filtered.map((t) => (
-              <tr key={t.id} className="border-b border-white/[0.03] hover:bg-white/[0.02] transition-colors">
+              <tr key={t.id} className="border-b border-white/[0.03] hover:bg-card/[0.02] transition-colors">
                 <td className="px-6 py-4">
-                  <p className="text-slate-200 font-medium">{t.company_name}</p>
+                  <p className="text-foreground font-medium">{t.company_name}</p>
                   <p className="text-slate-600 text-xs font-mono mt-0.5">{t.id}</p>
                 </td>
                 <td className="px-6 py-4 text-muted-foreground text-xs">{t.contact_email}</td>
                 <td className="px-6 py-4">
-                  <span className={`px-2 py-0.5 rounded-full text-xs font-medium capitalize ${TIER_COLORS[t.subscription_tier?.toLowerCase()] ?? "bg-slate-700 text-slate-300"}`}>
+                  <span className={`px-2 py-0.5 rounded-full text-xs font-medium capitalize ${TIER_COLORS[t.subscription_tier?.toLowerCase()] ?? "bg-muted text-slate-300"}`}>
                     {t.subscription_tier ?? "—"}
                   </span>
                 </td>
                 <td className="px-6 py-4">
-                  <span className={`px-2 py-0.5 rounded-full text-xs font-medium capitalize ${STATUS_COLORS[t.status?.toLowerCase()] ?? "bg-slate-700 text-slate-300"}`}>
+                  <span className={`px-2 py-0.5 rounded-full text-xs font-medium capitalize ${STATUS_COLORS[t.status?.toLowerCase()] ?? "bg-muted text-slate-300"}`}>
                     {t.status ?? "—"}
                   </span>
                 </td>

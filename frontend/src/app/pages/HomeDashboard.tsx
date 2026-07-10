@@ -83,11 +83,11 @@ function MetricCard({
   accent: string;
 }) {
   return (
-    <div className="relative bg-card text-card-foreground border border-border rounded-xl p-5 flex flex-col gap-3 overflow-hidden group hover:border-slate-300 dark:hover:border-white/10 transition-colors">
+    <div className="relative bg-card text-card-foreground border border-border rounded-xl p-5 flex flex-col gap-3 overflow-hidden group hover:border-slate-300 dark:hover:border-border transition-colors">
       <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity"
            style={{ background: `radial-gradient(circle at top left, ${accent}08 0%, transparent 70%)` }} />
       <div className="flex items-center justify-between">
-        <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">{label}</span>
+        <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">{label}</span>
         <span style={{ color: accent }} className="opacity-70">{icon}</span>
       </div>
       <div className="text-3xl font-bold text-foreground font-mono tracking-tight">{value}</div>

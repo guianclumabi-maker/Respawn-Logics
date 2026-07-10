@@ -86,7 +86,7 @@ export function HRDirectory() {
             {hasPermission("employees.view") && (
               <button 
                 onClick={handleExport}
-                className="px-4 py-2 bg-white/5 hover:bg-accent border border-border text-foreground rounded-lg text-sm font-medium transition-all flex items-center gap-2 cursor-pointer"
+                className="px-4 py-2 bg-card/50 hover:bg-accent border border-border text-foreground rounded-lg text-sm font-medium transition-all flex items-center gap-2 cursor-pointer"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
                 Export CSV
@@ -111,9 +111,9 @@ export function HRDirectory() {
                 placeholder="Search employees..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="w-full bg-[#1a1d27]/80 border border-border rounded-lg py-2 pl-9 pr-4 text-slate-900 dark:text-white text-sm focus:outline-none focus:border-[#00e07a]/50 transition-colors"
+                className="w-full bg-input/80 border border-border rounded-lg py-2 pl-9 pr-4 text-foreground text-sm focus:outline-none focus:border-[#00e07a]/50 transition-colors"
               />
-              <svg className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+              <svg className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
             </div>
             <div className="text-sm text-muted-foreground">
               {filteredEmployees.length} record{filteredEmployees.length !== 1 ? "s" : ""}
@@ -125,34 +125,34 @@ export function HRDirectory() {
             {loading ? (
               <div className="p-8 text-center text-muted-foreground">Loading directory...</div>
             ) : filteredEmployees.length === 0 ? (
-              <div className="p-8 text-center text-gray-500">No employees found.</div>
+              <div className="p-8 text-center text-muted-foreground">No employees found.</div>
             ) : (
               <table className="w-full text-left border-collapse">
                 <thead className="sticky top-0 bg-card text-card-foreground shadow-sm z-10">
                   <tr>
-                    <th className="py-3 px-5 text-xs font-semibold text-gray-500 uppercase tracking-wider border-b border-border">Employee</th>
-                    <th className="py-3 px-5 text-xs font-semibold text-gray-500 uppercase tracking-wider border-b border-border">Role & Department</th>
-                    <th className="py-3 px-5 text-xs font-semibold text-gray-500 uppercase tracking-wider border-b border-border">Status</th>
-                    <th className="py-3 px-5 text-xs font-semibold text-gray-500 uppercase tracking-wider border-b border-border text-right">Actions</th>
+                    <th className="py-3 px-5 text-xs font-semibold text-muted-foreground uppercase tracking-wider border-b border-border">Employee</th>
+                    <th className="py-3 px-5 text-xs font-semibold text-muted-foreground uppercase tracking-wider border-b border-border">Role & Department</th>
+                    <th className="py-3 px-5 text-xs font-semibold text-muted-foreground uppercase tracking-wider border-b border-border">Status</th>
+                    <th className="py-3 px-5 text-xs font-semibold text-muted-foreground uppercase tracking-wider border-b border-border text-right">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
                   {filteredEmployees.map((emp) => (
-                    <tr key={emp.id} className="hover:bg-white/[0.02] transition-colors border-b border-white/[0.02]">
+                    <tr key={emp.id} className="hover:bg-card/[0.02] transition-colors border-b border-white/[0.02]">
                       <td className="py-4 px-5 align-middle">
                         <div className="flex items-center gap-3">
                           <div className="w-9 h-9 rounded-full bg-[#00e07a]/15 border border-[#00e07a]/30 flex items-center justify-center text-[#c084fc] font-bold text-sm">
                             {getInitials(emp.full_name)}
                           </div>
                           <div>
-                            <div className="text-sm font-semibold text-slate-900 dark:text-white mb-0.5">{emp.full_name}</div>
-                            <div className="text-xs text-gray-500">{emp.email}</div>
+                            <div className="text-sm font-semibold text-foreground mb-0.5">{emp.full_name}</div>
+                            <div className="text-xs text-muted-foreground">{emp.email}</div>
                           </div>
                         </div>
                       </td>
                       <td className="py-4 px-5 align-middle">
-                        <div className="text-sm text-gray-300">{emp.job_title || "—"}</div>
-                        <div className="text-xs text-gray-500">{emp.department || "—"}</div>
+                        <div className="text-sm text-foreground">{emp.job_title || "—"}</div>
+                        <div className="text-xs text-muted-foreground">{emp.department || "—"}</div>
                       </td>
                       <td className="py-4 px-5 align-middle">
                         <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold border ${getStatusColor(emp.employment_status)}`}>
@@ -160,7 +160,7 @@ export function HRDirectory() {
                         </span>
                       </td>
                       <td className="py-4 px-5 align-middle text-right">
-                        <button className="px-3 py-1.5 bg-transparent border border-border rounded text-xs font-medium text-slate-900 dark:text-white hover:bg-accent hover:border-white/20 transition-all">
+                        <button className="px-3 py-1.5 bg-transparent border border-border rounded text-xs font-medium text-foreground hover:bg-accent hover:border-border transition-all">
                           View Master
                         </button>
                       </td>

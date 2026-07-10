@@ -21,7 +21,7 @@ export function HolidaysTab() {
           <CalendarClock size={20} className="text-blue-500" />
           Holiday Calendar ({tsStart} to {tsEnd})
         </h3>
-        <span className="text-xs text-gray-500">Only applicable to holidays in the selected period</span>
+        <span className="text-xs text-muted-foreground">Only applicable to holidays in the selected period</span>
       </div>
 
       {isHolidaysLoading ? (
@@ -30,7 +30,7 @@ export function HolidaysTab() {
         <div className="grid grid-cols-3 gap-6">
           {/* Add Holiday Form */}
           <div className="col-span-1 bg-input border-border p-4 rounded-lg border border-border">
-            <h4 className="font-semibold text-sm mb-3 text-gray-200">Add Holiday</h4>
+            <h4 className="font-semibold text-sm mb-3 text-foreground">Add Holiday</h4>
             <form onSubmit={handleSaveHoliday} className="space-y-3">
               <div className="form-group">
                 <label className="text-xs text-tertiary block mb-1">Date</label>
@@ -92,8 +92,8 @@ export function HolidaysTab() {
                 ) : (
                   holidays.map(h => (
                     <tr key={h.id} className="border-b border-border hover:bg-accent">
-                      <td className="p-3 font-mono text-gray-300">{h.holiday_date}</td>
-                      <td className="p-3 font-semibold text-slate-900 dark:text-white">{h.name}</td>
+                      <td className="p-3 font-mono text-foreground">{h.holiday_date}</td>
+                      <td className="p-3 font-semibold text-foreground">{h.name}</td>
                       <td className="p-3">
                         <span className={`badge ${h.type === 'Regular Holiday' ? 'badge-blue' : 'badge-amber'}`}>
                           {h.type}

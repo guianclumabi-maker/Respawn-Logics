@@ -161,7 +161,7 @@ export function ELRDailyReport() {
           <div className="flex items-center gap-3">
             <div className="relative flex gap-2">
                 <div>
-                  <label className="block text-[10px] font-bold text-gray-500 uppercase mb-1">Start Date</label>
+                  <label className="block text-[10px] font-bold text-muted-foreground uppercase mb-1">Start Date</label>
                   <input 
                     type="date" 
                     value={filters.start_date}
@@ -170,7 +170,7 @@ export function ELRDailyReport() {
                   />
                 </div>
                 <div>
-                  <label className="block text-[10px] font-bold text-gray-500 uppercase mb-1">End Date</label>
+                  <label className="block text-[10px] font-bold text-muted-foreground uppercase mb-1">End Date</label>
                   <input 
                     type="date" 
                     value={filters.end_date}
@@ -181,7 +181,7 @@ export function ELRDailyReport() {
             </div>
             <button 
               onClick={() => window.print()}
-              className="p-2.5 bg-white/5 hover:bg-accent rounded-lg text-foreground transition-colors"
+              className="p-2.5 bg-card/50 hover:bg-accent rounded-lg text-foreground transition-colors"
               title="Print Digest"
             >
               <Printer size={16} />
@@ -207,33 +207,33 @@ export function ELRDailyReport() {
               <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
                 <div className="bg-card text-card-foreground/70 border border-border rounded-xl p-5 shadow-lg relative overflow-hidden">
                   <div className="absolute top-0 left-0 w-1 h-full bg-[#00e07a]"></div>
-                  <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Total Filed Today</h3>
-                  <div className="text-2xl font-bold font-mono text-slate-900 dark:text-white mb-1">{summary.total}</div>
+                  <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2">Total Filed Today</h3>
+                  <div className="text-2xl font-bold font-mono text-foreground mb-1">{summary.total}</div>
                 </div>
                 
                 <div className="bg-card text-card-foreground/70 border border-border rounded-xl p-5 shadow-lg relative overflow-hidden">
                   <div className="absolute top-0 left-0 w-1 h-full bg-blue-500"></div>
-                  <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Automated (System)</h3>
-                  <div className="text-2xl font-bold font-mono text-slate-900 dark:text-white mb-1">{summary.auto}</div>
+                  <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2">Automated (System)</h3>
+                  <div className="text-2xl font-bold font-mono text-foreground mb-1">{summary.auto}</div>
                 </div>
                 
                 <div className="bg-card text-card-foreground/70 border border-border rounded-xl p-5 shadow-lg relative overflow-hidden">
                   <div className="absolute top-0 left-0 w-1 h-full bg-purple-500"></div>
-                  <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Manual Filing</h3>
-                  <div className="text-2xl font-bold font-mono text-slate-900 dark:text-white mb-1">{summary.manual}</div>
+                  <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2">Manual Filing</h3>
+                  <div className="text-2xl font-bold font-mono text-foreground mb-1">{summary.manual}</div>
                 </div>
 
                 <div className="bg-card text-card-foreground/70 border border-border rounded-xl p-4 shadow-lg overflow-hidden flex flex-col justify-center">
-                  <h3 className="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-2 border-b border-border pb-1">Top Departments</h3>
+                  <h3 className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-2 border-b border-border pb-1">Top Departments</h3>
                   <div className="space-y-1.5 text-xs">
                     {Object.entries(summary.by_department).slice(0, 3).map(([dept, count]) => (
-                      <div key={dept} className="flex justify-between text-gray-300">
+                      <div key={dept} className="flex justify-between text-foreground">
                         <span className="truncate pr-2">{dept}</span>
-                        <span className="font-bold text-slate-900 dark:text-white bg-white/10 px-1.5 rounded">{count}</span>
+                        <span className="font-bold text-foreground bg-card/10 px-1.5 rounded">{count}</span>
                       </div>
                     ))}
                     {Object.keys(summary.by_department).length === 0 && (
-                      <span className="text-gray-500 italic">No data</span>
+                      <span className="text-muted-foreground italic">No data</span>
                     )}
                   </div>
                 </div>
@@ -244,20 +244,20 @@ export function ELRDailyReport() {
             <div className="bg-card text-card-foreground/40 border border-border p-4 rounded-xl flex flex-wrap gap-4 items-center justify-between shadow-sm">
               <div className="flex flex-wrap gap-3 items-center flex-1">
                 <div className="relative w-64">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" size={15} />
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={15} />
                   <input 
                     type="text"
                     placeholder="Search employee..."
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
-                    className="w-full bg-background border border-border rounded-lg py-2 pl-9 pr-3 text-slate-900 dark:text-white text-sm focus:outline-none focus:border-[#00e07a]/50"
+                    className="w-full bg-background border border-border rounded-lg py-2 pl-9 pr-3 text-foreground text-sm focus:outline-none focus:border-[#00e07a]/50"
                   />
                 </div>
 
                 <select
                   value={sourceFilter}
                   onChange={(e) => setSourceFilter(e.target.value)}
-                  className="bg-background border border-border rounded-lg py-2 px-3 text-sm text-slate-900 dark:text-white focus:outline-none focus:border-[#00e07a]/50"
+                  className="bg-background border border-border rounded-lg py-2 px-3 text-sm text-foreground focus:outline-none focus:border-[#00e07a]/50"
                 >
                   <option value="">All Sources</option>
                   <option value="auto">Automated (System)</option>
@@ -267,7 +267,7 @@ export function ELRDailyReport() {
                 <select
                   value={pipelineFilter}
                   onChange={(e) => setPipelineFilter(e.target.value)}
-                  className="bg-background border border-border rounded-lg py-2 px-3 text-sm text-slate-900 dark:text-white focus:outline-none focus:border-[#00e07a]/50"
+                  className="bg-background border border-border rounded-lg py-2 px-3 text-sm text-foreground focus:outline-none focus:border-[#00e07a]/50"
                 >
                   <option value="">All Pipelines</option>
                   {pipelines.map(p => <option key={p} value={p}>{p}</option>)}
@@ -276,13 +276,13 @@ export function ELRDailyReport() {
                 <select
                   value={deptFilter}
                   onChange={(e) => setDeptFilter(e.target.value)}
-                  className="bg-background border border-border rounded-lg py-2 px-3 text-sm text-slate-900 dark:text-white focus:outline-none focus:border-[#00e07a]/50"
+                  className="bg-background border border-border rounded-lg py-2 px-3 text-sm text-foreground focus:outline-none focus:border-[#00e07a]/50"
                 >
                   <option value="">All Departments</option>
                   {departments.map(d => <option key={d} value={d}>{d}</option>)}
                 </select>
               </div>
-              <div className="text-xs text-gray-500 font-sans flex items-center gap-2">
+              <div className="text-xs text-muted-foreground font-sans flex items-center gap-2">
                 <Filter size={12} /> Showing {filteredCases.length} case{filteredCases.length !== 1 ? "s" : ""}
               </div>
             </div>
@@ -291,7 +291,7 @@ export function ELRDailyReport() {
             <div className="bg-card text-card-foreground/70 border border-border rounded-xl overflow-hidden shadow-2xl">
               <div className="overflow-x-auto">
                 <table className="w-full text-left border-collapse">
-                  <thead className="bg-black/25 text-gray-500 text-xs font-semibold uppercase tracking-wider">
+                  <thead className="bg-muted/50 text-muted-foreground text-xs font-semibold uppercase tracking-wider">
                     <tr>
                       <th className="py-4 px-6">Employee</th>
                       <th className="py-4 px-6">Department</th>
@@ -307,23 +307,23 @@ export function ELRDailyReport() {
                       <tr 
                         key={c.id} 
                         onClick={() => setSelectedCardId(c.id)}
-                        className="hover:bg-white/[0.02] transition-colors cursor-pointer group"
+                        className="hover:bg-card/[0.02] transition-colors cursor-pointer group"
                       >
                         <td className="py-4 px-6">
-                          <div className="font-bold text-slate-900 dark:text-white group-hover:text-[#00e07a] transition-colors">{c.full_name}</div>
-                          <div className="text-[10px] text-gray-500 font-mono mt-0.5">{c.employee_id}</div>
+                          <div className="font-bold text-foreground group-hover:text-[#00e07a] transition-colors">{c.full_name}</div>
+                          <div className="text-[10px] text-muted-foreground font-mono mt-0.5">{c.employee_id}</div>
                         </td>
-                        <td className="py-4 px-6 text-xs text-gray-300">{c.department}</td>
-                        <td className="py-4 px-6 text-xs font-bold text-gray-300">{c.pipeline_name}</td>
+                        <td className="py-4 px-6 text-xs text-foreground">{c.department}</td>
+                        <td className="py-4 px-6 text-xs font-bold text-foreground">{c.pipeline_name}</td>
                         <td className="py-4 px-6 text-xs text-muted-foreground">
-                          <span className="bg-white/5 px-2 py-1 rounded border border-border">{c.stage_name}</span>
+                          <span className="bg-card/50 px-2 py-1 rounded border border-border">{c.stage_name}</span>
                         </td>
                         <td className="py-4 px-6 text-center">
                           <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${c.entered_via === 'auto' ? 'bg-purple-500/10 text-purple-400 border border-purple-500/20' : 'bg-blue-500/10 text-blue-400 border border-blue-500/20'}`}>
                             {c.entered_via === 'auto' ? 'Auto-detected' : 'Manual'}
                           </span>
                         </td>
-                        <td className="py-4 px-6 text-center text-[11px] text-gray-500">
+                        <td className="py-4 px-6 text-center text-[11px] text-muted-foreground">
                           {new Date(c.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                         </td>
                         <td className="py-4 px-6 text-center">
@@ -335,7 +335,7 @@ export function ELRDailyReport() {
                     ))}
                     {filteredCases.length === 0 && (
                       <tr>
-                        <td colSpan={7} className="py-12 text-center text-gray-500 text-sm">
+                        <td colSpan={7} className="py-12 text-center text-muted-foreground text-sm">
                           No cases found matching the criteria.
                         </td>
                       </tr>

@@ -113,7 +113,7 @@ export function RecruitingCopilot({ onViewChange }: { onViewChange: (v: ViewStat
                   </h3>
                 </div>
 
-                <button className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-[10px] font-bold bg-muted border border-border hover:border-white/20 hover:bg-accent transition-colors whitespace-nowrap text-foreground shrink-0">
+                <button className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-[10px] font-bold bg-muted border border-border hover:border-border hover:bg-accent transition-colors whitespace-nowrap text-foreground shrink-0">
                   {`[ ${act.action.toUpperCase()} ]`}
                   <ChevronRight size={12} className="text-muted-foreground group-hover:text-foreground" />
                 </button>

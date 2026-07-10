@@ -22,7 +22,7 @@ export function PlatformAdminImpersonate() {
 
   return (
     <div className="p-8 max-w-3xl mx-auto mt-10">
-      <div className="bg-[#0c1018] border border-white/[0.05] rounded-2xl p-8 relative overflow-hidden">
+      <div className="bg-background border border-white/[0.05] rounded-2xl p-8 relative overflow-hidden">
         {/* Decorative background element */}
         <div className="absolute top-0 right-0 w-64 h-64 bg-violet-500/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3 pointer-events-none" />
         
@@ -58,7 +58,7 @@ export function PlatformAdminImpersonate() {
                   value={tenantId}
                   onChange={(e) => setTenantId(e.target.value)}
                   placeholder="e.g. t_6a48f93feeb07"
-                  className="w-full pl-10 pr-4 py-3 bg-[#080b12] border border-white/[0.07] rounded-xl text-slate-200 placeholder-slate-600 focus:outline-none focus:border-violet-500/50 transition-colors"
+                  className="w-full pl-10 pr-4 py-3 bg-background border border-white/[0.07] rounded-xl text-foreground placeholder-slate-600 focus:outline-none focus:border-violet-500/50 transition-colors"
                 />
               </div>
             </div>

@@ -108,7 +108,7 @@ export function ElrCopilotContent() {
         return (
           <li 
             key={idx} 
-            className="ml-5 list-disc text-gray-300 my-1 font-sans text-sm" 
+            className="ml-5 list-disc text-foreground my-1 font-sans text-sm" 
             dangerouslySetInnerHTML={{ __html: content.substring(2) }} 
           />
         );
@@ -121,7 +121,7 @@ export function ElrCopilotContent() {
       return (
         <p 
           key={idx} 
-          className="mb-3 leading-relaxed text-gray-300 text-sm font-sans" 
+          className="mb-3 leading-relaxed text-foreground text-sm font-sans" 
           dangerouslySetInnerHTML={{ __html: content }} 
         />
       );
@@ -144,7 +144,7 @@ export function ElrCopilotContent() {
         {transcript.length > 0 && (
           <button 
             onClick={() => setTranscript([])}
-            className="flex items-center gap-1.5 px-3 py-1.5 bg-white/5 hover:bg-red-500/15 hover:text-red-400 border border-border hover:border-red-500/20 rounded-lg text-xs text-muted-foreground transition-all cursor-pointer font-sans"
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-card/50 hover:bg-red-500/15 hover:text-red-400 border border-border hover:border-red-500/20 rounded-lg text-xs text-muted-foreground transition-all cursor-pointer font-sans"
           >
             <Trash2 size={13} /> Clear Session
           </button>
@@ -152,7 +152,7 @@ export function ElrCopilotContent() {
       </div>
 
       {/* Main Workspace (Split / Scrollable view) */}
-      <div className="flex-1 flex flex-col overflow-hidden bg-[#0d0f19] border border-border rounded-2xl relative shadow-2xl">
+      <div className="flex-1 flex flex-col overflow-hidden bg-card border border-border rounded-2xl relative shadow-2xl">
         
         {/* Transcript History */}
         <div className="flex-1 overflow-y-auto p-6 space-y-6 scrollbar-thin">
@@ -174,7 +174,7 @@ export function ElrCopilotContent() {
                 <div className="w-8 h-8 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 flex items-center justify-center flex-shrink-0">
                   <Bot size={15} />
                 </div>
-                <div className="flex-1 p-5 rounded-2xl bg-white/[0.02] border border-border rounded-tl-sm shadow-md space-y-4">
+                <div className="flex-1 p-5 rounded-2xl bg-card/[0.02] border border-border rounded-tl-sm shadow-md space-y-4">
                   
                   {/* Markdown Answer */}
                   <div className="space-y-1">
@@ -201,7 +201,7 @@ export function ElrCopilotContent() {
                           Live web result — not yet in the reviewed knowledge base.
                         </div>
                       )}
-                      <span className="text-[10px] font-bold text-gray-500 uppercase tracking-wider block mb-2">Sources Cited:</span>
+                      <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block mb-2">Sources Cited:</span>
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         {qa.sources.map((src, srcIdx) => (
                           <div key={srcIdx} className="bg-input border-border border border-border p-3 rounded-lg flex flex-col justify-between gap-1 hover:border-cyan-500/20 transition-all">
@@ -212,9 +212,9 @@ export function ElrCopilotContent() {
                                 ) : (
                                   <Scale className="w-3.5 h-3.5 text-purple-400 flex-shrink-0" />
                                 )}
-                                <span className="text-[9px] font-bold text-gray-500 uppercase tracking-wider">{src.type}</span>
+                                <span className="text-[9px] font-bold text-muted-foreground uppercase tracking-wider">{src.type}</span>
                               </div>
-                              <div className="text-xs font-bold text-slate-900 dark:text-white leading-tight mt-1 line-clamp-2">{src.title}</div>
+                              <div className="text-xs font-bold text-foreground leading-tight mt-1 line-clamp-2">{src.title}</div>
                               <div className="text-[10px] text-muted-foreground mt-0.5 line-clamp-1">{src.reference}</div>
                             </div>
 
@@ -253,7 +253,7 @@ export function ElrCopilotContent() {
               <div className="w-8 h-8 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 flex items-center justify-center flex-shrink-0">
                 <Bot size={15} />
               </div>
-              <div className="p-4 rounded-2xl bg-white/[0.02] border border-border rounded-tl-sm text-muted-foreground flex items-center gap-2 text-sm font-sans shadow-md">
+              <div className="p-4 rounded-2xl bg-card/[0.02] border border-border rounded-tl-sm text-muted-foreground flex items-center gap-2 text-sm font-sans shadow-md">
                 <Loader2 size={16} className="animate-spin text-cyan-400" /> Scanning labor law references...
               </div>
             </div>
@@ -267,10 +267,10 @@ export function ElrCopilotContent() {
           )}
 
           {transcript.length === 0 && !loading && (
-            <div className="h-full flex flex-col items-center justify-center text-center text-gray-500 py-12 px-6">
-              <Sparkles className="w-12 h-12 text-gray-700 mb-3" />
-              <h3 className="text-base font-bold text-slate-900 dark:text-white mb-1">Ask a labor relations query</h3>
-              <p className="text-sm text-gray-500 max-w-sm font-sans">Type a query below. The Copilot will analyze your input against registered DOLE advisories and SC decisions.</p>
+            <div className="h-full flex flex-col items-center justify-center text-center text-muted-foreground py-12 px-6">
+              <Sparkles className="w-12 h-12 text-foreground mb-3" />
+              <h3 className="text-base font-bold text-foreground mb-1">Ask a labor relations query</h3>
+              <p className="text-sm text-muted-foreground max-w-sm font-sans">Type a query below. The Copilot will analyze your input against registered DOLE advisories and SC decisions.</p>
             </div>
           )}
 
@@ -278,7 +278,7 @@ export function ElrCopilotContent() {
         </div>
 
         {/* Persistent bottom input workspace */}
-        <div className="p-4 bg-[#0d0f19] border-t border-border space-y-3 flex-none">
+        <div className="p-4 bg-card border-t border-border space-y-3 flex-none">
           {/* Suggestions (only when empty) */}
           {transcript.length === 0 && (
             <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-thin">
@@ -290,7 +290,7 @@ export function ElrCopilotContent() {
                     handleAsk(sug);
                   }}
                   disabled={loading}
-                  className="whitespace-nowrap px-3 py-1.5 bg-white/5 hover:bg-accent border border-border rounded-full text-xs text-gray-300 transition-all cursor-pointer disabled:opacity-50"
+                  className="whitespace-nowrap px-3 py-1.5 bg-card/50 hover:bg-accent border border-border rounded-full text-xs text-foreground transition-all cursor-pointer disabled:opacity-50"
                 >
                   {sug}
                 </button>
@@ -308,7 +308,7 @@ export function ElrCopilotContent() {
               onChange={(e) => setQuestion(e.target.value)}
               placeholder="Type your labor relations question..."
               rows={2}
-              className="flex-1 bg-white/5 border border-border rounded-xl px-4 py-2.5 text-slate-900 dark:text-white placeholder-gray-500 focus:outline-none focus:border-cyan-500/50 focus:bg-white/10 transition-all text-sm font-sans resize-none"
+              className="flex-1 bg-card/50 border border-border rounded-xl px-4 py-2.5 text-foreground placeholder-gray-500 focus:outline-none focus:border-cyan-500/50 focus:bg-card/10 transition-all text-sm font-sans resize-none"
               onKeyDown={(e) => {
                 if (e.key === "Enter" && !e.shiftKey) {
                   e.preventDefault();
@@ -326,7 +326,7 @@ export function ElrCopilotContent() {
           </form>
 
           {/* Persistent Disclaimer */}
-          <p className="text-center text-[10px] text-gray-500 flex justify-center items-center gap-1.5 select-none leading-none">
+          <p className="text-center text-[10px] text-muted-foreground flex justify-center items-center gap-1.5 select-none leading-none">
             <Info size={12} className="text-[#00e07a]" />
             <span>Guidance only, not legal advice. Avoid pasting sensitive employee names or details.</span>
           </p>
@@ -339,7 +339,7 @@ export function ElrCopilotContent() {
 
 export function ElrCopilot() {
   return (
-    <ThemeProvider attribute="data-theme" defaultTheme="dark">
+    <ThemeProvider attribute="data-theme" defaultTheme="system">
       <div className="h-full w-full flex-1 overflow-hidden relative" style={{ isolation: 'isolate' }}>
         <ElrCopilotContent />
       </div>

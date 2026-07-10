@@ -348,7 +348,7 @@ export function CompensationAdminContent() {
           <button 
             onClick={() => setActiveTab("bands")}
             className={`pb-3 px-1 text-sm font-semibold transition-colors flex items-center gap-2 cursor-pointer ${
-              activeTab === "bands" ? "text-foreground border-b-2 border-[#00e07a]" : "text-gray-500 hover:text-gray-300"
+              activeTab === "bands" ? "text-foreground border-b-2 border-[#00e07a]" : "text-muted-foreground hover:text-foreground"
             }`}
           >
             <Banknote size={16} /> Salary Bands
@@ -356,7 +356,7 @@ export function CompensationAdminContent() {
           <button 
             onClick={() => setActiveTab("equity")}
             className={`pb-3 px-1 text-sm font-semibold transition-colors flex items-center gap-2 cursor-pointer ${
-              activeTab === "equity" ? "text-foreground border-b-2 border-[#00e07a]" : "text-gray-500 hover:text-gray-300"
+              activeTab === "equity" ? "text-foreground border-b-2 border-[#00e07a]" : "text-muted-foreground hover:text-foreground"
             }`}
           >
             <Coins size={16} /> Employee Equity
@@ -373,11 +373,11 @@ export function CompensationAdminContent() {
           ) : error ? (
             <div className="flex flex-col items-center justify-center py-16 px-6 bg-red-500/10 border border-red-500/20 rounded-xl text-center space-y-3">
               <AlertCircle className="w-10 h-10 text-red-500" />
-              <h3 className="text-lg font-bold text-slate-900 dark:text-white">Load Error</h3>
+              <h3 className="text-lg font-bold text-foreground">Load Error</h3>
               <p className="text-sm text-muted-foreground">{error}</p>
               <button 
                 onClick={loadData}
-                className="mt-2 px-4 py-2 bg-white/5 hover:bg-accent text-slate-900 dark:text-white rounded-lg text-xs transition-colors border border-border"
+                className="mt-2 px-4 py-2 bg-card/50 hover:bg-accent text-foreground rounded-lg text-xs transition-colors border border-border"
               >
                 Retry
               </button>
@@ -387,7 +387,7 @@ export function CompensationAdminContent() {
             <div className="bg-card text-card-foreground/70 border border-border rounded-xl overflow-hidden shadow-2xl">
               <div className="overflow-x-auto">
                 <table className="w-full text-left border-collapse">
-                  <thead className="bg-black/25 text-gray-500 text-xs font-semibold uppercase tracking-wider">
+                  <thead className="bg-muted/50 text-muted-foreground text-xs font-semibold uppercase tracking-wider">
                     <tr>
                       <th className="py-4 px-6">Job Title</th>
                       <th className="py-4 px-6 text-right">Min Salary</th>
@@ -398,15 +398,15 @@ export function CompensationAdminContent() {
                   </thead>
                   <tbody className="divide-y divide-white/[0.03]">
                     {bands.map((b) => (
-                      <tr key={b.id} className="hover:bg-white/[0.02] transition-colors">
-                        <td className="py-4 px-6 font-semibold text-slate-900 dark:text-white">{b.job_title}</td>
-                        <td className="py-4 px-6 text-right font-mono text-xs text-gray-300">
+                      <tr key={b.id} className="hover:bg-card/[0.02] transition-colors">
+                        <td className="py-4 px-6 font-semibold text-foreground">{b.job_title}</td>
+                        <td className="py-4 px-6 text-right font-mono text-xs text-foreground">
                           {formatCurrency(b.min_salary, b.currency)}
                         </td>
                         <td className="py-4 px-6 text-right font-mono text-xs text-foreground">
                           {formatCurrency(b.mid_salary, b.currency)}
                         </td>
-                        <td className="py-4 px-6 text-right font-mono text-xs text-gray-300">
+                        <td className="py-4 px-6 text-right font-mono text-xs text-foreground">
                           {formatCurrency(b.max_salary, b.currency)}
                         </td>
                         {canManage && (
@@ -431,7 +431,7 @@ export function CompensationAdminContent() {
                     ))}
                     {bands.length === 0 && (
                       <tr>
-                        <td colSpan={canManage ? 5 : 4} className="py-12 text-center text-gray-500 text-sm">
+                        <td colSpan={canManage ? 5 : 4} className="py-12 text-center text-muted-foreground text-sm">
                           No salary bands configured for this tenant.
                         </td>
                       </tr>
@@ -445,7 +445,7 @@ export function CompensationAdminContent() {
             <div className="bg-card text-card-foreground/70 border border-border rounded-xl overflow-hidden shadow-2xl">
               <div className="overflow-x-auto">
                 <table className="w-full text-left border-collapse">
-                  <thead className="bg-black/25 text-gray-500 text-xs font-semibold uppercase tracking-wider">
+                  <thead className="bg-muted/50 text-muted-foreground text-xs font-semibold uppercase tracking-wider">
                     <tr>
                       <th className="py-4 px-6">Employee</th>
                       <th className="py-4 px-6">Type</th>
@@ -461,10 +461,10 @@ export function CompensationAdminContent() {
                         ? Math.min(100, Math.round((eq.vested_shares / eq.total_shares) * 100)) 
                         : 0;
                       return (
-                        <tr key={eq.id} className="hover:bg-white/[0.02] transition-colors">
+                        <tr key={eq.id} className="hover:bg-card/[0.02] transition-colors">
                           <td className="py-4 px-6">
-                            <div className="font-semibold text-slate-900 dark:text-white">{eq.employee_name}</div>
-                            <div className="text-[10px] text-gray-500 font-mono mt-0.5">Granted: {eq.grant_date}</div>
+                            <div className="font-semibold text-foreground">{eq.employee_name}</div>
+                            <div className="text-[10px] text-muted-foreground font-mono mt-0.5">Granted: {eq.grant_date}</div>
                           </td>
                           <td className="py-4 px-6">
                             <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold border bg-purple-500/10 text-purple-400 border-purple-500/20">
@@ -472,8 +472,8 @@ export function CompensationAdminContent() {
                             </span>
                           </td>
                           <td className="py-4 px-6 text-right font-mono text-xs">
-                            <span className="text-slate-900 dark:text-white font-bold">{eq.vested_shares.toLocaleString()}</span>
-                            <span className="text-gray-500"> / {eq.total_shares.toLocaleString()}</span>
+                            <span className="text-foreground font-bold">{eq.vested_shares.toLocaleString()}</span>
+                            <span className="text-muted-foreground"> / {eq.total_shares.toLocaleString()}</span>
                           </td>
                           <td className="py-4 px-6 text-xs text-muted-foreground max-w-[150px] truncate" title={eq.vesting_schedule}>
                             {eq.vesting_schedule}
@@ -483,7 +483,7 @@ export function CompensationAdminContent() {
                               <div className="flex justify-between text-[10px] font-mono font-bold leading-none">
                                 <span className="text-muted-foreground">{percent}% Vested</span>
                               </div>
-                              <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
+                              <div className="h-1.5 w-full bg-card/50 rounded-full overflow-hidden">
                                 <div 
                                   className="h-full bg-gradient-to-r from-purple-500 to-[#00b8ff] rounded-full transition-all duration-500" 
                                   style={{ width: `${percent}%` }}
@@ -514,7 +514,7 @@ export function CompensationAdminContent() {
                     })}
                     {equity.length === 0 && (
                       <tr>
-                        <td colSpan={canManage ? 6 : 5} className="py-12 text-center text-gray-500 text-sm">
+                        <td colSpan={canManage ? 6 : 5} className="py-12 text-center text-muted-foreground text-sm">
                           No equity grants registered for this tenant.
                         </td>
                       </tr>
@@ -531,11 +531,11 @@ export function CompensationAdminContent() {
       {showBandModal && (
         <div className="fixed inset-0 bg-black/75 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <div className="bg-card text-card-foreground border border-border rounded-xl w-full max-w-md shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
-            <div className="p-5 border-b border-border flex justify-between items-center bg-black/10">
+            <div className="p-5 border-b border-border flex justify-between items-center bg-muted/30">
               <h3 className="text-base font-bold text-foreground uppercase tracking-wider">
                 {modalMode === "add" ? "Register Salary Band" : "Adjust Salary Band"}
               </h3>
-              <button onClick={() => setShowBandModal(false)} className="text-muted-foreground hover:text-white text-xl leading-none">&times;</button>
+              <button onClick={() => setShowBandModal(false)} className="text-muted-foreground hover:text-foreground text-xl leading-none">&times;</button>
             </div>
             <form onSubmit={handleBandSubmit} className="p-5 space-y-4">
               <div>
@@ -545,7 +545,7 @@ export function CompensationAdminContent() {
                   required
                   value={jobTitle}
                   onChange={(e) => setJobTitle(e.target.value)}
-                  className="w-full bg-background border border-border rounded-lg py-2.5 px-3 text-slate-900 dark:text-white text-sm focus:outline-none focus:border-[#00e07a]/50" 
+                  className="w-full bg-background border border-border rounded-lg py-2.5 px-3 text-foreground text-sm focus:outline-none focus:border-[#00e07a]/50" 
                   placeholder="e.g. Senior Software Engineer"
                 />
               </div>
@@ -557,7 +557,7 @@ export function CompensationAdminContent() {
                     required
                     value={minSalary}
                     onChange={(e) => setMinSalary(e.target.value)}
-                    className="w-full bg-background border border-border rounded-lg py-2.5 px-3 text-slate-900 dark:text-white text-sm focus:outline-none focus:border-[#00e07a]/50" 
+                    className="w-full bg-background border border-border rounded-lg py-2.5 px-3 text-foreground text-sm focus:outline-none focus:border-[#00e07a]/50" 
                     placeholder="Min"
                   />
                 </div>
@@ -568,7 +568,7 @@ export function CompensationAdminContent() {
                     required
                     value={midSalary}
                     onChange={(e) => setMidSalary(e.target.value)}
-                    className="w-full bg-background border border-border rounded-lg py-2.5 px-3 text-slate-900 dark:text-white text-sm focus:outline-none focus:border-[#00e07a]/50" 
+                    className="w-full bg-background border border-border rounded-lg py-2.5 px-3 text-foreground text-sm focus:outline-none focus:border-[#00e07a]/50" 
                     placeholder="Mid"
                   />
                 </div>
@@ -581,7 +581,7 @@ export function CompensationAdminContent() {
                     required
                     value={maxSalary}
                     onChange={(e) => setMaxSalary(e.target.value)}
-                    className="w-full bg-background border border-border rounded-lg py-2.5 px-3 text-slate-900 dark:text-white text-sm focus:outline-none focus:border-[#00e07a]/50" 
+                    className="w-full bg-background border border-border rounded-lg py-2.5 px-3 text-foreground text-sm focus:outline-none focus:border-[#00e07a]/50" 
                     placeholder="Max"
                   />
                 </div>
@@ -592,13 +592,13 @@ export function CompensationAdminContent() {
                     required
                     value={currency}
                     onChange={(e) => setCurrency(e.target.value.toUpperCase())}
-                    className="w-full bg-background border border-border rounded-lg py-2.5 px-3 text-slate-900 dark:text-white text-sm focus:outline-none focus:border-[#00e07a]/50" 
+                    className="w-full bg-background border border-border rounded-lg py-2.5 px-3 text-foreground text-sm focus:outline-none focus:border-[#00e07a]/50" 
                     placeholder="PHP"
                   />
                 </div>
               </div>
               <div className="pt-2 flex justify-end gap-3 border-t border-border mt-4">
-                <button type="button" onClick={() => setShowBandModal(false)} className="px-3 py-1.5 text-muted-foreground hover:text-white text-xs font-semibold">Cancel</button>
+                <button type="button" onClick={() => setShowBandModal(false)} className="px-3 py-1.5 text-muted-foreground hover:text-foreground text-xs font-semibold">Cancel</button>
                 <button type="submit" disabled={submitting} className="px-4 py-2 bg-[#00e07a] hover:bg-[#00c96a] text-black font-extrabold rounded-lg text-xs transition-colors flex items-center gap-1.5">
                   {submitting && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
                   Save Band Changes
@@ -613,11 +613,11 @@ export function CompensationAdminContent() {
       {showEquityModal && (
         <div className="fixed inset-0 bg-black/75 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <div className="bg-card text-card-foreground border border-border rounded-xl w-full max-w-md shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
-            <div className="p-5 border-b border-border flex justify-between items-center bg-black/10">
+            <div className="p-5 border-b border-border flex justify-between items-center bg-muted/30">
               <h3 className="text-base font-bold text-foreground uppercase tracking-wider">
                 {modalMode === "add" ? "Grant Employee Equity" : "Adjust Equity Grant"}
               </h3>
-              <button onClick={() => setShowEquityModal(false)} className="text-muted-foreground hover:text-white text-xl leading-none">&times;</button>
+              <button onClick={() => setShowEquityModal(false)} className="text-muted-foreground hover:text-foreground text-xl leading-none">&times;</button>
             </div>
             <form onSubmit={handleEquitySubmit} className="p-5 space-y-4">
               <div>
@@ -627,7 +627,7 @@ export function CompensationAdminContent() {
                   required
                   value={employeeName}
                   onChange={(e) => setEmployeeName(e.target.value)}
-                  className="w-full bg-background border border-border rounded-lg py-2.5 px-3 text-slate-900 dark:text-white text-sm focus:outline-none focus:border-[#00e07a]/50" 
+                  className="w-full bg-background border border-border rounded-lg py-2.5 px-3 text-foreground text-sm focus:outline-none focus:border-[#00e07a]/50" 
                   placeholder="e.g. Juan dela Cruz"
                 />
               </div>
@@ -637,7 +637,7 @@ export function CompensationAdminContent() {
                   <select 
                     value={grantType}
                     onChange={(e) => setGrantType(e.target.value as any)}
-                    className="w-full bg-background border border-border rounded-lg py-2.5 px-3 text-slate-900 dark:text-white text-sm focus:outline-none focus:border-[#00e07a]/50"
+                    className="w-full bg-background border border-border rounded-lg py-2.5 px-3 text-foreground text-sm focus:outline-none focus:border-[#00e07a]/50"
                   >
                     <option value="ESOP">ESOP</option>
                     <option value="RSU">RSU</option>
@@ -651,7 +651,7 @@ export function CompensationAdminContent() {
                     required
                     value={grantDate}
                     onChange={(e) => setGrantDate(e.target.value)}
-                    className="w-full bg-background border border-border rounded-lg py-2.5 px-3 text-slate-900 dark:text-white text-sm focus:outline-none focus:border-[#00e07a]/50 [color-scheme:dark]" 
+                    className="w-full bg-background border border-border rounded-lg py-2.5 px-3 text-foreground text-sm focus:outline-none focus:border-[#00e07a]/50 [color-scheme:dark]" 
                   />
                 </div>
               </div>
@@ -663,7 +663,7 @@ export function CompensationAdminContent() {
                     required
                     value={totalShares}
                     onChange={(e) => setTotalShares(e.target.value)}
-                    className="w-full bg-background border border-border rounded-lg py-2.5 px-3 text-slate-900 dark:text-white text-sm focus:outline-none focus:border-[#00e07a]/50" 
+                    className="w-full bg-background border border-border rounded-lg py-2.5 px-3 text-foreground text-sm focus:outline-none focus:border-[#00e07a]/50" 
                     placeholder="e.g. 10000"
                   />
                 </div>
@@ -674,7 +674,7 @@ export function CompensationAdminContent() {
                     required
                     value={vestedShares}
                     onChange={(e) => setVestedShares(e.target.value)}
-                    className="w-full bg-background border border-border rounded-lg py-2.5 px-3 text-slate-900 dark:text-white text-sm focus:outline-none focus:border-[#00e07a]/50" 
+                    className="w-full bg-background border border-border rounded-lg py-2.5 px-3 text-foreground text-sm focus:outline-none focus:border-[#00e07a]/50" 
                     placeholder="e.g. 2500"
                   />
                 </div>
@@ -686,12 +686,12 @@ export function CompensationAdminContent() {
                   required
                   value={vestingSchedule}
                   onChange={(e) => setVestingSchedule(e.target.value)}
-                  className="w-full bg-background border border-border rounded-lg py-2.5 px-3 text-slate-900 dark:text-white text-sm focus:outline-none focus:border-[#00e07a]/50" 
+                  className="w-full bg-background border border-border rounded-lg py-2.5 px-3 text-foreground text-sm focus:outline-none focus:border-[#00e07a]/50" 
                   placeholder="e.g. 4-year monthly vesting, 1-year cliff"
                 />
               </div>
               <div className="pt-2 flex justify-end gap-3 border-t border-border mt-4">
-                <button type="button" onClick={() => setShowEquityModal(false)} className="px-3 py-1.5 text-muted-foreground hover:text-white text-xs font-semibold">Cancel</button>
+                <button type="button" onClick={() => setShowEquityModal(false)} className="px-3 py-1.5 text-muted-foreground hover:text-foreground text-xs font-semibold">Cancel</button>
                 <button type="submit" disabled={submitting} className="px-4 py-2 bg-[#00e07a] hover:bg-[#00c96a] text-black font-extrabold rounded-lg text-xs transition-colors flex items-center gap-1.5">
                   {submitting && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
                   Save Grant Changes
@@ -707,7 +707,7 @@ export function CompensationAdminContent() {
 
 export function CompensationAdmin() {
   return (
-    <ThemeProvider attribute="data-theme" defaultTheme="dark">
+    <ThemeProvider attribute="data-theme" defaultTheme="system">
       <div className="h-full w-full flex-1 overflow-hidden relative" style={{ isolation: 'isolate' }}>
         <CompensationAdminContent />
       </div>

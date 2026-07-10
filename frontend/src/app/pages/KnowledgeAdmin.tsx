@@ -345,11 +345,11 @@ export function KnowledgeAdmin() {
         ) : error ? (
           <div className="flex flex-col items-center justify-center py-16 px-6 bg-red-500/10 border border-red-500/20 rounded-xl max-w-xl mx-auto text-center space-y-3">
             <AlertCircle className="w-10 h-10 text-red-500" />
-            <h3 className="text-lg font-bold text-slate-900 dark:text-white">Load Error</h3>
+            <h3 className="text-lg font-bold text-foreground">Load Error</h3>
             <p className="text-sm text-muted-foreground">{error}</p>
             <button 
               onClick={fetchData}
-              className="mt-2 px-4 py-2 bg-white/5 hover:bg-accent text-slate-900 dark:text-white rounded-lg text-xs transition-colors border border-border cursor-pointer"
+              className="mt-2 px-4 py-2 bg-card/50 hover:bg-accent text-foreground rounded-lg text-xs transition-colors border border-border cursor-pointer"
             >
               Retry
             </button>
@@ -361,7 +361,7 @@ export function KnowledgeAdmin() {
               <button 
                 onClick={() => setActiveTab("references")}
                 className={`pb-3 px-1 text-sm font-medium transition-colors flex items-center gap-2 cursor-pointer ${
-                  activeTab === "references" ? "text-foreground border-b-2 border-[#00e07a]" : "text-gray-500 hover:text-gray-300"
+                  activeTab === "references" ? "text-foreground border-b-2 border-[#00e07a]" : "text-muted-foreground hover:text-foreground"
                 }`}
               >
                 <BookOpen size={16} /> Labor References ({references.length})
@@ -369,7 +369,7 @@ export function KnowledgeAdmin() {
               <button 
                 onClick={() => setActiveTab("precedents")}
                 className={`pb-3 px-1 text-sm font-medium transition-colors flex items-center gap-2 cursor-pointer ${
-                  activeTab === "precedents" ? "text-foreground border-b-2 border-[#00e07a]" : "text-gray-500 hover:text-gray-300"
+                  activeTab === "precedents" ? "text-foreground border-b-2 border-[#00e07a]" : "text-muted-foreground hover:text-foreground"
                 }`}
               >
                 <Scale size={16} /> Legal Precedents ({precedents.length})
@@ -378,7 +378,7 @@ export function KnowledgeAdmin() {
                 <button 
                   onClick={() => setActiveTab("search_sources")}
                   className={`pb-3 px-1 text-sm font-medium transition-colors flex items-center gap-2 cursor-pointer ${
-                    activeTab === "search_sources" ? "text-foreground border-b-2 border-[#00e07a]" : "text-gray-500 hover:text-gray-300"
+                    activeTab === "search_sources" ? "text-foreground border-b-2 border-[#00e07a]" : "text-muted-foreground hover:text-foreground"
                   }`}
                 >
                   <Compass size={16} /> Search Sources
@@ -391,7 +391,7 @@ export function KnowledgeAdmin() {
               <div className="bg-card text-card-foreground/70 border border-border rounded-xl overflow-hidden shadow-2xl">
                 <div className="overflow-x-auto">
                   <table className="w-full text-left border-collapse">
-                    <thead className="bg-black/25 text-gray-500 text-xs font-semibold uppercase tracking-wider">
+                    <thead className="bg-muted/50 text-muted-foreground text-xs font-semibold uppercase tracking-wider">
                       <tr>
                         <th className="py-4 px-6">Title & Category</th>
                         <th className="py-4 px-6">Summary</th>
@@ -402,17 +402,17 @@ export function KnowledgeAdmin() {
                     </thead>
                     <tbody className="divide-y divide-white/[0.03]">
                       {references.map((ref) => (
-                        <tr key={ref.id} className="hover:bg-white/[0.02] transition-colors">
+                        <tr key={ref.id} className="hover:bg-card/[0.02] transition-colors">
                           <td className="py-4 px-6 max-w-xs">
-                            <div className="text-sm font-bold text-slate-900 dark:text-white leading-tight">{ref.title}</div>
+                            <div className="text-sm font-bold text-foreground leading-tight">{ref.title}</div>
                             <div className="text-[10px] text-cyan-400 font-semibold uppercase mt-1">{ref.category}</div>
                           </td>
                           <td className="py-4 px-6 text-sm text-muted-foreground max-w-md line-clamp-3" title={ref.summary}>
                             {ref.summary}
                           </td>
-                          <td className="py-4 px-6 text-xs text-gray-300">
+                          <td className="py-4 px-6 text-xs text-foreground">
                             <div>{ref.source_type}</div>
-                            {ref.effective_date && <div className="text-gray-500 font-mono mt-0.5">{ref.effective_date}</div>}
+                            {ref.effective_date && <div className="text-muted-foreground font-mono mt-0.5">{ref.effective_date}</div>}
                             {ref.official_url && (
                               <a href={ref.official_url} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 text-cyan-400 hover:underline mt-1">
                                 Link <ExternalLink size={10} />
@@ -444,7 +444,7 @@ export function KnowledgeAdmin() {
                                   </button>
                                 </div>
                               ) : (
-                                <span className="text-xs text-gray-600">—</span>
+                                <span className="text-xs text-muted-foreground">—</span>
                               )}
                             </td>
                           )}
@@ -452,8 +452,8 @@ export function KnowledgeAdmin() {
                       ))}
                       {references.length === 0 && (
                         <tr>
-                          <td colSpan={isSuperAdmin ? 5 : 4} className="py-12 text-center text-gray-500 text-sm">
-                            <Compass className="w-10 h-10 text-gray-600 mx-auto mb-2" />
+                          <td colSpan={isSuperAdmin ? 5 : 4} className="py-12 text-center text-muted-foreground text-sm">
+                            <Compass className="w-10 h-10 text-muted-foreground mx-auto mb-2" />
                             No labor references logged.
                           </td>
                         </tr>
@@ -469,7 +469,7 @@ export function KnowledgeAdmin() {
               <div className="bg-card text-card-foreground/70 border border-border rounded-xl overflow-hidden shadow-2xl">
                 <div className="overflow-x-auto">
                   <table className="w-full text-left border-collapse">
-                    <thead className="bg-black/25 text-gray-500 text-xs font-semibold uppercase tracking-wider">
+                    <thead className="bg-muted/50 text-muted-foreground text-xs font-semibold uppercase tracking-wider">
                       <tr>
                         <th className="py-4 px-6">Jurisprudence</th>
                         <th className="py-4 px-6">Key Principles</th>
@@ -479,13 +479,13 @@ export function KnowledgeAdmin() {
                     </thead>
                     <tbody className="divide-y divide-white/[0.03]">
                       {precedents.map((prec) => (
-                        <tr key={prec.id} className="hover:bg-white/[0.02] transition-colors">
+                        <tr key={prec.id} className="hover:bg-card/[0.02] transition-colors">
                           <td className="py-4 px-6 max-w-xs">
-                            <div className="text-sm font-bold text-slate-900 dark:text-white leading-tight">{prec.title}</div>
-                            <div className="text-[10px] text-gray-500 font-mono mt-1">{prec.source_reference}</div>
+                            <div className="text-sm font-bold text-foreground leading-tight">{prec.title}</div>
+                            <div className="text-[10px] text-muted-foreground font-mono mt-1">{prec.source_reference}</div>
                             <div className="text-xs text-muted-foreground mt-2 line-clamp-3">{prec.summary}</div>
                           </td>
-                          <td className="py-4 px-6 text-sm text-gray-300 max-w-xs font-sans" title={prec.key_principles}>
+                          <td className="py-4 px-6 text-sm text-foreground max-w-xs font-sans" title={prec.key_principles}>
                             <p className="line-clamp-4">{prec.key_principles}</p>
                           </td>
                           <td className="py-4 px-6 text-xs text-muted-foreground max-w-xs font-sans" title={prec.recommended_process}>
@@ -500,8 +500,8 @@ export function KnowledgeAdmin() {
                       ))}
                       {precedents.length === 0 && (
                         <tr>
-                          <td colSpan={4} className="py-12 text-center text-gray-500 text-sm">
-                            <Compass className="w-10 h-10 text-gray-600 mx-auto mb-2" />
+                          <td colSpan={4} className="py-12 text-center text-muted-foreground text-sm">
+                            <Compass className="w-10 h-10 text-muted-foreground mx-auto mb-2" />
                             No precedents logged.
                           </td>
                         </tr>
@@ -520,7 +520,7 @@ export function KnowledgeAdmin() {
                 <div className="bg-card text-card-foreground/70 border border-border p-6 rounded-2xl shadow-xl space-y-4">
                   <div className="flex items-center gap-2 mb-2">
                     <Globe size={18} className="text-[#00e07a]" />
-                    <h3 className="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-wider">Search Authoritative Web Corpus</h3>
+                    <h3 className="text-sm font-bold text-foreground uppercase tracking-wider">Search Authoritative Web Corpus</h3>
                   </div>
 
                   <form onSubmit={handleSearchSources} className="space-y-4">
@@ -528,14 +528,14 @@ export function KnowledgeAdmin() {
                       <div>
                         <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-1.5">Query / Topic</label>
                         <div className="relative">
-                          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" size={14} />
+                          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={14} />
                           <input 
                             type="text"
                             required
                             placeholder="e.g. Twin notice rule termination procedure..."
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
-                            className="w-full bg-background border border-border rounded-lg py-2.5 pl-9 pr-3 text-slate-900 dark:text-white text-sm focus:outline-none focus:border-[#00e07a]/50"
+                            className="w-full bg-background border border-border rounded-lg py-2.5 pl-9 pr-3 text-foreground text-sm focus:outline-none focus:border-[#00e07a]/50"
                           />
                         </div>
                       </div>
@@ -546,7 +546,7 @@ export function KnowledgeAdmin() {
                           placeholder="e.g. Dismissals, Maternity, Overtime Pay..."
                           value={searchCategory}
                           onChange={(e) => setSearchCategory(e.target.value)}
-                          className="w-full bg-background border border-border rounded-lg py-2.5 px-3 text-slate-900 dark:text-white text-sm focus:outline-none focus:border-[#00e07a]/50"
+                          className="w-full bg-background border border-border rounded-lg py-2.5 px-3 text-foreground text-sm focus:outline-none focus:border-[#00e07a]/50"
                         />
                       </div>
                     </div>
@@ -563,7 +563,7 @@ export function KnowledgeAdmin() {
                               className={`flex items-center gap-2 px-3 py-2 border rounded-xl cursor-pointer select-none transition-all text-xs ${
                                 checked 
                                   ? "bg-[#00e07a]/10 border-[#00e07a]/35 text-[#00e07a]" 
-                                  : "bg-black/10 border-border text-muted-foreground hover:text-foreground"
+                                  : "bg-muted/30 border-border text-muted-foreground hover:text-foreground"
                               }`}
                             >
                               <input 
@@ -616,7 +616,7 @@ export function KnowledgeAdmin() {
                 {/* Candidate List Cards */}
                 {candidates.length > 0 && (
                   <div className="space-y-4">
-                    <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider">Candidate Documents Retrieved</h3>
+                    <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Candidate Documents Retrieved</h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       {candidates.map((cand, idx) => (
                         <div key={idx} className="bg-card text-card-foreground/70 border border-border rounded-2xl p-5 flex flex-col justify-between hover:border-border transition-all relative overflow-hidden">
@@ -633,9 +633,9 @@ export function KnowledgeAdmin() {
                               <span className="px-2 py-0.5 bg-purple-500/10 text-purple-400 border border-purple-500/20 rounded text-[9px] font-bold uppercase">
                                 {cand.suggested_category || cand.category || "General"}
                               </span>
-                              <span className="text-[10px] font-bold text-gray-500 font-mono uppercase">{cand.entry_type || "reference"}</span>
+                              <span className="text-[10px] font-bold text-muted-foreground font-mono uppercase">{cand.entry_type || "reference"}</span>
                             </div>
-                            <h4 className="text-sm font-bold text-slate-900 dark:text-white leading-snug">{cand.title}</h4>
+                            <h4 className="text-sm font-bold text-foreground leading-snug">{cand.title}</h4>
                             <p className="text-xs text-muted-foreground leading-relaxed font-sans">{cand.summary}</p>
                           </div>
 
@@ -650,7 +650,7 @@ export function KnowledgeAdmin() {
                                 Source Link <ExternalLink size={12} />
                               </a>
                             ) : (
-                              <span className="text-xs text-gray-600">No URL</span>
+                              <span className="text-xs text-muted-foreground">No URL</span>
                             )}
 
                             <button
@@ -682,8 +682,8 @@ export function KnowledgeAdmin() {
       {showAddModal && (
         <div className="fixed inset-0 bg-black/75 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <div className="bg-card text-card-foreground border border-border rounded-xl w-full max-w-lg shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200 text-foreground">
-            <div className="p-5 border-b border-border flex justify-between items-center bg-black/10">
-              <h3 className="text-base font-bold text-slate-900 dark:text-white uppercase tracking-wider">Add Knowledge Entry</h3>
+            <div className="p-5 border-b border-border flex justify-between items-center bg-muted/30">
+              <h3 className="text-base font-bold text-foreground uppercase tracking-wider">Add Knowledge Entry</h3>
               <button 
                 onClick={() => setShowAddModal(false)} 
                 className="text-muted-foreground hover:text-foreground text-xl leading-none cursor-pointer"
@@ -733,7 +733,7 @@ export function KnowledgeAdmin() {
                   required
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
-                  className="w-full bg-background border border-border rounded-lg py-2 px-3 text-slate-900 dark:text-white text-sm focus:outline-none focus:border-[#00e07a]/50" 
+                  className="w-full bg-background border border-border rounded-lg py-2 px-3 text-foreground text-sm focus:outline-none focus:border-[#00e07a]/50" 
                   placeholder="e.g. DOLE Advisory No. 17-15"
                 />
               </div>
@@ -745,7 +745,7 @@ export function KnowledgeAdmin() {
                   value={summary}
                   onChange={(e) => setSummary(e.target.value)}
                   rows={4}
-                  className="w-full bg-background border border-border rounded-lg py-2 px-3 text-slate-900 dark:text-white text-sm focus:outline-none focus:border-[#00e07a]/50 resize-none font-sans" 
+                  className="w-full bg-background border border-border rounded-lg py-2 px-3 text-foreground text-sm focus:outline-none focus:border-[#00e07a]/50 resize-none font-sans" 
                   placeholder="Summarize the core guidelines or implications of this advisory..."
                 ></textarea>
               </div>
@@ -761,7 +761,7 @@ export function KnowledgeAdmin() {
                         required
                         value={category}
                         onChange={(e) => setCategory(e.target.value)}
-                        className="w-full bg-background border border-border rounded-lg py-2 px-3 text-slate-900 dark:text-white text-sm focus:outline-none focus:border-[#00e07a]/50" 
+                        className="w-full bg-background border border-border rounded-lg py-2 px-3 text-foreground text-sm focus:outline-none focus:border-[#00e07a]/50" 
                         placeholder="e.g. Contracting / Subcontracting"
                       />
                     </div>
@@ -772,7 +772,7 @@ export function KnowledgeAdmin() {
                         required
                         value={sourceType}
                         onChange={(e) => setSourceType(e.target.value)}
-                        className="w-full bg-background border border-border rounded-lg py-2 px-3 text-slate-900 dark:text-white text-sm focus:outline-none focus:border-[#00e07a]/50" 
+                        className="w-full bg-background border border-border rounded-lg py-2 px-3 text-foreground text-sm focus:outline-none focus:border-[#00e07a]/50" 
                         placeholder="e.g. DOLE Advisory"
                       />
                     </div>
@@ -785,7 +785,7 @@ export function KnowledgeAdmin() {
                         type="url" 
                         value={officialUrl}
                         onChange={(e) => setOfficialUrl(e.target.value)}
-                        className="w-full bg-background border border-border rounded-lg py-2 px-3 text-slate-900 dark:text-white text-sm focus:outline-none focus:border-[#00e07a]/50" 
+                        className="w-full bg-background border border-border rounded-lg py-2 px-3 text-foreground text-sm focus:outline-none focus:border-[#00e07a]/50" 
                         placeholder="https://..."
                       />
                     </div>
@@ -795,7 +795,7 @@ export function KnowledgeAdmin() {
                         type="date" 
                         value={effectiveDate}
                         onChange={(e) => setEffectiveDate(e.target.value)}
-                        className="w-full bg-background border border-border rounded-lg py-2 px-3 text-slate-900 dark:text-white text-sm focus:outline-none focus:border-[#00e07a]/50 [color-scheme:dark]" 
+                        className="w-full bg-background border border-border rounded-lg py-2 px-3 text-foreground text-sm focus:outline-none focus:border-[#00e07a]/50 [color-scheme:dark]" 
                       />
                     </div>
                   </div>
@@ -813,7 +813,7 @@ export function KnowledgeAdmin() {
                         required
                         value={caseType}
                         onChange={(e) => setCaseType(e.target.value)}
-                        className="w-full bg-background border border-border rounded-lg py-2 px-3 text-slate-900 dark:text-white text-sm focus:outline-none focus:border-[#00e07a]/50" 
+                        className="w-full bg-background border border-border rounded-lg py-2 px-3 text-foreground text-sm focus:outline-none focus:border-[#00e07a]/50" 
                         placeholder="e.g. SC Jurisprudence"
                       />
                     </div>
@@ -822,7 +822,7 @@ export function KnowledgeAdmin() {
                       <select 
                         value={riskLevel}
                         onChange={(e) => setRiskLevel(e.target.value as any)}
-                        className="w-full bg-background border border-border rounded-lg py-2 px-3 text-slate-900 dark:text-white text-sm focus:outline-none focus:border-[#00e07a]/50"
+                        className="w-full bg-background border border-border rounded-lg py-2 px-3 text-foreground text-sm focus:outline-none focus:border-[#00e07a]/50"
                       >
                         <option value="Low">Low</option>
                         <option value="Medium">Medium</option>
@@ -839,7 +839,7 @@ export function KnowledgeAdmin() {
                       required
                       value={sourceReference}
                       onChange={(e) => setSourceReference(e.target.value)}
-                      className="w-full bg-background border border-border rounded-lg py-2 px-3 text-slate-900 dark:text-white text-sm focus:outline-none focus:border-[#00e07a]/50" 
+                      className="w-full bg-background border border-border rounded-lg py-2 px-3 text-foreground text-sm focus:outline-none focus:border-[#00e07a]/50" 
                       placeholder="e.g. G.R. No. 123456 (2020)"
                     />
                   </div>
@@ -851,7 +851,7 @@ export function KnowledgeAdmin() {
                       value={keyPrinciples}
                       onChange={(e) => setKeyPrinciples(e.target.value)}
                       rows={2}
-                      className="w-full bg-background border border-border rounded-lg py-2 px-3 text-slate-900 dark:text-white text-sm focus:outline-none focus:border-[#00e07a]/50 resize-none font-sans" 
+                      className="w-full bg-background border border-border rounded-lg py-2 px-3 text-foreground text-sm focus:outline-none focus:border-[#00e07a]/50 resize-none font-sans" 
                       placeholder="Core legal standards established by the SC in this case..."
                     ></textarea>
                   </div>
@@ -863,7 +863,7 @@ export function KnowledgeAdmin() {
                       value={recommendedProcess}
                       onChange={(e) => setRecommendedProcess(e.target.value)}
                       rows={2}
-                      className="w-full bg-background border border-border rounded-lg py-2 px-3 text-slate-900 dark:text-white text-sm focus:outline-none focus:border-[#00e07a]/50 resize-none font-sans" 
+                      className="w-full bg-background border border-border rounded-lg py-2 px-3 text-foreground text-sm focus:outline-none focus:border-[#00e07a]/50 resize-none font-sans" 
                       placeholder="What should HR do operationally based on this ruling..."
                     ></textarea>
                   </div>

@@ -344,7 +344,7 @@ export function ELRPipelineBoard() {
   });
 
   return (
-    <main className="flex-1 flex flex-col h-full bg-[#f4f6f8] dark:bg-[#06070a] text-foreground overflow-hidden transition-colors duration-300 relative">
+    <main className="flex-1 flex flex-col h-full bg-[#f4f6f8] dark:bg-background text-foreground overflow-hidden transition-colors duration-300 relative">
       
       {/* Header */}
       <div className="flex-none px-6 py-4 border-b border-border bg-card/50 backdrop-blur-md flex items-center justify-between">
@@ -384,7 +384,7 @@ export function ELRPipelineBoard() {
       </div>
 
       {/* Filter Bar */}
-      <div className="flex-none px-6 py-3 border-b border-border bg-gray-50/50 dark:bg-black/20 flex flex-wrap gap-4 items-center">
+      <div className="flex-none px-6 py-3 border-b border-border bg-muted/50/50 dark:bg-black/20 flex flex-wrap gap-4 items-center">
         <div className="relative">
           <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
           <input 
@@ -431,7 +431,7 @@ export function ELRPipelineBoard() {
             <p>{error}</p>
           </div>
         ) : stages.length === 0 ? (
-          <div className="flex-1 flex items-center justify-center text-gray-500">
+          <div className="flex-1 flex items-center justify-center text-muted-foreground">
             No stages configured for this pipeline.
           </div>
         ) : (
@@ -445,10 +445,10 @@ export function ELRPipelineBoard() {
                 onDrop={(e) => handleDrop(e, stage.id)}
               >
                 {/* Column Header */}
-                <div className="p-3 border-b border-border flex justify-between items-center bg-white/50 dark:bg-[#161922]/50 rounded-t-xl">
+                <div className="p-3 border-b border-border flex justify-between items-center bg-card/50 dark:bg-card/50 rounded-t-xl">
                   <div className="flex items-center gap-2">
                     <h3 className="font-bold text-sm tracking-tight text-slate-800 dark:text-white uppercase">{stage.name}</h3>
-                    <span className="bg-accent text-xs font-mono px-2 py-0.5 rounded-full text-slate-600 dark:text-gray-400">
+                    <span className="bg-accent text-xs font-mono px-2 py-0.5 rounded-full text-slate-600 dark:text-muted-foreground">
                       {grouped[stage.id].length}
                     </span>
                   </div>
@@ -468,9 +468,9 @@ export function ELRPipelineBoard() {
                       className="bg-card border border-border hover:border-[#00e07a]/50 rounded-lg p-4 cursor-grab active:cursor-grabbing shadow-sm hover:shadow-md transition-all group"
                     >
                       <div className="flex justify-between items-start mb-2">
-                        <span className="font-bold text-sm text-slate-900 dark:text-white group-hover:text-[#00e07a] transition-colors">{card.full_name}</span>
+                        <span className="font-bold text-sm text-foreground group-hover:text-[#00e07a] transition-colors">{card.full_name}</span>
                       </div>
-                      <div className="text-xs text-gray-500 font-mono mb-3">
+                      <div className="text-xs text-muted-foreground font-mono mb-3">
                         {card.employee_id} • {card.department}
                       </div>
                       <div className="flex justify-between items-center pt-3 border-t border-gray-100 dark:border-white/5">
@@ -497,8 +497,8 @@ export function ELRPipelineBoard() {
         <div className="absolute inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-card border border-border rounded-xl w-full max-w-lg shadow-2xl overflow-hidden flex flex-col max-h-[80vh]">
             <div className="p-4 border-b border-border flex justify-between items-center bg-muted">
-              <h3 className="font-bold text-slate-900 dark:text-white flex items-center gap-2"><Settings size={16} className="text-[#00e07a]" /> Manage Phases</h3>
-              <button onClick={() => setShowManagePhases(false)} className="text-gray-400 hover:text-foreground"><X size={18} /></button>
+              <h3 className="font-bold text-foreground flex items-center gap-2"><Settings size={16} className="text-[#00e07a]" /> Manage Phases</h3>
+              <button onClick={() => setShowManagePhases(false)} className="text-muted-foreground hover:text-foreground"><X size={18} /></button>
             </div>
             
             <div className="p-5 overflow-y-auto flex-1 space-y-3">
@@ -556,7 +556,7 @@ export function ELRPipelineBoard() {
 
             <div className="p-4 border-t border-border bg-muted flex flex-col gap-3">
               <div className="flex justify-between items-center w-full mb-2">
-                <span className="text-xs text-gray-500">Drag to reorder, then click Save.</span>
+                <span className="text-xs text-muted-foreground">Drag to reorder, then click Save.</span>
                 <button 
                   onClick={handleSaveOrder}
                   className="px-4 py-1.5 bg-accent hover:bg-accent text-slate-800 dark:text-white font-semibold rounded-lg text-sm transition-colors whitespace-nowrap"
@@ -591,7 +591,7 @@ export function ELRPipelineBoard() {
           <div className="bg-card border border-border rounded-xl w-full max-w-sm shadow-2xl overflow-hidden">
             <div className="p-4 border-b border-border flex justify-between items-center bg-muted">
               <h3 className="font-bold text-foreground">Create Case</h3>
-              <button onClick={() => setShowAddCard(false)} className="text-gray-400 hover:text-foreground"><X size={18} /></button>
+              <button onClick={() => setShowAddCard(false)} className="text-muted-foreground hover:text-foreground"><X size={18} /></button>
             </div>
             <form onSubmit={handleAddCard} className="p-5 space-y-4">
               <div>
@@ -632,11 +632,11 @@ export function ELRPipelineBoard() {
         <div className="absolute inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-card border border-border rounded-xl w-full max-w-sm shadow-2xl overflow-hidden animate-in fade-in zoom-in-95">
             <div className="p-4 border-b border-border flex justify-between items-center bg-muted">
-              <h3 className="font-bold text-slate-900 dark:text-white flex items-center gap-2"><FileText size={16} className="text-[#00e07a]" /> Stage Requires Details</h3>
-              <button onClick={() => { setShowTransitionModal(false); setPendingMove(null); }} className="text-gray-400 hover:text-foreground"><X size={18} /></button>
+              <h3 className="font-bold text-foreground flex items-center gap-2"><FileText size={16} className="text-[#00e07a]" /> Stage Requires Details</h3>
+              <button onClick={() => { setShowTransitionModal(false); setPendingMove(null); }} className="text-muted-foreground hover:text-foreground"><X size={18} /></button>
             </div>
             <div className="p-5 space-y-4">
-              <p className="text-xs text-gray-500 mb-2">This stage auto-generates a document. Please provide any required dynamic fields:</p>
+              <p className="text-xs text-muted-foreground mb-2">This stage auto-generates a document. Please provide any required dynamic fields:</p>
               
               <div>
                 <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">AWOL Start Date</label>

@@ -48,20 +48,20 @@ export function ManagerApprovals() {
     }
   };
 
-  if (loading) return <div className="text-slate-900 dark:text-white p-8">Loading...</div>;
+  if (loading) return <div className="text-foreground p-8">Loading...</div>;
 
   return (
-    <div className="flex-1 overflow-auto bg-[#06070a] text-slate-900 dark:text-white p-8 space-y-8">
+    <div className="flex-1 overflow-auto bg-background text-foreground p-8 space-y-8">
       <div>
         <h1 className="text-3xl font-bold bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent mb-2" style={{ fontFamily: "'Outfit', 'Inter', sans-serif" }}>
           Timesheet Approvals
         </h1>
-        <p className="text-gray-400 text-sm">Review and approve employee timesheets across your organization.</p>
+        <p className="text-muted-foreground text-sm">Review and approve employee timesheets across your organization.</p>
       </div>
 
-      <div className="bg-[#0d0f19] border border-white/[0.04] rounded-2xl overflow-hidden">
-        <table className="w-full text-left text-sm text-gray-400">
-          <thead className="text-xs uppercase bg-white/[0.02] border-b border-white/[0.04]">
+      <div className="bg-card border border-border rounded-2xl overflow-hidden">
+        <table className="w-full text-left text-sm text-muted-foreground">
+          <thead className="text-xs uppercase bg-card/[0.02] border-b border-border">
             <tr>
               <th className="px-6 py-4 font-medium">Employee</th>
               <th className="px-6 py-4 font-medium">Date</th>
@@ -73,14 +73,14 @@ export function ManagerApprovals() {
           </thead>
           <tbody className="divide-y divide-white/[0.04]">
             {logs.map((log) => (
-              <tr key={log.id} className="hover:bg-white/[0.02] transition-colors">
+              <tr key={log.id} className="hover:bg-card/[0.02] transition-colors">
                 <td className="px-6 py-4">
                   <div className="flex flex-col">
-                    <span className="text-slate-900 dark:text-white font-medium">{log.full_name}</span>
-                    <span className="text-xs text-gray-500">{log.department}</span>
+                    <span className="text-foreground font-medium">{log.full_name}</span>
+                    <span className="text-xs text-muted-foreground">{log.department}</span>
                   </div>
                 </td>
-                <td className="px-6 py-4 text-slate-900 dark:text-white">
+                <td className="px-6 py-4 text-foreground">
                   {new Date(log.time_in).toLocaleDateString()}
                 </td>
                 <td className="px-6 py-4">
@@ -112,12 +112,12 @@ export function ManagerApprovals() {
             ))}
             {logs.length === 0 && (
               <tr>
-                <td colSpan={6} className="px-6 py-12 text-center text-gray-500">
+                <td colSpan={6} className="px-6 py-12 text-center text-muted-foreground">
                   <div className="flex flex-col items-center justify-center">
                     <div className="w-12 h-12 rounded-full bg-emerald-500/10 flex items-center justify-center mb-4">
                       <CheckCircle className="text-emerald-500 w-6 h-6" />
                     </div>
-                    <p className="text-base text-gray-300 font-medium">All Caught Up!</p>
+                    <p className="text-base text-foreground font-medium">All Caught Up!</p>
                     <p className="text-sm mt-1">There are no pending timesheets to approve.</p>
                   </div>
                 </td>

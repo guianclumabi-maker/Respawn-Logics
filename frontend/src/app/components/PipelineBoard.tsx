@@ -110,8 +110,8 @@ function LoadingSkeleton() {
   return (
     <div className="space-y-4 p-8 animate-pulse">
       <div className="h-8 bg-secondary rounded-xl w-64" />
-      <div className="h-5 bg-white/[0.03] rounded-lg w-44" />
-      <div className="flex gap-3 mt-6">{[...Array(7)].map((_, i) => <div key={i} className="h-16 w-20 bg-white/[0.03] rounded-xl" />)}</div>
+      <div className="h-5 bg-card/[0.03] rounded-lg w-44" />
+      <div className="flex gap-3 mt-6">{[...Array(7)].map((_, i) => <div key={i} className="h-16 w-20 bg-card/[0.03] rounded-xl" />)}</div>
       <div className="h-[400px] bg-muted rounded-2xl mt-4 border border-border" />
     </div>
   );
@@ -191,7 +191,7 @@ function KanbanCard({ app, onClick }: { app: Application; onClick: () => void })
   return (
     <div draggable onDragStart={e => { e.dataTransfer.setData("text/plain", app.id.toString()); e.dataTransfer.effectAllowed = "move"; }}
       onClick={onClick}
-      className="bg-card border border-border rounded-xl p-3.5 cursor-grab hover:border-[#9b6dff]/40 hover:bg-purple-500/5 dark:hover:bg-[#141929] hover:shadow-[0_0_12px_rgba(155,109,255,0.08)] transition-all group">
+      className="bg-card border border-border rounded-xl p-3.5 cursor-grab hover:border-[#9b6dff]/40 hover:bg-purple-500/5 dark:hover:bg-card hover:shadow-[0_0_12px_rgba(155,109,255,0.08)] transition-all group">
       <div className="flex items-start justify-between mb-1.5">
         <span className="text-xs font-bold text-foreground group-hover:text-primary transition-colors truncate flex-1">{app.name}</span>
         <div className="flex items-center gap-1 ml-1.5"><SourceIcon source={app.source || app.candidate_source || ""} /></div>
@@ -254,16 +254,16 @@ function BulkBar({ count, onAdvance, onReject, onDelete }: {
   return (
     <div className="fixed bottom-10 left-1/2 -translate-x-1/2 z-50 flex items-center gap-6 px-8 py-4 rounded-[2rem] border border-[#00e07a]/30 bg-background/95 backdrop-blur-2xl shadow-[0_20px_50px_rgba(0,224,122,0.15)] font-mono text-sm">
       <span className="text-muted-foreground whitespace-nowrap"><span className="font-bold text-primary text-base">{count}</span> CANDIDATES SELECTED</span>
-      <div className="w-px h-6 bg-white/10" />
+      <div className="w-px h-6 bg-card/10" />
       <div className="relative">
         <button onClick={() => setShowStages(s => !s)} className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold bg-[#9b6dff]/10 border border-[#9b6dff]/20 text-[#9b6dff] hover:bg-[#9b6dff]/20 hover:shadow-[0_0_15px_rgba(155,109,255,0.2)] transition-all cursor-pointer whitespace-nowrap border-0">
           [ ADVANCE STAGE ] <ChevronDown size={14} />
         </button>
         {showStages && (
-          <div className="absolute bottom-full mb-3 left-0 w-48 bg-[#0d0f19] border border-border rounded-xl shadow-2xl z-50 py-2">
+          <div className="absolute bottom-full mb-3 left-0 w-48 bg-card border border-border rounded-xl shadow-2xl z-50 py-2">
             {STAGES.map(s => (
               <button key={s} onClick={() => { onAdvance(s); setShowStages(false); }}
-                className="w-full text-left px-4 py-2.5 text-xs font-bold text-gray-300 hover:bg-accent transition-colors cursor-pointer border-0 bg-transparent">{s}</button>
+                className="w-full text-left px-4 py-2.5 text-xs font-bold text-foreground hover:bg-accent transition-colors cursor-pointer border-0 bg-transparent">{s}</button>
             ))}
           </div>
         )}
@@ -685,13 +685,13 @@ export function PipelineBoard({ onViewChange, jobId }: Props) {
           </div>
           <div className="flex items-center gap-2 font-mono flex-shrink-0">
             {/* View toggle */}
-            <div className="flex items-center rounded-xl border border-border overflow-hidden bg-white/[0.01]">
+            <div className="flex items-center rounded-xl border border-border overflow-hidden bg-card/[0.01]">
               <button onClick={() => setViewMode("table")}
-                className={`flex items-center gap-1.5 px-3 py-2 text-[10px] font-bold transition-all cursor-pointer border-0 ${viewMode === "table" ? "bg-[#00e07a]/10 border-r border-[#00e07a]/20 text-primary" : "text-muted-foreground hover:text-gray-300 border-r border-border bg-transparent"}`}>
+                className={`flex items-center gap-1.5 px-3 py-2 text-[10px] font-bold transition-all cursor-pointer border-0 ${viewMode === "table" ? "bg-[#00e07a]/10 border-r border-[#00e07a]/20 text-primary" : "text-muted-foreground hover:text-foreground border-r border-border bg-transparent"}`}>
                 <LayoutList size={14} /> [ HUD TABLE ]
               </button>
               <button onClick={() => setViewMode("kanban")}
-                className={`flex items-center gap-1.5 px-3 py-2 text-[10px] font-bold transition-all cursor-pointer border-0 ${viewMode === "kanban" ? "bg-[#00e07a]/10 text-primary" : "text-muted-foreground hover:text-gray-300 bg-transparent"}`}>
+                className={`flex items-center gap-1.5 px-3 py-2 text-[10px] font-bold transition-all cursor-pointer border-0 ${viewMode === "kanban" ? "bg-[#00e07a]/10 text-primary" : "text-muted-foreground hover:text-foreground bg-transparent"}`}>
                 <Columns3 size={14} /> [ HUD KANBAN ]
               </button>
             </div>
