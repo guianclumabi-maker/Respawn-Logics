@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { apiFetch } from "../../../../lib/apiClient";
 import { useState, useEffect } from "react";
 import { 
@@ -50,7 +49,7 @@ export function InsightsPage({ onViewChange }: InsightsPageProps) {
     const height = 120; // 30 to 150
     
     let pathStr = "";
-    const points = [];
+    const points: any[] = [];
     
     trendData.forEach((d, i) => {
       const cx = 50 + (i * spacing);

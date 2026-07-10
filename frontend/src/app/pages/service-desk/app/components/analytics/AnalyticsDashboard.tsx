@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { Ticket } from "../tickets/data";
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, BarChart, Bar, PieChart, Pie, Cell } from "recharts";
 import { Clock, AlertTriangle, CheckCircle, Activity } from "lucide-react";

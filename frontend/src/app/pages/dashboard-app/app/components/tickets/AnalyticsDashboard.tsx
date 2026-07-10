@@ -6,7 +6,6 @@ interface Props {
   tickets: Ticket[];
 }
 
-// @ts-nocheck
 import { useState, useMemo } from "react";
 
 // Colors for categories
