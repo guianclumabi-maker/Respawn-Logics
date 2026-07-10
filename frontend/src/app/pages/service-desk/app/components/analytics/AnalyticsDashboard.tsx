@@ -115,7 +115,7 @@ export function AnalyticsDashboard({ tickets }: AnalyticsProps) {
                 </defs>
                 <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: "#4b5a6e" }} dy={10} />
                 <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: "#4b5a6e" }} dx={-10} />
-                <Tooltip contentStyle={{ background: "#0f1422", border: "1px solid rgba(0,224,122,0.2)", borderRadius: "8px" }} />
+                <Tooltip contentStyle={{ background: "var(--card)", border: "1px solid rgba(0,224,122,0.2)", borderRadius: "8px", color: "var(--foreground)" }} />
                 <Area type="monotone" dataKey="created" stroke="#00e07a" fillOpacity={1} fill="url(#colorCreated)" />
                 <Area type="monotone" dataKey="resolved" stroke="#00b8ff" fillOpacity={1} fill="url(#colorResolved)" />
               </AreaChart>
@@ -134,7 +134,7 @@ export function AnalyticsDashboard({ tickets }: AnalyticsProps) {
                     <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                   ))}
                 </Pie>
-                <Tooltip contentStyle={{ background: "#0f1422", border: "1px solid rgba(0,224,122,0.2)", borderRadius: "8px" }} />
+                <Tooltip contentStyle={{ background: "var(--card)", border: "1px solid rgba(0,224,122,0.2)", borderRadius: "8px", color: "var(--foreground)" }} />
               </PieChart>
             </ResponsiveContainer>
           </div>
@@ -150,7 +150,7 @@ export function AnalyticsDashboard({ tickets }: AnalyticsProps) {
               <BarChart data={categoryData} layout="vertical" margin={{ left: 0, right: 0 }}>
                 <XAxis type="number" hide />
                 <YAxis dataKey="name" type="category" axisLine={false} tickLine={false} width={200} tick={{ fontSize: 11, fill: "#f0f4ff" }} />
-                <Tooltip cursor={{ fill: "rgba(255,255,255,0.02)" }} contentStyle={{ background: "#0f1422", border: "1px solid rgba(0,224,122,0.2)", borderRadius: "8px" }} />
+                <Tooltip cursor={{ fill: "rgba(255,255,255,0.02)" }} contentStyle={{ background: "var(--card)", border: "1px solid rgba(0,224,122,0.2)", borderRadius: "8px", color: "var(--foreground)" }} />
                 <Bar dataKey="value" fill="#00b8ff" radius={[0, 4, 4, 0]} barSize={6} />
               </BarChart>
             </ResponsiveContainer>

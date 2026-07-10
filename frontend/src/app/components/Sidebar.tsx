@@ -326,7 +326,7 @@ export function Sidebar({ activeView, onViewChange, badges = {} }: SidebarProps)
             {section.title && collapsed && (
               <HoverCard openDelay={0} closeDelay={0}>
                 <HoverCardTrigger asChild>
-                  <button className="w-10 h-10 mx-auto flex items-center justify-center text-slate-400 hover:bg-slate-100 hover:text-slate-900 dark:hover:bg-white/10 dark:hover:text-white rounded-lg transition-colors cursor-pointer mb-3">
+                  <button className="w-10 h-10 mx-auto flex items-center justify-center text-muted-foreground hover:bg-slate-100 hover:text-slate-900 dark:hover:bg-card/10 dark:hover:text-foreground rounded-lg transition-colors cursor-pointer mb-3">
                     {section.icon}
                   </button>
                 </HoverCardTrigger>
@@ -357,7 +357,7 @@ export function Sidebar({ activeView, onViewChange, badges = {} }: SidebarProps)
                           }}
                           className={`
                             w-full flex items-center gap-3 px-[12px] py-2.5 rounded-lg transition-all duration-200 justify-start
-                            ${active ? "bg-primary/10 text-primary font-semibold dark:bg-[#00e07a]/10 dark:text-[#00e07a]" : "text-slate-600 dark:text-slate-400 hover:bg-slate-100 hover:text-slate-900 dark:hover:bg-white/5 dark:hover:text-white"}
+                            ${active ? "bg-primary/10 text-primary font-semibold dark:bg-[#00e07a]/10 dark:text-[#00e07a]" : "text-slate-600 dark:text-muted-foreground hover:bg-slate-100 hover:text-slate-900 dark:hover:bg-card/50 dark:hover:text-foreground"}
                           `}
                         >
                           <div className="flex-shrink-0 transition-transform duration-200 hover:scale-110" style={{ color: item.color || (active ? 'inherit' : '') }}>
@@ -382,12 +382,12 @@ export function Sidebar({ activeView, onViewChange, badges = {} }: SidebarProps)
                 className="w-full flex items-center justify-between pl-[12px] pr-2 mb-1.5 cursor-pointer group"
               >
                 <p
-                  className="text-[0.75rem] font-bold text-muted-foreground dark:text-muted-foreground tracking-[1px] uppercase group-hover:text-slate-700 dark:group-hover:text-slate-300 transition-colors"
+                  className="text-[0.75rem] font-bold text-muted-foreground dark:text-muted-foreground tracking-[1px] uppercase group-hover:text-slate-700 dark:group-hover:text-foreground transition-colors"
                   style={{ fontFamily: "'Space Grotesk', sans-serif" }}
                 >
                   {section.title}
                 </p>
-                <span className="text-muted-foreground group-hover:text-slate-700 dark:group-hover:text-slate-300 transition-colors">
+                <span className="text-muted-foreground group-hover:text-slate-700 dark:group-hover:text-foreground transition-colors">
                   {isSectionCollapsed ? <ChevronRight size={14} /> : <ChevronDown size={14} />}
                 </span>
               </button>
@@ -425,7 +425,7 @@ export function Sidebar({ activeView, onViewChange, badges = {} }: SidebarProps)
                             ${
                               active
                                 ? "bg-primary/10 text-primary font-semibold dark:bg-[#00e07a]/10 dark:text-[#00e07a]"
-                                : "text-muted-foreground hover:bg-slate-100 hover:text-slate-900 dark:hover:bg-white/5 dark:hover:text-white"
+                                : "text-muted-foreground hover:bg-slate-100 hover:text-slate-900 dark:hover:bg-card/50 dark:hover:text-foreground"
                             }
                           `}
                         >

@@ -40,7 +40,7 @@ export function RunTab({ view }: RunTabProps) {
               <button className="btn btn-secondary"><Filter size={16}/> Filter</button>
               <div className="search-bar">
                 <Search size={16} className="text-muted" />
-                <input type="text" placeholder="Search origins..." className="bg-transparent border-none text-slate-900 dark:text-white outline-none" />
+                <input type="text" placeholder="Search origins..." className="bg-transparent border-none text-foreground outline-none" />
               </div>
             </div>
           </div>
@@ -95,7 +95,7 @@ export function RunTab({ view }: RunTabProps) {
           </div>
           <div className="flex gap-2">
             <button className="btn btn-secondary">Export Log</button>
-            <button className="btn btn-primary bg-red-600 hover:bg-red-700 shadow-none text-slate-900 dark:text-white">Resolve Selected</button>
+            <button className="btn btn-primary bg-red-600 hover:bg-red-700 shadow-none text-foreground">Resolve Selected</button>
           </div>
         </div>
 
@@ -224,7 +224,7 @@ export function RunTab({ view }: RunTabProps) {
                </div>
             </div>
             
-            <div className="card w-full max-w-3xl bg-white text-slate-900">
+            <div className="card w-full max-w-3xl bg-card text-slate-900">
               <div className="flex justify-between items-start border-b border-slate-200 pb-6 mb-6">
                 <div>
                   <h1 className="text-3xl font-bold text-slate-800 tracking-tight">PAYSLIP</h1>
@@ -378,7 +378,7 @@ export function RunTab({ view }: RunTabProps) {
         <div className="flex justify-between items-center mb-6">
           <div>
             <h2 className="text-2xl font-bold">Employee Compensation</h2>
-            <p className="text-muted mt-1">Viewing salary history for: <strong className="text-slate-900 dark:text-white">{compData.employeeName} ({compData.employeeId})</strong></p>
+            <p className="text-muted mt-1">Viewing salary history for: <strong className="text-foreground">{compData.employeeName} ({compData.employeeId})</strong></p>
           </div>
           <button className="btn btn-primary"><Plus size={18} /> New Compensation Record</button>
         </div>
@@ -440,11 +440,11 @@ export function RunTab({ view }: RunTabProps) {
               <div className="mt-4 pt-4 border-t border-emerald-500/20 text-sm">
                 <div className="flex justify-between mb-2">
                   <span className="text-tertiary">Daily Rate:</span>
-                  <span className="text-slate-900 dark:text-white">{formatCurrency(dailyRate)}</span>
+                  <span className="text-foreground">{formatCurrency(dailyRate)}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-tertiary">Hourly Rate:</span>
-                  <span className="text-slate-900 dark:text-white">{formatCurrency(hourlyRate)}</span>
+                  <span className="text-foreground">{formatCurrency(hourlyRate)}</span>
                 </div>
               </div>
             </div>

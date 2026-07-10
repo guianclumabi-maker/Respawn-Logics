@@ -29,11 +29,11 @@ export function SetupModeCards() {
         </a>
 
         <div className="hidden md:flex items-center gap-[30px] text-[0.9rem] font-medium text-[#8b95a8]" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
-          <a href={API_BASE + "/index.php"} className="flex items-center gap-2 hover:text-white transition-colors no-underline text-sm px-3 py-1.5 rounded-md hover:bg-accent">
+          <a href={API_BASE + "/index.php"} className="flex items-center gap-2 hover:text-foreground transition-colors no-underline text-sm px-3 py-1.5 rounded-md hover:bg-accent">
             <i className="fa-solid fa-arrow-left"></i> Back to Home
           </a>
           
-          <a href={API_BASE + "/login.php"} className="font-['JetBrains_Mono'] text-[0.8rem] font-bold tracking-[0.04em] text-black bg-[#00e07a] px-[20px] py-[9px] rounded-[5px] no-underline transition-all hover:bg-white hover:-translate-y-[1px] hover:shadow-[0_4px_16px_rgba(0,224,122,0.3)] ml-2">
+          <a href={API_BASE + "/login.php"} className="font-['JetBrains_Mono'] text-[0.8rem] font-bold tracking-[0.04em] text-black bg-[#00e07a] px-[20px] py-[9px] rounded-[5px] no-underline transition-all hover:bg-card hover:-translate-y-[1px] hover:shadow-[0_4px_16px_rgba(0,224,122,0.3)] ml-2">
             [ LOGIN ]
           </a>
         </div>
@@ -42,8 +42,8 @@ export function SetupModeCards() {
       <main className="max-w-5xl mx-auto px-6 py-12 mt-16 pb-24 relative z-10">
         <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
           <div className="text-center max-w-2xl mx-auto mb-16 mt-8">
-            <div className="inline-block px-3 py-1 mb-4 rounded-full border border-border bg-white/5 text-[#8b95a8] text-sm font-['JetBrains_Mono']">// INIT_SEQUENCE</div>
-            <h1 className="text-5xl font-bold text-slate-900 dark:text-white mb-6 tracking-tight">Select Setup Mode<span className="text-[#00e07a] animate-pulse">_</span></h1>
+            <div className="inline-block px-3 py-1 mb-4 rounded-full border border-border bg-card/50 text-[#8b95a8] text-sm font-['JetBrains_Mono']">// INIT_SEQUENCE</div>
+            <h1 className="text-5xl font-bold text-foreground mb-6 tracking-tight">Select Setup Mode<span className="text-[#00e07a] animate-pulse">_</span></h1>
             <p className="text-[#8b95a8] text-lg font-['Space_Grotesk']">Choose the onboarding path that best fits your organizational scale.</p>
           </div>
           
@@ -62,7 +62,7 @@ export function SetupModeCards() {
                 <div className={`w-14 h-14 rounded-lg ${s.bg} flex items-center justify-center mb-6 transition-all group-hover:scale-110`}>
                   <s.icon className={`w-7 h-7 ${s.color}`} />
                 </div>
-                <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-3 font-['JetBrains_Mono']">{s.title}</h3>
+                <h3 className="text-xl font-bold text-foreground mb-3 font-['JetBrains_Mono']">{s.title}</h3>
                 <p className="text-[#8b95a8] text-sm leading-relaxed">{s.desc}</p>
               </div>
             ))}
@@ -84,7 +84,7 @@ export function SetupModeCards() {
               <div className={`w-14 h-14 rounded-lg bg-card text-card-foreground flex items-center justify-center mb-6 transition-all group-hover:scale-110`}>
                 <User className="w-7 h-7 text-foreground group-hover:text-[#00e07a] transition-colors" />
               </div>
-              <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-3 font-['JetBrains_Mono']">Single Player</h3>
+              <h3 className="text-xl font-bold text-foreground mb-3 font-['JetBrains_Mono']">Single Player</h3>
               <p className="text-[#8b95a8] text-sm leading-relaxed">1 employee. Direct dashboard access, no mapping required.</p>
             </div>
           </div>

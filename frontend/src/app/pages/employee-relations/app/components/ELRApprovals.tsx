@@ -85,14 +85,14 @@ export function ELRApprovals() {
 
   if (loading) {
     return (
-      <div className="flex-1 flex justify-center items-center h-full bg-[#f4f6f8] dark:bg-[#06070a]">
+      <div className="flex-1 flex justify-center items-center h-full bg-[#f4f6f8] dark:bg-background">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#00e07a]"></div>
       </div>
     );
   }
 
   return (
-    <div className="flex-1 flex flex-col h-full bg-[#f4f6f8] dark:bg-[#06070a] text-foreground overflow-y-auto">
+    <div className="flex-1 flex flex-col h-full bg-[#f4f6f8] dark:bg-background text-foreground overflow-y-auto">
       <div className="p-8 max-w-6xl mx-auto w-full">
         
         <div className="flex items-center justify-between mb-8">
@@ -100,7 +100,7 @@ export function ELRApprovals() {
             <h1 className="text-2xl font-bold tracking-tight bg-gradient-to-r from-slate-900 to-slate-600 dark:from-white dark:to-gray-400 bg-clip-text text-transparent mb-1" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
               Manager Approvals
             </h1>
-            <p className="text-slate-500 dark:text-slate-400 text-sm">Review and decide on pending case requests (terminations, suspensions, etc).</p>
+            <p className="text-slate-500 dark:text-muted-foreground text-sm">Review and decide on pending case requests (terminations, suspensions, etc).</p>
           </div>
         </div>
 
@@ -114,9 +114,9 @@ export function ELRApprovals() {
         <div className="space-y-4">
           {approvals.length === 0 ? (
             <div className="text-center py-16 bg-card/50 border border-border rounded-2xl border-dashed">
-              <CheckSquare className="w-12 h-12 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
+              <CheckSquare className="w-12 h-12 text-foreground dark:text-muted-foreground mx-auto mb-4" />
               <h3 className="text-lg font-bold text-foreground">All caught up!</h3>
-              <p className="text-sm text-gray-500 mt-1">There are no pending approvals requiring your attention.</p>
+              <p className="text-sm text-muted-foreground mt-1">There are no pending approvals requiring your attention.</p>
             </div>
           ) : (
             approvals.map(approval => (
@@ -136,8 +136,8 @@ export function ELRApprovals() {
                         {approval.status}
                       </span>
                     </div>
-                    <div className="text-sm text-slate-600 dark:text-gray-400 mb-3">
-                      Employee: <span className="font-bold text-slate-800 dark:text-gray-300">{approval.full_name}</span> ({approval.department})
+                    <div className="text-sm text-slate-600 dark:text-muted-foreground mb-3">
+                      Employee: <span className="font-bold text-slate-800 dark:text-foreground">{approval.full_name}</span> ({approval.department})
                     </div>
                     <div className="flex items-center gap-4">
                       <button 
@@ -162,9 +162,9 @@ export function ELRApprovals() {
                             rows={2}
                           ></textarea>
                           <div className="flex justify-between items-center">
-                            <button onClick={() => setDecidingId(null)} className="text-[10px] text-gray-500 font-bold uppercase hover:text-slate-700 dark:hover:text-white">Cancel</button>
+                            <button onClick={() => setDecidingId(null)} className="text-[10px] text-muted-foreground font-bold uppercase hover:text-slate-700 dark:hover:text-foreground">Cancel</button>
                             <div className="flex gap-2">
-                              <button onClick={() => handleDecision(approval.id, 'Rejected')} className="px-3 py-1.5 bg-red-500 hover:bg-red-600 text-slate-900 dark:text-white text-[11px] font-bold rounded flex items-center gap-1 transition-colors"><ThumbsDown size={12}/> Reject</button>
+                              <button onClick={() => handleDecision(approval.id, 'Rejected')} className="px-3 py-1.5 bg-red-500 hover:bg-red-600 text-foreground text-[11px] font-bold rounded flex items-center gap-1 transition-colors"><ThumbsDown size={12}/> Reject</button>
                               <button onClick={() => handleDecision(approval.id, 'Approved')} className="px-3 py-1.5 bg-[#00e07a] hover:bg-[#00c96d] text-black text-[11px] font-bold rounded flex items-center gap-1 transition-colors"><ThumbsUp size={12}/> Approve</button>
                             </div>
                           </div>

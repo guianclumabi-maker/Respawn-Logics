@@ -106,9 +106,9 @@ export function AuditLogs() {
   if (error && !logs.length) {
     return (
       <div className="h-full w-full flex items-center justify-center bg-background p-8">
-        <div className="bg-[#141929] border border-red-500/20 rounded-xl p-8 max-w-md text-center">
+        <div className="bg-card border border-red-500/20 rounded-xl p-8 max-w-md text-center">
           <ShieldAlert className="w-12 h-12 text-red-500 mx-auto mb-4" />
-          <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-2">Access Restricted</h2>
+          <h2 className="text-xl font-bold text-foreground mb-2">Access Restricted</h2>
           <p className="text-muted-foreground">{error}</p>
         </div>
       </div>
@@ -116,7 +116,7 @@ export function AuditLogs() {
   }
 
   return (
-    <div className="h-full w-full flex flex-col p-8 overflow-y-auto" style={{ backgroundColor: "#0b0f19" }}>
+    <div className="h-full w-full flex flex-col p-8 overflow-y-auto" >
       <header className="mb-6 flex flex-col md:flex-row md:justify-between md:items-end gap-4">
         <div>
           <h1 className="text-2xl font-bold text-foreground tracking-tight mb-2 flex items-center gap-2">
@@ -132,7 +132,7 @@ export function AuditLogs() {
             <input 
               type="text"
               placeholder="Search logs..."
-              className="pl-9 pr-4 py-2 bg-[#141929] border border-border rounded-lg text-sm text-foreground focus:outline-none focus:border-blue-500 w-64"
+              className="pl-9 pr-4 py-2 bg-card border border-border rounded-lg text-sm text-foreground focus:outline-none focus:border-blue-500 w-64"
               value={search}
               onChange={(e) => { setSearch(e.target.value); setPage(1); }}
             />
@@ -140,7 +140,7 @@ export function AuditLogs() {
           <div className="relative">
             <Filter className="w-4 h-4 text-muted-foreground absolute left-3 top-1/2 -translate-y-1/2" />
             <select
-              className="pl-9 pr-8 py-2 bg-[#141929] border border-border rounded-lg text-sm text-foreground focus:outline-none focus:border-blue-500 appearance-none"
+              className="pl-9 pr-8 py-2 bg-card border border-border rounded-lg text-sm text-foreground focus:outline-none focus:border-blue-500 appearance-none"
               value={actionFilter}
               onChange={(e) => { setActionFilter(e.target.value); setPage(1); }}
             >
@@ -153,9 +153,9 @@ export function AuditLogs() {
         </div>
       </header>
 
-      <div className="bg-[#141929] rounded-xl border border-border overflow-hidden flex-1 flex flex-col">
+      <div className="bg-card rounded-xl border border-border overflow-hidden flex-1 flex flex-col">
         <div className="overflow-x-auto flex-1">
-          <table className="w-full text-left text-sm text-gray-300">
+          <table className="w-full text-left text-sm text-foreground">
             <thead className="text-xs text-muted-foreground uppercase bg-input border-border border-b border-border">
               <tr>
                 <th className="px-6 py-4 font-semibold">Event</th>
@@ -164,30 +164,30 @@ export function AuditLogs() {
                 <th className="px-6 py-4 font-semibold text-right">Timestamp</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-white/5">
+            <tbody className="divide-y divide-border">
               {loading && logs.length === 0 ? (
                 <tr>
-                  <td colSpan={4} className="px-6 py-8 text-center text-gray-500">
+                  <td colSpan={4} className="px-6 py-8 text-center text-muted-foreground">
                     Loading audit trail...
                   </td>
                 </tr>
               ) : logs.length === 0 ? (
                 <tr>
-                  <td colSpan={4} className="px-6 py-8 text-center text-gray-500">
+                  <td colSpan={4} className="px-6 py-8 text-center text-muted-foreground">
                     No audit logs found matching your criteria.
                   </td>
                 </tr>
               ) : (
                 logs.map((log) => (
-                  <tr key={log.id} className="hover:bg-white/[0.02] transition-colors">
+                  <tr key={log.id} className="hover:bg-card/[0.02] transition-colors">
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
-                        <div className="p-2 rounded-lg bg-white/5 border border-border">
+                        <div className="p-2 rounded-lg bg-card/50 border border-border">
                           {getStatusIcon(log.action)}
                         </div>
                         <div>
-                          <div className="font-medium text-gray-200">{log.action}</div>
-                          <div className="text-xs text-gray-500">ID: {log.id}</div>
+                          <div className="font-medium text-foreground">{log.action}</div>
+                          <div className="text-xs text-muted-foreground">ID: {log.id}</div>
                         </div>
                       </div>
                     </td>
@@ -201,13 +201,13 @@ export function AuditLogs() {
                           )}
                         </div>
                         <div>
-                          <div className="font-medium text-gray-200">{log.full_name || 'System User'}</div>
-                          <div className="text-xs text-gray-500">{log.user_email}</div>
+                          <div className="font-medium text-foreground">{log.full_name || 'System User'}</div>
+                          <div className="text-xs text-muted-foreground">{log.user_email}</div>
                         </div>
                       </div>
                     </td>
                     <td className="px-6 py-4">
-                      <p className="text-gray-300 max-w-md truncate" title={log.details}>
+                      <p className="text-foreground max-w-md truncate" title={log.details}>
                         {log.details}
                       </p>
                     </td>
@@ -225,22 +225,22 @@ export function AuditLogs() {
         </div>
         
         {meta && meta.total_pages > 1 && (
-          <div className="p-4 border-t border-border flex items-center justify-between bg-black/10">
+          <div className="p-4 border-t border-border flex items-center justify-between bg-muted/30">
             <div className="text-sm text-muted-foreground">
-              Showing <span className="font-medium text-gray-200">{((meta.page - 1) * meta.limit) + 1}</span> to <span className="font-medium text-gray-200">{Math.min(meta.page * meta.limit, meta.total)}</span> of <span className="font-medium text-gray-200">{meta.total}</span> entries
+              Showing <span className="font-medium text-foreground">{((meta.page - 1) * meta.limit) + 1}</span> to <span className="font-medium text-foreground">{Math.min(meta.page * meta.limit, meta.total)}</span> of <span className="font-medium text-foreground">{meta.total}</span> entries
             </div>
             <div className="flex items-center gap-2">
               <button 
                 onClick={() => setPage(p => Math.max(1, p - 1))}
                 disabled={page === 1}
-                className="px-3 py-1 bg-white/5 border border-border rounded text-gray-300 hover:bg-accent disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-3 py-1 bg-card/50 border border-border rounded text-foreground hover:bg-accent disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Previous
               </button>
               <button 
                 onClick={() => setPage(p => Math.min(meta.total_pages, p + 1))}
                 disabled={page === meta.total_pages}
-                className="px-3 py-1 bg-white/5 border border-border rounded text-gray-300 hover:bg-accent disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-3 py-1 bg-card/50 border border-border rounded text-foreground hover:bg-accent disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Next
               </button>

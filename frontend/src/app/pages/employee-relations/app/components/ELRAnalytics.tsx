@@ -70,11 +70,11 @@ export function ELRAnalytics() {
         ) : error ? (
           <div className="flex flex-col items-center justify-center py-16 px-6 bg-red-500/10 border border-red-500/20 rounded-xl text-center space-y-3">
             <AlertCircle className="w-10 h-10 text-red-500" />
-            <h3 className="text-lg font-bold text-slate-900 dark:text-white">Load Error</h3>
+            <h3 className="text-lg font-bold text-foreground">Load Error</h3>
             <p className="text-sm text-muted-foreground">{error}</p>
             <button 
               onClick={fetchAnalytics}
-              className="mt-2 px-4 py-2 bg-white/5 hover:bg-accent text-slate-900 dark:text-white rounded-lg text-xs transition-colors border border-border"
+              className="mt-2 px-4 py-2 bg-card/50 hover:bg-accent text-foreground rounded-lg text-xs transition-colors border border-border"
             >
               Retry
             </button>
@@ -102,13 +102,13 @@ export function ELRAnalytics() {
                       <XAxis dataKey="month" stroke="#4b5563" />
                       <YAxis stroke="#4b5563" allowDecimals={false} />
                       <Tooltip 
-                        contentStyle={{ backgroundColor: '#111625', borderColor: 'rgba(255,255,255,0.1)', color: '#fff', borderRadius: '8px' }}
+                        contentStyle={{ backgroundColor: 'var(--card)', borderColor: 'var(--border)', color: 'var(--foreground)', borderRadius: '8px' }}
                       />
                       <Area type="monotone" dataKey="count" stroke="#00e07a" strokeWidth={2.5} fillOpacity={1} fill="url(#colorTrend)" />
                     </AreaChart>
                   </ResponsiveContainer>
                 ) : (
-                  <div className="h-full flex items-center justify-center text-gray-500">No volume data to chart.</div>
+                  <div className="h-full flex items-center justify-center text-muted-foreground">No volume data to chart.</div>
                 )}
               </div>
             </div>
@@ -127,7 +127,7 @@ export function ELRAnalytics() {
                       <XAxis type="number" stroke="#4b5563" allowDecimals={false} />
                       <YAxis dataKey="source" type="category" stroke="#4b5563" width={100} tickLine={false} />
                       <Tooltip
-                        contentStyle={{ backgroundColor: '#111625', borderColor: 'rgba(255,255,255,0.1)', color: '#fff', borderRadius: '8px' }}
+                        contentStyle={{ backgroundColor: 'var(--card)', borderColor: 'var(--border)', color: 'var(--foreground)', borderRadius: '8px' }}
                       />
                       <Bar dataKey="applications" barSize={12} radius={[0, 4, 4, 0]}>
                         {data.channels.map((entry: any, index: number) => (
@@ -137,7 +137,7 @@ export function ELRAnalytics() {
                     </BarChart>
                   </ResponsiveContainer>
                 ) : (
-                  <div className="h-full flex items-center justify-center text-gray-500">No density data to chart.</div>
+                  <div className="h-full flex items-center justify-center text-muted-foreground">No density data to chart.</div>
                 )}
               </div>
             </div>

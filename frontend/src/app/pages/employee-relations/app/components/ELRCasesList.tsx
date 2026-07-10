@@ -216,7 +216,7 @@ export function ELRCasesList({ onViewChange, onSelectCase, mine = false }: ELRCa
         <div className="bg-card text-card-foreground/40 border border-border p-4 rounded-xl flex flex-wrap gap-4 items-center justify-between shadow-sm">
           <div className="flex flex-wrap gap-3 items-center flex-1">
             <div className="relative w-64">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" size={15} />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={15} />
               <input 
                 type="text"
                 placeholder="Search case, ID, department..."
@@ -252,7 +252,7 @@ export function ELRCasesList({ onViewChange, onSelectCase, mine = false }: ELRCa
               <option value="Critical">Critical</option>
             </select>
           </div>
-          <div className="text-xs text-gray-500 font-sans">
+          <div className="text-xs text-muted-foreground font-sans">
             Showing {filteredCases.length} incident record{filteredCases.length !== 1 ? "s" : ""}
           </div>
         </div>
@@ -270,7 +270,7 @@ export function ELRCasesList({ onViewChange, onSelectCase, mine = false }: ELRCa
             <p className="text-sm text-muted-foreground">{error}</p>
             <button 
               onClick={fetchCases}
-              className="mt-2 px-4 py-2 bg-white/5 hover:bg-accent text-foreground rounded-lg text-xs transition-colors border border-border"
+              className="mt-2 px-4 py-2 bg-card/50 hover:bg-accent text-foreground rounded-lg text-xs transition-colors border border-border"
             >
               Retry
             </button>
@@ -279,7 +279,7 @@ export function ELRCasesList({ onViewChange, onSelectCase, mine = false }: ELRCa
           <div className="bg-card text-card-foreground/70 border border-border rounded-xl overflow-hidden shadow-2xl">
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse">
-                <thead className="bg-black/25 text-gray-500 text-xs font-semibold uppercase tracking-wider">
+                <thead className="bg-muted/50 text-muted-foreground text-xs font-semibold uppercase tracking-wider">
                   <tr>
                     <th className="py-4 px-6">Case Number</th>
                     <th className="py-4 px-6">Employee ID</th>
@@ -292,7 +292,7 @@ export function ELRCasesList({ onViewChange, onSelectCase, mine = false }: ELRCa
                 </thead>
                 <tbody className="divide-y divide-white/[0.03]">
                   {filteredCases.map((c) => (
-                    <tr key={c.id} className="hover:bg-white/[0.01] transition-colors">
+                    <tr key={c.id} className="hover:bg-card/[0.01] transition-colors">
                       <td className="py-4 px-6">
                         <div className="flex items-center gap-2">
                           <span className="font-semibold text-foreground">{c.case_number}</span>
@@ -301,8 +301,8 @@ export function ELRCasesList({ onViewChange, onSelectCase, mine = false }: ELRCa
                           )}
                         </div>
                       </td>
-                      <td className="py-4 px-6 font-mono text-xs text-gray-300">{c.employee_id}</td>
-                      <td className="py-4 px-6 text-xs text-gray-300">{c.department}</td>
+                      <td className="py-4 px-6 font-mono text-xs text-foreground">{c.employee_id}</td>
+                      <td className="py-4 px-6 text-xs text-foreground">{c.department}</td>
                       <td className="py-4 px-6 text-xs text-foreground">{c.case_type_name || "General Inquiry"}</td>
                       <td className="py-4 px-6 text-center">
                         <span className={`inline-flex px-2 py-0.5 rounded text-[10px] font-bold ${getSeverityStyle(c.severity)}`}>
@@ -317,7 +317,7 @@ export function ELRCasesList({ onViewChange, onSelectCase, mine = false }: ELRCa
                       <td className="py-4 px-6 text-center">
                         <button 
                           onClick={() => onSelectCase(c.id)}
-                          className="px-3 py-1 bg-white/5 hover:bg-accent text-foreground rounded text-xs font-semibold transition-colors flex items-center gap-1.5 mx-auto cursor-pointer border border-border"
+                          className="px-3 py-1 bg-card/50 hover:bg-accent text-foreground rounded text-xs font-semibold transition-colors flex items-center gap-1.5 mx-auto cursor-pointer border border-border"
                         >
                           <Eye size={12} /> View Details
                         </button>
@@ -326,7 +326,7 @@ export function ELRCasesList({ onViewChange, onSelectCase, mine = false }: ELRCa
                   ))}
                   {filteredCases.length === 0 && (
                     <tr>
-                      <td colSpan={7} className="py-12 text-center text-gray-500 text-sm">
+                      <td colSpan={7} className="py-12 text-center text-muted-foreground text-sm">
                         No cases found matching the criteria.
                       </td>
                     </tr>
@@ -343,7 +343,7 @@ export function ELRCasesList({ onViewChange, onSelectCase, mine = false }: ELRCa
       {showModal && (
         <div className="fixed inset-0 bg-black/75 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <div className="bg-card text-card-foreground border border-border rounded-xl w-full max-w-md shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
-            <div className="p-5 border-b border-border flex justify-between items-center bg-black/10">
+            <div className="p-5 border-b border-border flex justify-between items-center bg-muted/30">
               <h3 className="text-base font-bold text-foreground uppercase tracking-wider">
                 Open Investigation Case
               </h3>

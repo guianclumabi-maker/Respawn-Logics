@@ -89,10 +89,10 @@ export function InsightsPage({ onViewChange }: InsightsPageProps) {
             <div className="flex justify-between items-start mb-6">
               <div>
                 <h3 className="text-sm font-semibold tracking-wide">Case Volume Trend</h3>
-                <p className="text-[10px] text-gray-500 mt-0.5">Monthly breakdown of filed grievances and cases.</p>
+                <p className="text-[10px] text-muted-foreground mt-0.5">Monthly breakdown of filed grievances and cases.</p>
               </div>
               <div className="flex items-center gap-3">
-                <button className="flex items-center gap-2 px-3 py-1.5 bg-white/[0.03] hover:bg-white/[0.08] border border-white/[0.06] rounded-md text-xs transition-colors">
+                <button className="flex items-center gap-2 px-3 py-1.5 bg-card/[0.03] hover:bg-card/[0.08] border border-border rounded-md text-xs transition-colors">
                   <Filter size={12} />
                   {filterPeriod}
                 </button>
@@ -103,7 +103,7 @@ export function InsightsPage({ onViewChange }: InsightsPageProps) {
             </div>
 
             {/* Custom SVG Line Chart */}
-            <div className="w-full h-44 relative bg-black/10 border border-white/[0.03] rounded-xl p-4 overflow-hidden">
+            <div className="w-full h-44 relative bg-muted/30 border border-white/[0.03] rounded-xl p-4 overflow-hidden">
               <svg viewBox="0 0 600 160" className="w-full h-full">
                 {/* Horizontal Guide Lines */}
                 <line x1="30" y1="30" x2="570" y2="30" stroke="rgba(255,255,255,0.03)" strokeWidth="1" />
@@ -150,7 +150,7 @@ export function InsightsPage({ onViewChange }: InsightsPageProps) {
             </div>
           </div>
           
-          <div className="border-t border-white/[0.04] pt-4 mt-6 flex justify-between items-center text-[10px] text-gray-500">
+          <div className="border-t border-border pt-4 mt-6 flex justify-between items-center text-[10px] text-muted-foreground">
             <span>Peak Month: **June** with 15 new cases</span>
             <span>Report updated live</span>
           </div>
@@ -160,23 +160,23 @@ export function InsightsPage({ onViewChange }: InsightsPageProps) {
         <div className="p-6 rounded-2xl border bg-card text-card-foreground/20 backdrop-blur-md flex flex-col justify-between" style={{ borderColor: "rgba(255, 255, 255, 0.06)" }}>
           <div>
             <h3 className="text-sm font-semibold tracking-wide mb-1">Report Channels</h3>
-            <p className="text-[10px] text-gray-500 mb-5">Primary reporting distributions.</p>
+            <p className="text-[10px] text-muted-foreground mb-5">Primary reporting distributions.</p>
             
             <div className="space-y-4.5">
               {channels.map((c, idx) => (
                 <div key={idx}>
                   <div className="flex justify-between items-center text-xs mb-1.5 font-medium">
-                    <span className="text-slate-900 dark:text-white">{c.source}</span>
-                    <span className="text-gray-500">{c.percentage}%</span>
+                    <span className="text-foreground">{c.source}</span>
+                    <span className="text-muted-foreground">{c.percentage}%</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <div className="flex-1 h-2 bg-white/[0.02] border border-white/[0.04] rounded-full overflow-hidden">
+                    <div className="flex-1 h-2 bg-card/[0.02] border border-border rounded-full overflow-hidden">
                       <div 
                         className="h-full rounded-full transition-all duration-500"
                         style={{ width: `${c.percentage}%`, backgroundColor: c.color }}
                       />
                     </div>
-                    <span className="text-[9px] font-bold text-gray-500 uppercase leading-none min-w-24 text-right">
+                    <span className="text-[9px] font-bold text-muted-foreground uppercase leading-none min-w-24 text-right">
                       {c.applications} Cases
                     </span>
                   </div>
@@ -185,7 +185,7 @@ export function InsightsPage({ onViewChange }: InsightsPageProps) {
             </div>
           </div>
 
-          <div className="border-t border-white/[0.04] pt-4 mt-5 text-[10px] text-gray-500 leading-relaxed">
+          <div className="border-t border-border pt-4 mt-5 text-[10px] text-muted-foreground leading-relaxed">
             💡 Direct HR Reports are resolved **20% faster** than external compliance escalations.
           </div>
         </div>
@@ -197,7 +197,7 @@ export function InsightsPage({ onViewChange }: InsightsPageProps) {
           <div className="p-3 rounded-xl bg-purple-500/10 text-purple-400 border border-purple-500/20"><Target size={16} /></div>
           <div>
             <h4 className="text-xs font-bold mb-1.5">Resolution Quality</h4>
-            <p className="text-[11px] text-gray-500 leading-normal">
+            <p className="text-[11px] text-muted-foreground leading-normal">
               85% of resolved cases result in mutual agreements and signed closing letters.
             </p>
           </div>
@@ -207,7 +207,7 @@ export function InsightsPage({ onViewChange }: InsightsPageProps) {
           <div className="p-3 rounded-xl bg-cyan-500/10 text-cyan-400 border border-cyan-500/20"><Globe size={16} /></div>
           <div>
             <h4 className="text-xs font-bold mb-1.5">Department Distribution</h4>
-            <p className="text-[11px] text-gray-500 leading-normal">
+            <p className="text-[11px] text-muted-foreground leading-normal">
               Operations and Finance represent 65% of all filed relations inquiries this quarter.
             </p>
           </div>
@@ -217,7 +217,7 @@ export function InsightsPage({ onViewChange }: InsightsPageProps) {
           <div className="p-3 rounded-xl bg-pink-500/10 text-pink-400 border border-pink-500/20"><Layers size={16} /></div>
           <div>
             <h4 className="text-xs font-bold mb-1.5">Resolution Velocity</h4>
-            <p className="text-[11px] text-gray-500 leading-normal">
+            <p className="text-[11px] text-muted-foreground leading-normal">
               Simple policy inquiries are resolved fastest, averaging 3 days to complete resolution.
             </p>
           </div>

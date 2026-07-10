@@ -53,7 +53,7 @@ export function InsightsPage({ onViewChange }: InsightsPageProps) {
     return (
       <div className="flex-1 flex flex-col items-center justify-center py-24 text-center">
         <Target size={40} className="text-[#f5a623] mb-4" />
-        <p className="text-gray-900 dark:text-foreground font-medium mb-1" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
+        <p className="text-foreground font-medium mb-1" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
           Unable to load analytics
         </p>
         <p className="text-sm text-muted-foreground dark:text-muted-foreground font-mono">{error || "No data available"}</p>
@@ -212,7 +212,7 @@ export function InsightsPage({ onViewChange }: InsightsPageProps) {
             </div>
 
             {/* Custom SVG Line Chart */}
-            <div className="w-full h-44 relative bg-black/10 border border-border rounded-xl p-4 overflow-hidden">
+            <div className="w-full h-44 relative bg-muted/30 border border-border rounded-xl p-4 overflow-hidden">
               <svg viewBox="0 0 600 160" className="w-full h-full">
                 <line x1="30" y1="30" x2="570" y2="30" stroke="rgba(255,255,255,0.03)" strokeWidth="1" />
                 <line x1="30" y1="80" x2="570" y2="80" stroke="rgba(255,255,255,0.03)" strokeWidth="1" />

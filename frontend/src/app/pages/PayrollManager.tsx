@@ -38,49 +38,49 @@ function PayrollManagerInner() {
           <div className="flex items-center gap-4 w-full justify-between">
             <div className="flex bg-input border-border rounded-lg p-1 border border-border">
               <button 
-                className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${activeTab === 'dashboard' ? 'bg-[#00e07a]/20 text-[#00e07a]' : 'text-muted-foreground hover:text-white'}`} 
+                className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${activeTab === 'dashboard' ? 'bg-[#00e07a]/20 text-[#00e07a]' : 'text-muted-foreground hover:text-foreground'}`} 
                 onClick={() => setActiveTab('dashboard')}
               >
                 Dashboard
               </button>
               <button 
-                className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${activeTab === 'queue' ? 'bg-[#00e07a]/20 text-[#00e07a]' : 'text-muted-foreground hover:text-white'}`} 
+                className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${activeTab === 'queue' ? 'bg-[#00e07a]/20 text-[#00e07a]' : 'text-muted-foreground hover:text-foreground'}`} 
                 onClick={() => setActiveTab('queue')}
               >
                 Queue
               </button>
               <button 
-                className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${activeTab === 'exceptions' ? 'bg-red-500/20 text-red-500' : 'text-muted-foreground hover:text-white'}`} 
+                className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${activeTab === 'exceptions' ? 'bg-red-500/20 text-red-500' : 'text-muted-foreground hover:text-foreground'}`} 
                 onClick={() => setActiveTab('exceptions')}
               >
                 Exceptions ({exceptions.filter(e => e.severity === 'Critical').length})
               </button>
               <button 
-                className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${activeTab === 'compensation' ? 'bg-[#00e07a]/20 text-[#00e07a]' : 'text-muted-foreground hover:text-white'}`} 
+                className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${activeTab === 'compensation' ? 'bg-[#00e07a]/20 text-[#00e07a]' : 'text-muted-foreground hover:text-foreground'}`} 
                 onClick={() => setActiveTab('compensation')}
               >
                 Compensation
               </button>
               <button 
-                className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${activeTab === 'payslips' ? 'bg-[#00e07a]/20 text-[#00e07a]' : 'text-muted-foreground hover:text-white'}`} 
+                className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${activeTab === 'payslips' ? 'bg-[#00e07a]/20 text-[#00e07a]' : 'text-muted-foreground hover:text-foreground'}`} 
                 onClick={() => setActiveTab('payslips')}
               >
                 Payslips
               </button>
               <button 
-                className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${activeTab === 'timesheets' ? 'bg-[#00e07a]/20 text-[#00e07a]' : 'text-muted-foreground hover:text-white'}`} 
+                className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${activeTab === 'timesheets' ? 'bg-[#00e07a]/20 text-[#00e07a]' : 'text-muted-foreground hover:text-foreground'}`} 
                 onClick={() => setActiveTab('timesheets')}
               >
                 Timesheets
               </button>
               <button 
-                className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${activeTab === 'govreports' ? 'bg-[#00e07a]/20 text-[#00e07a]' : 'text-muted-foreground hover:text-white'}`} 
+                className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${activeTab === 'govreports' ? 'bg-[#00e07a]/20 text-[#00e07a]' : 'text-muted-foreground hover:text-foreground'}`} 
                 onClick={() => setActiveTab('govreports')}
               >
                 Reports
               </button>
               <button 
-                className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${activeTab === 'settings' ? 'bg-[#00e07a]/20 text-[#00e07a]' : 'text-muted-foreground hover:text-white'}`} 
+                className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${activeTab === 'settings' ? 'bg-[#00e07a]/20 text-[#00e07a]' : 'text-muted-foreground hover:text-foreground'}`} 
                 onClick={() => setActiveTab('settings')}
               >
                 Settings
@@ -91,7 +91,7 @@ function PayrollManagerInner() {
               {hasPermission("payroll.view") && (
                 <button 
                   onClick={handleExport}
-                  className="px-4 py-2 bg-white/5 hover:bg-accent border border-border text-foreground rounded-lg text-sm font-semibold transition-all flex items-center gap-2 cursor-pointer"
+                  className="px-4 py-2 bg-card/50 hover:bg-accent border border-border text-foreground rounded-lg text-sm font-semibold transition-all flex items-center gap-2 cursor-pointer"
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
                   Export CSV

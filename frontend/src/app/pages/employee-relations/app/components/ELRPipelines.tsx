@@ -244,14 +244,14 @@ export function ELRPipelines() {
   // ------------------------------------------------------------------
   if (view === 'list') {
     return (
-      <main className="flex-1 flex flex-col h-full bg-[#f4f6f8] dark:bg-[#0b0f1a] text-foreground overflow-y-auto transition-colors duration-300">
+      <main className="flex-1 flex flex-col h-full bg-[#f4f6f8] dark:bg-background text-foreground overflow-y-auto transition-colors duration-300">
         <div className="p-8">
           <div className="flex items-center justify-between mb-8">
             <div>
               <h1 className="text-2xl font-bold tracking-tight bg-gradient-to-r from-white via-white to-gray-400 bg-clip-text text-transparent mb-1" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
                 Pipelines & Workflows
               </h1>
-              <p className="text-slate-500 dark:text-slate-400 text-sm">Manage case progression paths and automated stage logic.</p>
+              <p className="text-slate-500 dark:text-muted-foreground text-sm">Manage case progression paths and automated stage logic.</p>
             </div>
             <button 
               onClick={handleCreatePipeline}
@@ -275,7 +275,7 @@ export function ELRPipelines() {
             <div className="bg-card/80 border border-border rounded-2xl p-12 text-center">
               <GitBranch className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
               <h3 className="text-lg font-bold mb-2">No pipelines configured</h3>
-              <p className="text-sm text-gray-500 mb-6">Create a pipeline to structure your employee relations cases.</p>
+              <p className="text-sm text-muted-foreground mb-6">Create a pipeline to structure your employee relations cases.</p>
               <button 
                 onClick={handleCreatePipeline}
                 className="px-4 py-2 bg-card border border-border hover:bg-accent rounded-lg text-sm font-medium transition-colors"
@@ -313,13 +313,13 @@ export function ELRPipelines() {
                     <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                       <button 
                         onClick={(e) => { e.stopPropagation(); handleEditPipeline(pipe); }}
-                        className="p-1.5 hover:bg-blue-50 dark:hover:bg-blue-500/10 text-gray-400 hover:text-blue-500 rounded"
+                        className="p-1.5 hover:bg-blue-50 dark:hover:bg-blue-500/10 text-muted-foreground hover:text-blue-500 rounded"
                       >
                         <Settings size={16} />
                       </button>
                       <button 
                         onClick={(e) => { e.stopPropagation(); handleDeletePipeline(pipe.id); }}
-                        className="p-1.5 hover:bg-red-50 dark:hover:bg-red-500/10 text-gray-400 hover:text-red-500 rounded"
+                        className="p-1.5 hover:bg-red-50 dark:hover:bg-red-500/10 text-muted-foreground hover:text-red-500 rounded"
                       >
                         <Trash2 size={16} />
                       </button>
@@ -339,7 +339,7 @@ export function ELRPipelines() {
   // ------------------------------------------------------------------
   if (view === 'edit_pipeline') {
     return (
-      <main className="flex-1 flex flex-col h-full bg-[#f4f6f8] dark:bg-[#0b0f1a] text-foreground overflow-y-auto transition-colors duration-300">
+      <main className="flex-1 flex flex-col h-full bg-[#f4f6f8] dark:bg-background text-foreground overflow-y-auto transition-colors duration-300">
         <div className="p-8 max-w-3xl mx-auto w-full">
           <div className="flex items-center justify-between mb-6">
             <div>
@@ -381,7 +381,7 @@ export function ELRPipelines() {
                 type="text" 
                 value={currentPipeline.name || ""} 
                 onChange={e => setCurrentPipeline({ ...currentPipeline, name: e.target.value })}
-                className="w-full bg-background border border-border rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#00e07a] focus:ring-1 focus:ring-[#00e07a]/50 text-slate-900 dark:text-white"
+                className="w-full bg-background border border-border rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#00e07a] focus:ring-1 focus:ring-[#00e07a]/50 text-foreground"
                 placeholder="e.g. Standard Disciplinary Flow"
               />
             </div>
@@ -392,7 +392,7 @@ export function ELRPipelines() {
               <textarea 
                 value={currentPipeline.description || ""} 
                 onChange={e => setCurrentPipeline({ ...currentPipeline, description: e.target.value })}
-                className="w-full bg-background border border-border rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#00e07a] focus:ring-1 focus:ring-[#00e07a]/50 text-slate-900 dark:text-white resize-none h-32"
+                className="w-full bg-background border border-border rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#00e07a] focus:ring-1 focus:ring-[#00e07a]/50 text-foreground resize-none h-32"
                 placeholder="Brief internal description"
               />
             </div>
@@ -406,7 +406,7 @@ export function ELRPipelines() {
   // RENDER: EDIT STAGES
   // ------------------------------------------------------------------
   return (
-    <main className="flex-1 flex flex-col h-full bg-[#f4f6f8] dark:bg-[#0b0f1a] text-foreground overflow-y-auto transition-colors duration-300 relative">
+    <main className="flex-1 flex flex-col h-full bg-[#f4f6f8] dark:bg-background text-foreground overflow-y-auto transition-colors duration-300 relative">
       <div className="p-8 max-w-5xl mx-auto w-full">
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-4">
@@ -420,7 +420,7 @@ export function ELRPipelines() {
               <h1 className="text-2xl font-bold tracking-tight bg-gradient-to-r from-white via-white to-gray-400 bg-clip-text text-transparent mb-1" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
                 Pipeline: {currentPipeline.name}
               </h1>
-              <p className="text-slate-500 dark:text-slate-400 text-sm">Configure stages and automated document triggers.</p>
+              <p className="text-slate-500 dark:text-muted-foreground text-sm">Configure stages and automated document triggers.</p>
             </div>
           </div>
           <button 
@@ -445,7 +445,7 @@ export function ELRPipelines() {
           <div className="bg-card/80 border border-border rounded-2xl p-12 text-center">
             <ListOrdered className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
             <h3 className="text-lg font-bold mb-2">No stages defined</h3>
-            <p className="text-sm text-gray-500 mb-6">Build your workflow by adding the first stage.</p>
+            <p className="text-sm text-muted-foreground mb-6">Build your workflow by adding the first stage.</p>
           </div>
         ) : (
           <div className="space-y-4 relative">
@@ -454,7 +454,7 @@ export function ELRPipelines() {
             
             {stages.map((stage, idx) => (
               <div key={stage.id} className="relative z-10 flex gap-4 items-start group">
-                <div className="w-12 h-12 rounded-full bg-[#f4f6f8] dark:bg-[#0b0f1a] border-4 border-[#f4f6f8] dark:border-[#0b0f1a] flex items-center justify-center flex-shrink-0">
+                <div className="w-12 h-12 rounded-full bg-[#f4f6f8] dark:bg-background border-4 border-[#f4f6f8] dark:border-[#0b0f1a] flex items-center justify-center flex-shrink-0">
                   <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold ${stage.is_terminal ? 'bg-red-500/20 text-red-500' : 'bg-blue-500/20 text-blue-500'}`}>
                     {idx + 1}
                   </div>
@@ -468,7 +468,7 @@ export function ELRPipelines() {
                           <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase border bg-red-500/10 text-red-500 border-red-500/20">Terminal</span>
                         ) : null}
                       </div>
-                      <div className="flex gap-4 text-xs font-mono text-gray-500 mt-2">
+                      <div className="flex gap-4 text-xs font-mono text-muted-foreground mt-2">
                         <span className="flex items-center gap-1"><ListOrdered size={14} /> Order: {stage.order_index}</span>
                         <span className="flex items-center gap-1"><Clock size={14} /> SLA: {stage.sla_days} days</span>
                         {stage.template_id && (
@@ -485,7 +485,7 @@ export function ELRPipelines() {
                       </button>
                       <button 
                         onClick={() => handleDeleteStage(stage.id)}
-                        className="p-1.5 hover:bg-red-50 dark:hover:bg-red-500/10 text-gray-400 hover:text-red-500 rounded transition-colors"
+                        className="p-1.5 hover:bg-red-50 dark:hover:bg-red-500/10 text-muted-foreground hover:text-red-500 rounded transition-colors"
                       >
                         <Trash2 size={16} />
                       </button>
@@ -560,7 +560,7 @@ export function ELRPipelines() {
                     <option key={t.id} value={t.id}>{t.name}</option>
                   ))}
                 </select>
-                <p className="text-[11px] text-gray-500 mt-1">If selected, this document is automatically generated when a case enters this stage.</p>
+                <p className="text-[11px] text-muted-foreground mt-1">If selected, this document is automatically generated when a case enters this stage.</p>
               </div>
 
               <div className="pt-2">
@@ -573,7 +573,7 @@ export function ELRPipelines() {
                   />
                   <div>
                     <span className="block text-sm font-bold">Terminal Stage</span>
-                    <span className="block text-[11px] text-gray-500">Entering this stage will close the case.</span>
+                    <span className="block text-[11px] text-muted-foreground">Entering this stage will close the case.</span>
                   </div>
                 </label>
               </div>

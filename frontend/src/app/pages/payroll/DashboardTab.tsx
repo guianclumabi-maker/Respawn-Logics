@@ -110,7 +110,7 @@ export function DashboardTab() {
                 <CartesianGrid strokeDasharray="3 3" stroke="var(--border-color)" vertical={false} />
                 <XAxis dataKey="name" stroke="var(--text-tertiary)" tick={{ fill: 'var(--text-tertiary)' }} />
                 <YAxis stroke="var(--text-tertiary)" tick={{ fill: 'var(--text-tertiary)' }} tickFormatter={(val) => `₱${val/1000}k`} />
-                <Tooltip contentStyle={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-color)', color: '#fff', borderRadius: '8px' }} itemStyle={{ color: 'var(--accent-blue)' }} />
+                <Tooltip contentStyle={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-color)', color: 'var(--foreground)', borderRadius: '8px' }} itemStyle={{ color: 'var(--accent-blue)' }} />
                 <Area type="monotone" dataKey="cost" stroke="var(--accent-blue)" strokeWidth={3} fillOpacity={1} fill="url(#colorCost)" />
               </AreaChart>
             </ResponsiveContainer>

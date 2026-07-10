@@ -26,7 +26,7 @@ const PRIORITY_COLORS: Record<string, string> = {
   critical: "bg-red-500/20 text-red-300 border-red-500/30",
   high: "bg-orange-500/20 text-orange-300 border-orange-500/30",
   medium: "bg-amber-500/20 text-amber-300 border-amber-500/30",
-  low: "bg-slate-700 text-muted-foreground border-slate-600",
+  low: "bg-muted text-muted-foreground border-slate-600",
 };
 
 const SLI_COLORS: Record<string, string> = {
@@ -40,7 +40,7 @@ const STATUS_COLORS: Record<string, string> = {
   "in_progress": "bg-violet-500/20 text-violet-300",
   waiting: "bg-amber-500/20 text-amber-300",
   resolved: "bg-emerald-500/20 text-emerald-300",
-  closed: "bg-slate-700 text-muted-foreground",
+  closed: "bg-muted text-muted-foreground",
 };
 
 export function PlatformAdminSupport() {
@@ -89,12 +89,12 @@ export function PlatformAdminSupport() {
           <p className="text-slate-500 text-sm mt-1">All tenant support requests across the platform.</p>
         </div>
         <div className="flex gap-2">
-          <button onClick={load} className="flex items-center gap-2 px-3 py-2 rounded-lg bg-white/[0.03] border border-white/[0.07] text-muted-foreground hover:text-slate-200 text-sm transition-colors">
+          <button onClick={load} className="flex items-center gap-2 px-3 py-2 rounded-lg bg-card/[0.03] border border-white/[0.07] text-muted-foreground hover:text-foreground text-sm transition-colors">
             <RefreshCw size={14} className={loading ? "animate-spin" : ""} />
           </button>
           <a
             href={`${API}&action=export_report&tab=${tab}`}
-            className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white/[0.03] border border-white/[0.07] text-muted-foreground hover:text-slate-200 text-sm transition-colors"
+            className="flex items-center gap-2 px-4 py-2 rounded-lg bg-card/[0.03] border border-white/[0.07] text-muted-foreground hover:text-foreground text-sm transition-colors"
           >
             <ExternalLink size={14} /> Export CSV
           </a>
@@ -102,13 +102,13 @@ export function PlatformAdminSupport() {
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-1 bg-[#0c1018] border border-white/[0.05] rounded-xl p-1 mb-6 w-fit">
+      <div className="flex gap-1 bg-background border border-white/[0.05] rounded-xl p-1 mb-6 w-fit">
         {(["pending", "finished"] as const).map((t) => (
           <button
             key={t}
             onClick={() => setTab(t)}
             className={`px-5 py-2 rounded-lg text-sm font-medium transition-all capitalize cursor-pointer ${
-              tab === t ? "bg-violet-600 text-foreground" : "text-muted-foreground hover:text-slate-200"
+              tab === t ? "bg-violet-600 text-foreground" : "text-muted-foreground hover:text-foreground"
             }`}
           >
             {t}
@@ -125,13 +125,13 @@ export function PlatformAdminSupport() {
             onChange={(e) => setSearch(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && load()}
             placeholder="Search tickets…"
-            className="w-full pl-9 pr-4 py-2 bg-[#0c1018] border border-white/[0.07] rounded-lg text-sm text-slate-200 placeholder-slate-600 focus:outline-none focus:border-violet-500/40"
+            className="w-full pl-9 pr-4 py-2 bg-background border border-white/[0.07] rounded-lg text-sm text-foreground placeholder-slate-600 focus:outline-none focus:border-violet-500/40"
           />
         </div>
         <select
           value={priority}
           onChange={(e) => setPriority(e.target.value)}
-          className="px-3 py-2 bg-[#0c1018] border border-white/[0.07] rounded-lg text-sm text-muted-foreground focus:outline-none focus:border-violet-500/40"
+          className="px-3 py-2 bg-background border border-white/[0.07] rounded-lg text-sm text-muted-foreground focus:outline-none focus:border-violet-500/40"
         >
           <option value="">All Priorities</option>
           <option value="critical">Critical</option>
@@ -143,7 +143,7 @@ export function PlatformAdminSupport() {
 
       {error && <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-4 text-red-400 text-sm mb-6">{error}</div>}
 
-      <div className="bg-[#0c1018] border border-white/[0.05] rounded-2xl overflow-hidden">
+      <div className="bg-background border border-white/[0.05] rounded-2xl overflow-hidden">
         <table className="w-full text-sm">
           <thead>
             <tr className="text-xs text-slate-600 uppercase tracking-widest border-b border-white/[0.05]">
@@ -168,14 +168,14 @@ export function PlatformAdminSupport() {
               <tr><td colSpan={7} className="px-5 py-16 text-center text-slate-600">No tickets found.</td></tr>
             )}
             {!loading && tickets.map((t) => (
-              <tr key={t.id} className="border-b border-white/[0.03] hover:bg-white/[0.02] transition-colors">
+              <tr key={t.id} className="border-b border-white/[0.03] hover:bg-card/[0.02] transition-colors">
                 <td className="px-5 py-4">
-                  <p className="text-slate-200 text-sm font-medium line-clamp-1">#{t.id} — {t.subject}</p>
+                  <p className="text-foreground text-sm font-medium line-clamp-1">#{t.id} — {t.subject}</p>
                   <p className="text-slate-600 text-xs mt-0.5">{new Date(t.created_at).toLocaleDateString()}</p>
                 </td>
                 <td className="px-5 py-4 text-muted-foreground text-sm">{t.company_name}</td>
                 <td className="px-5 py-4">
-                  <span className={`px-2 py-0.5 rounded-full text-xs font-medium border capitalize ${PRIORITY_COLORS[t.priority?.toLowerCase()] ?? "bg-slate-700 text-muted-foreground border-slate-600"}`}>
+                  <span className={`px-2 py-0.5 rounded-full text-xs font-medium border capitalize ${PRIORITY_COLORS[t.priority?.toLowerCase()] ?? "bg-muted text-muted-foreground border-slate-600"}`}>
                     {t.priority}
                   </span>
                 </td>
@@ -183,7 +183,7 @@ export function PlatformAdminSupport() {
                   <select
                     defaultValue={t.status?.toLowerCase().replace(" ", "_")}
                     onChange={(e) => handleStatusChange(t.id, e.target.value)}
-                    className={`px-2 py-1 rounded-lg text-xs font-medium border-none outline-none cursor-pointer capitalize ${STATUS_COLORS[t.status?.toLowerCase().replace(" ", "_")] ?? "bg-slate-700 text-muted-foreground"}`}
+                    className={`px-2 py-1 rounded-lg text-xs font-medium border-none outline-none cursor-pointer capitalize ${STATUS_COLORS[t.status?.toLowerCase().replace(" ", "_")] ?? "bg-muted text-muted-foreground"}`}
                   >
                     <option value="open">Open</option>
                     <option value="in_progress">In Progress</option>
@@ -205,7 +205,7 @@ export function PlatformAdminSupport() {
                 <td className="px-5 py-4 text-right">
                   <a
                     href={`#/platform-admin/support/${t.id}`}
-                    className="text-slate-500 hover:text-slate-300 transition-colors cursor-pointer"
+                    className="text-slate-500 hover:text-foreground transition-colors cursor-pointer"
                   >
                     <MoreHorizontal size={16} />
                   </a>

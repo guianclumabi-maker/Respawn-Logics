@@ -52,26 +52,26 @@ export function AdminUsers() {
   }, []);
 
   if (loading) {
-    return <div className="p-8 text-slate-400">Loading users...</div>;
+    return <div className="p-8 text-muted-foreground">Loading users...</div>;
   }
 
   return (
-    <div className="h-full w-full flex flex-col p-8 overflow-y-auto" style={{ backgroundColor: "#f9fafb" }}>
+    <div className="h-full w-full flex flex-col p-8 overflow-y-auto" >
       <header className="mb-6 flex justify-between items-center">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 tracking-tight mb-2">User Management</h1>
-          <p className="text-gray-500">Manage platform users, roles, and access status.</p>
+          <h1 className="text-2xl font-bold text-foreground tracking-tight mb-2">User Management</h1>
+          <p className="text-muted-foreground">Manage platform users, roles, and access status.</p>
         </div>
-        <button className="bg-blue-600 hover:bg-blue-700 text-slate-900 dark:text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors shadow-sm flex items-center gap-2">
+        <button className="bg-blue-600 hover:bg-blue-700 text-foreground px-4 py-2 rounded-lg text-sm font-medium transition-colors shadow-sm flex items-center gap-2">
           <User className="w-4 h-4" />
           Add User
         </button>
       </header>
 
-      <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+      <div className="bg-card rounded-xl border border-gray-200 shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm text-gray-600">
-            <thead className="bg-gray-50 border-b border-gray-200 text-gray-700 uppercase text-xs font-semibold">
+          <table className="w-full text-left text-sm text-muted-foreground">
+            <thead className="bg-muted/50 border-b border-gray-200 text-foreground uppercase text-xs font-semibold">
               <tr>
                 <th className="px-6 py-4">User</th>
                 <th className="px-6 py-4">Contact</th>
@@ -80,19 +80,19 @@ export function AdminUsers() {
                 <th className="px-6 py-4 text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-200">
+            <tbody className="divide-y divide-border">
               {users.map(u => (
-                <tr key={u.id} className="hover:bg-gray-50 transition-colors">
+                <tr key={u.id} className="hover:bg-muted/50 transition-colors">
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold">
+                      <div className="w-8 h-8 rounded-full bg-primary/10 text-blue-600 flex items-center justify-center font-bold">
                         {u.full_name.charAt(0)}
                       </div>
-                      <div className="font-medium text-gray-900">{u.full_name}</div>
+                      <div className="font-medium text-foreground">{u.full_name}</div>
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="flex items-center gap-2 text-gray-500">
+                    <div className="flex items-center gap-2 text-muted-foreground">
                       <Mail className="w-4 h-4" />
                       {u.email}
                     </div>
@@ -109,7 +109,7 @@ export function AdminUsers() {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium ${u.status === 'Active' ? 'bg-emerald-100 text-emerald-800' : 'bg-gray-100 text-gray-800'}`}>
-                      <Circle className={`w-2 h-2 ${u.status === 'Active' ? 'fill-emerald-500 text-emerald-500' : 'fill-gray-500 text-gray-500'}`} />
+                      <Circle className={`w-2 h-2 ${u.status === 'Active' ? 'fill-emerald-500 text-emerald-500' : 'fill-gray-500 text-muted-foreground'}`} />
                       {u.status}
                     </span>
                   </td>
@@ -125,7 +125,7 @@ export function AdminUsers() {
               ))}
               {users.length === 0 && (
                 <tr>
-                  <td colSpan={5} className="px-6 py-8 text-center text-gray-500">
+                  <td colSpan={5} className="px-6 py-8 text-center text-muted-foreground">
                     No users found.
                   </td>
                 </tr>

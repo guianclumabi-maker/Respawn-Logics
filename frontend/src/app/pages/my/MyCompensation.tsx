@@ -76,17 +76,17 @@ export function MyCompensation() {
         ) : error ? (
           <div className="flex flex-col items-center justify-center py-16 px-6 bg-red-500/10 border border-red-500/20 rounded-xl max-w-xl mx-auto text-center space-y-3">
             <AlertCircle className="w-10 h-10 text-red-500" />
-            <h3 className="text-lg font-bold text-slate-900 dark:text-white">Access Denied / Failed</h3>
+            <h3 className="text-lg font-bold text-foreground">Access Denied / Failed</h3>
             <p className="text-sm text-muted-foreground">{error}</p>
             <button 
               onClick={fetchCompHistory}
-              className="mt-2 px-4 py-2 bg-white/5 hover:bg-accent text-slate-900 dark:text-white rounded-lg text-xs transition-colors border border-border"
+              className="mt-2 px-4 py-2 bg-card/50 hover:bg-accent text-foreground rounded-lg text-xs transition-colors border border-border"
             >
               Retry Connection
             </button>
           </div>
         ) : !data ? (
-          <div className="text-center text-gray-500 py-10">No compensation records found.</div>
+          <div className="text-center text-muted-foreground py-10">No compensation records found.</div>
         ) : (
           <div className="max-w-4xl mx-auto space-y-6">
             {/* Overview / Card */}
@@ -94,8 +94,8 @@ export function MyCompensation() {
               <div className="bg-card text-card-foreground/70 border border-border rounded-xl p-6 shadow-lg relative overflow-hidden">
                 <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-[#00e07a]/5 to-[#00b8ff]/5 rounded-bl-full pointer-events-none"></div>
                 <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Employee Name</div>
-                <div className="text-xl font-bold text-slate-900 dark:text-white tracking-tight">{data.employeeName}</div>
-                <div className="text-xs text-gray-500 mt-1">ID: {data.employeeId}</div>
+                <div className="text-xl font-bold text-foreground tracking-tight">{data.employeeName}</div>
+                <div className="text-xs text-muted-foreground mt-1">ID: {data.employeeId}</div>
               </div>
 
               <div className="bg-card text-card-foreground/70 border border-[#00e07a]/10 rounded-xl p-6 shadow-lg relative overflow-hidden">
@@ -105,7 +105,7 @@ export function MyCompensation() {
                   <DollarSign size={22} className="mt-1" />
                   {data.currentBase.toLocaleString("en-PH", { minimumFractionDigits: 2 })}
                 </div>
-                <div className="text-xs text-gray-500 mt-1">Pay Cycle: Monthly / Semi-Monthly</div>
+                <div className="text-xs text-muted-foreground mt-1">Pay Cycle: Monthly / Semi-Monthly</div>
               </div>
 
               <div className="bg-card text-card-foreground/70 border border-border rounded-xl p-6 shadow-lg relative overflow-hidden">
@@ -114,7 +114,7 @@ export function MyCompensation() {
                 <div className="text-sm font-semibold text-foreground flex items-center gap-2 mt-1">
                   <Shield className="text-blue-400 w-5 h-5" /> Secured Record
                 </div>
-                <div className="text-xs text-gray-500 mt-1.5">Compliance Scoped & Signed</div>
+                <div className="text-xs text-muted-foreground mt-1.5">Compliance Scoped & Signed</div>
               </div>
             </div>
 
@@ -128,7 +128,7 @@ export function MyCompensation() {
             <div className="bg-card text-card-foreground/70 border border-border rounded-xl overflow-hidden shadow-2xl">
               <div className="overflow-x-auto">
                 <table className="w-full text-left border-collapse">
-                  <thead className="bg-black/25 text-gray-500 text-xs font-semibold uppercase tracking-wider">
+                  <thead className="bg-muted/50 text-muted-foreground text-xs font-semibold uppercase tracking-wider">
                     <tr>
                       <th className="py-4 px-6">Effective Date</th>
                       <th className="py-4 px-6">Base Pay Rate</th>
@@ -139,15 +139,15 @@ export function MyCompensation() {
                   </thead>
                   <tbody className="divide-y divide-white/[0.03]">
                     {data.history.map((record) => (
-                      <tr key={record.id} className="hover:bg-white/[0.02] transition-colors">
+                      <tr key={record.id} className="hover:bg-card/[0.02] transition-colors">
                         <td className="py-4 px-6 font-medium text-foreground flex items-center gap-2">
-                          <Calendar size={14} className="text-gray-500" />
+                          <Calendar size={14} className="text-muted-foreground" />
                           {record.effective}
                         </td>
                         <td className="py-4 px-6 text-sm text-foreground font-bold font-mono">
                           {formatCurrency(record.base)}
                         </td>
-                        <td className="py-4 px-6 text-sm text-gray-300">
+                        <td className="py-4 px-6 text-sm text-foreground">
                           {record.type}
                         </td>
                         <td className="py-4 px-6">
@@ -155,15 +155,15 @@ export function MyCompensation() {
                             {record.status}
                           </span>
                         </td>
-                        <td className="py-4 px-6 text-sm text-gray-500 text-right font-mono">
+                        <td className="py-4 px-6 text-sm text-muted-foreground text-right font-mono">
                           {record.author}
                         </td>
                       </tr>
                     ))}
                     {data.history.length === 0 && (
                       <tr>
-                        <td colSpan={5} className="py-8 text-center text-gray-500 text-sm">
-                          <Scale className="w-10 h-10 text-gray-600 mx-auto mb-2" />
+                        <td colSpan={5} className="py-8 text-center text-muted-foreground text-sm">
+                          <Scale className="w-10 h-10 text-muted-foreground mx-auto mb-2" />
                           No previous compensation adjustments logged.
                         </td>
                       </tr>

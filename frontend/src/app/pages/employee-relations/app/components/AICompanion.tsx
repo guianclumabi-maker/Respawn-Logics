@@ -95,7 +95,7 @@ export function AICompanion() {
         return (
           <li 
             key={idx} 
-            className="ml-5 list-disc text-gray-300 my-1 font-sans text-sm" 
+            className="ml-5 list-disc text-foreground my-1 font-sans text-sm" 
             dangerouslySetInnerHTML={{ __html: content.substring(2) }} 
           />
         );
@@ -108,7 +108,7 @@ export function AICompanion() {
       return (
         <p 
           key={idx} 
-          className="mb-3 leading-relaxed text-gray-300 text-sm font-sans" 
+          className="mb-3 leading-relaxed text-foreground text-sm font-sans" 
           dangerouslySetInnerHTML={{ __html: content }} 
         />
       );
@@ -132,7 +132,7 @@ export function AICompanion() {
       <div className="flex-1 flex flex-col gap-6 overflow-hidden">
         
         {/* Input panel */}
-        <div className="bg-[#0f121d]/40 border border-border p-6 rounded-2xl space-y-4">
+        <div className="bg-card/40 border border-border p-6 rounded-2xl space-y-4">
           <form 
             onSubmit={(e) => { e.preventDefault(); handleAsk(question); }}
             className="flex gap-3"
@@ -142,7 +142,7 @@ export function AICompanion() {
               value={question}
               onChange={(e) => setQuestion(e.target.value)}
               placeholder="Ask a labor relations question (e.g., 'What are the steps for Twin Notice Rule?')"
-              className="flex-1 bg-white/5 border border-border rounded-xl px-4 py-3 text-slate-900 dark:text-white placeholder-gray-500 focus:outline-none focus:border-cyan-500/50 focus:bg-white/10 transition-all text-sm font-sans"
+              className="flex-1 bg-card/50 border border-border rounded-xl px-4 py-3 text-foreground placeholder-gray-500 focus:outline-none focus:border-cyan-500/50 focus:bg-card/10 transition-all text-sm font-sans"
             />
             <button
               type="submit"
@@ -155,14 +155,14 @@ export function AICompanion() {
 
           {/* Suggestions */}
           <div className="space-y-2">
-            <span className="block text-xs font-semibold text-gray-500 uppercase tracking-wider">Suggested Queries</span>
+            <span className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider">Suggested Queries</span>
             <div className="flex flex-wrap gap-2">
               {SUGGESTIONS.map((sug, i) => (
                 <button
                   key={i}
                   onClick={() => handleAsk(sug)}
                   disabled={loading}
-                  className="px-3.5 py-1.5 bg-white/5 hover:bg-accent border border-border rounded-full text-xs text-gray-300 transition-colors disabled:opacity-50"
+                  className="px-3.5 py-1.5 bg-card/50 hover:bg-accent border border-border rounded-full text-xs text-foreground transition-colors disabled:opacity-50"
                 >
                   {sug}
                 </button>
@@ -172,7 +172,7 @@ export function AICompanion() {
         </div>
 
         {/* Output Panel / Workspace */}
-        <div className="flex-1 bg-[#0d0f19] border border-border rounded-2xl overflow-hidden flex flex-col relative shadow-2xl">
+        <div className="flex-1 bg-card border border-border rounded-2xl overflow-hidden flex flex-col relative shadow-2xl">
           
           {loading ? (
             <div className="flex-1 flex flex-col items-center justify-center gap-3 text-muted-foreground">
@@ -182,11 +182,11 @@ export function AICompanion() {
           ) : error ? (
             <div className="flex-1 flex flex-col items-center justify-center p-6 text-center space-y-3">
               <AlertTriangle className="w-10 h-10 text-red-500" />
-              <h3 className="text-lg font-bold text-slate-900 dark:text-white">Copilot Exception</h3>
+              <h3 className="text-lg font-bold text-foreground">Copilot Exception</h3>
               <p className="text-sm text-muted-foreground max-w-md">{error}</p>
             </div>
           ) : result ? (
-            <div className="flex-1 flex flex-col lg:flex-row overflow-hidden divide-y lg:divide-y-0 lg:divide-x divide-white/5">
+            <div className="flex-1 flex flex-col lg:flex-row overflow-hidden divide-y lg:divide-y-0 lg:divide-x divide-border">
               
               {/* Answer Column */}
               <div className="flex-1 p-6 overflow-y-auto space-y-4">
@@ -211,7 +211,7 @@ export function AICompanion() {
               </div>
 
               {/* Sources Column */}
-              <div className="w-full lg:w-80 p-6 overflow-y-auto space-y-4 bg-black/10 flex-shrink-0">
+              <div className="w-full lg:w-80 p-6 overflow-y-auto space-y-4 bg-muted/30 flex-shrink-0">
                 <div className="border-b border-border pb-2">
                   <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider block">Grounded Sources</span>
                 </div>
@@ -225,14 +225,14 @@ export function AICompanion() {
 
                 <div className="space-y-3">
                   {result.sources.map((src, i) => (
-                    <div key={i} className="bg-white/[0.02] border border-border p-3.5 rounded-xl space-y-2 hover:border-cyan-500/20 transition-all">
+                    <div key={i} className="bg-card/[0.02] border border-border p-3.5 rounded-xl space-y-2 hover:border-cyan-500/20 transition-all">
                       <div className="flex items-center gap-2">
                         {src.type === "reference" ? (
                           <BookOpen className="w-4 h-4 text-cyan-400 flex-shrink-0" />
                         ) : (
                           <Scale className="w-4 h-4 text-purple-400 flex-shrink-0" />
                         )}
-                        <span className="text-[10px] font-bold text-gray-500 uppercase tracking-wider">
+                        <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
                           {src.type}
                         </span>
                       </div>
@@ -265,7 +265,7 @@ export function AICompanion() {
                   ))}
 
                   {result.sources.length === 0 && (
-                    <div className="text-center text-gray-600 text-xs py-8">
+                    <div className="text-center text-muted-foreground text-xs py-8">
                       No document sources referenced.
                     </div>
                   )}
@@ -274,15 +274,15 @@ export function AICompanion() {
 
             </div>
           ) : (
-            <div className="flex-1 flex flex-col items-center justify-center p-8 text-center text-gray-500 space-y-3">
-              <Compass className="w-12 h-12 text-gray-700" />
-              <h3 className="text-base font-bold text-slate-900 dark:text-white">Ask a labor relations query</h3>
-              <p className="text-sm text-gray-500 max-w-sm">The Copilot will answer based on DOLE handbook references and Supreme Court rulings.</p>
+            <div className="flex-1 flex flex-col items-center justify-center p-8 text-center text-muted-foreground space-y-3">
+              <Compass className="w-12 h-12 text-foreground" />
+              <h3 className="text-base font-bold text-foreground">Ask a labor relations query</h3>
+              <p className="text-sm text-muted-foreground max-w-sm">The Copilot will answer based on DOLE handbook references and Supreme Court rulings.</p>
             </div>
           )}
 
           {/* Disclaimer / Bottom bar */}
-          <div className="p-4 bg-[#0d0f19] border-t border-border flex items-center justify-center gap-1.5 text-center text-xs text-gray-500">
+          <div className="p-4 bg-card border-t border-border flex items-center justify-center gap-1.5 text-center text-xs text-muted-foreground">
             <Info size={14} className="text-[#00e07a] flex-shrink-0" />
             <span>Guidance only, not legal advice. Avoid pasting sensitive employee details.</span>
           </div>

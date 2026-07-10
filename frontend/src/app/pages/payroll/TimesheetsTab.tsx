@@ -73,14 +73,14 @@ export function TimesheetsTab() {
           <button
             onClick={() => handleSetTsStatus('Approved')}
             disabled={selectedTsIds.length === 0}
-            className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all ${selectedTsIds.length === 0 ? 'bg-slate-700 text-muted-foreground cursor-not-allowed' : 'bg-emerald-600 hover:bg-emerald-700 text-foreground cursor-pointer'}`}
+            className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all ${selectedTsIds.length === 0 ? 'bg-muted text-muted-foreground cursor-not-allowed' : 'bg-emerald-600 hover:bg-emerald-700 text-foreground cursor-pointer'}`}
           >
             Approve Selected ({selectedTsIds.length})
           </button>
           <button 
             onClick={() => handleSetTsStatus('Rejected')}
             disabled={selectedTsIds.length === 0}
-            className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all ${selectedTsIds.length === 0 ? 'bg-slate-700 text-muted-foreground cursor-not-allowed' : 'bg-rose-600 hover:bg-rose-700 text-foreground cursor-pointer'}`}
+            className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all ${selectedTsIds.length === 0 ? 'bg-muted text-muted-foreground cursor-not-allowed' : 'bg-rose-600 hover:bg-rose-700 text-foreground cursor-pointer'}`}
           >
             Reject Selected ({selectedTsIds.length})
           </button>
@@ -173,7 +173,7 @@ export function TimesheetsTab() {
           <button
             onClick={handleGenerateDraft}
             disabled={isGenerating}
-            className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all flex-shrink-0 ${isGenerating ? 'bg-slate-700 text-muted-foreground cursor-not-allowed' : 'bg-emerald-600 hover:bg-emerald-700 text-foreground cursor-pointer'}`}
+            className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all flex-shrink-0 ${isGenerating ? 'bg-muted text-muted-foreground cursor-not-allowed' : 'bg-emerald-600 hover:bg-emerald-700 text-foreground cursor-pointer'}`}
           >
             {isGenerating ? "Generating..." : "Generate from Attendance"}
           </button>
@@ -184,7 +184,7 @@ export function TimesheetsTab() {
         <div>
           <button
             onClick={() => setShowHolidays(!showHolidays)}
-            className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all border border-border ${showHolidays ? 'bg-blue-600 text-slate-900 dark:text-white' : 'bg-white/5 hover:bg-accent text-foreground cursor-pointer'}`}
+            className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all border border-border ${showHolidays ? 'bg-blue-600 text-foreground' : 'bg-card/50 hover:bg-accent text-foreground cursor-pointer'}`}
           >
             {showHolidays ? "Hide Holiday Calendar" : "Show Holiday Calendar"}
           </button>
@@ -220,7 +220,7 @@ export function TimesheetsTab() {
                   status: 'Pending'
                 });
               }}
-              className="px-4 py-2 bg-white/5 hover:bg-accent border border-border rounded text-xs font-semibold text-foreground cursor-pointer"
+              className="px-4 py-2 bg-card/50 hover:bg-accent border border-border rounded text-xs font-semibold text-foreground cursor-pointer"
             >
               + Add Daily Entry
             </button>
@@ -321,7 +321,7 @@ export function TimesheetsTab() {
                       <button onClick={() => handleSaveTsRow(editingTsData)} className="px-2 py-1 bg-emerald-600 hover:bg-emerald-500 rounded text-xs text-foreground flex items-center gap-1 font-semibold cursor-pointer">
                         <Save size={12}/> Save
                       </button>
-                      <button onClick={() => setEditingTsId(null)} className="px-2 py-1 bg-slate-700 hover:bg-slate-600 rounded text-xs text-foreground cursor-pointer">
+                      <button onClick={() => setEditingTsId(null)} className="px-2 py-1 bg-muted hover:bg-slate-600 rounded text-xs text-foreground cursor-pointer">
                         Cancel
                       </button>
                     </td>
@@ -343,10 +343,10 @@ export function TimesheetsTab() {
                         />
                       </td>
                       <td className="p-3">
-                        <span className="font-semibold text-slate-900 dark:text-white block">{ts.full_name || 'N/A'}</span>
-                        <span className="text-xs text-gray-500">{ts.department || 'Staff'}</span>
+                        <span className="font-semibold text-foreground block">{ts.full_name || 'N/A'}</span>
+                        <span className="text-xs text-muted-foreground">{ts.department || 'Staff'}</span>
                       </td>
-                      <td className="p-3 font-mono text-sm text-gray-300">{ts.timesheet_date}</td>
+                      <td className="p-3 font-mono text-sm text-foreground">{ts.timesheet_date}</td>
                       
                       <td className="p-3 text-center">
                         {isEditing ? (
@@ -454,7 +454,7 @@ export function TimesheetsTab() {
                               <button onClick={() => handleSaveTsRow(editingTsData)} className="p-1.5 bg-emerald-600 hover:bg-emerald-500 rounded text-foreground cursor-pointer" title="Save">
                                 <Save size={14}/>
                               </button>
-                              <button onClick={() => setEditingTsId(null)} className="p-1.5 bg-slate-700 hover:bg-slate-600 rounded text-foreground cursor-pointer" title="Cancel">
+                              <button onClick={() => setEditingTsId(null)} className="p-1.5 bg-muted hover:bg-slate-600 rounded text-foreground cursor-pointer" title="Cancel">
                                 <AlertCircle size={14}/>
                               </button>
                             </>
@@ -465,7 +465,7 @@ export function TimesheetsTab() {
                                   setEditingTsId(ts.id);
                                   setEditingTsData({ ...ts });
                                 }}
-                                className="px-2 py-1 bg-white/5 hover:bg-accent border border-border rounded text-xs text-foreground cursor-pointer"
+                                className="px-2 py-1 bg-card/50 hover:bg-accent border border-border rounded text-xs text-foreground cursor-pointer"
                               >
                                 Edit
                               </button>

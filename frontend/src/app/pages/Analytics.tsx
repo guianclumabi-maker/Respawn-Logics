@@ -72,7 +72,7 @@ export function Analytics() {
           <div className="w-16 h-16 bg-red-500/10 rounded-2xl border border-red-500/20 flex items-center justify-center mx-auto mb-6 shadow-[0_0_20px_rgba(239,68,68,0.15)]">
             <AlertTriangle className="w-8 h-8 text-red-400" />
           </div>
-          <h2 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">Access Denied</h2>
+          <h2 className="text-2xl font-bold text-foreground tracking-tight">Access Denied</h2>
           <p className="text-sm">You don't have access to Analytics. Executive clearance is required to view this module.</p>
         </div>
       </div>
@@ -83,7 +83,7 @@ export function Analytics() {
     return (
       <div className="flex-1 flex flex-col items-center justify-center py-24 text-center">
         <Target size={40} className="text-[#f5a623] mb-4" />
-        <p className="text-gray-900 dark:text-foreground font-medium mb-1 font-sans">
+        <p className="text-foreground font-medium mb-1 font-sans">
           Unable to load analytics
         </p>
         <p className="text-sm text-muted-foreground dark:text-muted-foreground font-mono">{error}</p>
@@ -128,7 +128,7 @@ export function Analytics() {
                   <YAxis stroke="#888888" fontSize={12} tickLine={false} axisLine={false} />
                   <RechartsTooltip 
                     cursor={{ fill: 'rgba(255,255,255,0.05)' }}
-                    contentStyle={{ backgroundColor: 'rgba(15, 23, 42, 0.9)', borderColor: 'rgba(255,255,255,0.1)', borderRadius: '8px', color: '#fff' }}
+                    contentStyle={{ backgroundColor: 'var(--card)', borderColor: 'var(--border)', borderRadius: '8px', color: 'var(--foreground)' }}
                     itemStyle={{ color: '#fff' }}
                   />
                   <Bar dataKey="count" fill="#3b82f6" radius={[4, 4, 0, 0]} />
@@ -162,7 +162,7 @@ export function Analytics() {
                   <YAxis stroke="#888888" fontSize={12} tickLine={false} axisLine={false} />
                   <RechartsTooltip 
                     cursor={{ fill: 'rgba(255,255,255,0.05)' }}
-                    contentStyle={{ backgroundColor: 'rgba(15, 23, 42, 0.9)', borderColor: 'rgba(255,255,255,0.1)', borderRadius: '8px', color: '#fff' }}
+                    contentStyle={{ backgroundColor: 'var(--card)', borderColor: 'var(--border)', borderRadius: '8px', color: 'var(--foreground)' }}
                     itemStyle={{ color: '#fff' }}
                   />
                   <Bar dataKey="count" fill="#00e07a" radius={[4, 4, 0, 0]} />
@@ -202,7 +202,7 @@ export function Analytics() {
                   tickFormatter={(value) => `$${value.toLocaleString()}`}
                 />
                 <RechartsTooltip 
-                  contentStyle={{ backgroundColor: 'rgba(15, 23, 42, 0.9)', borderColor: 'rgba(255,255,255,0.1)', borderRadius: '8px', color: '#fff' }}
+                  contentStyle={{ backgroundColor: 'var(--card)', borderColor: 'var(--border)', borderRadius: '8px', color: 'var(--foreground)' }}
                   itemStyle={{ color: '#fff' }}
                   formatter={(value: any) => [`$${Number(value).toLocaleString()}`, 'Gross Payroll']}
                 />

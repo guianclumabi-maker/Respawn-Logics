@@ -131,7 +131,7 @@ async function boot() {
   }
 
   createRoot(document.getElementById("root")!).render(
-    <ThemeProvider attribute="data-theme" defaultTheme="dark" storageKey="theme">
+    <ThemeProvider attribute="data-theme" defaultTheme="system" storageKey="theme">
       {/* @ts-ignore: React 18 type mismatch from Sentry */}
       <Sentry.ErrorBoundary fallback={<div className="p-8 text-red-500">Something went wrong. Please reload the page.</div>}>
         <AuthProvider>

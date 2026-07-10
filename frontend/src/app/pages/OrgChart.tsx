@@ -54,24 +54,24 @@ export function OrgChart() {
   if (!canView) return <div className="h-full flex items-center justify-center bg-background text-muted-foreground">Permission denied.</div>;
 
   return (
-    <ThemeProvider attribute="data-theme" defaultTheme="dark">
-      <div className="h-full w-full flex flex-col bg-background text-slate-200">
+    <ThemeProvider attribute="data-theme" defaultTheme="system">
+      <div className="h-full w-full flex flex-col bg-background text-foreground">
         
         {/* Header */}
-        <div className="p-8 pb-4 border-b border-border flex justify-between items-end bg-[#141929]">
+        <div className="p-8 pb-4 border-b border-border flex justify-between items-end bg-card">
           <div>
-            <h1 className="text-3xl font-bold text-slate-900 dark:text-white mb-2" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>Organization Chart</h1>
+            <h1 className="text-3xl font-bold text-foreground mb-2" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>Organization Chart</h1>
             <p className="text-muted-foreground text-sm">Visual hierarchy of all employees</p>
           </div>
           <div className="flex gap-2 bg-input border-border p-1 rounded-lg border border-border">
-            <button onClick={() => setZoom(z => Math.min(z + 0.1, 2))} className="p-2 text-muted-foreground hover:text-white hover:bg-accent rounded"><ZoomIn size={18} /></button>
-            <button onClick={() => setZoom(1)} className="p-2 text-muted-foreground hover:text-white hover:bg-accent rounded"><Maximize size={18} /></button>
-            <button onClick={() => setZoom(z => Math.max(z - 0.1, 0.5))} className="p-2 text-muted-foreground hover:text-white hover:bg-accent rounded"><ZoomOut size={18} /></button>
+            <button onClick={() => setZoom(z => Math.min(z + 0.1, 2))} className="p-2 text-muted-foreground hover:text-foreground hover:bg-accent rounded"><ZoomIn size={18} /></button>
+            <button onClick={() => setZoom(1)} className="p-2 text-muted-foreground hover:text-foreground hover:bg-accent rounded"><Maximize size={18} /></button>
+            <button onClick={() => setZoom(z => Math.max(z - 0.1, 0.5))} className="p-2 text-muted-foreground hover:text-foreground hover:bg-accent rounded"><ZoomOut size={18} /></button>
           </div>
         </div>
 
         {/* Canvas */}
-        <div className="flex-1 overflow-auto p-12 relative custom-scrollbar bg-gradient-to-b from-[#0b0f1a] to-[#0f1423]">
+        <div className="flex-1 overflow-auto p-12 relative custom-scrollbar bg-gradient-to-b from-background to-muted dark:from-[#0b0f1a] dark:to-[#0f1423]">
           {loading ? (
             <div className="absolute inset-0 flex items-center justify-center text-[#00e07a] animate-pulse">Loading Chart...</div>
           ) : data ? (
@@ -110,28 +110,28 @@ function TreeNode({ node }: { node: Employee }) {
       <div className="relative group">
         <div className="w-56 bg-card text-card-foreground border border-border rounded-xl p-4 shadow-xl flex flex-col items-center text-center transition-all duration-200 hover:border-[#00e07a]/50 hover:shadow-[0_0_20px_rgba(0,224,122,0.15)] z-10 relative">
           
-          <div className="w-12 h-12 bg-gradient-to-br from-slate-700 to-slate-800 rounded-full flex items-center justify-center text-foreground font-bold text-sm border-2 border-[#161922] shadow-md -mt-8 mb-3 group-hover:scale-110 transition-transform">
+          <div className="w-12 h-12 bg-gradient-to-br from-slate-700 to-slate-800 rounded-full flex items-center justify-center text-foreground font-bold text-sm border-2 border-border shadow-md -mt-8 mb-3 group-hover:scale-110 transition-transform">
             {getInitials(node.full_name)}
           </div>
           
-          <div className="font-bold text-slate-900 dark:text-white text-sm" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>{node.full_name}</div>
+          <div className="font-bold text-foreground text-sm" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>{node.full_name}</div>
           <div className="text-xs font-semibold text-[#00b8ff] mt-1">{node.job_title || 'Employee'}</div>
-          <div className="text-[10px] text-slate-500 uppercase tracking-widest mt-2 px-2 py-1 bg-white/5 rounded-md inline-block">{node.department || 'General'}</div>
+          <div className="text-[10px] text-slate-500 uppercase tracking-widest mt-2 px-2 py-1 bg-card/50 rounded-md inline-block">{node.department || 'General'}</div>
         </div>
       </div>
 
       {/* Lines & Children */}
       {hasChildren && (
         <>
-          <div className="w-px h-8 bg-white/20"></div>
-          <div className="flex relative pt-4 border-t border-white/20">
+          <div className="w-px h-8 bg-card/20"></div>
+          <div className="flex relative pt-4 border-t border-border">
             {node.children!.map((child, index) => (
               <div key={child.id} className="relative flex flex-col items-center px-4">
                 {/* Connecting Lines for children */}
                 {index === 0 && <div className="absolute top-0 right-0 w-1/2 h-px bg-background -mt-px"></div>}
                 {index === node.children!.length - 1 && <div className="absolute top-0 left-0 w-1/2 h-px bg-background -mt-px"></div>}
                 
-                <div className="absolute top-0 w-px h-4 bg-white/20 -mt-4"></div>
+                <div className="absolute top-0 w-px h-4 bg-card/20 -mt-4"></div>
                 
                 <TreeNode node={child} />
               </div>

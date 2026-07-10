@@ -1,27 +1,29 @@
 @custom-variant dark (&:is([data-theme="dark"] *));
 
 :root {
+  /* LIGHT MODE — was previously a copy of the dark palette, which kept this
+     entire bundle black in light mode. Aligned with the main SPA's light theme. */
   --font-size: 16px;
-  --background: #0d1117;
-  --foreground: #f0f4ff;
-  --card: rgba(255, 255, 255, 0.05);
-  --card-foreground: #f0f4ff;
-  --popover: #161b27;
-  --popover-foreground: #f0f4ff;
+  --background: hsl(220, 20%, 96%);
+  --foreground: #0f172a;
+  --card: #ffffff;
+  --card-foreground: #0f172a;
+  --popover: #ffffff;
+  --popover-foreground: #0f172a;
   --primary: #00e07a;
-  --primary-foreground: #0b0f1a;
-  --secondary: rgba(255, 255, 255, 0.08);
-  --secondary-foreground: #f0f4ff;
-  --muted: rgba(255, 255, 255, 0.06);
-  --muted-foreground: #8899b4;
-  --accent: #00e07a;
-  --accent-foreground: #0b0f1a;
-  --destructive: #ef4444;
+  --primary-foreground: #020617;
+  --secondary: #f1f5f9;
+  --secondary-foreground: #0f172a;
+  --muted: #f1f5f9;
+  --muted-foreground: #4b5563;
+  --accent: #e2e8f0;
+  --accent-foreground: #0f172a;
+  --destructive: #dc2626;
   --destructive-foreground: #ffffff;
-  --border: rgba(255, 255, 255, 0.1);
-  --input: rgba(255, 255, 255, 0.06);
-  --input-background: rgba(255, 255, 255, 0.06);
-  --switch-background: #334155;
+  --border: rgba(15, 23, 42, 0.11);
+  --input: #f8fafc;
+  --input-background: #f8fafc;
+  --switch-background: #cbd5e1;
   --font-weight-medium: 500;
   --font-weight-normal: 400;
   --ring: #00e07a;
@@ -31,13 +33,13 @@
   --chart-4: #6366f1;
   --chart-5: #ef4444;
   --radius: 0.75rem;
-  --sidebar: #0d1117;
-  --sidebar-foreground: #f0f4ff;
+  --sidebar: #ffffff;
+  --sidebar-foreground: #0f172a;
   --sidebar-primary: #00e07a;
-  --sidebar-primary-foreground: #0b0f1a;
-  --sidebar-accent: rgba(255, 255, 255, 0.06);
-  --sidebar-accent-foreground: #f0f4ff;
-  --sidebar-border: rgba(255, 255, 255, 0.1);
+  --sidebar-primary-foreground: #020617;
+  --sidebar-accent: #f1f5f9;
+  --sidebar-accent-foreground: #0f172a;
+  --sidebar-border: rgba(15, 23, 42, 0.09);
   --sidebar-ring: #00e07a;
 }
 

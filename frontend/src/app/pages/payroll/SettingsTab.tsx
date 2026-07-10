@@ -233,7 +233,7 @@ export function SettingsTab() {
               </div>
 
               <div className="flex justify-end gap-3 mt-6">
-                <button type="button" className="btn bg-slate-700 hover:bg-slate-600 text-slate-900 dark:text-white" onClick={() => setShowComponentModal(false)}>Cancel</button>
+                <button type="button" className="btn bg-muted hover:bg-slate-600 text-foreground" onClick={() => setShowComponentModal(false)}>Cancel</button>
                 <button type="submit" className="btn btn-primary">Save Component</button>
               </div>
             </form>

@@ -122,7 +122,7 @@ export function TalentSearch({ onViewChange }: { onViewChange: (v: ViewState) =>
               <select
                 value={query.source}
                 onChange={(e) => setQuery({ ...query, source: e.target.value })}
-                className="w-full bg-card border border-border rounded-xl pl-9 pr-3 py-2 text-xs text-gray-300 outline-none focus:border-[#00e07a] appearance-none cursor-pointer"
+                className="w-full bg-card border border-border rounded-xl pl-9 pr-3 py-2 text-xs text-foreground outline-none focus:border-[#00e07a] appearance-none cursor-pointer"
               >
                 <option value="" className="bg-background">Any Source</option>
                 <option value="Direct" className="bg-background">Direct</option>

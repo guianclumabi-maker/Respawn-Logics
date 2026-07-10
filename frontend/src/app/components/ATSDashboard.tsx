@@ -315,7 +315,7 @@ function JobHealthCard({
   ];
 
   return (
-    <div className="bg-card border border-border rounded-xl p-5 flex flex-col justify-between transition-all hover:border-[#9b6dff]/40 hover:bg-purple-500/5 dark:hover:bg-[#141929] hover:shadow-[0_0_15px_rgba(155,109,255,0.1)]">
+    <div className="bg-card border border-border rounded-xl p-5 flex flex-col justify-between transition-all hover:border-[#9b6dff]/40 hover:bg-purple-500/5 dark:hover:bg-card hover:shadow-[0_0_15px_rgba(155,109,255,0.1)]">
       {/* Header */}
       <div className="mb-4">
         <div className="flex items-start justify-between mb-2">
@@ -336,7 +336,7 @@ function JobHealthCard({
           )}
           {job.priority && (
             <span
-              className={`text-[10px] font-mono px-2 py-0.5 rounded border ${priorityConfig[job.priority] || "bg-white/5 text-muted-foreground border-border"}`}
+              className={`text-[10px] font-mono px-2 py-0.5 rounded border ${priorityConfig[job.priority] || "bg-card/50 text-muted-foreground border-border"}`}
             >
               {`PRIORITY: ${job.priority}`}
             </span>
@@ -397,7 +397,7 @@ function JobHealthCard({
         >
           [ BOARD ]
         </button>
-        <span className="text-gray-700">·</span>
+        <span className="text-foreground">·</span>
         <button
           onClick={() =>
             onViewChange({ view: "Candidates", jobId: job.id })
@@ -406,7 +406,7 @@ function JobHealthCard({
         >
           [ + CANDIDATE ]
         </button>
-        <span className="text-gray-700">·</span>
+        <span className="text-foreground">·</span>
         <button className="flex items-center gap-1 text-[10px] font-semibold text-muted-foreground hover:text-muted-foreground transition-colors cursor-pointer bg-transparent border-0 px-0">
           [ PAUSE ]
         </button>
@@ -575,7 +575,7 @@ export function ATSDashboard({ onViewChange }: Props) {
           /* ── Error State ──────────────────────────────────────────────── */
           <div className="flex flex-col items-center justify-center py-24 text-center">
             <AlertTriangle size={40} className="text-[#f5a623] mb-4" />
-            <p className="text-gray-900 dark:text-foreground font-medium mb-1" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
+            <p className="text-foreground font-medium mb-1" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
               Unable to load dashboard
             </p>
             <p className="text-sm text-muted-foreground dark:text-muted-foreground font-mono">{error}</p>
@@ -747,7 +747,7 @@ export function ATSDashboard({ onViewChange }: Props) {
                         key={act.id || idx}
                         className="flex items-start gap-3 p-3 rounded-lg hover:bg-muted transition-colors group"
                       >
-                        <div className="flex-shrink-0 w-8 h-8 rounded-lg bg-white/[0.03] border border-border flex items-center justify-center mt-0.5">
+                        <div className="flex-shrink-0 w-8 h-8 rounded-lg bg-card/[0.03] border border-border flex items-center justify-center mt-0.5">
                           {getActivityIcon(act.action)}
                         </div>
                         <div className="flex-1 min-w-0">
@@ -806,7 +806,7 @@ export function ATSDashboard({ onViewChange }: Props) {
                             candidateId: interview.candidate_id,
                           })
                         }
-                        className="w-full text-left p-3.5 rounded-lg bg-white/[0.01] border border-border hover:border-blue-500/20 hover:bg-blue-500/5 transition-all cursor-pointer group"
+                        className="w-full text-left p-3.5 rounded-lg bg-card/[0.01] border border-border hover:border-blue-500/20 hover:bg-blue-500/5 transition-all cursor-pointer group"
                       >
                         <div className="flex items-start justify-between mb-1.5">
                           <span className="text-sm font-medium text-foreground group-hover:text-blue-300 transition-colors">
@@ -827,7 +827,7 @@ export function ATSDashboard({ onViewChange }: Props) {
                           </span>
                           {interview.interview_type && (
                             <>
-                              <span className="text-gray-700">·</span>
+                              <span className="text-foreground">·</span>
                               <span>{interview.interview_type}</span>
                             </>
                           )}

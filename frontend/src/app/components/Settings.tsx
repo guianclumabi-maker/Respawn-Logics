@@ -38,9 +38,9 @@ export function Settings({ onViewChange }: { onViewChange: (v: ViewState) => voi
       </div>
 
       <div className="flex-1 border border-border bg-card text-card-foreground/50 rounded-2xl overflow-hidden relative z-10 flex flex-col items-center justify-center">
-        <SettingsIcon size={48} className="mb-4 text-gray-600 opacity-50" />
-        <h2 className="text-lg font-bold text-gray-300">Settings Configuration Active</h2>
-        <p className="text-sm text-gray-500 mt-2 max-w-sm text-center">Platform configurations are synced globally via Respawn Logic Core HRIS.</p>
+        <SettingsIcon size={48} className="mb-4 text-muted-foreground opacity-50" />
+        <h2 className="text-lg font-bold text-foreground">Settings Configuration Active</h2>
+        <p className="text-sm text-muted-foreground mt-2 max-w-sm text-center">Platform configurations are synced globally via Respawn Logic Core HRIS.</p>
       </div>
     </div>
   );

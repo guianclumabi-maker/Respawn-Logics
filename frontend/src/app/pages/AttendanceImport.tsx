@@ -149,7 +149,7 @@ export function AttendanceImportContent() {
           </div>
           <button 
             onClick={downloadTemplate}
-            className="px-4 py-2 bg-white/5 hover:bg-accent border border-border text-foreground font-semibold rounded-lg text-sm transition-all flex items-center gap-2 cursor-pointer"
+            className="px-4 py-2 bg-card/50 hover:bg-accent border border-border text-foreground font-semibold rounded-lg text-sm transition-all flex items-center gap-2 cursor-pointer"
           >
             <Download size={16} /> Download CSV Template
           </button>
@@ -168,7 +168,7 @@ export function AttendanceImportContent() {
             <p>
               Please structure your biometric import using these guidelines. Columns must match the exact case-sensitive headers:
             </p>
-            <div className="bg-black/35 p-3 rounded-lg font-mono text-[11px] text-gray-300 border border-border">
+            <div className="bg-black/35 p-3 rounded-lg font-mono text-[11px] text-foreground border border-border">
               employee_id, time_in, time_out<br />
               EMP-001, 2026-07-01 08:00, 2026-07-01 17:00<br />
               maria.clara@company.com, 2026-07-01 08:30, 2026-07-01 17:30
@@ -193,26 +193,26 @@ export function AttendanceImportContent() {
           )}
 
           {response && (
-            <div className="p-5 bg-white/[0.02] border border-border rounded-xl space-y-4">
+            <div className="p-5 bg-card/[0.02] border border-border rounded-xl space-y-4">
               <div className="flex items-center gap-2.5">
                 <CheckCircle className="w-5 h-5 text-[#00e07a] flex-shrink-0" />
-                <h3 className="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-wider">Import Processing Complete</h3>
+                <h3 className="text-sm font-bold text-foreground uppercase tracking-wider">Import Processing Complete</h3>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="bg-input border-border p-4 rounded-lg border border-border text-center">
                   <span className="block text-2xl font-bold text-[#00e07a]">{response.processed ?? 0}</span>
-                  <span className="text-[10px] text-gray-500 uppercase font-semibold tracking-wider">Processed & Saved</span>
+                  <span className="text-[10px] text-muted-foreground uppercase font-semibold tracking-wider">Processed & Saved</span>
                 </div>
                 <div className="bg-input border-border p-4 rounded-lg border border-border text-center">
                   <span className="block text-2xl font-bold text-amber-500">{response.skipped ?? 0}</span>
-                  <span className="text-[10px] text-gray-500 uppercase font-semibold tracking-wider">Skipped</span>
+                  <span className="text-[10px] text-muted-foreground uppercase font-semibold tracking-wider">Skipped</span>
                 </div>
               </div>
 
               {response.warnings && response.warnings.length > 0 && (
                 <div className="border-t border-border pt-3 mt-3 space-y-2">
                   <span className="text-xs font-bold text-amber-500 uppercase tracking-wider block">Import warnings:</span>
-                  <div className="bg-black/25 p-3 rounded-lg border border-border space-y-1.5 max-h-48 overflow-y-auto scrollbar-thin">
+                  <div className="bg-muted/50 p-3 rounded-lg border border-border space-y-1.5 max-h-48 overflow-y-auto scrollbar-thin">
                     {response.warnings.map((w, idx) => (
                       <p key={idx} className="text-xs text-muted-foreground font-sans flex items-start gap-2">
                         <span className="text-amber-500 font-bold">•</span>
@@ -236,7 +236,7 @@ export function AttendanceImportContent() {
               className={`border-2 border-dashed rounded-2xl p-12 text-center transition-all cursor-pointer flex flex-col items-center justify-center gap-3 ${
                 dragActive 
                   ? "border-[#00e07a] bg-[#00e07a]/5" 
-                  : "border-border hover:border-white/20 bg-black/15"
+                  : "border-border hover:border-border bg-black/15"
               }`}
             >
               <input 
@@ -246,7 +246,7 @@ export function AttendanceImportContent() {
                 accept=".csv"
                 className="hidden"
               />
-              <div className="w-14 h-14 rounded-full bg-white/5 border border-border flex items-center justify-center shadow-lg">
+              <div className="w-14 h-14 rounded-full bg-card/50 border border-border flex items-center justify-center shadow-lg">
                 <Upload className="w-6 h-6 text-muted-foreground" />
               </div>
               
@@ -255,12 +255,12 @@ export function AttendanceImportContent() {
                   <p className="text-sm font-bold text-foreground flex items-center gap-2 justify-center">
                     <FileText size={16} className="text-[#00e07a]" /> {file.name}
                   </p>
-                  <p className="text-xs text-gray-500">{(file.size / 1024).toFixed(2)} KB · Ready to import</p>
+                  <p className="text-xs text-muted-foreground">{(file.size / 1024).toFixed(2)} KB · Ready to import</p>
                 </div>
               ) : (
                 <div className="space-y-1 font-sans">
-                  <p className="text-sm font-semibold text-slate-900 dark:text-white">Drag and drop your biometric CSV log here</p>
-                  <p className="text-xs text-gray-500">or click to browse local files (Accepts .csv format)</p>
+                  <p className="text-sm font-semibold text-foreground">Drag and drop your biometric CSV log here</p>
+                  <p className="text-xs text-muted-foreground">or click to browse local files (Accepts .csv format)</p>
                 </div>
               )}
             </div>
@@ -286,7 +286,7 @@ export function AttendanceImportContent() {
 
 export function AttendanceImport() {
   return (
-    <ThemeProvider attribute="data-theme" defaultTheme="dark">
+    <ThemeProvider attribute="data-theme" defaultTheme="system">
       <div className="h-full w-full flex-1 overflow-hidden relative" style={{ isolation: 'isolate' }}>
         <AttendanceImportContent />
       </div>

@@ -127,8 +127,8 @@ export function LeavesDashboard() {
               <div key={i} className="bg-card text-card-foreground/70 border border-border rounded-xl p-5 shadow-lg">
                 <div className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-2">{b.leave_type}</div>
                 <div className="flex items-end gap-2">
-                  <div className="text-3xl font-bold text-slate-900 dark:text-white">{available}</div>
-                  <div className="text-sm text-gray-500 mb-1">/ {b.total_allowance} days</div>
+                  <div className="text-3xl font-bold text-foreground">{available}</div>
+                  <div className="text-sm text-muted-foreground mb-1">/ {b.total_allowance} days</div>
                 </div>
               </div>
             );
@@ -139,14 +139,14 @@ export function LeavesDashboard() {
         <div className="flex gap-4 border-b border-border">
           <button 
             onClick={() => setActiveTab("my_requests")}
-            className={`pb-3 px-1 text-sm font-medium transition-colors ${activeTab === "my_requests" ? "text-foreground border-b-2 border-[#00e07a]" : "text-gray-500 hover:text-gray-300"}`}
+            className={`pb-3 px-1 text-sm font-medium transition-colors ${activeTab === "my_requests" ? "text-foreground border-b-2 border-[#00e07a]" : "text-muted-foreground hover:text-foreground"}`}
           >
             My Requests
           </button>
           {approvals.length > 0 && (
             <button 
               onClick={() => setActiveTab("approvals")}
-              className={`pb-3 px-1 text-sm font-medium transition-colors flex items-center gap-2 ${activeTab === "approvals" ? "text-foreground border-b-2 border-[#00e07a]" : "text-gray-500 hover:text-gray-300"}`}
+              className={`pb-3 px-1 text-sm font-medium transition-colors flex items-center gap-2 ${activeTab === "approvals" ? "text-foreground border-b-2 border-[#00e07a]" : "text-muted-foreground hover:text-foreground"}`}
             >
               Pending Approvals
               <span className="bg-[#c084fc]/20 text-[#c084fc] px-1.5 py-0.5 rounded text-[10px] font-bold">{approvals.length}</span>
@@ -156,33 +156,33 @@ export function LeavesDashboard() {
 
         {/* Content */}
         {loading ? (
-          <div className="text-center text-gray-500 py-10">Loading...</div>
+          <div className="text-center text-muted-foreground py-10">Loading...</div>
         ) : activeTab === "my_requests" ? (
           <div className="bg-card text-card-foreground/70 border border-border rounded-xl overflow-hidden">
             <table className="w-full text-left border-collapse">
               <thead className="bg-input border-border">
                 <tr>
-                  <th className="py-3 px-5 text-xs font-semibold text-gray-500 uppercase">Type</th>
-                  <th className="py-3 px-5 text-xs font-semibold text-gray-500 uppercase">Dates</th>
-                  <th className="py-3 px-5 text-xs font-semibold text-gray-500 uppercase">Status</th>
-                  <th className="py-3 px-5 text-xs font-semibold text-gray-500 uppercase">Submitted</th>
+                  <th className="py-3 px-5 text-xs font-semibold text-muted-foreground uppercase">Type</th>
+                  <th className="py-3 px-5 text-xs font-semibold text-muted-foreground uppercase">Dates</th>
+                  <th className="py-3 px-5 text-xs font-semibold text-muted-foreground uppercase">Status</th>
+                  <th className="py-3 px-5 text-xs font-semibold text-muted-foreground uppercase">Submitted</th>
                 </tr>
               </thead>
               <tbody>
                 {myRequests.map((req) => (
-                  <tr key={req.id} className="border-b border-white/[0.02] hover:bg-white/[0.02]">
-                    <td className="py-4 px-5 text-sm text-slate-900 dark:text-white font-medium">{req.leave_type}</td>
-                    <td className="py-4 px-5 text-sm text-gray-300">{req.start_date} to {req.end_date}</td>
+                  <tr key={req.id} className="border-b border-white/[0.02] hover:bg-card/[0.02]">
+                    <td className="py-4 px-5 text-sm text-foreground font-medium">{req.leave_type}</td>
+                    <td className="py-4 px-5 text-sm text-foreground">{req.start_date} to {req.end_date}</td>
                     <td className="py-4 px-5">
                       <span className={`inline-flex items-center px-2 py-0.5 rounded text-[11px] font-bold border ${getStatusColor(req.status)}`}>
                         {req.status}
                       </span>
                     </td>
-                    <td className="py-4 px-5 text-xs text-gray-500">{new Date(req.created_at).toLocaleDateString()}</td>
+                    <td className="py-4 px-5 text-xs text-muted-foreground">{new Date(req.created_at).toLocaleDateString()}</td>
                   </tr>
                 ))}
                 {myRequests.length === 0 && (
-                  <tr><td colSpan={4} className="py-8 text-center text-gray-500 text-sm">No leave requests found.</td></tr>
+                  <tr><td colSpan={4} className="py-8 text-center text-muted-foreground text-sm">No leave requests found.</td></tr>
                 )}
               </tbody>
             </table>
@@ -192,22 +192,22 @@ export function LeavesDashboard() {
             <table className="w-full text-left border-collapse">
               <thead className="bg-input border-border">
                 <tr>
-                  <th className="py-3 px-5 text-xs font-semibold text-gray-500 uppercase">Employee</th>
-                  <th className="py-3 px-5 text-xs font-semibold text-gray-500 uppercase">Type & Dates</th>
-                  <th className="py-3 px-5 text-xs font-semibold text-gray-500 uppercase">Reason</th>
-                  <th className="py-3 px-5 text-xs font-semibold text-gray-500 uppercase text-right">Actions</th>
+                  <th className="py-3 px-5 text-xs font-semibold text-muted-foreground uppercase">Employee</th>
+                  <th className="py-3 px-5 text-xs font-semibold text-muted-foreground uppercase">Type & Dates</th>
+                  <th className="py-3 px-5 text-xs font-semibold text-muted-foreground uppercase">Reason</th>
+                  <th className="py-3 px-5 text-xs font-semibold text-muted-foreground uppercase text-right">Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {approvals.map((req) => (
-                  <tr key={req.id} className="border-b border-white/[0.02] hover:bg-white/[0.02]">
+                  <tr key={req.id} className="border-b border-white/[0.02] hover:bg-card/[0.02]">
                     <td className="py-4 px-5">
-                      <div className="text-sm font-medium text-slate-900 dark:text-white">{req.full_name}</div>
-                      <div className="text-xs text-gray-500">{req.department}</div>
+                      <div className="text-sm font-medium text-foreground">{req.full_name}</div>
+                      <div className="text-xs text-muted-foreground">{req.department}</div>
                     </td>
                     <td className="py-4 px-5">
-                      <div className="text-sm text-gray-300">{req.leave_type}</div>
-                      <div className="text-xs text-gray-500">{req.start_date} to {req.end_date}</div>
+                      <div className="text-sm text-foreground">{req.leave_type}</div>
+                      <div className="text-xs text-muted-foreground">{req.start_date} to {req.end_date}</div>
                     </td>
                     <td className="py-4 px-5 text-sm text-muted-foreground max-w-xs truncate">{req.reason || "—"}</td>
                     <td className="py-4 px-5 text-right space-x-2">
@@ -227,13 +227,13 @@ export function LeavesDashboard() {
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <div className="bg-card text-card-foreground border border-border rounded-xl w-full max-w-md shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
             <div className="p-5 border-b border-border flex justify-between items-center">
-              <h3 className="text-lg font-bold text-slate-900 dark:text-white">Apply for Leave</h3>
-              <button onClick={() => setShowApplyModal(false)} className="text-muted-foreground hover:text-white">&times;</button>
+              <h3 className="text-lg font-bold text-foreground">Apply for Leave</h3>
+              <button onClick={() => setShowApplyModal(false)} className="text-muted-foreground hover:text-foreground">&times;</button>
             </div>
             <form onSubmit={handleApply} className="p-5 space-y-4">
               <div>
                 <label className="block text-xs font-medium text-muted-foreground uppercase mb-1">Leave Type</label>
-                <select value={leaveType} onChange={(e) => setLeaveType(e.target.value)} className="w-full bg-[#1a1d27] border border-border rounded-lg py-2.5 px-3 text-slate-900 dark:text-white text-sm focus:outline-none focus:border-[#00e07a]/50">
+                <select value={leaveType} onChange={(e) => setLeaveType(e.target.value)} className="w-full bg-input border border-border rounded-lg py-2.5 px-3 text-foreground text-sm focus:outline-none focus:border-[#00e07a]/50">
                   <option value="Vacation Leave">Vacation Leave</option>
                   <option value="Sick Leave">Sick Leave</option>
                   <option value="Maternity Leave">Maternity Leave</option>
@@ -243,19 +243,19 @@ export function LeavesDashboard() {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-xs font-medium text-muted-foreground uppercase mb-1">Start Date</label>
-                  <input type="date" required value={startDate} onChange={(e) => setStartDate(e.target.value)} className="w-full bg-[#1a1d27] border border-border rounded-lg py-2.5 px-3 text-slate-900 dark:text-white text-sm focus:outline-none focus:border-[#00e07a]/50 [color-scheme:dark]" />
+                  <input type="date" required value={startDate} onChange={(e) => setStartDate(e.target.value)} className="w-full bg-input border border-border rounded-lg py-2.5 px-3 text-foreground text-sm focus:outline-none focus:border-[#00e07a]/50 [color-scheme:dark]" />
                 </div>
                 <div>
                   <label className="block text-xs font-medium text-muted-foreground uppercase mb-1">End Date</label>
-                  <input type="date" required value={endDate} onChange={(e) => setEndDate(e.target.value)} className="w-full bg-[#1a1d27] border border-border rounded-lg py-2.5 px-3 text-slate-900 dark:text-white text-sm focus:outline-none focus:border-[#00e07a]/50 [color-scheme:dark]" />
+                  <input type="date" required value={endDate} onChange={(e) => setEndDate(e.target.value)} className="w-full bg-input border border-border rounded-lg py-2.5 px-3 text-foreground text-sm focus:outline-none focus:border-[#00e07a]/50 [color-scheme:dark]" />
                 </div>
               </div>
               <div>
                 <label className="block text-xs font-medium text-muted-foreground uppercase mb-1">Reason</label>
-                <textarea value={reason} onChange={(e) => setReason(e.target.value)} rows={3} className="w-full bg-[#1a1d27] border border-border rounded-lg py-2.5 px-3 text-slate-900 dark:text-white text-sm focus:outline-none focus:border-[#00e07a]/50 resize-none" placeholder="Optional details..."></textarea>
+                <textarea value={reason} onChange={(e) => setReason(e.target.value)} rows={3} className="w-full bg-input border border-border rounded-lg py-2.5 px-3 text-foreground text-sm focus:outline-none focus:border-[#00e07a]/50 resize-none" placeholder="Optional details..."></textarea>
               </div>
               <div className="pt-2 flex justify-end gap-3">
-                <button type="button" onClick={() => setShowApplyModal(false)} className="px-4 py-2 bg-transparent text-muted-foreground hover:text-white font-medium text-sm">Cancel</button>
+                <button type="button" onClick={() => setShowApplyModal(false)} className="px-4 py-2 bg-transparent text-muted-foreground hover:text-foreground font-medium text-sm">Cancel</button>
                 <button type="submit" className="px-4 py-2 bg-[#00e07a] text-black font-bold rounded-lg text-sm shadow-[0_0_10px_rgba(0,224,122,0.3)]">Submit Request</button>
               </div>
             </form>

@@ -15,12 +15,12 @@ type Stats = {
 
 function StatCard({ icon: Icon, label, value, sub, color }: { icon: any; label: string; value: string | number; sub?: string; color: string }) {
   return (
-    <div className={`bg-[#0c1018] border border-white/[0.05] rounded-2xl p-6 flex items-start gap-4 relative overflow-hidden group hover:border-border transition-all`}>
+    <div className={`bg-background border border-white/[0.05] rounded-2xl p-6 flex items-start gap-4 relative overflow-hidden group hover:border-border transition-all`}>
       <div className={`w-11 h-11 rounded-xl ${color} flex items-center justify-center flex-shrink-0`}>
-        <Icon size={20} className="text-slate-900 dark:text-white" />
+        <Icon size={20} className="text-foreground" />
       </div>
       <div>
-        <p className="text-3xl font-bold text-slate-900 dark:text-white leading-tight">{value}</p>
+        <p className="text-3xl font-bold text-foreground leading-tight">{value}</p>
         <p className="text-sm text-muted-foreground mt-0.5">{label}</p>
         {sub && <p className="text-xs text-slate-600 mt-1">{sub}</p>}
       </div>
@@ -80,7 +80,7 @@ export function PlatformAdminOverview() {
               label="Breached SLAs"
               value={stats.breachedTickets}
               sub="Tickets past SLA deadline"
-              color={stats.breachedTickets > 0 ? "bg-red-500" : "bg-slate-700"}
+              color={stats.breachedTickets > 0 ? "bg-red-500" : "bg-muted"}
             />
           </div>
 
@@ -96,14 +96,14 @@ export function PlatformAdminOverview() {
           </div>
 
           {/* Recent tenants */}
-          <div className="bg-[#0c1018] border border-white/[0.05] rounded-2xl overflow-hidden">
+          <div className="bg-background border border-white/[0.05] rounded-2xl overflow-hidden">
             <div className="px-6 py-4 border-b border-white/[0.05] flex items-center justify-between">
-              <h2 className="text-sm font-semibold text-slate-900 dark:text-white">Recent Tenants</h2>
+              <h2 className="text-sm font-semibold text-foreground">Recent Tenants</h2>
               <span className="text-xs text-slate-500">Last 5 sign-ups</span>
             </div>
             <table className="w-full text-sm">
               <thead>
-                <tr className="text-xs text-slate-600 uppercase tracking-widest border-b border-white/[0.04]">
+                <tr className="text-xs text-slate-600 uppercase tracking-widest border-b border-border">
                   <th className="px-6 py-3 text-left">Company</th>
                   <th className="px-6 py-3 text-left">Tenant ID</th>
                   <th className="px-6 py-3 text-right">Actions</th>
@@ -111,8 +111,8 @@ export function PlatformAdminOverview() {
               </thead>
               <tbody>
                 {stats.recentTenants.map((t) => (
-                  <tr key={t.id} className="border-b border-white/[0.03] hover:bg-white/[0.02] transition-colors">
-                    <td className="px-6 py-4 text-slate-200 font-medium">{t.company_name}</td>
+                  <tr key={t.id} className="border-b border-white/[0.03] hover:bg-card/[0.02] transition-colors">
+                    <td className="px-6 py-4 text-foreground font-medium">{t.company_name}</td>
                     <td className="px-6 py-4 text-slate-500 font-mono text-xs">{t.id}</td>
                     <td className="px-6 py-4 text-right">
                       <a

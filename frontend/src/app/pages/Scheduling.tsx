@@ -200,7 +200,7 @@ export function Scheduling() {
         </div>
         <div className="flex gap-3">
           <button 
-            className="flex items-center gap-2 px-4 py-2 bg-white/5 hover:bg-accent border border-border rounded-md text-foreground text-sm transition-colors"
+            className="flex items-center gap-2 px-4 py-2 bg-card/50 hover:bg-accent border border-border rounded-md text-foreground text-sm transition-colors"
             onClick={() => setShowShiftModal(true)}
           >
             <Settings size={16} /> Manage Shift Types

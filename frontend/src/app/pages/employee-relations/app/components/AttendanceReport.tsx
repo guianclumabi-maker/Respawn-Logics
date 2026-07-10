@@ -116,7 +116,7 @@ export function AttendanceReport() {
     window.open(url, '_blank');
   };
   return (
-    <main className="flex-1 flex flex-col h-full bg-[#f4f6f8] dark:bg-[#0b0f1a] text-foreground overflow-hidden transition-colors duration-300">
+    <main className="flex-1 flex flex-col h-full bg-[#f4f6f8] dark:bg-background text-foreground overflow-hidden transition-colors duration-300">
       
       {/* Top Header Filter Bar */}
       <div className="p-8 border-b border-border shrink-0 space-y-6">
@@ -125,7 +125,7 @@ export function AttendanceReport() {
             <h1 className="text-3xl font-bold tracking-tight mb-2 bg-gradient-to-r from-[#10b981] to-[#0ea5e9] bg-clip-text text-transparent drop-shadow-[0_0_8px_rgba(16,185,129,0.3)]">
               Attendance & Leave Report
             </h1>
-            <p className="text-slate-500 dark:text-slate-400 text-sm">Consolidated organizational attendance audit log for Employee Relations analysis.</p>
+            <p className="text-slate-500 dark:text-muted-foreground text-sm">Consolidated organizational attendance audit log for Employee Relations analysis.</p>
           </div>
           <div className="flex gap-3">
             {hasPermission("attendance.view") && (
@@ -151,7 +151,7 @@ export function AttendanceReport() {
         {/* Filter Controls */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 bg-card/40 border border-border p-4 rounded-xl shadow-sm">
           <div>
-            <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1.5">Start Date</label>
+            <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-1.5">Start Date</label>
             <div className="relative">
               <input 
                 type="date"
@@ -162,7 +162,7 @@ export function AttendanceReport() {
             </div>
           </div>
           <div>
-            <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1.5">End Date</label>
+            <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-1.5">End Date</label>
             <div className="relative">
               <input 
                 type="date"
@@ -173,7 +173,7 @@ export function AttendanceReport() {
             </div>
           </div>
           <div>
-            <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1.5">Department</label>
+            <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-1.5">Department</label>
             <select
               value={department}
               onChange={(e) => setDepartment(e.target.value)}
@@ -186,7 +186,7 @@ export function AttendanceReport() {
             </select>
           </div>
           <div>
-            <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1.5">Search Employee</label>
+            <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-1.5">Search Employee</label>
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" size={15} />
               <input 
@@ -211,7 +211,7 @@ export function AttendanceReport() {
             <p className="text-sm text-muted-foreground">{error}</p>
             <button
               onClick={fetchReport}
-              className="mt-2 px-4 py-2 bg-white/5 hover:bg-accent text-foreground border border-border rounded-lg text-xs transition-all"
+              className="mt-2 px-4 py-2 bg-card/50 hover:bg-accent text-foreground border border-border rounded-lg text-xs transition-all"
             >
               Retry Generation
             </button>
@@ -224,7 +224,7 @@ export function AttendanceReport() {
               {/* Present */}
               <div className="bg-card border border-border p-4 rounded-xl flex items-center justify-between shadow-sm">
                 <div>
-                  <span className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider">Present</span>
+                  <span className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Present</span>
                   <span className="text-2xl font-bold text-[#00e07a] mt-1 block">{summary.present}</span>
                 </div>
                 <div className="w-10 h-10 rounded-full bg-[#00e07a]/10 flex items-center justify-center text-[#00e07a]">
@@ -235,7 +235,7 @@ export function AttendanceReport() {
               {/* Late */}
               <div className="bg-card border border-border p-4 rounded-xl flex items-center justify-between shadow-sm">
                 <div>
-                  <span className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider">Late</span>
+                  <span className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Late</span>
                   <span className="text-2xl font-bold text-amber-400 mt-1 block">{summary.late}</span>
                 </div>
                 <div className="w-10 h-10 rounded-full bg-amber-500/10 flex items-center justify-center text-amber-400">
@@ -246,7 +246,7 @@ export function AttendanceReport() {
               {/* On Leave */}
               <div className="bg-card border border-border p-4 rounded-xl flex items-center justify-between shadow-sm">
                 <div>
-                  <span className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider">On Leave</span>
+                  <span className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider">On Leave</span>
                   <span className="text-2xl font-bold text-blue-400 mt-1 block">{summary.on_leave}</span>
                 </div>
                 <div className="w-10 h-10 rounded-full bg-blue-500/10 flex items-center justify-center text-blue-400">
@@ -257,7 +257,7 @@ export function AttendanceReport() {
               {/* Absent */}
               <div className="bg-card border border-border p-4 rounded-xl flex items-center justify-between shadow-sm">
                 <div>
-                  <span className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider">Absent</span>
+                  <span className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Absent</span>
                   <span className="text-2xl font-bold text-red-400 mt-1 block">{summary.absent}</span>
                 </div>
                 <div className="w-10 h-10 rounded-full bg-red-500/10 flex items-center justify-center text-red-400">
@@ -268,7 +268,7 @@ export function AttendanceReport() {
               {/* Rest Day */}
               <div className="bg-card border border-border p-4 rounded-xl flex items-center justify-between shadow-sm">
                 <div>
-                  <span className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider">Rest Day</span>
+                  <span className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Rest Day</span>
                   <span className="text-2xl font-bold text-muted-foreground mt-1 block">{summary.rest_day}</span>
                 </div>
                 <div className="w-10 h-10 rounded-full bg-gray-500/10 flex items-center justify-center text-muted-foreground">
@@ -282,7 +282,7 @@ export function AttendanceReport() {
             <div className="bg-card border border-border rounded-xl overflow-hidden shadow-sm relative">
               
               {loading && (
-                <div className="absolute inset-0 bg-[#111625]/25 backdrop-blur-[1px] flex items-center justify-center z-10">
+                <div className="absolute inset-0 bg-card/25 backdrop-blur-[1px] flex items-center justify-center z-10">
                   <Loader2 className="w-8 h-8 animate-spin text-[#10b981]" />
                 </div>
               )}
@@ -301,17 +301,17 @@ export function AttendanceReport() {
                   </thead>
                   <tbody className="divide-y divide-gray-150 dark:divide-white/[0.03]">
                     {rows.map((row, i) => (
-                      <tr key={i} className="hover:bg-gray-50 dark:hover:bg-white/[0.01] transition-colors">
+                      <tr key={i} className="hover:bg-muted/50 dark:hover:bg-card/[0.01] transition-colors">
                         <td className="p-4 pl-6">
                           <div className="font-semibold text-slate-800 dark:text-white">{row.name}</div>
-                          <div className="text-[10px] text-gray-500 font-mono mt-0.5">{row.employee_id}</div>
+                          <div className="text-[10px] text-muted-foreground font-mono mt-0.5">{row.employee_id}</div>
                         </td>
-                        <td className="p-4 text-sm text-slate-600 dark:text-gray-300">{row.department}</td>
-                        <td className="p-4 text-sm font-mono text-slate-600 dark:text-gray-400">{row.date}</td>
-                        <td className="p-4 text-sm font-mono text-slate-600 dark:text-gray-300">
+                        <td className="p-4 text-sm text-slate-600 dark:text-foreground">{row.department}</td>
+                        <td className="p-4 text-sm font-mono text-slate-600 dark:text-muted-foreground">{row.date}</td>
+                        <td className="p-4 text-sm font-mono text-slate-600 dark:text-foreground">
                           {row.time_in ? row.time_in.substring(0, 5) : "—"}
                         </td>
-                        <td className="p-4 text-sm font-mono text-slate-600 dark:text-gray-300">
+                        <td className="p-4 text-sm font-mono text-slate-600 dark:text-foreground">
                           {row.time_out ? row.time_out.substring(0, 5) : "—"}
                         </td>
                         <td className="p-4 text-center">
@@ -327,8 +327,8 @@ export function AttendanceReport() {
 
                     {rows.length === 0 && !loading && (
                       <tr>
-                        <td colSpan={6} className="py-12 text-center text-gray-500 text-sm">
-                          <FileText className="w-10 h-10 text-gray-600 mx-auto mb-2" />
+                        <td colSpan={6} className="py-12 text-center text-muted-foreground text-sm">
+                          <FileText className="w-10 h-10 text-muted-foreground mx-auto mb-2" />
                           No attendance records found matching the criteria.
                         </td>
                       </tr>

@@ -109,7 +109,7 @@ export function CandidatesList({ onViewChange }: { onViewChange: (v: ViewState) 
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              className="appearance-none bg-transparent text-xs text-gray-300 outline-none cursor-pointer pr-4"
+              className="appearance-none bg-transparent text-xs text-foreground outline-none cursor-pointer pr-4"
             >
               <option value="" className="bg-background">All Statuses</option>
               <option value="Active" className="bg-background">Active</option>
@@ -140,7 +140,7 @@ export function CandidatesList({ onViewChange }: { onViewChange: (v: ViewState) 
         ) : (
           <div className="flex-1 overflow-y-auto scrollbar-thin">
             <table className="w-full text-left border-collapse">
-              <thead className="sticky top-0 bg-[#121625] z-10 text-[9px] uppercase font-bold text-muted-foreground tracking-wider border-b border-border shadow-md shadow-black/10">
+              <thead className="sticky top-0 bg-card z-10 text-[9px] uppercase font-bold text-muted-foreground tracking-wider border-b border-border shadow-md shadow-black/10">
                 <tr>
                   <th className="px-6 py-4">// CANDIDATE</th>
                   <th className="px-6 py-4">// DETAILS</th>
@@ -215,7 +215,7 @@ export function CandidatesList({ onViewChange }: { onViewChange: (v: ViewState) 
           </div>
         )}
         {!loading && !error && candidates.length > 0 && (
-          <div className="p-4 border-t border-border bg-[#121625] flex justify-between items-center z-10 text-xs text-muted-foreground">
+          <div className="p-4 border-t border-border bg-card flex justify-between items-center z-10 text-xs text-muted-foreground">
             <div>
                PAGE {page} OF {totalPages}
             </div>

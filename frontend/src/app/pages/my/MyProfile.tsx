@@ -118,17 +118,17 @@ export function MyProfile() {
         ) : error ? (
           <div className="flex flex-col items-center justify-center py-16 px-6 bg-red-500/10 border border-red-500/20 rounded-xl max-w-xl mx-auto text-center space-y-3">
             <AlertCircle className="w-10 h-10 text-red-500" />
-            <h3 className="text-lg font-bold text-slate-900 dark:text-white">Connection Error</h3>
+            <h3 className="text-lg font-bold text-foreground">Connection Error</h3>
             <p className="text-sm text-muted-foreground">{error}</p>
             <button 
               onClick={fetchProfile}
-              className="mt-2 px-4 py-2 bg-white/5 hover:bg-accent text-slate-900 dark:text-white rounded-lg text-xs transition-colors border border-border"
+              className="mt-2 px-4 py-2 bg-card/50 hover:bg-accent text-foreground rounded-lg text-xs transition-colors border border-border"
             >
               Retry Connection
             </button>
           </div>
         ) : !profile ? (
-          <div className="text-center text-gray-500 py-10">Profile record empty.</div>
+          <div className="text-center text-muted-foreground py-10">Profile record empty.</div>
         ) : (
           <form onSubmit={handleSave} className="max-w-4xl mx-auto space-y-6 animate-in fade-in duration-300">
             
@@ -155,9 +155,9 @@ export function MyProfile() {
               </div>
               
               <div className="text-center md:text-left space-y-1">
-                <h2 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">{profile.full_name}</h2>
+                <h2 className="text-2xl font-bold text-foreground tracking-tight">{profile.full_name}</h2>
                 <div className="text-sm font-semibold text-[#00e07a] font-mono">{profile.job_title || "No Job Title"}</div>
-                <div className="text-xs text-gray-500">{profile.department || "No Department"} · ID: {profile.employee_id}</div>
+                <div className="text-xs text-muted-foreground">{profile.department || "No Department"} · ID: {profile.employee_id}</div>
               </div>
             </div>
 
@@ -165,37 +165,37 @@ export function MyProfile() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* Read Only Corporate Meta */}
               <div className="bg-card text-card-foreground/70 border border-border rounded-xl p-6 shadow-lg space-y-4">
-                <h3 className="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-wider border-b border-border pb-2 flex items-center gap-2">
-                  <User size={16} className="text-gray-500" /> Corporate Metadata
+                <h3 className="text-sm font-bold text-foreground uppercase tracking-wider border-b border-border pb-2 flex items-center gap-2">
+                  <User size={16} className="text-muted-foreground" /> Corporate Metadata
                 </h3>
                 
                 <div className="space-y-3">
                   <div>
-                    <span className="block text-xs text-gray-500 uppercase tracking-wider font-semibold">Full Legal Name</span>
-                    <span className="text-sm text-slate-900 dark:text-white font-medium">{profile.full_name}</span>
+                    <span className="block text-xs text-muted-foreground uppercase tracking-wider font-semibold">Full Legal Name</span>
+                    <span className="text-sm text-foreground font-medium">{profile.full_name}</span>
                   </div>
                   <div>
-                    <span className="block text-xs text-gray-500 uppercase tracking-wider font-semibold">Corporate Email</span>
-                    <span className="text-sm text-gray-300 font-mono">{profile.email || "—"}</span>
+                    <span className="block text-xs text-muted-foreground uppercase tracking-wider font-semibold">Corporate Email</span>
+                    <span className="text-sm text-foreground font-mono">{profile.email || "—"}</span>
                   </div>
                   <div>
-                    <span className="block text-xs text-gray-500 uppercase tracking-wider font-semibold">Work Email</span>
-                    <span className="text-sm text-gray-300 font-mono">{profile.work_email || "—"}</span>
+                    <span className="block text-xs text-muted-foreground uppercase tracking-wider font-semibold">Work Email</span>
+                    <span className="text-sm text-foreground font-mono">{profile.work_email || "—"}</span>
                   </div>
                   <div>
-                    <span className="block text-xs text-gray-500 uppercase tracking-wider font-semibold">Department Node</span>
-                    <span className="text-sm text-slate-900 dark:text-white font-medium">{profile.department || "—"}</span>
+                    <span className="block text-xs text-muted-foreground uppercase tracking-wider font-semibold">Department Node</span>
+                    <span className="text-sm text-foreground font-medium">{profile.department || "—"}</span>
                   </div>
                   <div>
-                    <span className="block text-xs text-gray-500 uppercase tracking-wider font-semibold">Employee ID Badge</span>
-                    <span className="text-sm text-slate-900 dark:text-white font-mono">{profile.employee_id || "—"}</span>
+                    <span className="block text-xs text-muted-foreground uppercase tracking-wider font-semibold">Employee ID Badge</span>
+                    <span className="text-sm text-foreground font-mono">{profile.employee_id || "—"}</span>
                   </div>
                 </div>
               </div>
 
               {/* Editable Fields */}
               <div className="bg-card text-card-foreground/70 border border-border rounded-xl p-6 shadow-lg space-y-4">
-                <h3 className="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-wider border-b border-border pb-2 flex items-center gap-2">
+                <h3 className="text-sm font-bold text-foreground uppercase tracking-wider border-b border-border pb-2 flex items-center gap-2">
                   <Phone size={16} className="text-[#00e07a]" /> Contact & Emergency Details
                 </h3>
 
@@ -206,7 +206,7 @@ export function MyProfile() {
                       type="text" 
                       value={phone}
                       onChange={(e) => setPhone(e.target.value)}
-                      className="w-full bg-background border border-border rounded-lg py-2.5 px-3 text-slate-900 dark:text-white text-sm focus:outline-none focus:border-[#00e07a]/50 focus:ring-1 focus:ring-[#00e07a]/20" 
+                      className="w-full bg-background border border-border rounded-lg py-2.5 px-3 text-foreground text-sm focus:outline-none focus:border-[#00e07a]/50 focus:ring-1 focus:ring-[#00e07a]/20" 
                       placeholder="e.g. +63 917 123 4567"
                     />
                   </div>
@@ -217,7 +217,7 @@ export function MyProfile() {
                       type="text" 
                       value={emergencyName}
                       onChange={(e) => setEmergencyName(e.target.value)}
-                      className="w-full bg-background border border-border rounded-lg py-2.5 px-3 text-slate-900 dark:text-white text-sm focus:outline-none focus:border-[#00e07a]/50 focus:ring-1 focus:ring-[#00e07a]/20" 
+                      className="w-full bg-background border border-border rounded-lg py-2.5 px-3 text-foreground text-sm focus:outline-none focus:border-[#00e07a]/50 focus:ring-1 focus:ring-[#00e07a]/20" 
                       placeholder="e.g. Maria Clara"
                     />
                   </div>
@@ -228,7 +228,7 @@ export function MyProfile() {
                       type="text" 
                       value={emergencyPhone}
                       onChange={(e) => setEmergencyPhone(e.target.value)}
-                      className="w-full bg-background border border-border rounded-lg py-2.5 px-3 text-slate-900 dark:text-white text-sm focus:outline-none focus:border-[#00e07a]/50 focus:ring-1 focus:ring-[#00e07a]/20" 
+                      className="w-full bg-background border border-border rounded-lg py-2.5 px-3 text-foreground text-sm focus:outline-none focus:border-[#00e07a]/50 focus:ring-1 focus:ring-[#00e07a]/20" 
                       placeholder="e.g. +63 917 987 6543"
                     />
                   </div>
@@ -238,7 +238,7 @@ export function MyProfile() {
 
             {/* Profile Bio Field */}
             <div className="bg-card text-card-foreground/70 border border-border rounded-xl p-6 shadow-lg space-y-4">
-              <h3 className="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-wider border-b border-border pb-2 flex items-center gap-2">
+              <h3 className="text-sm font-bold text-foreground uppercase tracking-wider border-b border-border pb-2 flex items-center gap-2">
                 <BookOpen size={16} className="text-[#00b8ff]" /> Professional Biography
               </h3>
               
@@ -248,7 +248,7 @@ export function MyProfile() {
                   value={bio}
                   onChange={(e) => setBio(e.target.value)}
                   rows={4}
-                  className="w-full bg-background border border-border rounded-lg py-2.5 px-3 text-slate-900 dark:text-white text-sm focus:outline-none focus:border-[#00e07a]/50 focus:ring-1 focus:ring-[#00e07a]/20 resize-none" 
+                  className="w-full bg-background border border-border rounded-lg py-2.5 px-3 text-foreground text-sm focus:outline-none focus:border-[#00e07a]/50 focus:ring-1 focus:ring-[#00e07a]/20 resize-none" 
                   placeholder="Share details regarding your skills, past projects, or hobbies..."
                 ></textarea>
               </div>
@@ -256,13 +256,13 @@ export function MyProfile() {
 
             {/* Security Policy */}
             <div className="bg-card text-card-foreground/70 border border-border rounded-xl p-6 shadow-lg space-y-4">
-              <h3 className="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-wider border-b border-border pb-2 flex items-center gap-2">
+              <h3 className="text-sm font-bold text-foreground uppercase tracking-wider border-b border-border pb-2 flex items-center gap-2">
                 <ShieldAlert size={16} className="text-red-500" /> Security & Authentication
               </h3>
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div className="space-y-1">
                   <span className="block text-xs text-muted-foreground font-semibold uppercase tracking-wider">Two-Factor Authentication (2FA)</span>
-                  <p className="text-xs text-gray-500 font-sans leading-relaxed">
+                  <p className="text-xs text-muted-foreground font-sans leading-relaxed">
                     Protect your account with an extra layer of security. Enforcing 2FA requires entering a dynamic verification code from your authenticator app upon logging in.
                   </p>
                 </div>
@@ -273,7 +273,7 @@ export function MyProfile() {
                     const basePath = isLocal ? "/respawn-logics" : "";
                     window.location.href = `${window.location.origin}${basePath}/setup_2fa.php`;
                   }}
-                  className="px-4 py-2.5 bg-white/5 hover:bg-accent border border-border text-foreground rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 self-start sm:self-center cursor-pointer"
+                  className="px-4 py-2.5 bg-card/50 hover:bg-accent border border-border text-foreground rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 self-start sm:self-center cursor-pointer"
                 >
                   Enable / Manage Two-Factor Authentication
                 </button>

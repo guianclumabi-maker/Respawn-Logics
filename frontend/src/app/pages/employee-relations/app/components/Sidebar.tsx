@@ -159,7 +159,7 @@ export function Sidebar({ activeView, onViewChange, mode = "admin", onStartTour 
         {/* Manage section */}
         <div>
           {!collapsed && (
-            <p className="pl-3 text-[0.75rem] font-bold text-gray-500 tracking-[1px] uppercase mb-1.5" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
+            <p className="pl-3 text-[0.75rem] font-bold text-muted-foreground tracking-[1px] uppercase mb-1.5" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
               Manage
             </p>
           )}
