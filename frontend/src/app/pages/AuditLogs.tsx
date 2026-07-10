@@ -108,7 +108,7 @@ export function AuditLogs() {
       <div className="h-full w-full flex items-center justify-center bg-background p-8">
         <div className="bg-[#141929] border border-red-500/20 rounded-xl p-8 max-w-md text-center">
           <ShieldAlert className="w-12 h-12 text-red-500 mx-auto mb-4" />
-          <h2 className="text-xl font-bold text-white mb-2">Access Restricted</h2>
+          <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-2">Access Restricted</h2>
           <p className="text-muted-foreground">{error}</p>
         </div>
       </div>

@@ -6,9 +6,9 @@ export function Settings({ onViewChange }: { onViewChange: (v: ViewState) => voi
   const [activeTab, setActiveTab] = useState("general");
 
   return (
-    <div className="flex-1 flex flex-col h-full bg-[#0d0f19] text-foreground p-8 relative overflow-hidden font-sans">
+    <div className="flex-1 flex flex-col h-full bg-background text-foreground p-8 relative overflow-hidden font-sans">
       <div className="mb-8 relative z-10">
-        <h1 className="text-2xl font-bold font-outfit tracking-tight text-white mb-2">Company Settings</h1>
+        <h1 className="text-2xl font-bold font-outfit tracking-tight text-foreground mb-2">Company Settings</h1>
         <p className="text-sm text-muted-foreground">Manage your ATS configuration and preferences</p>
       </div>
 

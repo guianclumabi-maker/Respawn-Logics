@@ -43,7 +43,7 @@ export function SetupModeCards() {
         <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
           <div className="text-center max-w-2xl mx-auto mb-16 mt-8">
             <div className="inline-block px-3 py-1 mb-4 rounded-full border border-border bg-white/5 text-[#8b95a8] text-sm font-['JetBrains_Mono']">// INIT_SEQUENCE</div>
-            <h1 className="text-5xl font-bold text-white mb-6 tracking-tight">Select Setup Mode<span className="text-[#00e07a] animate-pulse">_</span></h1>
+            <h1 className="text-5xl font-bold text-slate-900 dark:text-white mb-6 tracking-tight">Select Setup Mode<span className="text-[#00e07a] animate-pulse">_</span></h1>
             <p className="text-[#8b95a8] text-lg font-['Space_Grotesk']">Choose the onboarding path that best fits your organizational scale.</p>
           </div>
           
@@ -62,7 +62,7 @@ export function SetupModeCards() {
                 <div className={`w-14 h-14 rounded-lg ${s.bg} flex items-center justify-center mb-6 transition-all group-hover:scale-110`}>
                   <s.icon className={`w-7 h-7 ${s.color}`} />
                 </div>
-                <h3 className="text-xl font-bold text-white mb-3 font-['JetBrains_Mono']">{s.title}</h3>
+                <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-3 font-['JetBrains_Mono']">{s.title}</h3>
                 <p className="text-[#8b95a8] text-sm leading-relaxed">{s.desc}</p>
               </div>
             ))}
@@ -84,7 +84,7 @@ export function SetupModeCards() {
               <div className={`w-14 h-14 rounded-lg bg-card text-card-foreground flex items-center justify-center mb-6 transition-all group-hover:scale-110`}>
                 <User className="w-7 h-7 text-foreground group-hover:text-[#00e07a] transition-colors" />
               </div>
-              <h3 className="text-xl font-bold text-white mb-3 font-['JetBrains_Mono']">Single Player</h3>
+              <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-3 font-['JetBrains_Mono']">Single Player</h3>
               <p className="text-[#8b95a8] text-sm leading-relaxed">1 employee. Direct dashboard access, no mapping required.</p>
             </div>
           </div>

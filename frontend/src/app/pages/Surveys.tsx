@@ -54,7 +54,7 @@ export function Surveys() {
           
           <div className="flex justify-between items-center border-b border-border pb-6">
             <div>
-              <h1 className="text-3xl font-bold text-white mb-2" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>Engagement Surveys</h1>
+              <h1 className="text-3xl font-bold text-slate-900 dark:text-white mb-2" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>Engagement Surveys</h1>
               <p className="text-muted-foreground text-sm">Company-wide pulse surveys and eNPS tracking.</p>
             </div>
             {isAdmin && (
@@ -77,7 +77,7 @@ export function Surveys() {
                       <span className={`self-start px-2 py-1 rounded-md text-xs font-bold mb-3 ${s.status === 'Draft' ? 'bg-slate-500/10 text-muted-foreground' : s.status === 'Active' ? 'bg-[#00e07a]/10 text-[#00e07a]' : 'bg-red-500/10 text-red-500'}`}>
                         {s.status}
                       </span>
-                      <h3 className="text-xl font-bold text-white mb-2" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>{s.title}</h3>
+                      <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>{s.title}</h3>
                       
                       <div className="flex justify-between border-t border-border pt-4 mt-auto mb-4">
                         <div className="text-center">
@@ -85,11 +85,11 @@ export function Surveys() {
                           <div className="text-[10px] text-slate-500 uppercase tracking-widest">eNPS Score</div>
                         </div>
                         <div className="text-center">
-                          <div className="text-2xl font-bold font-mono text-white">{s.completion_rate}%</div>
+                          <div className="text-2xl font-bold font-mono text-slate-900 dark:text-white">{s.completion_rate}%</div>
                           <div className="text-[10px] text-slate-500 uppercase tracking-widest">Completion</div>
                         </div>
                         <div className="text-center">
-                          <div className="text-2xl font-bold font-mono text-white">{s.responses}</div>
+                          <div className="text-2xl font-bold font-mono text-slate-900 dark:text-white">{s.responses}</div>
                           <div className="text-[10px] text-slate-500 uppercase tracking-widest">Responses</div>
                         </div>
                       </div>
@@ -107,7 +107,7 @@ export function Surveys() {
                   ) : (
                     <>
                       <span className="self-start px-2 py-1 rounded-md text-xs font-bold mb-3 bg-[#00e07a]/10 text-[#00e07a]">Pending</span>
-                      <h3 className="text-xl font-bold text-white mb-2" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>{s.title}</h3>
+                      <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>{s.title}</h3>
                       <p className="text-sm text-muted-foreground mb-6 flex-grow">{s.description || 'Please take a moment to fill out this pulse survey.'}</p>
                       
                       {s.has_completed === 0 ? (
@@ -158,18 +158,18 @@ function BuilderModal({ onClose, refresh }: { onClose: () => void, refresh: () =
     <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
       <div className="bg-card text-card-foreground border border-border rounded-xl w-full max-w-2xl flex flex-col max-h-[90vh]">
         <div className="p-6 border-b border-border flex justify-between items-center">
-          <h3 className="text-xl font-bold text-white" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>Survey Builder</h3>
+          <h3 className="text-xl font-bold text-slate-900 dark:text-white" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>Survey Builder</h3>
           <button onClick={onClose} className="text-muted-foreground hover:text-white"><X size={20}/></button>
         </div>
         <div className="p-6 overflow-y-auto space-y-6">
           
           <div>
             <label className="block text-xs font-medium text-muted-foreground mb-1">Survey Title</label>
-            <input type="text" value={title} onChange={e=>setTitle(e.target.value)} placeholder="e.g. Q3 Company Pulse" className="w-full bg-input border-border border border-border rounded-md p-3 text-sm text-white focus:outline-none focus:border-[#00e07a]/50" />
+            <input type="text" value={title} onChange={e=>setTitle(e.target.value)} placeholder="e.g. Q3 Company Pulse" className="w-full bg-input border-border border border-border rounded-md p-3 text-sm text-slate-900 dark:text-white focus:outline-none focus:border-[#00e07a]/50" />
           </div>
           <div>
             <label className="block text-xs font-medium text-muted-foreground mb-1">Description (Optional)</label>
-            <textarea value={desc} onChange={e=>setDesc(e.target.value)} rows={3} className="w-full bg-input border-border border border-border rounded-md p-3 text-sm text-white focus:outline-none focus:border-[#00e07a]/50"></textarea>
+            <textarea value={desc} onChange={e=>setDesc(e.target.value)} rows={3} className="w-full bg-input border-border border border-border rounded-md p-3 text-sm text-slate-900 dark:text-white focus:outline-none focus:border-[#00e07a]/50"></textarea>
           </div>
 
           <div className="bg-[#00e07a]/10 border border-[#00e07a]/30 rounded-lg p-4">
@@ -178,21 +178,21 @@ function BuilderModal({ onClose, refresh }: { onClose: () => void, refresh: () =
           </div>
 
           <div>
-            <h4 className="text-white font-bold mb-3">Custom Questions</h4>
+            <h4 className="text-slate-900 dark:text-white font-bold mb-3">Custom Questions</h4>
             {questions.map((q, i) => (
               <div key={i} className="flex gap-2 mb-2">
                 <input type="text" value={q.text} onChange={e => {
                   const newQ = [...questions]; newQ[i].text = e.target.value; setQuestions(newQ);
-                }} placeholder="Type your question..." className="flex-1 bg-input border-border border border-border rounded-md p-2 text-sm text-white focus:outline-none focus:border-[#00e07a]/50" />
+                }} placeholder="Type your question..." className="flex-1 bg-input border-border border border-border rounded-md p-2 text-sm text-slate-900 dark:text-white focus:outline-none focus:border-[#00e07a]/50" />
                 <button onClick={() => setQuestions(questions.filter((_, idx)=>idx!==i))} className="bg-transparent border border-border text-muted-foreground p-2 rounded-md hover:bg-red-500/20 hover:text-red-500 transition-colors"><Trash2 size={18}/></button>
               </div>
             ))}
-            <button onClick={() => setQuestions([...questions, {text: ''}])} className="w-full bg-white/5 border border-border text-white font-semibold py-2 rounded-md hover:bg-accent flex items-center justify-center gap-2 text-sm mt-2 transition-colors"><Plus size={16}/> Add Text Question</button>
+            <button onClick={() => setQuestions([...questions, {text: ''}])} className="w-full bg-white/5 border border-border text-slate-900 dark:text-white font-semibold py-2 rounded-md hover:bg-accent flex items-center justify-center gap-2 text-sm mt-2 transition-colors"><Plus size={16}/> Add Text Question</button>
           </div>
 
         </div>
         <div className="p-6 border-t border-border flex justify-end gap-3 bg-input border-border rounded-b-xl">
-          <button onClick={onClose} className="px-5 py-2 rounded-md text-sm font-semibold text-white bg-transparent border border-white/20 hover:bg-accent">Cancel</button>
+          <button onClick={onClose} className="px-5 py-2 rounded-md text-sm font-semibold text-slate-900 dark:text-white bg-transparent border border-white/20 hover:bg-accent">Cancel</button>
           <button onClick={save} className="px-5 py-2 rounded-md text-sm font-bold text-black bg-[#00e07a] hover:bg-white">Draft Survey</button>
         </div>
       </div>
@@ -237,20 +237,20 @@ function TakeModal({ surveyId, onClose, refresh }: { surveyId: number, onClose: 
     <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
       <div className="bg-card text-card-foreground border border-border rounded-xl w-full max-w-3xl flex flex-col max-h-[90vh]">
         <div className="p-6 border-b border-border flex justify-between items-center">
-          <h3 className="text-xl font-bold text-white" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>{data.survey.title}</h3>
+          <h3 className="text-xl font-bold text-slate-900 dark:text-white" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>{data.survey.title}</h3>
           <button onClick={onClose} className="text-muted-foreground hover:text-white"><X size={20}/></button>
         </div>
         
         <div className="p-6 overflow-y-auto space-y-8 bg-background">
           {data.questions.map((q: any, idx: number) => (
             <div key={q.id} className="bg-white/5 border border-border rounded-xl p-6">
-              <div className="text-lg font-semibold text-white mb-4">{idx+1}. {q.question_text}</div>
+              <div className="text-lg font-semibold text-slate-900 dark:text-white mb-4">{idx+1}. {q.question_text}</div>
               
               {q.question_type === 'eNPS' ? (
                 <div>
                   <div className="flex flex-wrap gap-2">
                     {[0,1,2,3,4,5,6,7,8,9,10].map(val => (
-                      <button key={val} onClick={() => setAnswers({...answers, [q.id]: val.toString()})} className={`w-10 h-10 rounded-md font-bold transition-colors ${answers[q.id] === val.toString() ? 'bg-[#00b8ff] text-black border-transparent' : 'bg-card text-card-foreground text-white border border-white/20 hover:border-[#00b8ff]'}`}>
+                      <button key={val} onClick={() => setAnswers({...answers, [q.id]: val.toString()})} className={`w-10 h-10 rounded-md font-bold transition-colors ${answers[q.id] === val.toString() ? 'bg-[#00b8ff] text-black border-transparent' : 'bg-card text-card-foreground text-slate-900 dark:text-white border border-white/20 hover:border-[#00b8ff]'}`}>
                         {val}
                       </button>
                     ))}
@@ -260,7 +260,7 @@ function TakeModal({ surveyId, onClose, refresh }: { surveyId: number, onClose: 
                   </div>
                 </div>
               ) : (
-                <textarea rows={3} value={answers[q.id] || ''} onChange={e => setAnswers({...answers, [q.id]: e.target.value})} placeholder="Type your answer here..." className="w-full bg-input border-border border border-border rounded-md p-3 text-sm text-white focus:outline-none focus:border-[#00e07a]/50"></textarea>
+                <textarea rows={3} value={answers[q.id] || ''} onChange={e => setAnswers({...answers, [q.id]: e.target.value})} placeholder="Type your answer here..." className="w-full bg-input border-border border border-border rounded-md p-3 text-sm text-slate-900 dark:text-white focus:outline-none focus:border-[#00e07a]/50"></textarea>
               )}
             </div>
           ))}
@@ -269,7 +269,7 @@ function TakeModal({ surveyId, onClose, refresh }: { surveyId: number, onClose: 
         <div className="p-6 border-t border-border flex items-center justify-between bg-input border-border rounded-b-xl">
           <div className="flex items-center gap-2 text-muted-foreground text-sm font-medium"><EyeOff size={18}/> Your responses are 100% anonymous.</div>
           <div className="flex gap-3">
-            <button onClick={onClose} className="px-5 py-2 rounded-md text-sm font-semibold text-white bg-transparent border border-white/20 hover:bg-accent">Cancel</button>
+            <button onClick={onClose} className="px-5 py-2 rounded-md text-sm font-semibold text-slate-900 dark:text-white bg-transparent border border-white/20 hover:bg-accent">Cancel</button>
             <button onClick={submit} className="px-5 py-2 rounded-md text-sm font-bold text-black bg-[#00e07a] hover:bg-white">Submit Anonymous Answers</button>
           </div>
         </div>

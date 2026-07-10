@@ -28,13 +28,15 @@ try {
         echo "org_unit_id already exists in users.\n";
     }
 
-    // 3. Clean up manager_id before converting to INT
-    // Some manager_id might be empty string '' instead of NULL.
-    $pdo->exec("UPDATE users SET manager_id = NULL WHERE manager_id = ''");
-    
-    // 4. Convert manager_id to INT safely
-    $pdo->exec("ALTER TABLE users MODIFY manager_id INT NULL");
-    echo "Converted manager_id to INT.\n";
+    // 3 & 4. Convert manager_id to INT safely if not already INT
+    $col = $pdo->query("SHOW COLUMNS FROM users LIKE 'manager_id'")->fetch();
+    if ($col && strpos(strtolower($col['Type']), 'int') === false) {
+        $pdo->exec("UPDATE users SET manager_id = NULL WHERE manager_id = ''");
+        $pdo->exec("ALTER TABLE users MODIFY manager_id INT NULL");
+        echo "Converted manager_id to INT.\n";
+    } else {
+        echo "manager_id is already INT.\n";
+    }
 
     // 5. Check if user_roles has scope/org_unit_id (we did this in M1, but safety first)
     try {

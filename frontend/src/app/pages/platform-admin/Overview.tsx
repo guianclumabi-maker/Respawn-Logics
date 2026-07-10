@@ -17,10 +17,10 @@ function StatCard({ icon: Icon, label, value, sub, color }: { icon: any; label: 
   return (
     <div className={`bg-[#0c1018] border border-white/[0.05] rounded-2xl p-6 flex items-start gap-4 relative overflow-hidden group hover:border-border transition-all`}>
       <div className={`w-11 h-11 rounded-xl ${color} flex items-center justify-center flex-shrink-0`}>
-        <Icon size={20} className="text-white" />
+        <Icon size={20} className="text-slate-900 dark:text-white" />
       </div>
       <div>
-        <p className="text-3xl font-bold text-white leading-tight">{value}</p>
+        <p className="text-3xl font-bold text-slate-900 dark:text-white leading-tight">{value}</p>
         <p className="text-sm text-muted-foreground mt-0.5">{label}</p>
         {sub && <p className="text-xs text-slate-600 mt-1">{sub}</p>}
       </div>
@@ -98,7 +98,7 @@ export function PlatformAdminOverview() {
           {/* Recent tenants */}
           <div className="bg-[#0c1018] border border-white/[0.05] rounded-2xl overflow-hidden">
             <div className="px-6 py-4 border-b border-white/[0.05] flex items-center justify-between">
-              <h2 className="text-sm font-semibold text-white">Recent Tenants</h2>
+              <h2 className="text-sm font-semibold text-slate-900 dark:text-white">Recent Tenants</h2>
               <span className="text-xs text-slate-500">Last 5 sign-ups</span>
             </div>
             <table className="w-full text-sm">

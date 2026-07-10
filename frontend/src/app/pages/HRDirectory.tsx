@@ -111,7 +111,7 @@ export function HRDirectory() {
                 placeholder="Search employees..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="w-full bg-[#1a1d27]/80 border border-border rounded-lg py-2 pl-9 pr-4 text-white text-sm focus:outline-none focus:border-[#00e07a]/50 transition-colors"
+                className="w-full bg-[#1a1d27]/80 border border-border rounded-lg py-2 pl-9 pr-4 text-slate-900 dark:text-white text-sm focus:outline-none focus:border-[#00e07a]/50 transition-colors"
               />
               <svg className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
             </div>
@@ -145,7 +145,7 @@ export function HRDirectory() {
                             {getInitials(emp.full_name)}
                           </div>
                           <div>
-                            <div className="text-sm font-semibold text-white mb-0.5">{emp.full_name}</div>
+                            <div className="text-sm font-semibold text-slate-900 dark:text-white mb-0.5">{emp.full_name}</div>
                             <div className="text-xs text-gray-500">{emp.email}</div>
                           </div>
                         </div>
@@ -160,7 +160,7 @@ export function HRDirectory() {
                         </span>
                       </td>
                       <td className="py-4 px-5 align-middle text-right">
-                        <button className="px-3 py-1.5 bg-transparent border border-border rounded text-xs font-medium text-white hover:bg-accent hover:border-white/20 transition-all">
+                        <button className="px-3 py-1.5 bg-transparent border border-border rounded text-xs font-medium text-slate-900 dark:text-white hover:bg-accent hover:border-white/20 transition-all">
                           View Master
                         </button>
                       </td>

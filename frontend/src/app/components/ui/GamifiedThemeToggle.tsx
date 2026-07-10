@@ -35,7 +35,7 @@ export function GamifiedThemeToggle({ collapsed = false }: { collapsed?: boolean
         className={`relative w-12 h-6 rounded-full flex items-center px-1 transition-all ${isDark ? "bg-card text-card-foreground border border-primary/50" : "bg-gray-200 border border-cyan-400/50"}`}
       >
         <span className={`absolute w-4 h-4 rounded-full flex items-center justify-center transition-all ${isDark ? "translate-x-6 bg-primary" : "translate-x-0 bg-cyan-500"}`}>
-          {isDark ? <Moon size={10} className="text-[#0b0f1a]" /> : <Sun size={10} className="text-white" />}
+          {isDark ? <Moon size={10} className="text-[#0b0f1a]" /> : <Sun size={10} className="text-slate-900 dark:text-white" />}
         </span>
       </button>
     </div>

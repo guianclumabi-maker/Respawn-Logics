@@ -147,11 +147,11 @@ export function MyLeave() {
         ) : error ? (
           <div className="flex flex-col items-center justify-center py-16 px-6 bg-red-500/10 border border-red-500/20 rounded-xl max-w-xl mx-auto text-center space-y-3">
             <AlertCircle className="w-10 h-10 text-red-500" />
-            <h3 className="text-lg font-bold text-white">Connection Error</h3>
+            <h3 className="text-lg font-bold text-slate-900 dark:text-white">Connection Error</h3>
             <p className="text-sm text-muted-foreground">{error}</p>
             <button 
               onClick={fetchData}
-              className="mt-2 px-4 py-2 bg-white/5 hover:bg-accent text-white rounded-lg text-xs transition-colors border border-border"
+              className="mt-2 px-4 py-2 bg-white/5 hover:bg-accent text-slate-900 dark:text-white rounded-lg text-xs transition-colors border border-border"
             >
               Retry Connection
             </button>
@@ -167,7 +167,7 @@ export function MyLeave() {
                     <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-[#00e07a]/5 to-[#00b8ff]/5 rounded-bl-full pointer-events-none"></div>
                     <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">{b.leave_type}</div>
                     <div className="flex items-end gap-2 relative z-10">
-                      <div className="text-3xl font-bold text-white">{available}</div>
+                      <div className="text-3xl font-bold text-slate-900 dark:text-white">{available}</div>
                       <div className="text-xs text-gray-500 mb-1.5 font-medium">/ {b.total_allowance} days remaining</div>
                     </div>
                   </div>
@@ -182,7 +182,7 @@ export function MyLeave() {
 
             {/* History Header */}
             <div className="border-b border-border pb-2">
-              <h2 className="text-lg font-bold text-white font-['Space_Grotesk']">Leave History</h2>
+              <h2 className="text-lg font-bold text-slate-900 dark:text-white font-['Space_Grotesk']">Leave History</h2>
             </div>
 
             {/* History Table */}
@@ -201,7 +201,7 @@ export function MyLeave() {
                   <tbody className="divide-y divide-white/[0.03]">
                     {myRequests.map((req) => (
                       <tr key={req.id} className="hover:bg-white/[0.02] transition-colors">
-                        <td className="py-4 px-6 font-medium text-white text-sm">{req.leave_type}</td>
+                        <td className="py-4 px-6 font-medium text-slate-900 dark:text-white text-sm">{req.leave_type}</td>
                         <td className="py-4 px-6 text-sm text-gray-300 font-mono">
                           {req.start_date} <span className="text-gray-600">to</span> {req.end_date}
                         </td>
@@ -263,7 +263,7 @@ export function MyLeave() {
                 <select 
                   value={leaveType} 
                   onChange={(e) => setLeaveType(e.target.value)} 
-                  className="w-full bg-background border border-border rounded-lg py-2.5 px-3 text-white text-sm focus:outline-none focus:border-[#00e07a]/50 focus:ring-1 focus:ring-[#00e07a]/20"
+                  className="w-full bg-background border border-border rounded-lg py-2.5 px-3 text-slate-900 dark:text-white text-sm focus:outline-none focus:border-[#00e07a]/50 focus:ring-1 focus:ring-[#00e07a]/20"
                 >
                   <option value="Vacation Leave">Vacation Leave</option>
                   <option value="Sick Leave">Sick Leave</option>
@@ -282,7 +282,7 @@ export function MyLeave() {
                     required 
                     value={startDate} 
                     onChange={(e) => setStartDate(e.target.value)} 
-                    className="w-full bg-background border border-border rounded-lg py-2.5 px-3 text-white text-sm focus:outline-none focus:border-[#00e07a]/50 focus:ring-1 focus:ring-[#00e07a]/20 [color-scheme:dark]" 
+                    className="w-full bg-background border border-border rounded-lg py-2.5 px-3 text-slate-900 dark:text-white text-sm focus:outline-none focus:border-[#00e07a]/50 focus:ring-1 focus:ring-[#00e07a]/20 [color-scheme:dark]" 
                   />
                 </div>
                 <div>
@@ -292,7 +292,7 @@ export function MyLeave() {
                     required 
                     value={endDate} 
                     onChange={(e) => setEndDate(e.target.value)} 
-                    className="w-full bg-background border border-border rounded-lg py-2.5 px-3 text-white text-sm focus:outline-none focus:border-[#00e07a]/50 focus:ring-1 focus:ring-[#00e07a]/20 [color-scheme:dark]" 
+                    className="w-full bg-background border border-border rounded-lg py-2.5 px-3 text-slate-900 dark:text-white text-sm focus:outline-none focus:border-[#00e07a]/50 focus:ring-1 focus:ring-[#00e07a]/20 [color-scheme:dark]" 
                   />
                 </div>
               </div>
@@ -304,7 +304,7 @@ export function MyLeave() {
                   onChange={(e) => setReason(e.target.value)} 
                   rows={3} 
                   required
-                  className="w-full bg-background border border-border rounded-lg py-2.5 px-3 text-white text-sm focus:outline-none focus:border-[#00e07a]/50 focus:ring-1 focus:ring-[#00e07a]/20 resize-none" 
+                  className="w-full bg-background border border-border rounded-lg py-2.5 px-3 text-slate-900 dark:text-white text-sm focus:outline-none focus:border-[#00e07a]/50 focus:ring-1 focus:ring-[#00e07a]/20 resize-none" 
                   placeholder="Explain why you are requesting leave..."
                 ></textarea>
               </div>

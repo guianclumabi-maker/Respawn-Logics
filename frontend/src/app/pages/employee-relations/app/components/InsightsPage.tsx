@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { apiFetch } from "../../../../lib/apiClient";
 import { useState, useEffect } from "react";
 import { 
@@ -50,7 +49,7 @@ export function InsightsPage({ onViewChange }: InsightsPageProps) {
     const height = 120; // 30 to 150
     
     let pathStr = "";
-    const points = [];
+    const points: any[] = [];
     
     trendData.forEach((d, i) => {
       const cx = 50 + (i * spacing);
@@ -167,7 +166,7 @@ export function InsightsPage({ onViewChange }: InsightsPageProps) {
               {channels.map((c, idx) => (
                 <div key={idx}>
                   <div className="flex justify-between items-center text-xs mb-1.5 font-medium">
-                    <span className="text-white">{c.source}</span>
+                    <span className="text-slate-900 dark:text-white">{c.source}</span>
                     <span className="text-gray-500">{c.percentage}%</span>
                   </div>
                   <div className="flex items-center gap-2">

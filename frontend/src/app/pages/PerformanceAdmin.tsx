@@ -19,7 +19,7 @@ export function PerformanceAdmin() {
         <div className="max-w-6xl mx-auto space-y-8">
           
           <div>
-            <h1 className="text-3xl font-bold text-white mb-2" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>Performance & Talent Management</h1>
+            <h1 className="text-3xl font-bold text-slate-900 dark:text-white mb-2" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>Performance & Talent Management</h1>
             <p className="text-muted-foreground">Evaluate your team and calibrate talent.</p>
           </div>
 
@@ -90,7 +90,7 @@ function TeamReviews() {
 
   return (
     <div>
-      <h3 className="text-lg font-semibold text-white mb-6">My Team's Evaluations</h3>
+      <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-6">My Team's Evaluations</h3>
       <div className="overflow-x-auto">
         <table className="w-full text-left border-collapse">
           <thead>
@@ -105,7 +105,7 @@ function TeamReviews() {
             {reviews.map(r => (
               <tr key={r.id} className="border-b border-border hover:bg-accent">
                 <td className="p-4">
-                  <div className="font-semibold text-white">{r.employee_name}</div>
+                  <div className="font-semibold text-slate-900 dark:text-white">{r.employee_name}</div>
                   <div className="text-xs text-muted-foreground">{r.job_title || 'N/A'}</div>
                 </td>
                 <td className="p-4 text-sm text-slate-300">{r.cycle_name}</td>
@@ -152,23 +152,23 @@ function EvalModal({ review, onClose, onSubmit }: { review: any, onClose: () => 
     <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
       <div className="bg-card text-card-foreground border border-border rounded-xl w-full max-w-lg flex flex-col max-h-[90vh]">
         <div className="p-6 border-b border-border flex justify-between items-center">
-          <h3 className="text-lg font-bold text-white">Evaluate Employee</h3>
+          <h3 className="text-lg font-bold text-slate-900 dark:text-white">Evaluate Employee</h3>
           <button onClick={onClose} className="text-muted-foreground hover:text-white"><X size={20}/></button>
         </div>
         <div className="p-6 overflow-y-auto">
           <div className="bg-white/5 p-4 rounded-lg mb-6">
-            <h4 className="text-sm font-semibold text-white mb-2">Employee's Self Evaluation</h4>
+            <h4 className="text-sm font-semibold text-slate-900 dark:text-white mb-2">Employee's Self Evaluation</h4>
             <p className="text-sm text-muted-foreground italic">{review.self_comments || 'No self evaluation submitted.'}</p>
           </div>
           <form onSubmit={submit} className="space-y-4">
             <div>
               <label className="block text-xs font-medium text-muted-foreground mb-1">Overall Score (1.0 to 5.0)</label>
-              <input type="number" step="0.1" min="1" max="5" value={score} onChange={e=>setScore(e.target.value)} required className="w-full bg-input border-border border border-border rounded-md p-3 text-sm text-white focus:outline-none focus:border-[#00e07a]/50" />
+              <input type="number" step="0.1" min="1" max="5" value={score} onChange={e=>setScore(e.target.value)} required className="w-full bg-input border-border border border-border rounded-md p-3 text-sm text-slate-900 dark:text-white focus:outline-none focus:border-[#00e07a]/50" />
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="block text-xs font-medium text-muted-foreground mb-1">9-Box: Performance</label>
-                <select value={perf} onChange={e=>setPerf(e.target.value)} required className="w-full bg-input border-border border border-border rounded-md p-3 text-sm text-white focus:outline-none focus:border-[#00e07a]/50">
+                <select value={perf} onChange={e=>setPerf(e.target.value)} required className="w-full bg-input border-border border border-border rounded-md p-3 text-sm text-slate-900 dark:text-white focus:outline-none focus:border-[#00e07a]/50">
                   <option value="1">1 - Below</option>
                   <option value="2">2 - Meets</option>
                   <option value="3">3 - Exceeds</option>
@@ -176,7 +176,7 @@ function EvalModal({ review, onClose, onSubmit }: { review: any, onClose: () => 
               </div>
               <div>
                 <label className="block text-xs font-medium text-muted-foreground mb-1">9-Box: Potential</label>
-                <select value={pot} onChange={e=>setPot(e.target.value)} required className="w-full bg-input border-border border border-border rounded-md p-3 text-sm text-white focus:outline-none focus:border-[#00e07a]/50">
+                <select value={pot} onChange={e=>setPot(e.target.value)} required className="w-full bg-input border-border border border-border rounded-md p-3 text-sm text-slate-900 dark:text-white focus:outline-none focus:border-[#00e07a]/50">
                   <option value="1">1 - Low</option>
                   <option value="2">2 - Moderate</option>
                   <option value="3">3 - High</option>
@@ -185,7 +185,7 @@ function EvalModal({ review, onClose, onSubmit }: { review: any, onClose: () => 
             </div>
             <div>
               <label className="block text-xs font-medium text-muted-foreground mb-1">Manager Comments (Final)</label>
-              <textarea rows={4} value={comments} onChange={e=>setComments(e.target.value)} required placeholder="Constructive feedback..." className="w-full bg-input border-border border border-border rounded-md p-3 text-sm text-white focus:outline-none focus:border-[#00e07a]/50"></textarea>
+              <textarea rows={4} value={comments} onChange={e=>setComments(e.target.value)} required placeholder="Constructive feedback..." className="w-full bg-input border-border border border-border rounded-md p-3 text-sm text-slate-900 dark:text-white focus:outline-none focus:border-[#00e07a]/50"></textarea>
             </div>
             <button type="submit" className="w-full bg-[#00e07a] text-black font-bold py-3 rounded-md hover:bg-white transition-colors">Finalize Review</button>
           </form>
@@ -232,7 +232,7 @@ function ReviewCycles() {
   return (
     <div>
       <div className="flex justify-between items-center mb-6">
-        <h3 className="text-lg font-semibold text-white">Company Review Cycles</h3>
+        <h3 className="text-lg font-semibold text-slate-900 dark:text-white">Company Review Cycles</h3>
         <button onClick={()=>setShowModal(true)} className="bg-[#00e07a] text-black px-4 py-2 rounded-md font-bold text-sm hover:bg-white transition-colors">Create Cycle</button>
       </div>
       <div className="overflow-x-auto">
@@ -248,13 +248,13 @@ function ReviewCycles() {
           <tbody>
             {cycles.map(c => (
               <tr key={c.id} className="border-b border-border hover:bg-accent">
-                <td className="p-4 font-semibold text-white">{c.name}</td>
+                <td className="p-4 font-semibold text-slate-900 dark:text-white">{c.name}</td>
                 <td className="p-4 text-sm text-slate-300">{c.start_date} to {c.end_date}</td>
                 <td className="p-4 text-sm">
                   <span className="px-3 py-1 rounded-full text-xs font-bold bg-[#00e07a]/10 text-[#00e07a] border border-[#00e07a]/20">{c.status}</span>
                 </td>
                 <td className="p-4 text-right">
-                  <button onClick={() => deploy(c.id)} className="bg-transparent border border-white/20 text-white px-3 py-1.5 rounded text-xs hover:bg-accent transition-colors">Deploy Reviews to Company</button>
+                  <button onClick={() => deploy(c.id)} className="bg-transparent border border-white/20 text-slate-900 dark:text-white px-3 py-1.5 rounded text-xs hover:bg-accent transition-colors">Deploy Reviews to Company</button>
                 </td>
               </tr>
             ))}
@@ -275,22 +275,22 @@ function CreateCycleModal({ onClose, onSubmit }: { onClose: () => void, onSubmit
     <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
       <div className="bg-card text-card-foreground border border-border rounded-xl w-full max-w-sm flex flex-col">
         <div className="p-6 border-b border-border flex justify-between items-center">
-          <h3 className="text-lg font-bold text-white">Create Cycle</h3>
+          <h3 className="text-lg font-bold text-slate-900 dark:text-white">Create Cycle</h3>
           <button onClick={onClose} className="text-muted-foreground hover:text-white"><X size={20}/></button>
         </div>
         <div className="p-6">
           <form onSubmit={e => onSubmit(e, { name, start_date: start, end_date: end })} className="space-y-4">
             <div>
               <label className="block text-xs font-medium text-muted-foreground mb-1">Cycle Name</label>
-              <input type="text" value={name} onChange={e=>setName(e.target.value)} required placeholder="e.g. Q3 2026 Annual" className="w-full bg-input border-border border border-border rounded-md p-3 text-sm text-white focus:outline-none focus:border-[#00e07a]/50" />
+              <input type="text" value={name} onChange={e=>setName(e.target.value)} required placeholder="e.g. Q3 2026 Annual" className="w-full bg-input border-border border border-border rounded-md p-3 text-sm text-slate-900 dark:text-white focus:outline-none focus:border-[#00e07a]/50" />
             </div>
             <div>
               <label className="block text-xs font-medium text-muted-foreground mb-1">Start Date</label>
-              <input type="date" value={start} onChange={e=>setStart(e.target.value)} required className="w-full bg-input border-border border border-border rounded-md p-3 text-sm text-white focus:outline-none focus:border-[#00e07a]/50" />
+              <input type="date" value={start} onChange={e=>setStart(e.target.value)} required className="w-full bg-input border-border border border-border rounded-md p-3 text-sm text-slate-900 dark:text-white focus:outline-none focus:border-[#00e07a]/50" />
             </div>
             <div>
               <label className="block text-xs font-medium text-muted-foreground mb-1">End Date</label>
-              <input type="date" value={end} onChange={e=>setEnd(e.target.value)} required className="w-full bg-input border-border border border-border rounded-md p-3 text-sm text-white focus:outline-none focus:border-[#00e07a]/50" />
+              <input type="date" value={end} onChange={e=>setEnd(e.target.value)} required className="w-full bg-input border-border border border-border rounded-md p-3 text-sm text-slate-900 dark:text-white focus:outline-none focus:border-[#00e07a]/50" />
             </div>
             <button type="submit" className="w-full bg-[#00e07a] text-black font-bold py-3 rounded-md hover:bg-white transition-colors">Create</button>
           </form>
@@ -335,7 +335,7 @@ function NineBoxCalibration() {
 
   const Box = ({ p, pt, title, color }: { p:number, pt:number, title:string, color:string }) => (
     <div className={`rounded-xl p-3 flex flex-wrap gap-2 content-start min-h-[140px] border ${color}`}>
-      <div className="w-full text-center text-[0.65rem] font-bold uppercase tracking-wider text-white/50 mb-2">{title}</div>
+      <div className="w-full text-center text-[0.65rem] font-bold uppercase tracking-wider text-slate-900/50 dark:text-white/50 mb-2">{title}</div>
       {getBoxEmps(p, pt).map((emp, i) => (
         <div key={i} title={`${emp.full_name} - Score: ${emp.overall_score_1_to_5}`} className="w-8 h-8 rounded-full bg-[#222] text-foreground border-2 border-white flex items-center justify-center text-xs font-bold shadow-lg hover:scale-110 hover:z-10 transition-transform cursor-pointer">
           {getInitials(emp.full_name)}
@@ -347,8 +347,8 @@ function NineBoxCalibration() {
   return (
     <div>
       <div className="flex justify-between items-center mb-6">
-        <h3 className="text-lg font-semibold text-white">Talent Grid (9-Box)</h3>
-        <select value={selectedCycle} onChange={e=>setSelectedCycle(e.target.value)} className="bg-input border-border border border-border rounded-md p-2 text-sm text-white focus:outline-none focus:border-[#00e07a]/50">
+        <h3 className="text-lg font-semibold text-slate-900 dark:text-white">Talent Grid (9-Box)</h3>
+        <select value={selectedCycle} onChange={e=>setSelectedCycle(e.target.value)} className="bg-input border-border border border-border rounded-md p-2 text-sm text-slate-900 dark:text-white focus:outline-none focus:border-[#00e07a]/50">
           {cycles.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
         </select>
       </div>

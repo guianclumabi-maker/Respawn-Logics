@@ -20,6 +20,11 @@ try {
         `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP,
         INDEX `idx_ect_tenant` (`tenant_id`)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;");
+    try {
+        $pdo->exec("ALTER TABLE `elr_case_types` ADD COLUMN `is_confidential` TINYINT(1) DEFAULT 0");
+    } catch (PDOException $e) {
+        // Ignore if column already exists
+    }
     echo "- Table `elr_case_types` verified.\n";
 
     // 2. Create elr_cases

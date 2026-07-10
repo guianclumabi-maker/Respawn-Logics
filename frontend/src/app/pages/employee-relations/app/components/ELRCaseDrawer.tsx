@@ -360,7 +360,7 @@ export function ELRCaseDrawer({ cardId, onClose, onUpdate }: ELRCaseDrawerProps)
                     )}
                     <div className="flex justify-end gap-2 pt-2">
                       <button onClick={() => setShowHearingForm(false)} className="px-3 py-1.5 text-xs text-gray-500">Cancel</button>
-                      <button onClick={saveHearing} className="px-3 py-1.5 text-xs bg-blue-500 text-white rounded font-bold hover:bg-blue-600 transition-colors">Save Hearing</button>
+                      <button onClick={saveHearing} className="px-3 py-1.5 text-xs bg-blue-500 text-slate-900 dark:text-white rounded font-bold hover:bg-blue-600 transition-colors">Save Hearing</button>
                     </div>
                   </div>
                 )}
@@ -411,7 +411,7 @@ export function ELRCaseDrawer({ cardId, onClose, onUpdate }: ELRCaseDrawerProps)
                     </div>
                     <div className="flex justify-end gap-2 pt-2">
                       <button onClick={() => setShowApprovalForm(false)} className="px-3 py-1.5 text-xs text-gray-500">Cancel</button>
-                      <button onClick={requestApproval} className="px-3 py-1.5 text-xs bg-purple-500 text-white rounded font-bold hover:bg-purple-600 transition-colors">Send Request</button>
+                      <button onClick={requestApproval} className="px-3 py-1.5 text-xs bg-purple-500 text-slate-900 dark:text-white rounded font-bold hover:bg-purple-600 transition-colors">Send Request</button>
                     </div>
                   </div>
                 )}

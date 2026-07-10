@@ -80,12 +80,12 @@ function AiScoreBadge({ score, breakdown }: { score: number | null, breakdown?: 
       
       {breakdown && (
         <div className="absolute left-0 bottom-full mb-2 hidden group-hover:block z-50 bg-popover/95 border border-border rounded-lg p-3 text-xs w-48 shadow-xl backdrop-blur-xl pointer-events-none">
-          <div className="font-bold mb-2 text-white/90 pb-2 border-b border-border">Score Breakdown</div>
+          <div className="font-bold mb-2 text-slate-900/90 dark:text-white/90 pb-2 border-b border-border">Score Breakdown</div>
           <div className="space-y-1.5">
-            <div className="flex justify-between"><span>Skill Match</span><span className="text-white/80">{breakdown.skill}%</span></div>
-            <div className="flex justify-between"><span>Experience</span><span className="text-white/80">{breakdown.experience}%</span></div>
-            <div className="flex justify-between"><span>Location</span><span className="text-white/80">{breakdown.location}%</span></div>
-            <div className="flex justify-between"><span>Salary Req</span><span className="text-white/80">{breakdown.salary}%</span></div>
+            <div className="flex justify-between"><span>Skill Match</span><span className="text-slate-900/80 dark:text-white/80">{breakdown.skill}%</span></div>
+            <div className="flex justify-between"><span>Experience</span><span className="text-slate-900/80 dark:text-white/80">{breakdown.experience}%</span></div>
+            <div className="flex justify-between"><span>Location</span><span className="text-slate-900/80 dark:text-white/80">{breakdown.location}%</span></div>
+            <div className="flex justify-between"><span>Salary Req</span><span className="text-slate-900/80 dark:text-white/80">{breakdown.salary}%</span></div>
           </div>
         </div>
       )}

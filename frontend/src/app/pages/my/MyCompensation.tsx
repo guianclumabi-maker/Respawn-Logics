@@ -76,11 +76,11 @@ export function MyCompensation() {
         ) : error ? (
           <div className="flex flex-col items-center justify-center py-16 px-6 bg-red-500/10 border border-red-500/20 rounded-xl max-w-xl mx-auto text-center space-y-3">
             <AlertCircle className="w-10 h-10 text-red-500" />
-            <h3 className="text-lg font-bold text-white">Access Denied / Failed</h3>
+            <h3 className="text-lg font-bold text-slate-900 dark:text-white">Access Denied / Failed</h3>
             <p className="text-sm text-muted-foreground">{error}</p>
             <button 
               onClick={fetchCompHistory}
-              className="mt-2 px-4 py-2 bg-white/5 hover:bg-accent text-white rounded-lg text-xs transition-colors border border-border"
+              className="mt-2 px-4 py-2 bg-white/5 hover:bg-accent text-slate-900 dark:text-white rounded-lg text-xs transition-colors border border-border"
             >
               Retry Connection
             </button>
@@ -94,7 +94,7 @@ export function MyCompensation() {
               <div className="bg-card text-card-foreground/70 border border-border rounded-xl p-6 shadow-lg relative overflow-hidden">
                 <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-[#00e07a]/5 to-[#00b8ff]/5 rounded-bl-full pointer-events-none"></div>
                 <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Employee Name</div>
-                <div className="text-xl font-bold text-white tracking-tight">{data.employeeName}</div>
+                <div className="text-xl font-bold text-slate-900 dark:text-white tracking-tight">{data.employeeName}</div>
                 <div className="text-xs text-gray-500 mt-1">ID: {data.employeeId}</div>
               </div>
 

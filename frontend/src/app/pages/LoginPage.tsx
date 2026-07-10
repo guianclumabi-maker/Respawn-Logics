@@ -100,7 +100,7 @@ export function LoginPage() {
                 placeholder="you@company.com"
                 required
                 autoComplete="email"
-                className="w-full bg-white/5 border border-border rounded-xl px-4 py-3 text-white placeholder-slate-600 text-sm outline-none focus:border-[#00e07a]/50 focus:ring-1 focus:ring-[#00e07a]/20 transition-all"
+                className="w-full bg-white/5 border border-border rounded-xl px-4 py-3 text-slate-900 dark:text-white placeholder-slate-600 text-sm outline-none focus:border-[#00e07a]/50 focus:ring-1 focus:ring-[#00e07a]/20 transition-all"
               />
             </div>
 
@@ -117,7 +117,7 @@ export function LoginPage() {
                   placeholder="••••••••"
                   required
                   autoComplete="current-password"
-                  className="w-full bg-white/5 border border-border rounded-xl px-4 py-3 pr-11 text-white placeholder-slate-600 text-sm outline-none focus:border-[#00e07a]/50 focus:ring-1 focus:ring-[#00e07a]/20 transition-all"
+                  className="w-full bg-white/5 border border-border rounded-xl px-4 py-3 pr-11 text-slate-900 dark:text-white placeholder-slate-600 text-sm outline-none focus:border-[#00e07a]/50 focus:ring-1 focus:ring-[#00e07a]/20 transition-all"
                 />
                 <button
                   type="button"

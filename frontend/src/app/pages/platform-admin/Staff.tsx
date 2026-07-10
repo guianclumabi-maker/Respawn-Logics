@@ -160,7 +160,7 @@ export function PlatformAdminStaff() {
         <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-[#0c1018] border border-white/[0.08] rounded-2xl w-full max-w-md shadow-2xl">
             <div className="px-6 py-5 border-b border-white/[0.05] flex items-center justify-between">
-              <h2 className="text-base font-semibold text-white">Add Internal Staff</h2>
+              <h2 className="text-base font-semibold text-slate-900 dark:text-white">Add Internal Staff</h2>
               <button onClick={() => setShowModal(false)} className="text-slate-500 hover:text-slate-300 cursor-pointer">
                 <X size={18} />
               </button>

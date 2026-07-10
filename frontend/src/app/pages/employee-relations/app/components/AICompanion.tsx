@@ -142,7 +142,7 @@ export function AICompanion() {
               value={question}
               onChange={(e) => setQuestion(e.target.value)}
               placeholder="Ask a labor relations question (e.g., 'What are the steps for Twin Notice Rule?')"
-              className="flex-1 bg-white/5 border border-border rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-cyan-500/50 focus:bg-white/10 transition-all text-sm font-sans"
+              className="flex-1 bg-white/5 border border-border rounded-xl px-4 py-3 text-slate-900 dark:text-white placeholder-gray-500 focus:outline-none focus:border-cyan-500/50 focus:bg-white/10 transition-all text-sm font-sans"
             />
             <button
               type="submit"
@@ -182,7 +182,7 @@ export function AICompanion() {
           ) : error ? (
             <div className="flex-1 flex flex-col items-center justify-center p-6 text-center space-y-3">
               <AlertTriangle className="w-10 h-10 text-red-500" />
-              <h3 className="text-lg font-bold text-white">Copilot Exception</h3>
+              <h3 className="text-lg font-bold text-slate-900 dark:text-white">Copilot Exception</h3>
               <p className="text-sm text-muted-foreground max-w-md">{error}</p>
             </div>
           ) : result ? (
@@ -276,7 +276,7 @@ export function AICompanion() {
           ) : (
             <div className="flex-1 flex flex-col items-center justify-center p-8 text-center text-gray-500 space-y-3">
               <Compass className="w-12 h-12 text-gray-700" />
-              <h3 className="text-base font-bold text-white">Ask a labor relations query</h3>
+              <h3 className="text-base font-bold text-slate-900 dark:text-white">Ask a labor relations query</h3>
               <p className="text-sm text-gray-500 max-w-sm">The Copilot will answer based on DOLE handbook references and Supreme Court rulings.</p>
             </div>
           )}

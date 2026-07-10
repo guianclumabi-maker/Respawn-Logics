@@ -164,7 +164,7 @@ export function ELRApprovals() {
                           <div className="flex justify-between items-center">
                             <button onClick={() => setDecidingId(null)} className="text-[10px] text-gray-500 font-bold uppercase hover:text-slate-700 dark:hover:text-white">Cancel</button>
                             <div className="flex gap-2">
-                              <button onClick={() => handleDecision(approval.id, 'Rejected')} className="px-3 py-1.5 bg-red-500 hover:bg-red-600 text-white text-[11px] font-bold rounded flex items-center gap-1 transition-colors"><ThumbsDown size={12}/> Reject</button>
+                              <button onClick={() => handleDecision(approval.id, 'Rejected')} className="px-3 py-1.5 bg-red-500 hover:bg-red-600 text-slate-900 dark:text-white text-[11px] font-bold rounded flex items-center gap-1 transition-colors"><ThumbsDown size={12}/> Reject</button>
                               <button onClick={() => handleDecision(approval.id, 'Approved')} className="px-3 py-1.5 bg-[#00e07a] hover:bg-[#00c96d] text-black text-[11px] font-bold rounded flex items-center gap-1 transition-colors"><ThumbsUp size={12}/> Approve</button>
                             </div>
                           </div>

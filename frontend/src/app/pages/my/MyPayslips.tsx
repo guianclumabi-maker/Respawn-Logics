@@ -81,11 +81,11 @@ export function MyPayslips() {
         ) : error ? (
           <div className="flex flex-col items-center justify-center py-16 px-6 bg-red-500/10 border border-red-500/20 rounded-xl max-w-xl mx-auto text-center space-y-3">
             <AlertCircle className="w-10 h-10 text-red-500" />
-            <h3 className="text-lg font-bold text-white">Access Denied / Failed</h3>
+            <h3 className="text-lg font-bold text-slate-900 dark:text-white">Access Denied / Failed</h3>
             <p className="text-sm text-muted-foreground">{error}</p>
             <button 
               onClick={fetchPayslips}
-              className="mt-2 px-4 py-2 bg-white/5 hover:bg-accent text-white rounded-lg text-xs transition-colors border border-border"
+              className="mt-2 px-4 py-2 bg-white/5 hover:bg-accent text-slate-900 dark:text-white rounded-lg text-xs transition-colors border border-border"
             >
               Retry Connection
             </button>
@@ -93,7 +93,7 @@ export function MyPayslips() {
         ) : payslips.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-20 text-center space-y-3 bg-card text-card-foreground/30 border border-border rounded-2xl max-w-2xl mx-auto">
             <FileText className="w-12 h-12 text-gray-600" />
-            <h3 className="text-lg font-semibold text-white">No Payslips Available</h3>
+            <h3 className="text-lg font-semibold text-slate-900 dark:text-white">No Payslips Available</h3>
             <p className="text-sm text-gray-500">You do not have any processed payslips yet.</p>
           </div>
         ) : (
@@ -131,7 +131,7 @@ export function MyPayslips() {
                       <td className="py-4 px-6 text-right space-x-2">
                         <button
                           onClick={() => setSelectedPayslip(ps)}
-                          className="px-3 py-1.5 bg-white/5 hover:bg-accent text-white rounded text-xs font-semibold transition-colors border border-border"
+                          className="px-3 py-1.5 bg-white/5 hover:bg-accent text-slate-900 dark:text-white rounded text-xs font-semibold transition-colors border border-border"
                         >
                           View Details
                         </button>
@@ -192,11 +192,11 @@ export function MyPayslips() {
                   </h4>
                   <div className="flex justify-between text-sm">
                     <span className="text-gray-500">Gross Salary:</span>
-                    <span className="font-mono text-white">{formatCurrency(selectedPayslip.gross_pay)}</span>
+                    <span className="font-mono text-slate-900 dark:text-white">{formatCurrency(selectedPayslip.gross_pay)}</span>
                   </div>
                   <div className="flex justify-between text-sm">
                     <span className="text-gray-500">Additions:</span>
-                    <span className="font-mono text-white">{formatCurrency(selectedPayslip.total_earnings - selectedPayslip.gross_pay > 0 ? selectedPayslip.total_earnings - selectedPayslip.gross_pay : 0)}</span>
+                    <span className="font-mono text-slate-900 dark:text-white">{formatCurrency(selectedPayslip.total_earnings - selectedPayslip.gross_pay > 0 ? selectedPayslip.total_earnings - selectedPayslip.gross_pay : 0)}</span>
                   </div>
                   <div className="flex justify-between border-t border-border pt-2 font-bold text-sm">
                     <span className="text-muted-foreground">Total:</span>
@@ -210,7 +210,7 @@ export function MyPayslips() {
                   </h4>
                   <div className="flex justify-between text-sm">
                     <span className="text-gray-500">Tax/Gov/Others:</span>
-                    <span className="font-mono text-white">{formatCurrency(selectedPayslip.total_deductions)}</span>
+                    <span className="font-mono text-slate-900 dark:text-white">{formatCurrency(selectedPayslip.total_deductions)}</span>
                   </div>
                   <div className="flex justify-between border-t border-border pt-2 font-bold text-sm">
                     <span className="text-muted-foreground font-bold">Total:</span>

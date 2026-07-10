@@ -72,7 +72,7 @@ export function Analytics() {
           <div className="w-16 h-16 bg-red-500/10 rounded-2xl border border-red-500/20 flex items-center justify-center mx-auto mb-6 shadow-[0_0_20px_rgba(239,68,68,0.15)]">
             <AlertTriangle className="w-8 h-8 text-red-400" />
           </div>
-          <h2 className="text-2xl font-bold text-white tracking-tight">Access Denied</h2>
+          <h2 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">Access Denied</h2>
           <p className="text-sm">You don't have access to Analytics. Executive clearance is required to view this module.</p>
         </div>
       </div>

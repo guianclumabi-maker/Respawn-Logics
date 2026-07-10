@@ -208,19 +208,19 @@ export function ELRDailyReport() {
                 <div className="bg-card text-card-foreground/70 border border-border rounded-xl p-5 shadow-lg relative overflow-hidden">
                   <div className="absolute top-0 left-0 w-1 h-full bg-[#00e07a]"></div>
                   <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Total Filed Today</h3>
-                  <div className="text-2xl font-bold font-mono text-white mb-1">{summary.total}</div>
+                  <div className="text-2xl font-bold font-mono text-slate-900 dark:text-white mb-1">{summary.total}</div>
                 </div>
                 
                 <div className="bg-card text-card-foreground/70 border border-border rounded-xl p-5 shadow-lg relative overflow-hidden">
                   <div className="absolute top-0 left-0 w-1 h-full bg-blue-500"></div>
                   <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Automated (System)</h3>
-                  <div className="text-2xl font-bold font-mono text-white mb-1">{summary.auto}</div>
+                  <div className="text-2xl font-bold font-mono text-slate-900 dark:text-white mb-1">{summary.auto}</div>
                 </div>
                 
                 <div className="bg-card text-card-foreground/70 border border-border rounded-xl p-5 shadow-lg relative overflow-hidden">
                   <div className="absolute top-0 left-0 w-1 h-full bg-purple-500"></div>
                   <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Manual Filing</h3>
-                  <div className="text-2xl font-bold font-mono text-white mb-1">{summary.manual}</div>
+                  <div className="text-2xl font-bold font-mono text-slate-900 dark:text-white mb-1">{summary.manual}</div>
                 </div>
 
                 <div className="bg-card text-card-foreground/70 border border-border rounded-xl p-4 shadow-lg overflow-hidden flex flex-col justify-center">
@@ -229,7 +229,7 @@ export function ELRDailyReport() {
                     {Object.entries(summary.by_department).slice(0, 3).map(([dept, count]) => (
                       <div key={dept} className="flex justify-between text-gray-300">
                         <span className="truncate pr-2">{dept}</span>
-                        <span className="font-bold text-white bg-white/10 px-1.5 rounded">{count}</span>
+                        <span className="font-bold text-slate-900 dark:text-white bg-white/10 px-1.5 rounded">{count}</span>
                       </div>
                     ))}
                     {Object.keys(summary.by_department).length === 0 && (
@@ -250,14 +250,14 @@ export function ELRDailyReport() {
                     placeholder="Search employee..."
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
-                    className="w-full bg-background border border-border rounded-lg py-2 pl-9 pr-3 text-white text-sm focus:outline-none focus:border-[#00e07a]/50"
+                    className="w-full bg-background border border-border rounded-lg py-2 pl-9 pr-3 text-slate-900 dark:text-white text-sm focus:outline-none focus:border-[#00e07a]/50"
                   />
                 </div>
 
                 <select
                   value={sourceFilter}
                   onChange={(e) => setSourceFilter(e.target.value)}
-                  className="bg-background border border-border rounded-lg py-2 px-3 text-sm text-white focus:outline-none focus:border-[#00e07a]/50"
+                  className="bg-background border border-border rounded-lg py-2 px-3 text-sm text-slate-900 dark:text-white focus:outline-none focus:border-[#00e07a]/50"
                 >
                   <option value="">All Sources</option>
                   <option value="auto">Automated (System)</option>
@@ -267,7 +267,7 @@ export function ELRDailyReport() {
                 <select
                   value={pipelineFilter}
                   onChange={(e) => setPipelineFilter(e.target.value)}
-                  className="bg-background border border-border rounded-lg py-2 px-3 text-sm text-white focus:outline-none focus:border-[#00e07a]/50"
+                  className="bg-background border border-border rounded-lg py-2 px-3 text-sm text-slate-900 dark:text-white focus:outline-none focus:border-[#00e07a]/50"
                 >
                   <option value="">All Pipelines</option>
                   {pipelines.map(p => <option key={p} value={p}>{p}</option>)}
@@ -276,7 +276,7 @@ export function ELRDailyReport() {
                 <select
                   value={deptFilter}
                   onChange={(e) => setDeptFilter(e.target.value)}
-                  className="bg-background border border-border rounded-lg py-2 px-3 text-sm text-white focus:outline-none focus:border-[#00e07a]/50"
+                  className="bg-background border border-border rounded-lg py-2 px-3 text-sm text-slate-900 dark:text-white focus:outline-none focus:border-[#00e07a]/50"
                 >
                   <option value="">All Departments</option>
                   {departments.map(d => <option key={d} value={d}>{d}</option>)}
@@ -310,7 +310,7 @@ export function ELRDailyReport() {
                         className="hover:bg-white/[0.02] transition-colors cursor-pointer group"
                       >
                         <td className="py-4 px-6">
-                          <div className="font-bold text-white group-hover:text-[#00e07a] transition-colors">{c.full_name}</div>
+                          <div className="font-bold text-slate-900 dark:text-white group-hover:text-[#00e07a] transition-colors">{c.full_name}</div>
                           <div className="text-[10px] text-gray-500 font-mono mt-0.5">{c.employee_id}</div>
                         </td>
                         <td className="py-4 px-6 text-xs text-gray-300">{c.department}</td>

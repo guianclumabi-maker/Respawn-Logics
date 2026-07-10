@@ -216,7 +216,7 @@ export function AICompanion() {
             /* Empty state */
             <div className="h-full flex flex-col items-center justify-center px-6 text-center">
               <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-2xl shadow-indigo-500/30 mb-6">
-                <Bot className="w-8 h-8 text-white" />
+                <Bot className="w-8 h-8 text-slate-900 dark:text-white" />
               </div>
               <h2 className="text-2xl font-bold text-foreground mb-2">
                 How can I help?
@@ -252,14 +252,14 @@ export function AICompanion() {
                   >
                     {message.role === 'assistant' && (
                       <div className="w-8 h-8 flex-shrink-0 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-500/20 mt-0.5">
-                        <Bot className="w-4 h-4 text-white" />
+                        <Bot className="w-4 h-4 text-slate-900 dark:text-white" />
                       </div>
                     )}
 
                     <div
                       className={`max-w-[78%] rounded-2xl px-5 py-3.5 shadow-sm text-[14.5px] leading-relaxed whitespace-pre-wrap ${
                         message.role === 'user'
-                          ? 'bg-indigo-600 text-white shadow-indigo-600/20 rounded-tr-sm'
+                          ? 'bg-indigo-600 text-slate-900 dark:text-white shadow-indigo-600/20 rounded-tr-sm'
                           : 'bg-white/[0.05] border border-white/[0.08] text-slate-200 rounded-tl-sm'
                       }`}
                     >
@@ -283,7 +283,7 @@ export function AICompanion() {
                 {isLoading && (
                   <div className="flex gap-3 justify-start">
                     <div className="w-8 h-8 flex-shrink-0 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-500/20 mt-0.5">
-                      <Bot className="w-4 h-4 text-white" />
+                      <Bot className="w-4 h-4 text-slate-900 dark:text-white" />
                     </div>
                     <div className="bg-white/[0.05] border border-white/[0.08] rounded-2xl rounded-tl-sm px-5 py-4 flex items-center gap-1.5">
                       {[0, 150, 300].map((delay) => (
@@ -335,7 +335,7 @@ export function AICompanion() {
                 <button
                   onClick={() => handleSend()}
                   disabled={!input.trim() || isLoading}
-                  className="p-2.5 bg-indigo-600 hover:bg-indigo-500 disabled:bg-slate-800 disabled:text-slate-600 text-white rounded-xl transition-all shadow-lg shadow-indigo-600/20 disabled:shadow-none mb-0.5 ml-1 flex-shrink-0"
+                  className="p-2.5 bg-indigo-600 hover:bg-indigo-500 disabled:bg-slate-800 disabled:text-slate-600 text-slate-900 dark:text-white rounded-xl transition-all shadow-lg shadow-indigo-600/20 disabled:shadow-none mb-0.5 ml-1 flex-shrink-0"
                 >
                   <Send className="w-4 h-4" />
                 </button>

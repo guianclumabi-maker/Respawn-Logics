@@ -60,7 +60,7 @@ export function OrgChart() {
         {/* Header */}
         <div className="p-8 pb-4 border-b border-border flex justify-between items-end bg-[#141929]">
           <div>
-            <h1 className="text-3xl font-bold text-white mb-2" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>Organization Chart</h1>
+            <h1 className="text-3xl font-bold text-slate-900 dark:text-white mb-2" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>Organization Chart</h1>
             <p className="text-muted-foreground text-sm">Visual hierarchy of all employees</p>
           </div>
           <div className="flex gap-2 bg-input border-border p-1 rounded-lg border border-border">
@@ -114,7 +114,7 @@ function TreeNode({ node }: { node: Employee }) {
             {getInitials(node.full_name)}
           </div>
           
-          <div className="font-bold text-white text-sm" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>{node.full_name}</div>
+          <div className="font-bold text-slate-900 dark:text-white text-sm" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>{node.full_name}</div>
           <div className="text-xs font-semibold text-[#00b8ff] mt-1">{node.job_title || 'Employee'}</div>
           <div className="text-[10px] text-slate-500 uppercase tracking-widest mt-2 px-2 py-1 bg-white/5 rounded-md inline-block">{node.department || 'General'}</div>
         </div>

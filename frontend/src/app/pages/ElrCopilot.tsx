@@ -214,7 +214,7 @@ export function ElrCopilotContent() {
                                 )}
                                 <span className="text-[9px] font-bold text-gray-500 uppercase tracking-wider">{src.type}</span>
                               </div>
-                              <div className="text-xs font-bold text-white leading-tight mt-1 line-clamp-2">{src.title}</div>
+                              <div className="text-xs font-bold text-slate-900 dark:text-white leading-tight mt-1 line-clamp-2">{src.title}</div>
                               <div className="text-[10px] text-muted-foreground mt-0.5 line-clamp-1">{src.reference}</div>
                             </div>
 
@@ -269,7 +269,7 @@ export function ElrCopilotContent() {
           {transcript.length === 0 && !loading && (
             <div className="h-full flex flex-col items-center justify-center text-center text-gray-500 py-12 px-6">
               <Sparkles className="w-12 h-12 text-gray-700 mb-3" />
-              <h3 className="text-base font-bold text-white mb-1">Ask a labor relations query</h3>
+              <h3 className="text-base font-bold text-slate-900 dark:text-white mb-1">Ask a labor relations query</h3>
               <p className="text-sm text-gray-500 max-w-sm font-sans">Type a query below. The Copilot will analyze your input against registered DOLE advisories and SC decisions.</p>
             </div>
           )}
@@ -308,7 +308,7 @@ export function ElrCopilotContent() {
               onChange={(e) => setQuestion(e.target.value)}
               placeholder="Type your labor relations question..."
               rows={2}
-              className="flex-1 bg-white/5 border border-border rounded-xl px-4 py-2.5 text-white placeholder-gray-500 focus:outline-none focus:border-cyan-500/50 focus:bg-white/10 transition-all text-sm font-sans resize-none"
+              className="flex-1 bg-white/5 border border-border rounded-xl px-4 py-2.5 text-slate-900 dark:text-white placeholder-gray-500 focus:outline-none focus:border-cyan-500/50 focus:bg-white/10 transition-all text-sm font-sans resize-none"
               onKeyDown={(e) => {
                 if (e.key === "Enter" && !e.shiftKey) {
                   e.preventDefault();
