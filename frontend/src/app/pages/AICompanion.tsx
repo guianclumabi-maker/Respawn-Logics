@@ -303,7 +303,7 @@ export function AICompanion() {
         </div>
 
         {/* Input area */}
-        <div className="flex-shrink-0 px-4 pb-4 pt-2 bg-gradient-to-t from-[#0f1115] to-transparent relative z-10">
+        <div className="flex-shrink-0 px-4 pb-4 pt-2 bg-gradient-to-t from-background to-transparent relative z-10">
           <div className="max-w-3xl mx-auto">
             {/* Glow ring behind input */}
             <div className="relative">

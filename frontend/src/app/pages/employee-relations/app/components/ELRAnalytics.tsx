@@ -102,7 +102,7 @@ export function ELRAnalytics() {
                       <XAxis dataKey="month" stroke="#4b5563" />
                       <YAxis stroke="#4b5563" allowDecimals={false} />
                       <Tooltip 
-                        contentStyle={{ backgroundColor: '#111625', borderColor: 'var(--border)', color: '#fff', borderRadius: '8px' }}
+                        contentStyle={{ backgroundColor: 'var(--card)', borderColor: 'var(--border)', color: 'var(--foreground)', borderRadius: '8px' }}
                       />
                       <Area type="monotone" dataKey="count" stroke="#00e07a" strokeWidth={2.5} fillOpacity={1} fill="url(#colorTrend)" />
                     </AreaChart>
@@ -127,7 +127,7 @@ export function ELRAnalytics() {
                       <XAxis type="number" stroke="#4b5563" allowDecimals={false} />
                       <YAxis dataKey="source" type="category" stroke="#4b5563" width={100} tickLine={false} />
                       <Tooltip
-                        contentStyle={{ backgroundColor: '#111625', borderColor: 'var(--border)', color: '#fff', borderRadius: '8px' }}
+                        contentStyle={{ backgroundColor: 'var(--card)', borderColor: 'var(--border)', color: 'var(--foreground)', borderRadius: '8px' }}
                       />
                       <Bar dataKey="applications" barSize={12} radius={[0, 4, 4, 0]}>
                         {data.channels.map((entry: any, index: number) => (

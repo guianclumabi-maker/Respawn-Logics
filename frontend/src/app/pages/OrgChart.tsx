@@ -71,7 +71,7 @@ export function OrgChart() {
         </div>
 
         {/* Canvas */}
-        <div className="flex-1 overflow-auto p-12 relative custom-scrollbar bg-gradient-to-b from-[#0b0f1a] to-[#0f1423]">
+        <div className="flex-1 overflow-auto p-12 relative custom-scrollbar bg-gradient-to-b from-background to-muted dark:from-[#0b0f1a] dark:to-[#0f1423]">
           {loading ? (
             <div className="absolute inset-0 flex items-center justify-center text-[#00e07a] animate-pulse">Loading Chart...</div>
           ) : data ? (
@@ -110,7 +110,7 @@ function TreeNode({ node }: { node: Employee }) {
       <div className="relative group">
         <div className="w-56 bg-card text-card-foreground border border-border rounded-xl p-4 shadow-xl flex flex-col items-center text-center transition-all duration-200 hover:border-[#00e07a]/50 hover:shadow-[0_0_20px_rgba(0,224,122,0.15)] z-10 relative">
           
-          <div className="w-12 h-12 bg-gradient-to-br from-slate-700 to-slate-800 rounded-full flex items-center justify-center text-foreground font-bold text-sm border-2 border-[#161922] shadow-md -mt-8 mb-3 group-hover:scale-110 transition-transform">
+          <div className="w-12 h-12 bg-gradient-to-br from-slate-700 to-slate-800 rounded-full flex items-center justify-center text-foreground font-bold text-sm border-2 border-border shadow-md -mt-8 mb-3 group-hover:scale-110 transition-transform">
             {getInitials(node.full_name)}
           </div>
           

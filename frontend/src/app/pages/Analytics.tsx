@@ -128,7 +128,7 @@ export function Analytics() {
                   <YAxis stroke="#888888" fontSize={12} tickLine={false} axisLine={false} />
                   <RechartsTooltip 
                     cursor={{ fill: 'rgba(255,255,255,0.05)' }}
-                    contentStyle={{ backgroundColor: 'var(--card)', borderColor: 'var(--border)', borderRadius: '8px', color: '#fff' }}
+                    contentStyle={{ backgroundColor: 'var(--card)', borderColor: 'var(--border)', borderRadius: '8px', color: 'var(--foreground)' }}
                     itemStyle={{ color: '#fff' }}
                   />
                   <Bar dataKey="count" fill="#3b82f6" radius={[4, 4, 0, 0]} />
@@ -162,7 +162,7 @@ export function Analytics() {
                   <YAxis stroke="#888888" fontSize={12} tickLine={false} axisLine={false} />
                   <RechartsTooltip 
                     cursor={{ fill: 'rgba(255,255,255,0.05)' }}
-                    contentStyle={{ backgroundColor: 'var(--card)', borderColor: 'var(--border)', borderRadius: '8px', color: '#fff' }}
+                    contentStyle={{ backgroundColor: 'var(--card)', borderColor: 'var(--border)', borderRadius: '8px', color: 'var(--foreground)' }}
                     itemStyle={{ color: '#fff' }}
                   />
                   <Bar dataKey="count" fill="#00e07a" radius={[4, 4, 0, 0]} />
@@ -202,7 +202,7 @@ export function Analytics() {
                   tickFormatter={(value) => `$${value.toLocaleString()}`}
                 />
                 <RechartsTooltip 
-                  contentStyle={{ backgroundColor: 'var(--card)', borderColor: 'var(--border)', borderRadius: '8px', color: '#fff' }}
+                  contentStyle={{ backgroundColor: 'var(--card)', borderColor: 'var(--border)', borderRadius: '8px', color: 'var(--foreground)' }}
                   itemStyle={{ color: '#fff' }}
                   formatter={(value: any) => [`$${Number(value).toLocaleString()}`, 'Gross Payroll']}
                 />
