@@ -4,7 +4,7 @@ import { TicketDetail } from "./components/tickets/TicketDetail";
 import { NewTicketModal } from "./components/tickets/NewTicketModal";
 import { AnalyticsDashboard } from "./components/analytics/AnalyticsDashboard";
 import { GamifiedThemeToggle } from "./components/GamifiedThemeToggle";
-import { TICKETS, Ticket, Status, Priority } from "./components/tickets/data";
+import { Ticket, Status, Priority } from "./components/tickets/data";
 import { Headphones, Bell, Settings, ArrowLeft, Search } from "lucide-react";
 import { useAuth } from "../../../context/AuthContext";
 
@@ -18,7 +18,7 @@ export default function App() {
   const ROLE = isAgent ? 'agent' : 'client';
   const USER_INITIALS = user ? user.name.split(' ').map((n: string) => n[0]).join('').substring(0, 2).toUpperCase() : 'U';
   
-  const [tickets, setTickets] = useState<Ticket[]>(TICKETS);
+  const [tickets, setTickets] = useState<Ticket[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [filterStatus, setFilterStatus] = useState<Status | "all">("all");
   const [filterCompany, setFilterCompany] = useState<string | "all">("all");
@@ -48,8 +48,9 @@ export default function App() {
             messages: [],
             tags: [t.team_name || 'Queue']
           }));
+          // Always reflect the backend result (even when empty) — never fall back to mock data.
+          setTickets(mapped);
           if (mapped.length > 0) {
-            setTickets(mapped);
             setSelectedId(mapped[0].id);
           }
         }
