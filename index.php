@@ -165,7 +165,7 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
 
         /* ─── NEW HERO (HUGO STYLE) ─── */
         .hero {
-            min-height: unset;
+            min-height: 100vh;
             display: flex;
             flex-direction: column;
             justify-content: center;
