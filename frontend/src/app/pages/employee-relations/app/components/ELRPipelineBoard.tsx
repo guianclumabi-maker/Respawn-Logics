@@ -3,8 +3,8 @@ import { apiFetch } from "../../../../lib/apiClient";
 import { 
   Kanban, Plus, Settings, Trash2, Save, AlertCircle, Clock,
   CheckCircle, FileText, AlignLeft, Type, ListOrdered, ArrowLeft,
-  Eye, X, FileDown, Printer, ChevronDown, Edit2, Check, Search, Filter,
-  ArrowUp, ArrowDown, Move
+  Eye, X, FileDown, Printer, ChevronDown, ChevronUp, Edit2, Check, Search, Filter,
+  ArrowUp, ArrowDown, Move, LayoutList, Columns3
 } from "lucide-react";
 import { ELRCaseDrawer } from "./ELRCaseDrawer";
 
@@ -73,6 +73,28 @@ export function ELRPipelineBoard() {
 
   // Toast
   const [toast, setToast] = useState<{message: string, isError: boolean} | null>(null);
+
+  // HUD states
+  const [viewMode, setViewMode] = useState<"table" | "kanban">(() => {
+    try {
+      const saved = localStorage.getItem("elr_view_mode");
+      return (saved === "table" || saved === "kanban") ? saved : "kanban";
+    } catch {
+      return "kanban";
+    }
+  });
+
+  useEffect(() => {
+    try {
+      localStorage.setItem("elr_view_mode", viewMode);
+    } catch {}
+  }, [viewMode]);
+
+  const [activeStage, setActiveStage] = useState<number | "All">("All");
+  
+  type SortKey = "full_name" | "employee_id" | "stage" | "department" | "doc_count" | "created_at";
+  const [sortKey, setSortKey] = useState<SortKey>("full_name");
+  const [sortDir, setSortDir] = useState<"asc" | "desc">("asc");
 
   useEffect(() => {
     fetchPipelines();
@@ -331,6 +353,7 @@ export function ELRPipelineBoard() {
     const stage = stages.find(s => s.id === card.current_stage_id);
     const isTerminal = stage?.is_terminal === 1 || stage?.is_terminal === true;
     
+    if (activeStage !== "All" && card.current_stage_id !== activeStage) return false;
     if (searchQuery) {
       const q = searchQuery.toLowerCase();
       if (!card.full_name.toLowerCase().includes(q) && !card.employee_id.toLowerCase().includes(q)) return false;
@@ -343,48 +366,133 @@ export function ELRPipelineBoard() {
     return true;
   });
 
+  const sortedCards = [...filteredCards].sort((a, b) => {
+    let cmp = 0;
+    if (sortKey === "stage") {
+      const stageA = stages.find(s => s.id === a.current_stage_id)?.name || "";
+      const stageB = stages.find(s => s.id === b.current_stage_id)?.name || "";
+      cmp = stageA.localeCompare(stageB);
+    } else {
+      const av = a[sortKey];
+      const bv = b[sortKey];
+      if (typeof av === "number" && typeof bv === "number") {
+        cmp = av - bv;
+      } else {
+        cmp = String(av || "").localeCompare(String(bv || ""));
+      }
+    }
+    return sortDir === "asc" ? cmp : -cmp;
+  });
+
+  const toggleSort = (key: SortKey) => {
+    if (sortKey === key) setSortDir(d => d === "asc" ? "desc" : "asc");
+    else { setSortKey(key); setSortDir("asc"); }
+  };
+
+  const SortIcon = ({ col }: { col: SortKey }) => {
+    if (sortKey !== col) return <ChevronDown size={11} className="text-muted-foreground" />;
+    return sortDir === "asc" ? <ChevronUp size={11} className="text-[#00e07a]" /> : <ChevronDown size={11} className="text-[#00e07a]" />;
+  };
+
+  const handleStageSelectChange = (cardId: number, toStageId: number) => {
+    const card = cards.find(c => c.id === cardId);
+    if (card && card.current_stage_id === toStageId) return;
+
+    const toStage = stages.find(s => s.id === toStageId);
+    if (toStage && toStage.template_id) {
+      setPendingMove({ cardId, toStageId });
+      setTransitionFields({});
+      setShowTransitionModal(true);
+    } else {
+      executeMove(cardId, toStageId, {});
+    }
+  };
+
   return (
-    <main className="flex-1 flex flex-col h-full bg-[#f4f6f8] dark:bg-background text-foreground overflow-hidden transition-colors duration-300 relative">
+    <main className="flex-1 flex flex-col h-full bg-[#f4f6f8] dark:bg-background text-foreground overflow-hidden transition-colors duration-300 relative font-mono">
       
       {/* Header */}
       <div className="flex-none px-6 py-4 border-b border-border bg-card/50 backdrop-blur-md flex items-center justify-between">
         <div className="flex items-center gap-4">
           <div>
-            <h1 className="text-xl font-bold text-foreground font-['Space_Grotesk'] flex items-center gap-3">
+            <h1 className="text-2xl font-bold tracking-tight text-foreground font-['Space_Grotesk'] flex items-center gap-1.5">
               {pipelines.length > 1 ? (
                 <select
                   value={currentPipelineId || ""}
                   onChange={(e) => setCurrentPipelineId(parseInt(e.target.value))}
-                  className="bg-transparent font-bold border-none outline-none cursor-pointer focus:ring-0"
+                  className="bg-transparent font-bold border-none outline-none cursor-pointer focus:ring-0 p-0 text-2xl text-foreground font-['Space_Grotesk']"
                 >
                   {pipelines.map(p => (
-                    <option key={p.id} value={p.id} className="text-black dark:text-white">{p.name}</option>
+                    <option key={p.id} value={p.id} className="text-black dark:text-white bg-card">{p.name}</option>
                   ))}
                 </select>
               ) : (
                 currentPipeline?.name || "Pipeline Board"
               )}
+              <span className="inline-block w-2 h-4 bg-[#00e07a] blink"></span>
             </h1>
           </div>
         </div>
         <div className="flex items-center gap-3">
+          {/* View toggle */}
+          <div className="flex items-center rounded-xl border border-border overflow-hidden bg-card/[0.01]">
+            <button onClick={() => setViewMode("table")}
+              className={`flex items-center gap-1.5 px-3 py-2 text-[10px] font-bold transition-all cursor-pointer border-0 ${viewMode === "table" ? "bg-[#00e07a]/10 border-r border-[#00e07a]/20 text-[#00e07a]" : "text-muted-foreground hover:text-foreground border-r border-border bg-transparent"}`}>
+              <LayoutList size={14} /> [ HUD TABLE ]
+            </button>
+            <button onClick={() => setViewMode("kanban")}
+              className={`flex items-center gap-1.5 px-3 py-2 text-[10px] font-bold transition-all cursor-pointer border-0 ${viewMode === "kanban" ? "bg-[#00e07a]/10 text-[#00e07a]" : "text-muted-foreground hover:text-foreground bg-transparent"}`}>
+              <Columns3 size={14} /> [ HUD KANBAN ]
+            </button>
+          </div>
           <button 
             onClick={() => setShowManagePhases(true)}
-            className="px-4 py-2 bg-accent hover:bg-accent font-semibold rounded-lg text-sm transition-all flex items-center gap-2 cursor-pointer shadow-sm"
+            className="px-4 py-2.5 bg-transparent border border-border text-muted-foreground hover:text-foreground hover:bg-accent font-bold rounded-xl text-xs transition-all flex items-center gap-2 cursor-pointer"
           >
-            <Settings size={16} /> Manage Phases
+            <Settings size={14} /> [ MANAGE PHASES ]
           </button>
           <button 
             onClick={() => setShowAddCard(true)}
-            className="px-4 py-2 bg-[#00e07a] hover:bg-[#00c96a] text-black font-extrabold rounded-lg text-sm transition-all flex items-center gap-2 cursor-pointer shadow-sm"
+            className="px-4 py-2.5 bg-[#00e07a] hover:bg-[#00c96a] text-black font-extrabold rounded-xl text-xs transition-all flex items-center gap-2 cursor-pointer shadow-lg shadow-green-500/10 border-0"
           >
-            <Plus size={16} /> Create Case
+            <Plus size={14} className="text-black" /> [ CREATE CASE ]
           </button>
         </div>
       </div>
 
+      {/* Stage-count HUD header row */}
+      <div className="flex-none flex gap-2 overflow-x-auto pb-2 pt-2 items-center scrollbar-thin px-6 border-b border-border bg-card/25 backdrop-blur-md">
+        <button
+          onClick={() => setActiveStage("All")}
+          className={`px-3 py-1.5 rounded-lg border text-xs font-bold transition-all cursor-pointer ${
+            activeStage === "All"
+              ? "bg-[#00e07a]/10 border-[#00e07a] text-[#00e07a]"
+              : "border-border text-muted-foreground hover:text-foreground bg-transparent"
+          }`}
+        >
+          {`[ ALL CASES: ${cards.length} ]`}
+        </button>
+        {stages.map(stage => {
+          const count = cards.filter(c => c.current_stage_id === stage.id).length;
+          const isActive = activeStage === stage.id;
+          return (
+            <button
+              key={stage.id}
+              onClick={() => setActiveStage(stage.id)}
+              className={`px-3 py-1.5 rounded-lg border text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
+                isActive
+                  ? "bg-[#00e07a]/10 border-[#00e07a] text-[#00e07a]"
+                  : "border-border text-muted-foreground hover:text-foreground bg-transparent"
+              }`}
+            >
+              {`[ ${stage.name.toUpperCase()}: ${count} ]`}
+            </button>
+          );
+        })}
+      </div>
+
       {/* Filter Bar */}
-      <div className="flex-none px-6 py-3 border-b border-border bg-muted/50/50 dark:bg-black/20 flex flex-wrap gap-4 items-center">
+      <div className="flex-none px-6 py-3 border-b border-border bg-muted/20 flex flex-wrap gap-4 items-center">
         <div className="relative">
           <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
           <input 
@@ -392,101 +500,172 @@ export function ELRPipelineBoard() {
             placeholder="Search by name or ID..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-9 pr-4 py-1.5 text-sm bg-background border border-border rounded-full focus:outline-none focus:border-[#00e07a] transition-colors w-64"
+            className="pl-9 pr-4 py-1.5 text-xs bg-background border border-border rounded-full focus:outline-none focus:border-[#00e07a] transition-colors w-64 text-foreground placeholder-gray-600 font-mono"
           />
         </div>
-        <div className="flex items-center gap-2">
-          <Filter size={14} className="text-muted-foreground" />
+        <div className="flex items-center gap-2 text-xs">
+          <span className="text-muted-foreground">// DEPT:</span>
           <select
             value={filterDepartment}
             onChange={(e) => setFilterDepartment(e.target.value)}
-            className="bg-background border border-border rounded-full px-3 py-1.5 text-sm focus:outline-none focus:border-[#00e07a]"
+            className="bg-background border border-border rounded-full px-3 py-1.5 text-xs focus:outline-none focus:border-[#00e07a] text-foreground font-mono"
           >
-            <option value="">All Departments</option>
-            {departments.map(d => <option key={d} value={d}>{d}</option>)}
+            <option value="">ALL DEPARTMENTS</option>
+            {departments.map(d => <option key={d} value={d}>{d.toUpperCase()}</option>)}
           </select>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 text-xs">
+          <span className="text-muted-foreground">// STATUS:</span>
           <select
             value={filterStatus}
             onChange={(e) => setFilterStatus(e.target.value)}
-            className="bg-background border border-border rounded-full px-3 py-1.5 text-sm focus:outline-none focus:border-[#00e07a]"
+            className="bg-background border border-border rounded-full px-3 py-1.5 text-xs focus:outline-none focus:border-[#00e07a] text-foreground font-mono"
           >
-            <option value="">All Cases</option>
-            <option value="active">Active Cases</option>
-            <option value="closed">Closed Cases (Terminal)</option>
+            <option value="">ALL CASES</option>
+            <option value="active">ACTIVE CASES</option>
+            <option value="closed">CLOSED CASES</option>
           </select>
+        </div>
+        <div className="ml-auto text-[10px] text-muted-foreground flex-shrink-0">
+          <span className="font-bold text-foreground">{filteredCards.length}</span> CASES FOUND
         </div>
       </div>
 
-      {/* Board Scroll Area */}
-      <div className="flex-1 overflow-x-auto overflow-y-hidden p-6 flex gap-6 select-none scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-[#2a2d36]">
+      {/* Main Content Area */}
+      <div className="flex-1 overflow-auto p-6 relative z-10 scrollbar-thin">
         {loading && stages.length === 0 ? (
-          <div className="flex-1 flex items-center justify-center">
+          <div className="flex-1 flex items-center justify-center py-20">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#00e07a]"></div>
           </div>
         ) : error ? (
-          <div className="flex-1 flex items-center justify-center flex-col gap-4 text-red-400">
+          <div className="flex-1 flex items-center justify-center flex-col gap-4 text-red-400 py-20">
             <AlertCircle size={32} />
             <p>{error}</p>
           </div>
-        ) : stages.length === 0 ? (
-          <div className="flex-1 flex items-center justify-center text-muted-foreground">
-            No stages configured for this pipeline.
+        ) : cards.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-20 text-center w-full">
+            <div className="w-16 h-16 rounded-2xl bg-[#00e07a]/10 border border-[#00e07a]/20 flex items-center justify-center mb-4">
+              <FileText size={28} className="text-[#00e07a]" />
+            </div>
+            <h3 className="text-sm font-bold text-foreground mb-1 font-['Space_Grotesk']">NO CASES ADDED</h3>
+            <p className="text-xs text-muted-foreground max-w-xs mb-4">Add a case to begin.</p>
+            <button onClick={() => setShowAddCard(true)} className="px-4 py-2.5 rounded-xl text-xs font-bold bg-[#00e07a] hover:bg-[#00c96a] text-black cursor-pointer border-0">
+              <Plus size={12} className="inline mr-1 text-black" />[ CREATE CASE ]
+            </button>
+          </div>
+        ) : viewMode === "table" ? (
+          /* ─── Table View ─── */
+          <div className="rounded-xl border border-border overflow-hidden bg-card backdrop-blur-md shadow-2xl">
+            <table className="w-full">
+              <thead>
+                <tr className="text-[9px] font-mono font-bold uppercase tracking-wider border-b"
+                  style={{ backgroundColor: "var(--card)", color: "#8b95a8", borderColor: "var(--border)" }}>
+                  {([["full_name", "// NAME"], ["stage", "// PHASE"], ["department", "// DEPARTMENT"], ["doc_count", "// DOCUMENTS"], ["created_at", "// SUMMONED"]] as [SortKey, string][]).map(([key, label]) => (
+                    <th key={key} className="px-4 py-3 text-left cursor-pointer hover:text-[#00e07a] transition-colors" onClick={() => toggleSort(key)}>
+                      <div className="flex items-center gap-1">{label} <SortIcon col={key} /></div>
+                    </th>
+                  ))}
+                  <th className="px-4 py-3 text-left">// ACTIONS</th>
+                </tr>
+              </thead>
+              <tbody>
+                {sortedCards.length === 0 ? (
+                  <tr><td colSpan={6} className="px-4 py-12 text-center text-xs text-muted-foreground font-mono">No cases match the target filters.</td></tr>
+                ) : sortedCards.map(card => {
+                  const stage = stages.find(s => s.id === card.current_stage_id);
+                  return (
+                    <tr key={card.id} className="border-b border-border transition-colors hover:bg-muted font-mono"
+                      style={{ borderColor: "var(--border)" }}>
+                      <td className="px-4 py-3">
+                        <button onClick={() => setSelectedCardId(card.id)}
+                          className="text-xs font-bold text-cyan-400 hover:text-cyan-300 hover:underline decoration-dotted underline-offset-2 cursor-pointer text-left border-0 bg-transparent p-0">{card.full_name}</button>
+                        <div className="text-[10px] text-muted-foreground mt-0.5">{card.employee_id}</div>
+                      </td>
+                      <td className="px-4 py-3">
+                        <select value={card.current_stage_id || ""} onChange={e => handleStageSelectChange(card.id, parseInt(e.target.value))}
+                          className="text-[9px] font-mono font-bold rounded px-2.5 py-1 bg-[#00e07a]/10 border border-[#00e07a]/20 text-[#00e07a] outline-none cursor-pointer">
+                          {stages.map(s => <option key={s.id} value={s.id} className="bg-card text-foreground">{s.name}</option>)}
+                        </select>
+                      </td>
+                      <td className="px-4 py-3 text-xs text-muted-foreground">{card.department || "—"}</td>
+                      <td className="px-4 py-3">
+                        <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                          <FileText size={12} />
+                          <span>{card.doc_count || 0} Docs</span>
+                        </div>
+                      </td>
+                      <td className="px-4 py-3 text-xs text-muted-foreground">{new Date(card.created_at).toLocaleDateString()}</td>
+                      <td className="px-4 py-3">
+                        <button onClick={() => setSelectedCardId(card.id)}
+                          className="text-[9px] text-muted-foreground hover:text-foreground px-2.5 py-1 rounded bg-muted border border-border hover:bg-accent cursor-pointer transition-colors">[ VIEW ]</button>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+            <div className="px-4 py-3 border-t border-border text-[10px] text-muted-foreground font-mono">
+              COMPILING {sortedCards.length} OF {cards.length} CASES
+            </div>
           </div>
         ) : (
-          stages.map(stage => {
-            grouped[stage.id] = filteredCards.filter((c: any) => c.current_stage_id === stage.id);
-            return (
-              <div 
-                key={stage.id} 
-                className="w-[320px] flex-shrink-0 flex flex-col max-h-full bg-muted rounded-xl border border-border"
-                onDragOver={handleDragOver}
-                onDrop={(e) => handleDrop(e, stage.id)}
-              >
-                {/* Column Header */}
-                <div className="p-3 border-b border-border flex justify-between items-center bg-card/50 dark:bg-card/50 rounded-t-xl">
-                  <div className="flex items-center gap-2">
-                    <h3 className="font-bold text-sm tracking-tight text-slate-800 dark:text-white uppercase">{stage.name}</h3>
-                    <span className="bg-accent text-xs font-mono px-2 py-0.5 rounded-full text-slate-600 dark:text-muted-foreground">
-                      {grouped[stage.id].length}
-                    </span>
-                  </div>
-                  {stage.is_terminal === 1 && (
-                    <span className="w-2 h-2 rounded-full bg-red-500" title="Terminal Stage" />
-                  )}
-                </div>
-                
-                {/* Column Body */}
-                <div className="flex-1 p-3 overflow-y-auto space-y-3 scrollbar-thin">
-                  {grouped[stage.id].map(card => (
-                    <div 
-                      key={card.id}
-                      draggable
-                      onDragStart={(e) => handleDragStart(e, card.id)}
-                      onClick={() => setSelectedCardId(card.id)}
-                      className="bg-card border border-border hover:border-[#00e07a]/50 rounded-lg p-4 cursor-grab active:cursor-grabbing shadow-sm hover:shadow-md transition-all group"
-                    >
-                      <div className="flex justify-between items-start mb-2">
-                        <span className="font-bold text-sm text-foreground group-hover:text-[#00e07a] transition-colors">{card.full_name}</span>
-                      </div>
-                      <div className="text-xs text-muted-foreground font-mono mb-3">
-                        {card.employee_id} • {card.department}
-                      </div>
-                      <div className="flex justify-between items-center pt-3 border-t border-gray-100 dark:border-white/5">
-                        <div className="flex items-center gap-1.5 text-[10px] uppercase font-bold text-muted-foreground">
-                          <FileText size={12} /> {card.doc_count || 0} Docs
-                        </div>
-                        <span className="text-[10px] text-muted-foreground">
-                          {new Date(card.created_at).toLocaleDateString()}
+          /* ─── Kanban View ─── */
+          <div className="flex gap-6 overflow-x-auto pb-4 scrollbar-thin select-none h-full items-start">
+            {stages
+              .filter(s => activeStage === "All" || s.id === activeStage)
+              .map(stage => {
+                grouped[stage.id] = filteredCards.filter((c: any) => c.current_stage_id === stage.id);
+                return (
+                  <div 
+                    key={stage.id} 
+                    className="w-[320px] flex-shrink-0 flex flex-col max-h-[70vh] bg-muted rounded-xl border border-border"
+                    onDragOver={handleDragOver}
+                    onDrop={(e) => handleDrop(e, stage.id)}
+                  >
+                    {/* Column Header */}
+                    <div className="p-3 border-b border-border flex justify-between items-center bg-card/50 rounded-t-xl">
+                      <div className="flex items-center gap-2">
+                        <h3 className="font-bold text-sm tracking-tight text-foreground uppercase">{stage.name}</h3>
+                        <span className="bg-accent text-xs font-mono px-2 py-0.5 rounded-full text-muted-foreground">
+                          {grouped[stage.id].length}
                         </span>
                       </div>
+                      {stage.is_terminal === 1 && (
+                        <span className="w-2 h-2 rounded-full bg-red-500" title="Terminal Stage" />
+                      )}
                     </div>
-                  ))}
-                </div>
-              </div>
-            );
-          })
+                    
+                    {/* Column Body */}
+                    <div className="flex-1 p-3 overflow-y-auto space-y-3 scrollbar-thin max-h-[60vh]">
+                      {grouped[stage.id].map(card => (
+                        <div 
+                          key={card.id}
+                          draggable
+                          onDragStart={(e) => handleDragStart(e, card.id)}
+                          onClick={() => setSelectedCardId(card.id)}
+                          className="bg-card border border-border hover:border-[#00e07a]/50 rounded-lg p-4 cursor-grab active:cursor-grabbing shadow-sm hover:shadow-md transition-all group"
+                        >
+                          <div className="flex justify-between items-start mb-2">
+                            <span className="font-bold text-sm text-foreground group-hover:text-[#00e07a] transition-colors">{card.full_name}</span>
+                          </div>
+                          <div className="text-xs text-muted-foreground font-mono mb-3">
+                            {card.employee_id} • {card.department}
+                          </div>
+                          <div className="flex justify-between items-center pt-3 border-t border-gray-100 dark:border-white/5">
+                            <div className="flex items-center gap-1.5 text-[10px] uppercase font-bold text-muted-foreground">
+                              <FileText size={12} /> {card.doc_count || 0} Docs
+                            </div>
+                            <span className="text-[10px] text-muted-foreground">
+                              {new Date(card.created_at).toLocaleDateString()}
+                            </span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })}
+          </div>
         )}
       </div>
 
@@ -495,9 +674,9 @@ export function ELRPipelineBoard() {
       {/* Manage Phases Modal */}
       {showManagePhases && (
         <div className="absolute inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-card border border-border rounded-xl w-full max-w-lg shadow-2xl overflow-hidden flex flex-col max-h-[80vh]">
+          <div className="bg-card border border-border rounded-xl w-full max-w-lg shadow-2xl overflow-hidden flex flex-col max-h-[80vh] font-mono">
             <div className="p-4 border-b border-border flex justify-between items-center bg-muted">
-              <h3 className="font-bold text-foreground flex items-center gap-2"><Settings size={16} className="text-[#00e07a]" /> Manage Phases</h3>
+              <h3 className="font-bold text-foreground flex items-center gap-2"><Settings size={16} className="text-[#00e07a]" /> [ MANAGE PHASES ]</h3>
               <button onClick={() => setShowManagePhases(false)} className="text-muted-foreground hover:text-foreground"><X size={18} /></button>
             </div>
             
@@ -575,7 +754,7 @@ export function ELRPipelineBoard() {
                 />
                 <button 
                   onClick={handleAddNewStage}
-                  className="px-4 py-2 bg-[#00e07a] hover:bg-[#00c96a] text-black font-extrabold rounded-lg text-sm transition-colors whitespace-nowrap"
+                  className="px-4 py-2 bg-[#00e07a] hover:bg-[#00c96a] text-black font-extrabold rounded-lg text-sm transition-colors whitespace-nowrap border-0 cursor-pointer"
                 >
                   Add Phase
                 </button>
@@ -588,9 +767,9 @@ export function ELRPipelineBoard() {
       {/* Add Card Modal */}
       {showAddCard && (
         <div className="absolute inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-card border border-border rounded-xl w-full max-w-sm shadow-2xl overflow-hidden">
+          <div className="bg-card border border-border rounded-xl w-full max-w-sm shadow-2xl overflow-hidden font-mono">
             <div className="p-4 border-b border-border flex justify-between items-center bg-muted">
-              <h3 className="font-bold text-foreground">Create Case</h3>
+              <h3 className="font-bold text-foreground">[ CREATE CASE ]</h3>
               <button onClick={() => setShowAddCard(false)} className="text-muted-foreground hover:text-foreground"><X size={18} /></button>
             </div>
             <form onSubmit={handleAddCard} className="p-5 space-y-4">
@@ -611,16 +790,16 @@ export function ELRPipelineBoard() {
                   <select 
                     value={addCardStageId}
                     onChange={(e) => setAddCardStageId(parseInt(e.target.value) || "")}
-                    className="w-full bg-background border border-border rounded-lg py-2.5 px-3 text-sm focus:outline-none focus:border-[#00e07a]" 
+                    className="w-full bg-background border border-border rounded-lg py-2.5 px-3 text-sm focus:outline-none focus:border-[#00e07a] text-foreground font-mono" 
                   >
                     <option value="">-- Default (First Stage) --</option>
                     {stages.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
                   </select>
                 </div>
               )}
-              <div className="pt-2 flex justify-end gap-3">
-                <button type="button" onClick={() => setShowAddCard(false)} className="px-3 py-1.5 text-muted-foreground hover:text-foreground text-sm font-semibold">Cancel</button>
-                <button type="submit" className="px-4 py-2 bg-[#00e07a] hover:bg-[#00c96a] text-black font-extrabold rounded-lg text-sm transition-colors">Create Case</button>
+              <div className="pt-2 flex justify-end gap-3 font-mono">
+                <button type="button" onClick={() => setShowAddCard(false)} className="px-3 py-1.5 text-muted-foreground hover:text-foreground text-sm font-semibold border-0 bg-transparent cursor-pointer">[ CANCEL ]</button>
+                <button type="submit" className="px-4 py-2 bg-[#00e07a] hover:bg-[#00c96a] text-black font-extrabold rounded-lg text-sm transition-colors border-0 cursor-pointer">[ CREATE CASE ]</button>
               </div>
             </form>
           </div>
@@ -630,7 +809,7 @@ export function ELRPipelineBoard() {
       {/* Transition Modal (Collect extra fields) */}
       {showTransitionModal && pendingMove && (
         <div className="absolute inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-card border border-border rounded-xl w-full max-w-sm shadow-2xl overflow-hidden animate-in fade-in zoom-in-95">
+          <div className="bg-card border border-border rounded-xl w-full max-w-sm shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 font-mono">
             <div className="p-4 border-b border-border flex justify-between items-center bg-muted">
               <h3 className="font-bold text-foreground flex items-center gap-2"><FileText size={16} className="text-[#00e07a]" /> Stage Requires Details</h3>
               <button onClick={() => { setShowTransitionModal(false); setPendingMove(null); }} className="text-muted-foreground hover:text-foreground"><X size={18} /></button>
@@ -658,7 +837,7 @@ export function ELRPipelineBoard() {
                 />
               </div>
               <div className="pt-2 flex justify-end gap-3">
-                <button type="button" onClick={() => executeMove(pendingMove.cardId, pendingMove.toStageId, transitionFields)} className="px-4 py-2 bg-[#00e07a] hover:bg-[#00c96a] text-black font-extrabold rounded-lg text-sm transition-colors w-full">Proceed & Generate Document</button>
+                <button type="button" onClick={() => executeMove(pendingMove.cardId, pendingMove.toStageId, transitionFields)} className="px-4 py-2 bg-[#00e07a] hover:bg-[#00c96a] text-black font-extrabold rounded-lg text-sm transition-colors w-full border-0 cursor-pointer">[ PROCEED & GENERATE ]</button>
               </div>
             </div>
           </div>
