@@ -429,6 +429,31 @@ export function CandidateProfile({ onViewChange, candidateId }: Props) {
   const [uploadingResume, setUploadingResume] = useState(false);
   const fileInputRef = React.useRef<HTMLInputElement>(null);
 
+  const [editingContact, setEditingContact] = useState(false);
+  const [editEmail, setEditEmail] = useState("");
+  const [editPhone, setEditPhone] = useState("");
+  const [updatingContact, setUpdatingContact] = useState(false);
+
+  const handleUpdateContact = async () => {
+    setUpdatingContact(true);
+    try {
+      const res = await apiFetch(`${API.replace(API_BASE, "")}&action=update_candidate`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: candidateId, email: editEmail, phone: editPhone })
+      });
+      const data = await res.json();
+      if (!data.success) throw new Error(data.error || "Unknown error");
+      showToast("Contact updated successfully");
+      setEditingContact(false);
+      fetchCandidate();
+    } catch (e: any) {
+      showToast(e.message || "Failed to update contact", "error");
+    } finally {
+      setUpdatingContact(false);
+    }
+  };
+
   const [showHireModal, setShowHireModal] = useState(false);
   const [hiring, setHiring] = useState(false);
   const [hireData, setHireData] = useState({ employeeId: '', hireDate: new Date().toISOString().split('T')[0], jobTitle: '', department: '', baseSalary: '' });
@@ -1323,27 +1348,85 @@ export function CandidateProfile({ onViewChange, candidateId }: Props) {
           <div
             className="p-5 rounded-xl border bg-background border-border"
           >
-            <h3 className="text-xs font-bold tracking-wide text-muted-foreground uppercase mb-3 border-b border-border pb-2">
-              Contact Registry
-            </h3>
-            <div className="space-y-3 font-sans">
-              {c.email && (
-                <div className="flex items-center gap-2.5">
-                  <div className="w-7 h-7 rounded bg-background border border-border flex items-center justify-center">
-                    <Mail size={13} className="text-primary" />
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <div className="text-[9px] font-medium text-muted-foreground uppercase tracking-wider">EMAIL</div>
-                    <a
-                      href={`mailto:${c.email}`}
-                      className="text-xs text-foreground hover:text-primary transition-colors truncate block"
-                    >
-                      {c.email}
-                    </a>
-                  </div>
+            <div className="flex items-center justify-between mb-3 border-b border-border pb-2">
+              <h3 className="text-xs font-bold tracking-wide text-muted-foreground uppercase">
+                Contact Registry
+              </h3>
+              {!editingContact ? (
+                <button
+                  onClick={() => {
+                    setEditEmail(c.email || "");
+                    setEditPhone(c.phone || "");
+                    setEditingContact(true);
+                  }}
+                  className="text-[10px] uppercase font-bold tracking-wider text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+                >
+                  Edit
+                </button>
+              ) : (
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => setEditingContact(false)}
+                    disabled={updatingContact}
+                    className="text-[10px] uppercase font-bold tracking-wider text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleUpdateContact}
+                    disabled={updatingContact}
+                    className="text-[10px] uppercase font-bold tracking-wider text-primary hover:opacity-80 transition-colors cursor-pointer"
+                  >
+                    Save
+                  </button>
                 </div>
               )}
-              {c.phone && (
+            </div>
+            
+            {editingContact ? (
+              <div className="space-y-3 font-sans">
+                <div>
+                  <label className="block text-[10px] font-bold text-muted-foreground uppercase mb-1">Email (Required for Hire)</label>
+                  <input
+                    type="email"
+                    value={editEmail}
+                    onChange={e => setEditEmail(e.target.value)}
+                    className="w-full bg-background border border-border rounded px-3 py-1.5 text-xs text-foreground focus:outline-none focus:border-primary"
+                    placeholder="candidate@example.com"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[10px] font-bold text-muted-foreground uppercase mb-1">Phone</label>
+                  <input
+                    type="text"
+                    value={editPhone}
+                    onChange={e => setEditPhone(e.target.value)}
+                    className="w-full bg-background border border-border rounded px-3 py-1.5 text-xs text-foreground focus:outline-none focus:border-primary"
+                    placeholder="+1 (555) 123-4567"
+                  />
+                </div>
+              </div>
+            ) : (
+              <div className="space-y-3 font-sans">
+                {c.email ? (
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-7 h-7 rounded bg-background border border-border flex items-center justify-center">
+                      <Mail size={13} className="text-primary" />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <div className="text-[9px] font-medium text-muted-foreground uppercase tracking-wider">EMAIL</div>
+                      <a
+                        href={`mailto:${c.email}`}
+                        className="text-xs text-foreground hover:text-primary transition-colors truncate block"
+                      >
+                        {c.email}
+                      </a>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="text-xs text-muted-foreground italic">No email provided</div>
+                )}
+                {c.phone && (
                 <div className="flex items-center gap-2.5">
                   <div className="w-7 h-7 rounded bg-background border border-border flex items-center justify-center">
                     <Phone size={13} className="text-primary" />
