@@ -2072,18 +2072,26 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
         .trust-inner {
             max-width: 1200px;
             margin: 0 auto;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 80px;
+            display: flex;
+            flex-direction: column;
+            gap: 60px;
             align-items: center;
         }
-        @media (max-width: 900px) {
-            .trust-inner { grid-template-columns: 1fr; gap: 40px; }
+        .trust-header {
+            text-align: center;
+            max-width: 800px;
         }
         .trust-shield {
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: repeat(4, 1fr);
             gap: 16px;
+            width: 100%;
+        }
+        @media (max-width: 900px) {
+            .trust-shield { grid-template-columns: repeat(2, 1fr); }
+        }
+        @media (max-width: 600px) {
+            .trust-shield { grid-template-columns: 1fr; }
         }
         .trust-badge {
             background: rgba(255,255,255,0.02);
@@ -3462,17 +3470,10 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
 <!-- SECURITY & TRUST SECTION -->
 <div class="trust-section">
     <div class="trust-inner">
-        <div>
-            <span class="pill-label blue">Security and Compliance</span>
+        <div class="trust-header">
+            <span class="pill-label blue" style="margin: 0 auto 16px;">Security and Compliance</span>
             <h2 style="font-size: clamp(1.75rem, 3.5vw, 2.5rem); font-family: var(--sans); font-weight: 700; line-height: 1.15; margin-bottom: 20px;">Built on a zero-trust foundation.</h2>
-            <p style="color: var(--text-mid); font-size: 1.05rem; line-height: 1.6; margin-bottom: 32px;">Every architectural decision was made with one principle: employee data is the most sensitive data your organization holds. We guard it accordingly.</p>
-            <div style="display:flex; flex-direction:column; gap:14px;">
-                <div style="display:flex; align-items:center; gap:12px; font-size:0.875rem; color:var(--text-mid);"><i data-lucide="check" style="color:var(--green); flex-shrink:0;"></i> Files stored outside the web root — direct URL access impossible</div>
-                <div style="display:flex; align-items:center; gap:12px; font-size:0.875rem; color:var(--text-mid);"><i data-lucide="check" style="color:var(--green); flex-shrink:0;"></i> Role-based access control (RBAC) down to individual field level</div>
-                <div style="display:flex; align-items:center; gap:12px; font-size:0.875rem; color:var(--text-mid);"><i data-lucide="check" style="color:var(--green); flex-shrink:0;"></i> Cryptographic audit logs — each entry is tamper-proof and timestamped</div>
-                <div style="display:flex; align-items:center; gap:12px; font-size:0.875rem; color:var(--text-mid);"><i data-lucide="check" style="color:var(--green); flex-shrink:0;"></i> Multi-tenant isolation — zero cross-contamination between workspaces</div>
-                <div style="display:flex; align-items:center; gap:12px; font-size:0.875rem; color:var(--text-mid);"><i data-lucide="check" style="color:var(--green); flex-shrink:0;"></i> Session-hardened authentication with brute-force protection</div>
-            </div>
+            <p style="color: var(--text-mid); font-size: 1.05rem; line-height: 1.6;">Every architectural decision was made with one principle: employee data is the most sensitive data your organization holds. We guard it accordingly.</p>
         </div>
         <div class="trust-shield">
             <div class="trust-badge">
