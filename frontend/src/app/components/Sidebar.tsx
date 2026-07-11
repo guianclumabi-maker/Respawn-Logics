@@ -186,7 +186,6 @@ const getSections = (hasPermission: (p: string) => boolean, hasRole: (r: string 
     title: "Account",
     icon: <UserCog size={20} />,
     items: [
-      ...(isAtsContext ? [{ label: "Back to Workspace", view: "Dashboard", icon: <ArrowLeft size={19} />, color: "#00b8ff" }] : []),
       ...(tenantId !== null ? [{
         label: "Give us Feedback",
         view: "Feedback",
@@ -219,7 +218,7 @@ export function Sidebar({ activeView, onViewChange, badges = {} }: SidebarProps)
   const location = useLocation();
   const isAtsContext = location.pathname.startsWith("/ats");
 
-  const sections = getSections(hasPermission, hasRole, user?.tenant_id || null, isAtsContext, user?.tier_config || null).filter(s => !s.hide);
+  const sections = getSections(hasPermission, hasRole, user?.tenant_id || null, isAtsContext, user?.tier_config || null).filter(s => !s.hide && s.items.length > 0);
 
   const isActive = (view: string) => activeView.view === view;
 
@@ -461,13 +460,26 @@ export function Sidebar({ activeView, onViewChange, badges = {} }: SidebarProps)
             </button>
           </div>
         )}
+
+        {/* ── Back to Workspace (ATS context only) ── */}
+        {isAtsContext && (
+          <div className="mt-3 px-3">
+            <button
+              onClick={() => onViewChange({ view: "Dashboard" })}
+              className={`w-full flex items-center gap-3 px-[12px] py-2.5 rounded-lg transition-all duration-200 justify-start
+                text-[#00b8ff] hover:bg-slate-100 hover:text-[#00b8ff] dark:hover:bg-card/50 cursor-pointer border-0 bg-transparent
+                ${collapsed ? "justify-center" : ""}`}
+              title="Back to Workspace"
+            >
+              <ArrowLeft size={19} className="text-[#00b8ff] flex-shrink-0" />
+              {!collapsed && <span className="text-[13px] font-semibold">Back to Workspace</span>}
+            </button>
+          </div>
+        )}
       </div>
 
       {/* ── mt-auto container ─────────────────────────── */}
       <div className="mt-auto flex-shrink-0">
-        {/* ACCOUNT section header */}
-        <p className="px-3 text-[0.7rem] font-bold text-muted-foreground tracking-widest uppercase mb-1">Account</p>
-
         {/* Theme toggle, right above the user */}
         <div className="mt-2 px-3">
           <GamifiedThemeToggle collapsed={collapsed} />
