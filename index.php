@@ -303,7 +303,7 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
             align-items: center;
             justify-content: center;
             gap: 10px;
-            background: #a3e635; /* lime green */
+            background: var(--green);
             color: #000;
             font-family: var(--sans);
             font-weight: 600;
@@ -318,7 +318,7 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
         }
         .btn-neon-pill:hover {
             transform: translateY(-2px);
-            box-shadow: 0 10px 24px rgba(163,230,53,0.35);
+            box-shadow: 0 10px 24px rgba(0,224,122,0.35);
         }
         .btn-outline-pill {
             display: inline-flex;
@@ -1800,7 +1800,7 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
 
         /* ─── FEATURE MARQUEE ─── */
         .marquee-section {
-            padding: 80px 0;
+            padding: 40px 0;
             overflow: hidden;
             border-bottom: 1px solid var(--border3);
             position: relative;
@@ -2116,7 +2116,7 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
 
         /* ─── CURSOR-STYLE DEMO WINDOW ─── */
         .demo-section {
-            padding: 120px 24px;
+            padding: 60px 24px;
             border-top: 1px solid var(--border3);
             text-align: center;
         }
