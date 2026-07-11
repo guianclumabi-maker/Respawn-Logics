@@ -165,11 +165,11 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
 
         /* ─── NEW HERO (HUGO STYLE) ─── */
         .hero {
-            min-height: 100vh;
+            min-height: unset;
             display: flex;
             flex-direction: column;
             justify-content: center;
-            padding: 140px 5% 80px;
+            padding: 120px 5% 80px;
             position: relative;
             overflow: hidden;
             background: #08090f;
@@ -2527,9 +2527,17 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
             margin-bottom: 0;
             font-family: var(--sans);
         }
+        @keyframes ops-color-cycle {
+            0%   { color: #00e07a; }   /* green */
+            20%  { color: #00c8f0; }   /* cyan */
+            40%  { color: #a78bfa; }   /* violet */
+            60%  { color: #f472b6; }   /* pink */
+            80%  { color: #fbbf24; }   /* amber */
+            100% { color: #00e07a; }   /* back to green */
+        }
         .bigtype-headline .bt-accent {
-            color: var(--green);
             display: block;
+            animation: ops-color-cycle 5s ease-in-out infinite;
         }
         .bigtype-sub {
             margin-top: 60px;
@@ -2952,11 +2960,10 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
             </div>
 
             <div class="demo-panels" style="display:block; padding:0; overflow:hidden; height:auto;">
-                <!-- LIVE APP EMBED — same-origin iframe rendering the real SPA (dashboard).
-                     Logged-in visitors see the actual app; logged-out visitors see the login screen. -->
+                <!-- OFFLINE DEMO EMBED — interactive Operations Center mock (no DB, no login needed) -->
                 <iframe class="live-app-iframe"
-                    src="<?= url('/frontend/dist/index.html') ?>#/dashboard"
-                    title="Respawn Logics — live application"
+                    src="<?= url('/demo/') ?>"
+                    title="Respawn Logics — Operations Center demo"
                     loading="lazy"
                     referrerpolicy="same-origin"></iframe>
             </div>
@@ -2965,6 +2972,41 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
         <p style="margin-top: 20px; font-family: var(--mono); font-size: 0.75rem; color: var(--text-dim);">Trusted by operations teams running real payroll cycles every pay period.</p>
     </div>
 </section>
+
+<!-- WALKTHROUGH ANIMATION — looping scripted promo visual -->
+<section style="padding: 0 5% 80px; background: #08090f;">
+    <div style="max-width: 1200px; margin: 0 auto;">
+        <p style="font-family: var(--mono); font-size: 0.7rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-dim); margin-bottom: 18px; text-align: center;">See it in motion</p>
+        <div style="border: 1px solid rgba(255,255,255,0.07); border-radius: 14px; overflow: hidden; box-shadow: 0 40px 80px rgba(0,0,0,0.6);">
+            <iframe src="<?= url('/demo/walkthrough.html') ?>" title="Respawn Logics walkthrough"
+                    loading="lazy" style="width:100%; height:420px; border:0; border-radius:14px; display:block;"></iframe>
+        </div>
+    </div>
+</section>
+
+<!-- APP PREVIEW WINDOW — placed above features -->
+<div style="padding: 60px 5% 80px; background: var(--bg); position:relative; z-index:1;">
+    <div style="max-width: 1240px; margin: 0 auto;">
+        <!-- section label -->
+        <p style="font-family:var(--mono);font-size:0.7rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--text-dim);text-align:center;margin-bottom:20px;">// LIVE PLATFORM PREVIEW</p>
+        <div style="background: #0d0f1a; border: 1px solid rgba(255,255,255,0.09); border-radius: 16px; overflow: hidden; box-shadow: 0 0 0 1px rgba(255,255,255,0.04), 0 60px 120px rgba(0,0,0,0.75), 0 0 80px rgba(0,224,122,0.05);">
+            <!-- title bar -->
+            <div style="background: #161827; border-bottom: 1px solid rgba(255,255,255,0.06); padding: 13px 20px; display: flex; align-items: center; gap: 14px;">
+                <div style="display:flex; gap:7px;">
+                    <div style="width:12px;height:12px;border-radius:50%;background:#ff5f57;"></div>
+                    <div style="width:12px;height:12px;border-radius:50%;background:#febc2e;"></div>
+                    <div style="width:12px;height:12px;border-radius:50%;background:#28c840;"></div>
+                </div>
+                <div style="font-family:var(--mono);font-size:0.75rem;color:var(--text-dim);margin:0 auto;">Respawn Logics — Operations Center</div>
+            </div>
+            <!-- iframe -->
+            <iframe src="<?= rtrim(dirname($_SERVER['SCRIPT_NAME']), '/') ?>/demo/index.html"
+                title="Respawn Logics — live demo"
+                style="width:100%;height:640px;border:0;display:block;background:#0d0f1a;"></iframe>
+        </div>
+        <p style="margin-top:14px;font-family:var(--mono);font-size:0.72rem;color:var(--text-dim);text-align:center;letter-spacing:0.04em;">Trusted by operations teams running real payroll cycles every pay period.</p>
+    </div>
+</div>
 
 <!-- TIMELINE SECTION 1: DIRECTORY ROUTING (RAILWAY TIMELINE ACCENT) -->
 <section class="timeline-section" id="journey">
