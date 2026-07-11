@@ -29,12 +29,13 @@ export function SetupModeCards() {
         </a>
 
         <div className="hidden md:flex items-center gap-[30px] text-[0.9rem] font-medium text-[#8b95a8]" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
-          <a href={API_BASE + "/index.php"} className="inline-flex items-center justify-center h-[36px] gap-2 hover:text-foreground transition-colors no-underline text-sm px-3 rounded-md hover:bg-accent">
-            <i className="fa-solid fa-arrow-left"></i> Back to Home
+          <a href={API_BASE + "/index.php"} className="group inline-flex items-center justify-center h-[36px] gap-2 hover:text-[#00e07a] transition-all duration-300 no-underline text-sm px-3 rounded-md hover:bg-[#00e07a]/10">
+            <i className="fa-solid fa-arrow-left transition-transform duration-300 group-hover:-translate-x-1"></i> Back to Home
           </a>
           
-          <a href={API_BASE + "/login.php"} className="inline-flex items-center justify-center h-[36px] font-['JetBrains_Mono'] text-[0.8rem] font-bold tracking-[0.04em] text-black bg-[#00e07a] px-[20px] rounded-[5px] no-underline transition-all hover:bg-card hover:-translate-y-[1px] hover:shadow-[0_4px_16px_rgba(0,224,122,0.3)] ml-2">
-            [ LOGIN ]
+          <a href={API_BASE + "/login.php"} className="relative overflow-hidden group inline-flex items-center justify-center h-[36px] font-['JetBrains_Mono'] text-[0.8rem] font-bold tracking-[0.04em] text-black bg-[#00e07a] px-[20px] rounded-[5px] no-underline transition-all duration-300 hover:scale-105 hover:shadow-[0_0_25px_rgba(0,224,122,0.6)] ml-2">
+            <span className="relative z-10">[ LOGIN ]</span>
+            <div className="absolute inset-0 h-full w-[150%] bg-gradient-to-r from-transparent via-white/40 to-transparent -translate-x-[120%] group-hover:translate-x-[120%] transition-transform duration-700 ease-in-out skew-x-[-20deg]"></div>
           </a>
         </div>
       </nav>
