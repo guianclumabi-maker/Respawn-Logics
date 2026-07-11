@@ -71,11 +71,41 @@
           {id:2, subject:'Update bank details', requester:'Sarah Chen', category:'HR', status:'In Progress', priority:'Medium', created_at:'2026-07-09'},
           {id:3, subject:'Laptop replacement', requester:'David Kim', category:'IT', status:'Resolved', priority:'Medium', created_at:'2026-07-05'}
         ];
+        var JOBS = [
+          {id:1, title:'Senior Frontend Engineer', department:'Engineering', location:'Manila (Hybrid)', employment_type:'Full-Time', status:'Open', priority:'High', hiring_manager:'David Kim', assigned_recruiter:'Sarah Chen', description:'Build the next generation of our product.', requirements:'[]', external_link:null, salary_min:80000, salary_max:120000, days_open:14, days_since_activity:1, formatted_date:'Jun 28, 2026', health:{total:8, applied:4, review:2, phone_screen:1, interview:1, offer:0, hired:0, stuck:0, score:82, status:'Healthy', velocity:3}},
+          {id:2, title:'Product Manager', department:'Product', location:'Remote', employment_type:'Full-Time', status:'Open', priority:'Normal', hiring_manager:'Alex Mercer', assigned_recruiter:'Sarah Chen', description:'Own the product roadmap.', requirements:'[]', external_link:null, salary_min:90000, salary_max:130000, days_open:21, days_since_activity:2, formatted_date:'Jun 21, 2026', health:{total:12, applied:5, review:3, phone_screen:2, interview:1, offer:1, hired:0, stuck:1, score:74, status:'Needs Attention', velocity:4}},
+          {id:3, title:'HR Business Partner', department:'People', location:'Cebu', employment_type:'Full-Time', status:'Draft', priority:'Normal', hiring_manager:'Sarah Chen', assigned_recruiter:'', description:'Partner with leaders on people strategy.', requirements:'[]', external_link:null, salary_min:55000, salary_max:75000, days_open:3, days_since_activity:3, formatted_date:'Jul 09, 2026', health:{total:0, applied:0, review:0, phone_screen:0, interview:0, offer:0, hired:0, stuck:0, score:0, status:'Healthy', velocity:0}}
+        ];
+        var JOB_DETAIL = {
+          1: { id:1, title:'Senior Frontend Engineer', department:'Engineering', status:'Open', health:{total:8, applied:4, review:2, phone_screen:1, interview:1, offer:0, hired:0, stuck:0, score:82, status:'Healthy', velocity:3},
+            applications:[
+              {id:1, candidate_id:101, name:'Elena Rodriguez', email:'elena@example.com', stage:'Applied', rating:4, ai_match_score:88, score_breakdown:{skill:90,experience:85,location:95,salary:82}, source:'LinkedIn', days_in_stage:2, tags:['Senior','Remote'], formatted_applied:'Jul 09, 2026', skills:'React, TypeScript, Node.js', assigned_recruiter:'Sarah Chen'},
+              {id:2, candidate_id:102, name:'James Wilson', email:'james@example.com', stage:'Review', rating:3, ai_match_score:71, score_breakdown:{skill:75,experience:70,location:80,salary:59}, source:'Referral', days_in_stage:4, tags:['Mid-level'], formatted_applied:'Jul 07, 2026', skills:'Vue, JavaScript', assigned_recruiter:'Sarah Chen'},
+              {id:3, candidate_id:103, name:'Anita Patel', email:'anita@example.com', stage:'Interview', rating:5, ai_match_score:94, score_breakdown:{skill:96,experience:92,location:98,salary:90}, source:'Careers Site', days_in_stage:1, tags:['Senior','Immediate'], formatted_applied:'Jul 05, 2026', skills:'React, Next.js, GraphQL', assigned_recruiter:'Sarah Chen'},
+              {id:4, candidate_id:104, name:'Marcus Johnson', email:'marcus@example.com', stage:'Applied', rating:2, ai_match_score:45, score_breakdown:{skill:50,experience:40,location:55,salary:35}, source:'Indeed', days_in_stage:6, tags:[], formatted_applied:'Jul 05, 2026', skills:'HTML, CSS', assigned_recruiter:'Sarah Chen'}
+            ]
+          },
+          2: { id:2, title:'Product Manager', department:'Product', status:'Open', health:{total:12, applied:5, review:3, phone_screen:2, interview:1, offer:1, hired:0, stuck:1, score:74, status:'Needs Attention', velocity:4},
+            applications:[
+              {id:5, candidate_id:105, name:'Priya Sharma', email:'priya@example.com', stage:'Offer', rating:5, ai_match_score:91, score_breakdown:{skill:93,experience:90,location:95,salary:86}, source:'LinkedIn', days_in_stage:2, tags:['Senior','PM'], formatted_applied:'Jun 28, 2026', skills:'Product Strategy, Agile, SQL', assigned_recruiter:'Sarah Chen'},
+              {id:6, candidate_id:106, name:'Carlos Mendes', email:'carlos@example.com', stage:'Interview', rating:4, ai_match_score:79, score_breakdown:{skill:82,experience:78,location:85,salary:71}, source:'Referral', days_in_stage:3, tags:['B2B'], formatted_applied:'Jun 30, 2026', skills:'Roadmapping, Figma, JIRA', assigned_recruiter:'Sarah Chen'}
+            ]
+          }
+        };
         function env(rows, key){ var o = { success:true, csrf_token:'demo', data:rows, items:rows, results:rows, records:rows, list:rows, rows:rows, total:rows.length, count:rows.length }; if (key) o[key]=rows; return o; }
         function route(url){
           var u = url.toLowerCase();
           if (u.indexOf('current_user')>-1) return { success:true, user:U, csrf_token:'demo' };
           if (u.indexOf('csrf')>-1) return { success:true, csrf_token:'demo' };
+          // ATS — must come before generic employee/dashboard checks
+          if (/candidate|route=candidates/.test(u)) {
+            var actMatch = url.match(/action=([a-zA-Z_]+)/), act = actMatch ? actMatch[1] : '';
+            var idMatch = url.match(/[&?]id=(\d+)/), jid = idMatch ? parseInt(idMatch[1]) : null;
+            if (act === 'job' && jid && JOB_DETAIL[jid]) return { success:true, job: JOB_DETAIL[jid] };
+            if (act === 'job' && jid) return { success:true, job: JOB_DETAIL[1] };
+            // jobs list (JobsPage + PipelineBoard job selector)
+            return { success:true, jobs: JOBS, departments:['Engineering','Product','People','Finance','Operations'], total: JOBS.length, limit:10 };
+          }
           if (/survey|engagement|enps/.test(u)) return env(SURV,'surveys');
           if (/employee|directory|staff|people|org/.test(u)) return env(EMP,'employees');
           if (/attendance|timekeep|clock|shift/.test(u)) return env(ATT,'attendance');
