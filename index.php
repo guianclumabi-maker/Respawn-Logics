@@ -2979,22 +2979,22 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
         <div class="revamp-grid">
             <div>
                 <span class="pill-label">Directory and Security</span>
-                <h2 style="font-size: clamp(2rem, 4vw, 2.75rem); font-family: var(--sans); font-weight: 700; line-height: 1.15; margin-bottom: 16px;">Instant networking.<br>Zero setup.</h2>
-                <p style="color: var(--text-mid); font-size: 1.05rem; line-height: 1.6;">Role mappings, SSS/BIR statutory table configurations, and file isolating rules are active from the second you initialize a workspace.</p>
-                
+                <h2 style="font-size: clamp(2rem, 4vw, 2.75rem); font-family: var(--sans); font-weight: 700; line-height: 1.15; margin-bottom: 16px;">Ready to use<br>from day one.</h2>
+                <p style="color: var(--text-mid); font-size: 1.05rem; line-height: 1.6;">Roles, Philippine statutory tables (SSS, BIR, PhilHealth), and secure file storage are all set up the moment you create your workspace — nothing to configure.</p>
+
                 <div class="revamp-list">
                     <div class="revamp-item">
                         <i data-lucide="shield"></i>
                         <div>
-                            <h4>Private, isolated tenants by default</h4>
-                            <p>Multi-tenant scope resolver guarantees that tenant data remains isolated under zero-trust authorization barriers.</p>
+                            <h4>Your data stays your data</h4>
+                            <p>Each company's information is fully separated and walled off — no one outside your organization can ever see it.</p>
                         </div>
                     </div>
                     <div class="revamp-item">
                         <i data-lucide="git-branch"></i>
                         <div>
-                            <h4>Audit logs and event traces built-in</h4>
-                            <p>Cryptographically verified audit trails record employee modifications, calculation modifications, and logins.</p>
+                            <h4>A complete record of every change</h4>
+                            <p>Every edit to an employee record, payroll calculation, and login is automatically logged — and can't be tampered with.</p>
                         </div>
                     </div>
                 </div>
@@ -3061,22 +3061,22 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
 
             <div>
                 <span class="pill-label orange">Scale and Compute</span>
-                <h2 style="font-size: clamp(2rem, 4vw, 2.75rem); font-family: var(--sans); font-weight: 700; line-height: 1.15; margin-bottom: 16px;">Scale calculations without growing pains.</h2>
-                <p style="color: var(--text-mid); font-size: 1.05rem; line-height: 1.6;">Run statutory contribution calculations, benefit distributions, and case logs simultaneously without locks or latency.</p>
-                
+                <h2 style="font-size: clamp(2rem, 4vw, 2.75rem); font-family: var(--sans); font-weight: 700; line-height: 1.15; margin-bottom: 16px;">Payroll that stays accurate as you grow.</h2>
+                <p style="color: var(--text-mid); font-size: 1.05rem; line-height: 1.6;">Process payroll, benefits, and statutory contributions for your whole team in one run — fast, whether you have 10 employees or 10,000.</p>
+
                 <div class="revamp-list">
                     <div class="revamp-item orange">
                         <i data-lucide="cpu"></i>
                         <div>
-                            <h4>Parallel statutory compute</h4>
-                            <p>Compute statutory tax brackets and contributions concurrently across thousands of active personnel files.</p>
+                            <h4>Built to handle any headcount</h4>
+                            <p>SSS, PhilHealth, Pag-IBIG, and tax are computed for every employee at once — no slowdowns as your team grows.</p>
                         </div>
                     </div>
                     <div class="revamp-item orange">
                         <i data-lucide="sliders"></i>
                         <div>
-                            <h4>Dynamic computation overrides</h4>
-                            <p>Change PhilHealth, SSS, or custom deduction rates without modifying code templates or schema definitions.</p>
+                            <h4>Rate changes are just a setting</h4>
+                            <p>When SSS, PhilHealth, or tax rates change, you update a value — no waiting on a developer or a software patch.</p>
                         </div>
                     </div>
                 </div>
@@ -3095,21 +3095,21 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
             <div>
                 <span class="pill-label blue">Monitor and Observe</span>
                 <h2 style="font-size: clamp(2rem, 4vw, 2.75rem); font-family: var(--sans); font-weight: 700; line-height: 1.15; margin-bottom: 16px;">Audits, metrics, and guards in one place.</h2>
-                <p style="color: var(--text-mid); font-size: 1.05rem; line-height: 1.6;">Audit document reads, check statutory tax runs, and monitor file guard activity. Full operational visibility from one unified dashboard.</p>
-                
+                <p style="color: var(--text-mid); font-size: 1.05rem; line-height: 1.6;">See every payroll run, document access, and compliance check from a single live dashboard — so nothing important slips by unnoticed.</p>
+
                 <div class="revamp-list">
                     <div class="revamp-item blue">
                         <i data-lucide="layout-grid"></i>
                         <div>
-                            <h4>All operations in one dashboard</h4>
-                            <p>Verify system environments and audit logs dynamically from the console wrapper without leaving the app.</p>
+                            <h4>Everything in one dashboard</h4>
+                            <p>Watch payroll, hiring, and compliance activity update in real time — no jumping between tools or spreadsheets.</p>
                         </div>
                     </div>
                     <div class="revamp-item blue">
                         <i data-lucide="bell"></i>
                         <div>
-                            <h4>Security guards that fail loud</h4>
-                            <p>Automatic notifications trigger when isolated paths are misconfigured, preventing file security breaches.</p>
+                            <h4>Alerts before problems become breaches</h4>
+                            <p>Get notified the moment a file-access rule or setting looks wrong, so sensitive employee data stays protected.</p>
                         </div>
                     </div>
                 </div>
@@ -3130,7 +3130,7 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
                             <div class="log-row">
                                 <span class="log-time">[14:15:30]</span>
                                 <span class="log-tag">SYSTEM</span>
-                                <span>Booted isolated storage: C:/xampp/respawn_isolated_files</span>
+                                <span>Secure storage online · employee files isolated</span>
                             </div>
                             <div class="log-row">
                                 <span class="log-time">[14:15:32]</span>
@@ -3140,12 +3140,12 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
                             <div class="log-row">
                                 <span class="log-time">[14:15:45]</span>
                                 <span class="log-tag warn">SECURITY</span>
-                                <span style="color:var(--amber);">Enforced isolated storage path verification bounds</span>
+                                <span style="color:var(--amber);">Blocked an unauthorized file-access attempt</span>
                             </div>
                             <div class="log-row">
                                 <span class="log-time">[14:16:01]</span>
                                 <span class="log-tag">AUDIT</span>
-                                <span>Admin credentials authenticated locally</span>
+                                <span>Admin sign-in verified</span>
                             </div>
                         </div>
                         
@@ -3228,22 +3228,22 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
 
             <div>
                 <span class="pill-label">Contextual AI Copilot</span>
-                <h2 style="font-size: clamp(2rem, 4vw, 2.75rem); font-family: var(--sans); font-weight: 700; line-height: 1.15; margin-bottom: 16px;">AI Companion drafts operational rules.</h2>
-                <p style="color: var(--text-mid); font-size: 1.05rem; line-height: 1.6;">Accelerate HR operations by handing off policy generation, document drafting, and support ticket routing to our intelligent agent companion.</p>
-                
+                <h2 style="font-size: clamp(2rem, 4vw, 2.75rem); font-family: var(--sans); font-weight: 700; line-height: 1.15; margin-bottom: 16px;">AI that drafts your HR paperwork.</h2>
+                <p style="color: var(--text-mid); font-size: 1.05rem; line-height: 1.6;">Hand the repetitive work — drafting contracts and policies, answering employee questions, and sorting support tickets — to a built-in AI assistant.</p>
+
                 <div class="revamp-list">
                     <div class="revamp-item">
                         <i data-lucide="sparkles"></i>
                         <div>
-                            <h4>Context-aware template generation</h4>
-                            <p>The AI companion references local environment details and statutory guidelines to draft contracts and review sheets.</p>
+                            <h4>Drafts contracts &amp; policies for you</h4>
+                            <p>It writes employment contracts, allowance policies, and review forms using your company details and current Philippine tax rules.</p>
                         </div>
                     </div>
                     <div class="revamp-item">
                         <i data-lucide="bot"></i>
                         <div>
-                            <h4>24/7 autonomous support agent</h4>
-                            <p>Automate answer lookup for employee ticket channels, routing complex cases to HR admins.</p>
+                            <h4>Answers employee questions 24/7</h4>
+                            <p>Staff get instant answers to common HR questions; anything complex is routed straight to your HR team.</p>
                         </div>
                     </div>
                 </div>
@@ -3261,15 +3261,15 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
         <div class="revamp-grid">
             <div>
                 <span class="pill-label">Search and Index</span>
-                <h2 style="font-size: clamp(2rem, 4vw, 2.75rem); font-family: var(--sans); font-weight: 700; line-height: 1.15; margin-bottom: 16px;">Complete directory indexing.</h2>
-                <p style="color: var(--text-mid); font-size: 1.05rem; line-height: 1.6;">Respawn Logics indexes employee relations, organizational charts, historical salaries, and audit logs. Ask anything, locate variables instantly.</p>
-                
+                <h2 style="font-size: clamp(2rem, 4vw, 2.75rem); font-family: var(--sans); font-weight: 700; line-height: 1.15; margin-bottom: 16px;">Find any employee record in seconds.</h2>
+                <p style="color: var(--text-mid); font-size: 1.05rem; line-height: 1.6;">Every employee profile, org chart, salary history, and audit log is instantly searchable. Ask a question and get the answer — no digging through folders or spreadsheets.</p>
+
                 <div class="revamp-list">
                     <div class="revamp-item">
                         <i data-lucide="search"></i>
                         <div>
-                            <h4>Sub-second directory search</h4>
-                            <p>Find metadata, contract items, or historical logs immediately without scanning nested databases manually.</p>
+                            <h4>Instant company-wide search</h4>
+                            <p>Pull up a contract, a leave balance, or a past payslip in seconds — no manual hunting through files.</p>
                         </div>
                     </div>
                 </div>
@@ -3278,14 +3278,14 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
             <div>
                 <!-- Mockup Search bar -->
                 <div style="background:#0e101b; border: 1px solid var(--border2); border-radius: 12px; padding: 24px; text-align: left; font-family: var(--mono); font-size: 0.8rem;">
-                    <div style="color:var(--text-dim); margin-bottom:12px;">Search Workspace</div>
+                    <div style="color:var(--text-dim); margin-bottom:12px;">Search your workspace</div>
                     <div style="background:#05070c; border: 1px solid var(--border3); padding: 12px 16px; border-radius: 6px; color:#fff; display:flex; justify-content:space-between;">
-                        <span>Where are payroll variables defined?</span>
+                        <span>Show Maria Reyes' latest payslip</span>
                         <span style="color:var(--green);">Ctrl + K</span>
                     </div>
                     <div style="margin-top:16px; color:var(--text-mid); line-height:1.7;">
-                        <span style="color:var(--green);">Found 1 reference:</span><br>
-                        <span style="color:var(--text-dim);">C:\xampp\htdocs\respawn-logics\backend\services\PayrollService.php:L89</span>
+                        <span style="color:var(--green);">Found 1 record:</span><br>
+                        <span style="color:var(--text-dim);">Directory ▸ Maria Reyes ▸ Payslips ▸ July 2026 · Net ₱54,200</span>
                     </div>
                 </div>
             </div>
@@ -3317,7 +3317,7 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
                     <tr>
                         <td style="padding: 20px; border-bottom: 1px solid var(--border2); color: var(--text); font-weight: 600;">User Experience</td>
                         <td style="padding: 20px; border-bottom: 1px solid var(--border2); color: var(--text-mid);">Clunky, slow interfaces that look like they were built in 2005. Employees dread using them.</td>
-                        <td style="padding: 20px; border-bottom: 1px solid var(--border2); color: var(--text); background: rgba(0,224,122,0.03);"><strong>Consumer-Grade Design.</strong> Dark mode, glassmorphic UI, and keyboard shortcuts. It feels like a premium developer tool.</td>
+                        <td style="padding: 20px; border-bottom: 1px solid var(--border2); color: var(--text); background: rgba(0,224,122,0.03);"><strong>Modern &amp; Effortless.</strong> A fast, clean interface your team actually enjoys using — no training manual required.</td>
                     </tr>
                     <tr>
                         <td style="padding: 20px; border-bottom: 1px solid var(--border2); color: var(--text); font-weight: 600;">PH Compliance</td>
@@ -3327,7 +3327,7 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
                     <tr>
                         <td style="padding: 20px; border-bottom: 1px solid var(--border2); color: var(--text); font-weight: 600;">Data Security</td>
                         <td style="padding: 20px; border-bottom: 1px solid var(--border2); color: var(--text-mid);">Weak access controls. Everything ends up exported to insecure Excel spreadsheets to make reporting work.</td>
-                        <td style="padding: 20px; border-bottom: 1px solid var(--border2); color: var(--text); background: rgba(0,224,122,0.03);"><strong>Zero-Trust & Audit-Ready.</strong> AES-256 encryption, strict Need-to-Know RBAC, and cryptographically tamper-proof audit logs.</td>
+                        <td style="padding: 20px; border-bottom: 1px solid var(--border2); color: var(--text); background: rgba(0,224,122,0.03);"><strong>Bank-Grade &amp; Audit-Ready.</strong> Bank-level encryption, strict role-based access, and tamper-proof activity logs on every record.</td>
                     </tr>
                     <tr>
                         <td style="padding: 20px; border-bottom: none; color: var(--text); font-weight: 600;">Pricing Model</td>
@@ -3472,29 +3472,29 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
     <div class="trust-inner">
         <div class="trust-header">
             <span class="pill-label blue" style="margin: 0 auto 16px;">Security and Compliance</span>
-            <h2 style="font-size: clamp(1.75rem, 3.5vw, 2.5rem); font-family: var(--sans); font-weight: 700; line-height: 1.15; margin-bottom: 20px;">Built on a zero-trust foundation.</h2>
-            <p style="color: var(--text-mid); font-size: 1.05rem; line-height: 1.6;">Every architectural decision was made with one principle: employee data is the most sensitive data your organization holds. We guard it accordingly.</p>
+            <h2 style="font-size: clamp(1.75rem, 3.5vw, 2.5rem); font-family: var(--sans); font-weight: 700; line-height: 1.15; margin-bottom: 20px;">Your employees' data, properly protected.</h2>
+            <p style="color: var(--text-mid); font-size: 1.05rem; line-height: 1.6;">Employee records are the most sensitive information your organization holds. Everything we build starts from that — and guards it accordingly.</p>
         </div>
         <div class="trust-shield">
             <div class="trust-badge">
                 <i data-lucide="hard-drive"></i>
-                <h4>Isolated Storage</h4>
-                <p>Files never live inside public web root. Configured at the environment level, verified on every boot.</p>
+                <h4>Private File Storage</h4>
+                <p>Employee documents are kept in a private, isolated location — never anywhere a web browser could reach them.</p>
             </div>
             <div class="trust-badge">
                 <i data-lucide="lock"></i>
-                <h4>AES-256 Encryption</h4>
-                <p>All stored payslips, contracts, and 201 files are encrypted using AES-256 at the application layer.</p>
+                <h4>Bank-Level Encryption</h4>
+                <p>Every payslip, contract, and 201 file is encrypted with the same AES-256 standard banks use.</p>
             </div>
             <div class="trust-badge">
                 <i data-lucide="eye-off"></i>
-                <h4>Need-to-Know RBAC</h4>
-                <p>HR Admins, Managers, and Employees see only what their role is permitted to access.</p>
+                <h4>Role-Based Access</h4>
+                <p>HR admins, managers, and employees each see only what their role is allowed to — nothing more.</p>
             </div>
             <div class="trust-badge">
                 <i data-lucide="scroll-text"></i>
-                <h4>Tamper-Proof Logs</h4>
-                <p>Every record update, login, and document access is immutably logged with cryptographic chaining.</p>
+                <h4>Tamper-Proof Audit Trail</h4>
+                <p>Every change, login, and file access is permanently recorded and can't be altered after the fact.</p>
             </div>
         </div>
     </div>
@@ -3507,7 +3507,7 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
         <p style="color: var(--text-mid); font-size: 1.125rem; max-width: 600px; margin: 0 auto;">Equip your operations team with a unified command center. No more juggling ten different tabs just to onboard a single employee or process payroll.</p>
         
         <div class="gaming-flow">
-            <div class="gaming-step"><i data-lucide="map-pin"></i> Initialization</div>
+            <div class="gaming-step"><i data-lucide="map-pin"></i> Get Set Up</div>
             <i data-lucide="chevron-right" class="gaming-divider"></i>
             <div class="gaming-step"><i data-lucide="users"></i> Scale Your Team</div>
             <i data-lucide="chevron-right" class="gaming-divider"></i>
@@ -3525,12 +3525,12 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
     <div class="story-container story-inner">
         <div>
             <div class="eyebrow">// THE CONCEPT</div>
-            <h2 class="section-h" style="margin-bottom: 24px;">Built for builders who value clear engineering over corporate bloat.</h2>
+            <h2 class="section-h" style="margin-bottom: 24px;">Built for teams that want clarity, not corporate bloat.</h2>
             <p style="font-size: 1rem; color: var(--text-mid); line-height: 1.8; margin-bottom: 20px; text-align: left;">
-                Every time system fragmentation slows you down, you need a <strong style="color:var(--text)">respawn</strong>. A clean slate, better configuration, and another execution run toward your business objectives. We think organizations deserve the same reset — clear directory alignment, versioned tracking, and the confidence that systems just work.
+                Every time scattered tools and messy spreadsheets slow you down, you need a <strong style="color:var(--text)">respawn</strong> — a clean slate and another shot at doing it right. We think every organization deserves that reset: one tidy system, a clear history of every change, and the confidence that things just work.
             </p>
             <p style="font-size: 1rem; color: var(--text-mid); line-height: 1.8; margin-bottom: 20px; text-align: left;">
-                The <strong style="color:var(--text)">Logics</strong> core is absolute. Business compliance relies on precise calculation engines, audit trails, and strict data isolation. We merge developer-friendly interfaces with enterprise-grade operational discipline.
+                The <strong style="color:var(--text)">Logics</strong> half keeps us grounded. Payroll, compliance, and personal data demand precision — accurate calculations, a full audit trail, and airtight security. We pair a genuinely modern interface with that discipline.
             </p>
             <p style="font-size: 1rem; color: var(--text); line-height: 1.8; font-weight: 500; text-align: left;">
                 Built in the Philippines <img src="https://flagcdn.com/ph.svg" width="20" alt="PH" style="vertical-align: middle; margin-left: 2px; margin-top: -3px; border-radius: 2px;">, for organizations that scale with precision.
