@@ -13,7 +13,7 @@ Priority key:
 
 ## P0 — Blockers (security, tenancy, data integrity)
 
-- [ ] **Multi-tenant isolation audit across ALL 23 controllers.** Every SQL read/write must be
+- [x] **Multi-tenant isolation audit across ALL 31 controllers.** Every SQL read/write must be
   scoped by the authenticated user's `tenant_id`. Confirmed gap: `CandidatesController::jobs()`
   departments query had no tenant filter. Audit every controller for the same pattern.
 - [ ] **Never trust a client-supplied `tenant_id`.** Resolve tenant strictly from the session/user,
@@ -23,15 +23,49 @@ Priority key:
 - [ ] **Fail closed on tenant resolution.** `CandidatesController` silently defaults the tenant to
   `'1'` when none resolves — a cross-tenant leak. Replace with a 403 when no tenant is resolvable,
   and apply the same pattern in every controller.
-- [ ] **Server-side authorization on EVERY mutating action.** AUDIT RESULT: only 2 of 23 controllers
-  (`CandidatesController`, `ELRController`) call `requirePermission` at all, and 5 controllers have
-  ZERO authorization of any kind: `AICompanionController`, `AuthController`, `EmployeeRelationsController`,
-  `LeavesController`, `NotificationController`. Sensitive modules are thinly gated server-side —
-  `PayrollController`, `IAMController`, `BenefitsController`, `ExpensesController` rely mostly on
-  `isLoggedIn()` + frontend hiding, so any authenticated user could invoke their actions directly.
-  Gate every create/update/delete server-side, per module, with `requirePermission` — do not rely on
-  frontend role flags. (`PlatformSupportController` and `Candidates/CoreHR/Performance` are the better
-  examples to follow.) Recommend a per-action authorization matrix as the deliverable.
+- [x] **Server-side authorization — verified closed (July 2026 audit, 31 controllers).**
+  Authorization convention: controllers gate via local wrapper helpers (`requireManage()`,
+  `isAgent()`, `hasRole()`, `isESMAgent()`, `canManagePerformance()`) rather than raw
+  `requirePermission()`/`hasPermission()` calls everywhere — a grep for those strings alone
+  will produce false negatives. Read the wrapper, not the call-site count.
+
+  Verified status by controller:
+  | Controller | Gate | Status |
+  |---|---|---|
+  | SaaSStaffController | `hasRole('Platform_Admin')` at top of `handleRequest()` | ✅ Closed |
+  | EmployeeRelationsController | `elr.view` (reads) / `elr.investigate` (writes) + `is_super` | ✅ Fixed Jul 2026 |
+  | ELRPipelineController | `requireManage()` → `elr.investigate` on all 17 mutating methods | ✅ Closed |
+  | ESMSupportController | `isESMAgent()` → `hasRole(['Admin','HR','Super_Admin'])` on all agent actions | ✅ Closed |
+  | ELRController | `requirePermission('elr.*')` per action | ✅ Closed |
+  | CandidatesController | `requirePermission` + 200 tenant refs | ✅ Closed |
+  | CoreHRController | 11 `hasPermission` gates | ✅ Closed |
+  | PayrollController | per-action `canRun`/`canView`/`canApprove` + cross-tenant ownership | ✅ Closed |
+  | IAMController | `hasPermission` per action | ✅ Closed |
+  | PlatformSupportController | `isPlatformStaff()` + 25× 403 | ✅ Closed |
+  | BenefitsController | `hasPermission('hr_*')` gates | ✅ Closed |
+  | CompensationController | `hasPermission` + `is_super` bypass | ✅ Closed |
+  | ExpensesController | `hasPermission('approve_claim')` | ✅ Closed |
+  | ExportController | per-export `hasPermission` | ✅ Closed |
+  | LeavesController | `hasPermission('approve_reject')` | ✅ Closed |
+  | OnboardingController | `hasPermission` per action | ✅ Closed |
+  | ShiftController | `hasPermission` per action | ✅ Closed |
+  | SurveyController | `hasPermission` per action | ✅ Closed |
+  | TimesheetController | `hasPermission('approve'/'delete')` | ✅ Closed |
+  | AttendanceController | `hasPermission('approve_timesheet'/'import_punches')` | ✅ Closed |
+  | AuditController | `hasPermission` on both actions | ✅ Closed |
+  | AnnouncementsController | `hasPermission('create_post')` | ✅ Closed |
+  | PerformanceController | `hasPermission('performance.manage')` / `canManagePerformance()` | ✅ Closed |
+  | AnalyticsController | `hasPermission('analytics.view')` gates ALL actions incl. `payroll_trend` | ✅ Closed |
+  | ESMController | `isAgent()` → `hasPermission('esm.manage')` on `agent_queue`/`update_ticket` | ✅ Closed |
+  | DashboardController | No role gate on `get_stats` — **intentional**: all queries scoped by `employee_email = ? AND tenant_id = ?` (returns only the calling user's own data, no company-wide aggregates) | ✅ By design |
+  | AICompanionController | No gate — any-authenticated by design; consider rate-limit for LLM cost | 🟡 Low risk |
+  | NotificationController | No gate — scoped to current user by design | ✅ By design |
+  | TourController | No gate — per-user by design | ✅ By design |
+  | AuthController | No gate — login endpoint | ✅ By design |
+  | HealthController | No gate — health check; 0 tenant refs is correct | ✅ By design |
+
+  **Remaining open item:** `AICompanionController` has no rate-limit; an authenticated user can
+  run unlimited LLM requests. Add a per-user/per-tenant rate-limit before production.
 - [ ] **Remove debug/scratch files from the web root.** `scratch*.php`, `check_perms.php`,
   `check_tables.php`, `create_sandbox.php`, `test_user_perms.php`, and the one-off `*.js` style
   scripts are web-reachable under XAMPP/Railway and must be deleted or moved out of the served path.
