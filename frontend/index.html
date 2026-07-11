@@ -26,6 +26,81 @@
         } catch(e) {}
       })();
     </script>
+    <script>
+      /* DEMO MODE — pure front-end sandbox. When ?demo=true, intercept every API call so nothing
+         reaches the backend (no auth, no DB, no security). In-memory SAMPLE data; refresh resets. */
+      (function () {
+        if (window.location.href.indexOf('demo=true') === -1) return;
+        var realFetch = window.fetch ? window.fetch.bind(window) : null;
+        var U = { id:999, name:'Peter Parker', full_name:'Peter Parker', email:'demo@respawn.logics', roles:['Super_Admin'], permissions:['manage_tenant','view_reports','manage_users'] };
+        var EMP = [
+          {id:1, name:'Alex Mercer', full_name:'Alex Mercer', email:'alex@respawn.ph', department:'Engineering', position:'Senior Engineer', status:'Active', hire_date:'2023-02-14', base_salary:85000},
+          {id:2, name:'Sarah Chen', full_name:'Sarah Chen', email:'sarah@respawn.ph', department:'People', position:'HR Manager', status:'Active', hire_date:'2022-08-01', base_salary:72000},
+          {id:3, name:'David Kim', full_name:'David Kim', email:'david@respawn.ph', department:'Operations', position:'Operations Lead', status:'Active', hire_date:'2021-11-20', base_salary:90000},
+          {id:4, name:'Maria Reyes', full_name:'Maria Reyes', email:'maria@respawn.ph', department:'Finance', position:'Finance Analyst', status:'Active', hire_date:'2024-01-09', base_salary:58000},
+          {id:5, name:'Jomar Cruz', full_name:'Jomar Cruz', email:'jomar@respawn.ph', department:'Sales', position:'Account Executive', status:'Active', hire_date:'2023-06-30', base_salary:64000}
+        ];
+        var SURV = [
+          {id:1, title:'Q3 Pulse Check', name:'Q3 Pulse Check', status:'Active', responses:38, response_rate:81, enps:42, created_at:'2026-07-01'},
+          {id:2, title:'Onboarding Experience', name:'Onboarding Experience', status:'Closed', responses:12, response_rate:100, enps:55, created_at:'2026-06-10'},
+          {id:3, title:'Remote Work Sentiment', name:'Remote Work Sentiment', status:'Draft', responses:0, response_rate:0, enps:0, created_at:'2026-07-08'}
+        ];
+        var ATT = [
+          {id:1, employee_name:'Alex Mercer', date:'2026-07-11', time_in:'08:58', time_out:'18:04', status:'Present', hours:8.1},
+          {id:2, employee_name:'Sarah Chen', date:'2026-07-11', time_in:'09:05', time_out:'18:00', status:'Present', hours:7.9},
+          {id:3, employee_name:'David Kim', date:'2026-07-11', time_in:'—', time_out:'—', status:'On Leave', hours:0},
+          {id:4, employee_name:'Maria Reyes', date:'2026-07-11', time_in:'09:12', time_out:'18:20', status:'Late', hours:8.0}
+        ];
+        var LEA = [
+          {id:1, employee_name:'David Kim', type:'Vacation Leave', start_date:'2026-07-21', end_date:'2026-07-23', days:3, status:'Approved'},
+          {id:2, employee_name:'Maria Reyes', type:'Sick Leave', start_date:'2026-07-14', end_date:'2026-07-14', days:1, status:'Pending'},
+          {id:3, employee_name:'Jomar Cruz', type:'Emergency Leave', start_date:'2026-07-18', end_date:'2026-07-19', days:2, status:'Pending'}
+        ];
+        var PAY = [
+          {id:1, employee_name:'Alex Mercer', basic:85000, deductions:12450, net:72550, status:'Paid'},
+          {id:2, employee_name:'Sarah Chen', basic:72000, deductions:10890, net:61110, status:'Paid'},
+          {id:3, employee_name:'David Kim', basic:90000, deductions:14200, net:75800, status:'Pending'},
+          {id:4, employee_name:'Maria Reyes', basic:58000, deductions:8700, net:49300, status:'Draft'}
+        ];
+        var CAS = [
+          {id:1, title:'Attendance dispute — July', employee_name:'Jomar Cruz', category:'Attendance', status:'Open', priority:'Medium', created_at:'2026-07-09'},
+          {id:2, title:'Payslip discrepancy', employee_name:'Maria Reyes', category:'Payroll', status:'In Review', priority:'High', created_at:'2026-07-07'}
+        ];
+        var TIC = [
+          {id:1, subject:'Cannot access payslip', requester:'Alex Mercer', category:'IT', status:'Open', priority:'Low', created_at:'2026-07-10'},
+          {id:2, subject:'Update bank details', requester:'Sarah Chen', category:'HR', status:'In Progress', priority:'Medium', created_at:'2026-07-09'},
+          {id:3, subject:'Laptop replacement', requester:'David Kim', category:'IT', status:'Resolved', priority:'Medium', created_at:'2026-07-05'}
+        ];
+        function env(rows, key){ var o = { success:true, csrf_token:'demo', data:rows, items:rows, results:rows, records:rows, list:rows, rows:rows, total:rows.length, count:rows.length }; if (key) o[key]=rows; return o; }
+        function route(url){
+          var u = url.toLowerCase();
+          if (u.indexOf('current_user')>-1) return { success:true, user:U, csrf_token:'demo' };
+          if (u.indexOf('csrf')>-1) return { success:true, csrf_token:'demo' };
+          if (/survey|engagement|enps/.test(u)) return env(SURV,'surveys');
+          if (/employee|directory|staff|people|org/.test(u)) return env(EMP,'employees');
+          if (/attendance|timekeep|clock|shift/.test(u)) return env(ATT,'attendance');
+          if (/leave/.test(u)) return env(LEA,'leaves');
+          if (/payroll|payslip/.test(u)) return env(PAY,'payroll');
+          if (/case|elr|relation/.test(u)) return env(CAS,'cases');
+          if (/ticket|service|helpdesk|desk/.test(u)) return env(TIC,'tickets');
+          if (/dashboard|stat|metric|analytic|summary|report/.test(u)) return { success:true, data:{ total_employees:142, present_today:128, on_leave:6, open_cases:2, open_tickets:3, gross:2847500, net:2463290 }, stats:{ total_employees:142, present_today:128, on_leave:6, open_cases:2 }, employees:EMP };
+          return env([], null);
+        }
+        function j(obj){ return new Response(JSON.stringify(obj), { status:200, headers:{'Content-Type':'application/json'} }); }
+        window.fetch = function(input, init){
+          var url = typeof input === 'string' ? input : (input && input.url) || '';
+          if (/api\.php|api\/index\.php/.test(url)) {
+            var obj = route(url);
+            if (obj && Array.isArray(obj.data)) {
+              var act=(url.match(/action=([a-zA-Z_]+)/)||[])[1], rt=(url.match(/route=([a-zA-Z_]+)/)||[])[1];
+              if(act) obj[act]=obj.data; if(rt) obj[rt]=obj.data;
+            }
+            return Promise.resolve(j(obj));
+          }
+          return realFetch ? realFetch(input, init) : Promise.reject(new Error('demo: no fetch'));
+        };
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>

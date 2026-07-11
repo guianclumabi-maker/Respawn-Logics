@@ -2839,7 +2839,7 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
                     <a href="<?= url('/frontend/dist/index.html?v=' . time() . '#/setup') ?>" class="btn-neon-pill">
                         Get Started Free <i data-lucide="arrow-right"></i>
                     </a>
-                    <a href="<?= url('/login.php') ?>" class="btn-outline-pill">
+                    <a href="#demo" class="btn-outline-pill">
                         View Demo
                     </a>
                 <?php endif; ?>
