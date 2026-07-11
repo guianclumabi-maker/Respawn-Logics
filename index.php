@@ -1288,33 +1288,29 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
             top: 0;
             bottom: 0;
             width: 2px;
-            background: linear-gradient(180deg, var(--green) 0%, rgba(255,255,255,0.02) 100%);
-            opacity: 0.3;
+            background: var(--green);
+            opacity: 0.15;
         }
         .timeline-line.orange {
-            background: linear-gradient(180deg, var(--amber) 0%, rgba(255,255,255,0.02) 100%);
+            background: var(--amber);
         }
         .timeline-line.blue {
-            background: linear-gradient(180deg, var(--blue) 0%, rgba(255,255,255,0.02) 100%);
+            background: var(--blue);
         }
-        .timeline-node {
-            position: absolute;
+        .fixed-timeline-node {
+            position: fixed;
             left: 43px;
+            top: 50vh;
             width: 16px;
             height: 16px;
             border-radius: 50%;
             border: 3px solid var(--bg);
             background: var(--green);
             box-shadow: 0 0 12px var(--green);
-            z-index: 10;
-        }
-        .timeline-node.orange {
-            background: var(--amber);
-            box-shadow: 0 0 12px var(--amber);
-        }
-        .timeline-node.blue {
-            background: var(--blue);
-            box-shadow: 0 0 12px var(--blue);
+            z-index: 999;
+            transform: translateY(-50%);
+            display: none;
+            transition: background 0.3s ease, box-shadow 0.3s ease;
         }
 
         .revamp-container {
@@ -1324,9 +1320,10 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
             position: relative;
             padding-left: 100px;
         }
+
         @media (max-width: 768px) {
             .timeline-line { display: none; }
-            .timeline-node { display: none; }
+            .fixed-timeline-node { display: none; }
             .revamp-container { padding-left: 0; }
         }
 
@@ -3021,7 +3018,6 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
 <!-- TIMELINE SECTION 1: DIRECTORY ROUTING (RAILWAY TIMELINE ACCENT) -->
 <section class="timeline-section" id="journey">
     <div class="timeline-line"></div>
-    <div class="timeline-node"></div>
     
     <div class="revamp-container">
         <div class="revamp-grid">
@@ -3085,7 +3081,6 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
 <!-- TIMELINE SECTION 2: SCALING CALCULATIONS (RAILWAY ORANGE TIMELINE) -->
 <section class="timeline-section" id="scale" style="background: rgba(0,0,0,0.15);">
     <div class="timeline-line orange"></div>
-    <div class="timeline-node orange"></div>
     
     <div class="revamp-container">
         <div class="revamp-grid reverse">
@@ -3136,7 +3131,6 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
 <!-- TIMELINE SECTION 3: OBSERVABILITY AUDIT TRAIL (RAILWAY OBS TIMELINE) -->
 <section class="timeline-section" id="observability">
     <div class="timeline-line blue"></div>
-    <div class="timeline-node blue"></div>
     
     <div class="revamp-container">
         <div class="revamp-grid" style="grid-template-columns: 40% 60%;">
@@ -3241,7 +3235,6 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
 <!-- TIMELINE SECTION 4: AI COMPANION AGENTS (CURSOR AGENT STYLE) -->
 <section class="timeline-section" id="agents" style="background: rgba(0,0,0,0.15);">
     <div class="timeline-line"></div>
-    <div class="timeline-node"></div>
     
     <div class="revamp-container">
         <div class="revamp-grid reverse">
@@ -3303,7 +3296,6 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
 <!-- TIMELINE SECTION 5: COMPLETE CODEBASE INDEXING (CURSOR CODEBASE STYLE) -->
 <section class="timeline-section" id="codebase">
     <div class="timeline-line"></div>
-    <div class="timeline-node"></div>
     
     <div class="revamp-container">
         <div class="revamp-grid">
@@ -4154,5 +4146,33 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
 
 </script>
 </div>
+<div class="fixed-timeline-node" id="scroll-dot"></div>
+<script>
+window.addEventListener('scroll', () => {
+    const dot = document.getElementById('scroll-dot');
+    if (!dot || getComputedStyle(dot).display === 'none') return;
+    const sections = document.querySelectorAll('.timeline-section');
+    const centerY = window.innerHeight / 2;
+    let activeSection = null;
+    sections.forEach(sec => {
+        const rect = sec.getBoundingClientRect();
+        if (rect.top <= centerY && rect.bottom >= centerY) {
+            activeSection = sec;
+        }
+    });
+    if (activeSection) {
+        if (activeSection.id === 'scale') {
+            dot.style.background = 'var(--amber)';
+            dot.style.boxShadow = '0 0 12px var(--amber)';
+        } else if (activeSection.id === 'observability') {
+            dot.style.background = 'var(--blue)';
+            dot.style.boxShadow = '0 0 12px var(--blue)';
+        } else {
+            dot.style.background = 'var(--green)';
+            dot.style.boxShadow = '0 0 12px var(--green)';
+        }
+    }
+});
+</script>
 </body>
 </html>
