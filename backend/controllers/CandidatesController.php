@@ -1432,6 +1432,7 @@ class CandidatesController
             exit;
         }
 
+        $candidateId = $data['candidate_id'] ?? null;
         $appId = $data['application_id'] ?? null;
         $employeeId = $data['employee_id'] ?? null;
         $hireDate = $data['hire_date'] ?? null;
@@ -1439,27 +1440,26 @@ class CandidatesController
         $department = $data['department'] ?? null;
         $baseSalary = $data['base_salary'] ?? null;
 
-        if (!$appId || !$employeeId || !$hireDate) {
+        if (!$candidateId || !$employeeId || !$hireDate) {
             http_response_code(400);
-            echo json_encode(['success' => false, 'error' => 'Application ID, Employee ID, and Hire Date are required.']);
+            echo json_encode(['success' => false, 'error' => 'Candidate ID, Employee ID, and Hire Date are required.']);
             exit;
         }
 
         try {
             $this->pdo->beginTransaction();
 
-            // 1. Get candidate application and profile info
-            $stmt = $this->pdo->prepare("SELECT ca.candidate_id, ca.job_id, cp.name, cp.email, cp.phone 
-                FROM candidate_applications ca 
-                JOIN candidate_profiles cp ON ca.candidate_id = cp.id 
-                WHERE ca.id = ? AND ca.tenant_id = ?");
-            $stmt->execute([$appId, $this->tenantId]);
+            // 1. Get candidate profile info
+            $stmt = $this->pdo->prepare("SELECT id as candidate_id, name, email, phone 
+                FROM candidate_profiles 
+                WHERE id = ? AND tenant_id = ?");
+            $stmt->execute([$candidateId, $this->tenantId]);
             $candidate = $stmt->fetch();
 
             if (!$candidate) {
                 $this->pdo->rollBack();
                 http_response_code(404);
-                echo json_encode(['success' => false, 'error' => 'Candidate application not found.']);
+                echo json_encode(['success' => false, 'error' => 'Candidate profile not found.']);
                 exit;
             }
 
@@ -1502,16 +1502,23 @@ class CandidatesController
                 $candidate['phone']
             ]);
 
-            // 3. Update application stage
-            $updateApp = $this->pdo->prepare("UPDATE candidate_applications SET stage = 'Hired', hired_at = NOW() WHERE id = ?");
-            $updateApp->execute([$appId]);
+            // 3. Update application stage if an application exists
+            $jobId = null;
+            if ($appId) {
+                $appStmt = $this->pdo->prepare("SELECT job_id FROM candidate_applications WHERE id = ?");
+                $appStmt->execute([$appId]);
+                $jobId = $appStmt->fetchColumn();
+
+                $updateApp = $this->pdo->prepare("UPDATE candidate_applications SET stage = 'Hired', hired_at = NOW() WHERE id = ?");
+                $updateApp->execute([$appId]);
+            }
 
             // 4. Log activity
             $this->logActivity(
                 "candidate_hired",
                 "Hired and enrolled as Employee ID: $employeeId",
-                $candidate['candidate_id'],
-                $candidate['job_id'],
+                $candidateId,
+                $jobId,
                 $appId
             );
 
