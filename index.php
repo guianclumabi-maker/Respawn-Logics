@@ -2941,48 +2941,6 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
     </div>
 </div>
 
-<!-- CURSOR-STYLE DEMO WINDOW SECTION -->
-<section class="demo-section" id="demo">
-    <div class="demo-section-inner">
-        <div class="stat-eyebrow">// WATCH IT WORK</div>
-        <h2 style="font-size: clamp(2rem, 4vw, 2.75rem); font-weight: 700; color: var(--text); letter-spacing: -0.03em; margin-top: 12px; margin-bottom: 16px;">Your operations engine.<br>Doing the heavy lifting.</h2>
-        <p style="color: var(--text-mid); font-size: 1.05rem; max-width: 580px; margin: 0 auto;">From payroll computation to statutory compliance — Respawn Logics handles the complexity so your team doesn't have to.</p>
-
-        <div class="demo-window">
-            <!-- Title bar -->
-            <div class="demo-titlebar">
-                <div class="demo-dots">
-                    <div class="demo-dot r"></div>
-                    <div class="demo-dot y"></div>
-                    <div class="demo-dot g"></div>
-                </div>
-                <div class="demo-title-text">Respawn Logics — Operations Center</div>
-            </div>
-
-            <div class="demo-panels" style="display:block; padding:0; overflow:hidden; height:auto;">
-                <!-- OFFLINE DEMO EMBED — interactive Operations Center mock (no DB, no login needed) -->
-                <iframe class="live-app-iframe"
-                    src="<?= url('/demo/') ?>"
-                    title="Respawn Logics — Operations Center demo"
-                    loading="lazy"
-                    referrerpolicy="same-origin"></iframe>
-            </div>
-        </div>
-
-        <p style="margin-top: 20px; font-family: var(--mono); font-size: 0.75rem; color: var(--text-dim);">Trusted by operations teams running real payroll cycles every pay period.</p>
-    </div>
-</section>
-
-<!-- WALKTHROUGH ANIMATION — looping scripted promo visual -->
-<section style="padding: 0 5% 80px; background: #08090f;">
-    <div style="max-width: 1200px; margin: 0 auto;">
-        <p style="font-family: var(--mono); font-size: 0.7rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-dim); margin-bottom: 18px; text-align: center;">See it in motion</p>
-        <div style="border: 1px solid rgba(255,255,255,0.07); border-radius: 14px; overflow: hidden; box-shadow: 0 40px 80px rgba(0,0,0,0.6);">
-            <iframe src="<?= url('/demo/walkthrough.html') ?>" title="Respawn Logics walkthrough"
-                    loading="lazy" style="width:100%; height:420px; border:0; border-radius:14px; display:block;"></iframe>
-        </div>
-    </div>
-</section>
 
 <!-- APP PREVIEW WINDOW — placed above features -->
 <div style="padding: 60px 5% 80px; background: var(--bg); position:relative; z-index:1;">
