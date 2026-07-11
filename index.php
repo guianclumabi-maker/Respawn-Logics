@@ -3338,46 +3338,69 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
 <!-- SECTION 5.5: US VS THEM COMPARISON -->
 <section class="story-section" id="compare" style="border-top: 1px solid var(--border3);">
     <div class="story-container">
-        <h2>The Legacy Way vs. The Respawn Way</h2>
-        <p class="sub" style="text-align: center; margin-bottom: 50px;">Why elite teams refuse to use legacy HR software.</p>
+        <div style="text-align:center; transform:translateZ(0);">
+          <div style="font-family:var(--mono); font-size:0.72rem; color:var(--green); letter-spacing:0.14em; text-transform:uppercase; margin-bottom:14px;">// THE RESPAWN MOMENT</div>
+          <h2 style="font-size:clamp(2rem,4.5vw,3rem); color:#fff; font-weight:700; letter-spacing:-0.03em; margin:0 0 14px;">Stop duct-taping<br>your HR tools together.</h2>
+          <p class="sub" style="max-width:640px; margin:0 auto 48px;">As companies grow, HR ends up spread across disconnected apps and spreadsheets — hiring in one, payroll in another, attendance somewhere else. Respawn Logics brings it all back into one system.</p>
+        </div>
 
-        <div class="comparison-table-wrapper" style="overflow-x: auto; background: rgba(255,255,255,0.02); border: 1px solid var(--border2); border-radius: 12px; padding: 20px;">
-            <table style="width: 100%; border-collapse: collapse; min-width: 600px; text-align: left;">
-                <thead>
-                    <tr>
-                        <th style="padding: 20px; border-bottom: 1px solid var(--border2); color: var(--text-mid); font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.05em; width: 20%;">Focus Area</th>
-                        <th style="padding: 20px; border-bottom: 1px solid var(--border2); color: #ff4a4a; font-size: 1.1rem; width: 40%;"><i class="fa-solid fa-xmark"></i> Legacy HR Tech</th>
-                        <th style="padding: 20px; border-bottom: 1px solid var(--border2); color: var(--green); font-size: 1.2rem; width: 40%;"><i class="fa-solid fa-check-double"></i> Respawn Logics</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td style="padding: 20px; border-bottom: 1px solid var(--border2); color: var(--text); font-weight: 600;">Architecture</td>
-                        <td style="padding: 20px; border-bottom: 1px solid var(--border2); color: var(--text-mid);">"Frankenstein" integrations. You buy an ATS, an HRIS, and a Payroll system from 3 different vendors and try to tape them together.</td>
-                        <td style="padding: 20px; border-bottom: 1px solid var(--border2); color: var(--text); background: rgba(0,224,122,0.03);"><strong>A Unified Ecosystem.</strong> Candidate data flows natively from ATS directly into the Employee Directory and straight into Payroll. Zero double-entry.</td>
-                    </tr>
-                    <tr>
-                        <td style="padding: 20px; border-bottom: 1px solid var(--border2); color: var(--text); font-weight: 600;">User Experience</td>
-                        <td style="padding: 20px; border-bottom: 1px solid var(--border2); color: var(--text-mid);">Clunky, slow interfaces that look like they were built in 2005. Employees dread using them.</td>
-                        <td style="padding: 20px; border-bottom: 1px solid var(--border2); color: var(--text); background: rgba(0,224,122,0.03);"><strong>Modern &amp; Effortless.</strong> A fast, clean interface your team actually enjoys using — no training manual required.</td>
-                    </tr>
-                    <tr>
-                        <td style="padding: 20px; border-bottom: 1px solid var(--border2); color: var(--text); font-weight: 600;">PH Compliance</td>
-                        <td style="padding: 20px; border-bottom: 1px solid var(--border2); color: var(--text-mid);">Generic payroll engines or hardcoded rules that break entirely whenever BIR, SSS, or PhilHealth changes rates.</td>
-                        <td style="padding: 20px; border-bottom: 1px solid var(--border2); color: var(--text); background: rgba(0,224,122,0.03);"><strong>Versioned Statutory Tables.</strong> Built specifically for the Philippines. Statutory changes are data updates, keeping historical runs 100% accurate.</td>
-                    </tr>
-                    <tr>
-                        <td style="padding: 20px; border-bottom: 1px solid var(--border2); color: var(--text); font-weight: 600;">Data Security</td>
-                        <td style="padding: 20px; border-bottom: 1px solid var(--border2); color: var(--text-mid);">Weak access controls. Everything ends up exported to insecure Excel spreadsheets to make reporting work.</td>
-                        <td style="padding: 20px; border-bottom: 1px solid var(--border2); color: var(--text); background: rgba(0,224,122,0.03);"><strong>Bank-Grade &amp; Audit-Ready.</strong> Bank-level encryption, strict role-based access, and tamper-proof activity logs on every record.</td>
-                    </tr>
-                    <tr>
-                        <td style="padding: 20px; border-bottom: none; color: var(--text); font-weight: 600;">Pricing Model</td>
-                        <td style="padding: 20px; border-bottom: none; color: var(--text-mid);">Predatory "Pay-Per-Module" pricing. Want the ATS? That's extra. Need Service Desk? Another contract.</td>
-                        <td style="padding: 20px; border-bottom: none; color: var(--text); background: rgba(0,224,122,0.03);"><strong>All-Inclusive Suite.</strong> You get the entire platform—Core HR, ATS, Payroll, ELR, Service Desk, and Attendance—out of the box.</td>
-                    </tr>
-                </tbody>
-            </table>
+        <style>
+          .ov-stage { display:grid; grid-template-columns:1fr auto 1fr; align-items:center; gap:10px; border:1px solid var(--border2); border-radius:20px; padding:44px 36px; background:radial-gradient(ellipse 55% 90% at 100% 50%, rgba(0,224,122,0.07), transparent 70%); transform:translateZ(0); }
+          .ov-label { font-family:var(--mono); font-size:0.62rem; letter-spacing:0.12em; text-transform:uppercase; margin-bottom:18px; }
+          .ov-old .ov-label { color:#ff6472; }
+          .ov-new .ov-label { color:var(--green); }
+          .ov-mess { display:flex; flex-wrap:wrap; gap:10px; }
+          .ov-chip { display:flex; align-items:center; gap:7px; font-size:0.8rem; color:var(--text-mid); background:rgba(255,255,255,0.02); border:1px dashed rgba(255,100,114,0.3); border-radius:8px; padding:8px 12px; filter:grayscale(0.55); opacity:0.72; }
+          .ov-chip:nth-child(odd){ transform:rotate(-2.5deg); } .ov-chip:nth-child(even){ transform:rotate(2deg); }
+          .ov-chip .dot { width:6px; height:6px; border-radius:50%; background:#ff6472; box-shadow:0 0 6px #ff6472; }
+          .ov-cap { margin-top:18px; font-size:0.82rem; color:var(--text-dim); }
+          .ov-cap b { color:#ff6472; } .ov-cap.good b { color:var(--green); }
+          .ov-burst { display:flex; flex-direction:column; align-items:center; gap:9px; padding:0 8px; }
+          .ov-burst .orb { width:62px; height:62px; border-radius:50%; background:radial-gradient(circle, rgba(0,224,122,0.95), rgba(0,224,122,0.25)); display:flex; align-items:center; justify-content:center; color:#001a0f; animation:ovPulse 3s ease-in-out infinite; }
+          @keyframes ovPulse { 0%,100%{ box-shadow:0 0 22px rgba(0,224,122,0.4);} 50%{ box-shadow:0 0 48px rgba(0,224,122,0.8);} }
+          .ov-burst .lbl { font-family:var(--mono); font-size:0.58rem; letter-spacing:0.14em; text-transform:uppercase; color:var(--green); }
+          .ov-core { background:linear-gradient(180deg, rgba(0,224,122,0.1), rgba(0,224,122,0.02)); border:1px solid rgba(0,224,122,0.4); border-radius:14px; padding:20px; box-shadow:0 0 42px rgba(0,224,122,0.1); }
+          .ov-core-head { display:flex; align-items:center; gap:9px; font-weight:800; color:#fff; font-size:1rem; margin-bottom:14px; }
+          .ov-core-head i { color:var(--green); }
+          .ov-mods { display:flex; flex-wrap:wrap; gap:8px; }
+          .ov-mod { font-size:0.78rem; color:var(--green); background:rgba(0,224,122,0.1); border:1px solid rgba(0,224,122,0.25); border-radius:7px; padding:6px 11px; }
+          @media (max-width:820px){ .ov-stage{ grid-template-columns:1fr; gap:26px; } .ov-burst{ flex-direction:row; } .ov-burst .orb{ transform:rotate(90deg); } }
+        </style>
+
+        <div class="ov-stage">
+          <div class="ov-old">
+            <div class="ov-label">✕ Before — the patchwork</div>
+            <div class="ov-mess">
+              <div class="ov-chip"><span class="dot"></span> Standalone ATS</div>
+              <div class="ov-chip"><span class="dot"></span> Payroll vendor</div>
+              <div class="ov-chip"><span class="dot"></span> Timekeeping app</div>
+              <div class="ov-chip"><span class="dot"></span> Spreadsheets</div>
+              <div class="ov-chip"><span class="dot"></span> Manual CSV imports</div>
+              <div class="ov-chip"><span class="dot"></span> Duplicate employee records</div>
+            </div>
+            <div class="ov-cap"><b>5+ tools · 5+ logins</b> — double-entry everywhere</div>
+          </div>
+
+          <div class="ov-burst">
+            <div class="orb"><i data-lucide="zap"></i></div>
+            <div class="lbl">Respawn</div>
+          </div>
+
+          <div class="ov-new">
+            <div class="ov-label">✓ After — one platform</div>
+            <div class="ov-core">
+              <div class="ov-core-head"><i data-lucide="layout-grid"></i> Respawn Logics</div>
+              <div class="ov-mods">
+                <div class="ov-mod">Core HR</div>
+                <div class="ov-mod">ATS</div>
+                <div class="ov-mod">Payroll</div>
+                <div class="ov-mod">Attendance</div>
+                <div class="ov-mod">Employee Relations</div>
+                <div class="ov-mod">Service Desk</div>
+              </div>
+            </div>
+            <div class="ov-cap good"><b>1 platform · 1 login</b> — everything wired together</div>
+          </div>
         </div>
     </div>
 </section>
