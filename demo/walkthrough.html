@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Respawn Logics — Walkthrough</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0b0f1a; --bg2:#0f1422; --bg3:#141929; --bg4:#1a2035;
+    --green:#00e07a; --amber:#f5a623; --blue:#4f8ef7; --purple:#9b6dff; --red:#ff4d6a;
+    --text:#c8d0e0; --text-dim:#5e6a82; --text-mid:#8b95a8;
+    --border:rgba(255,255,255,0.08);
+    --mono:'JetBrains Mono',monospace; --sans:'Space Grotesk',sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{
+    font-family:var(--sans); background:
+      radial-gradient(ellipse 80% 60% at 50% -10%, rgba(0,224,122,0.06), transparent 60%),
+      radial-gradient(ellipse 60% 50% at 90% 110%, rgba(79,142,247,0.05), transparent 60%),
+      var(--bg);
+    color:var(--text); display:flex; align-items:center; justify-content:center; overflow:hidden;
+  }
+  .stage{width:760px; max-width:94vw}
+  .term{
+    background:var(--bg2); border:1px solid var(--border); border-radius:14px; overflow:hidden;
+    box-shadow:0 40px 90px rgba(0,0,0,0.6), 0 0 60px rgba(0,224,122,0.04);
+  }
+  .term-bar{display:flex; align-items:center; gap:14px; padding:12px 16px; background:#161827; border-bottom:1px solid var(--border)}
+  .dots{display:flex; gap:7px}
+  .dots i{width:11px;height:11px;border-radius:50%}
+  .dots i:nth-child(1){background:#ff5f57}.dots i:nth-child(2){background:#febc2e}.dots i:nth-child(3){background:#28c840}
+  .term-title{font-family:var(--mono); font-size:0.72rem; color:var(--text-dim); margin:0 auto}
+  .term-body{padding:22px 24px; min-height:300px; font-family:var(--mono); font-size:0.86rem; line-height:1.85}
+  .cmd .prmpt{color:var(--green); font-weight:700}
+  .cmd .typed{color:var(--text)}
+  .caret{display:inline-block; width:8px; height:16px; background:var(--green); vertical-align:-2px; margin-left:2px; animation:blink 1s steps(1) infinite}
+  @keyframes blink{50%{opacity:0}}
+  .line{opacity:0; transform:translateY(6px); display:flex; gap:10px; align-items:baseline}
+  .line.show{opacity:1; transform:none; transition:all .35s ease}
+  .line .ok{color:var(--green)} .line .warn{color:var(--amber)} .line .mut{color:var(--text-dim)}
+  .line .th{color:var(--text-mid); font-style:italic}
+  .result{
+    margin-top:18px; opacity:0; transform:translateY(14px) scale(.98);
+    background:var(--bg3); border:1px solid rgba(0,224,122,0.25); border-radius:12px; padding:18px 20px;
+  }
+  .result.show{opacity:1; transform:none; transition:all .5s cubic-bezier(.2,.7,.3,1)}
+  .result-top{display:flex; justify-content:space-between; align-items:center; margin-bottom:14px}
+  .result-title{font-family:var(--sans); font-weight:800; font-size:1.15rem; color:#fff; letter-spacing:-0.02em}
+  .result-badge{font-family:var(--mono); font-size:0.6rem; color:var(--green); border:1px solid rgba(0,224,122,0.35); padding:4px 10px; border-radius:20px}
+  .stats{display:grid; grid-template-columns:repeat(3,1fr); gap:14px}
+  .stat .n{font-family:var(--sans); font-weight:800; font-size:1.5rem; color:#fff; letter-spacing:-0.03em}
+  .stat .n.g{color:var(--green)} .stat .n.a{color:var(--amber)}
+  .stat .l{font-family:var(--mono); font-size:0.6rem; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.08em; margin-top:3px}
+  .brand{display:flex; align-items:center; gap:10px; margin-top:20px; opacity:0; transition:opacity .5s}
+  .brand.show{opacity:1}
+  .logo{width:26px;height:26px;border-radius:7px;background:linear-gradient(135deg,var(--green),#00b8ff);display:flex;align-items:center;justify-content:center;color:#00160c;font-weight:900;font-family:var(--sans);font-size:0.9rem}
+  .brand b{font-family:var(--sans); font-weight:700; color:var(--text)}
+  .brand span{font-family:var(--mono); font-size:0.66rem; color:var(--text-dim); margin-left:auto}
+</style>
+</head>
+<body>
+<div class="stage">
+  <div class="term">
+    <div class="term-bar"><div class="dots"><i></i><i></i><i></i></div><div class="term-title">respawn-logics — operations</div></div>
+    <div class="term-body">
+      <div class="cmd"><span class="prmpt">respawn ▸</span> <span class="typed" id="typed"></span><span class="caret" id="caret"></span></div>
+      <div id="lines" style="margin-top:14px"></div>
+      <div class="result" id="result">
+        <div class="result-top"><div class="result-title">Payroll run complete</div><div class="result-badge">FINALIZED · JULY 2026</div></div>
+        <div class="stats">
+          <div class="stat"><div class="n g">47</div><div class="l">Payslips</div></div>
+          <div class="stat"><div class="n">₱2.84M</div><div class="l">Gross disbursed</div></div>
+          <div class="stat"><div class="n a">1</div><div class="l">Anomaly flagged</div></div>
+        </div>
+        <div class="brand" id="brand"><div class="logo">R</div><b>Respawn Logics</b><span>SSS · PhilHealth · Pag-IBIG · BIR — auto-computed</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+const CMD = "run payroll --workspace respawn-ph --month july --statutory 2026";
+const LINES = [
+  {t:'mut', h:'<span class="mut">▸ Reading 47 active employee records…</span>'},
+  {t:'th',  h:'<span class="th">Applying July 2026 statutory tables…</span>'},
+  {t:'ok',  h:'<span class="ok">✔</span><span>SSS / PhilHealth / Pag-IBIG deductions applied</span>'},
+  {t:'ok',  h:'<span class="ok">✔</span><span>BIR withholding computed for all employees</span>'},
+  {t:'warn',h:'<span class="warn">⚠</span><span>1 anomaly flagged — Cruz, J. (retroactive adjustment)</span>'},
+  {t:'ok',  h:'<span class="ok">✔</span><span>47 payslips generated · BIR 1601-C exported</span>'},
+];
+const typedEl=document.getElementById('typed'), caret=document.getElementById('caret'),
+      linesEl=document.getElementById('lines'), result=document.getElementById('result'), brand=document.getElementById('brand');
+
+function run(){
+  typedEl.textContent=''; linesEl.innerHTML=''; result.classList.remove('show'); brand.classList.remove('show'); caret.style.display='inline-block';
+  let i=0;
+  (function type(){
+    if(i<=CMD.length){ typedEl.textContent=CMD.slice(0,i); i++; setTimeout(type, 34); }
+    else { setTimeout(streamLines, 500); }
+  })();
+}
+function streamLines(){
+  let i=0;
+  (function add(){
+    if(i<LINES.length){
+      const d=document.createElement('div'); d.className='line'; d.innerHTML=LINES[i].h;
+      linesEl.appendChild(d); requestAnimationFrame(()=>d.classList.add('show'));
+      i++; setTimeout(add, 560);
+    } else {
+      setTimeout(()=>{ result.classList.add('show'); setTimeout(()=>brand.classList.add('show'), 500); }, 350);
+      setTimeout(run, 4200); // loop
+    }
+  })();
+}
+run();
+</script>
+</body>
+</html>

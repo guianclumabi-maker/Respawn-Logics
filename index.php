@@ -2857,9 +2857,10 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
 <!-- ANIMATED STAT COUNTERS -->
 <div class="trust-section" id="whats-inside" style="background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(0,224,122,0.05), transparent);">
     <div class="trust-inner">
-        <div class="trust-header">
-            <span class="pill-label" style="margin: 0 auto 16px; display:inline-block;">// WHAT'S INSIDE</span>
-            <h2 style="font-size: clamp(2rem, 4vw, 2.75rem); font-family: var(--sans); font-weight: 700; line-height: 1.15;">Everything your HR team needs, in one platform.</h2>
+        <div class="trust-header" style="transform: translateZ(0); will-change: transform; position: relative; z-index: 2;">
+            <div style="font-family: var(--mono); font-size: 0.72rem; color: var(--green); letter-spacing: 0.14em; text-transform: uppercase; margin-bottom: 16px;">// WHAT'S INSIDE</div>
+            <h2 style="font-size: clamp(2rem, 4vw, 2.75rem); font-family: var(--sans); font-weight: 700; line-height: 1.15; color: #fff;">One platform. Every HR tool your team needs.</h2>
+            <p style="color: var(--text-mid); font-size: 1.05rem; line-height: 1.6; margin-top: 14px;">No more juggling separate systems for payroll, hiring, and attendance — it's all built in and works together.</p>
         </div>
         <div class="trust-shield">
             <div class="trust-badge">

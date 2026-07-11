@@ -8,10 +8,12 @@ AddType text/css .css
 <FilesMatch "\.(bak|log|txt|sql|sh|ps1|bat)$">
     Require all denied
 </FilesMatch>
-# Block entire directories that should never be web-accessible
-<DirectoryMatch "^.*(screenshot-temp|scratch|archive|node_modules|\.git)">
-    Require all denied
-</DirectoryMatch>
+# Block entire directories that should never be web-accessible.
+# NOTE: <DirectoryMatch> is NOT valid inside .htaccess (it 500s Apache) — use mod_rewrite instead.
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteRule (^|/)(screenshot-temp|scratch|archive|node_modules|\.git)(/|$) - [F,L]
+</IfModule>
 
 # ── Cache Control for HTML ────────────────────────────────────────────────────
 <FilesMatch "\.(html|htm)$">
