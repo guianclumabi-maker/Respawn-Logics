@@ -15,6 +15,8 @@ class HealthController {
 
         if ($action === 'check') {
             $this->runChecks();
+        } elseif ($action === 'config_check') {
+            $this->runConfigCheck();
         } else {
             http_response_code(400);
             echo json_encode(['success' => false, 'error' => 'Invalid action']);
@@ -143,5 +145,37 @@ class HealthController {
         }
 
         echo json_encode(['success' => true, 'checks' => $checks]);
+    }
+
+    private function runConfigCheck() {
+        $resumePath = getenv('RESUME_STORAGE_PATH') ?: ($_ENV['RESUME_STORAGE_PATH'] ?? '');
+        $filePath = getenv('FILE_STORAGE_PATH') ?: ($_ENV['FILE_STORAGE_PATH'] ?? '');
+        $resendApi = getenv('RESEND_API_KEY') ?: ($_ENV['RESEND_API_KEY'] ?? '');
+        $mailFrom = getenv('MAIL_FROM') ?: ($_ENV['MAIL_FROM'] ?? '');
+
+        $resumeSet = !empty($resumePath);
+        $resumeWritable = $resumeSet && file_exists($resumePath) && is_writable($resumePath);
+
+        $fileSet = !empty($filePath);
+        $fileWritable = $fileSet && file_exists($filePath) && is_writable($filePath);
+
+        $apiKeySet = !empty($resendApi);
+        $fromSet = !empty($mailFrom);
+
+        echo json_encode([
+            'success' => true,
+            'storage_resume' => [
+                'set' => $resumeSet,
+                'writable' => $resumeWritable
+            ],
+            'storage_file' => [
+                'set' => $fileSet,
+                'writable' => $fileWritable
+            ],
+            'mail' => [
+                'api_key_set' => $apiKeySet,
+                'from_set' => $fromSet
+            ]
+        ]);
     }
 }
