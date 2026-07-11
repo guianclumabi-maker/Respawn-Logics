@@ -112,6 +112,56 @@ export default function MainLayout() {
     fetchBadges();
   }, []);
 
+  // Demo Auto-Tour Logic
+  useEffect(() => {
+    if (!window.location.href.includes("demo=true")) return;
+
+    let tourTimeout: ReturnType<typeof setTimeout>;
+    let idleTimeout: ReturnType<typeof setTimeout>;
+
+    const DEMO_TOUR_PATHS = [
+      "/dashboard",
+      "/surveys",
+      "/hr-directory",
+      "/leaves",
+      "/payroll",
+      "/ats",
+      "/admin/users",
+    ];
+
+    const startTourTimer = () => {
+      clearTimeout(tourTimeout);
+      tourTimeout = setTimeout(() => {
+        let currentPath = window.location.hash.replace('#', '').split('?')[0];
+        let currentIndex = DEMO_TOUR_PATHS.indexOf(currentPath);
+        if (currentIndex === -1) currentIndex = 0;
+        const nextIndex = (currentIndex + 1) % DEMO_TOUR_PATHS.length;
+        navigate(DEMO_TOUR_PATHS[nextIndex]);
+        startTourTimer();
+      }, 5000);
+    };
+
+    const handleInteraction = () => {
+      clearTimeout(tourTimeout);
+      clearTimeout(idleTimeout);
+      
+      idleTimeout = setTimeout(() => {
+        startTourTimer();
+      }, 10000);
+    };
+
+    startTourTimer();
+
+    const events = ['mousedown', 'keydown', 'touchstart', 'wheel'];
+    events.forEach(e => window.addEventListener(e, handleInteraction, { passive: true }));
+
+    return () => {
+      clearTimeout(tourTimeout);
+      clearTimeout(idleTimeout);
+      events.forEach(e => window.removeEventListener(e, handleInteraction));
+    };
+  }, [navigate]);
+
   // The ELR module (My HR Cases + ELR Admin Console) is a full-screen sub-app that renders
   // its OWN sidebar, so hide the main platform sidebar on those routes to avoid a double sidebar.
   const isElrSubApp =
