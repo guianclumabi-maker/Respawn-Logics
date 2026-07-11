@@ -2992,7 +2992,7 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
 
 
 <!-- APP PREVIEW WINDOW — placed above features -->
-<div style="padding: 60px 5% 80px; background: var(--bg); position:relative; z-index:1;">
+<div id="demo" style="padding: 60px 5% 80px; background: var(--bg); position:relative; z-index:1;">
     <div style="max-width: 1400px; margin: 0 auto;">
         <!-- section label -->
         <p style="font-family:var(--mono);font-size:0.7rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--text-dim);text-align:center;margin-bottom:20px;">// LIVE PLATFORM PREVIEW</p>
@@ -3543,19 +3543,84 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
 </div>
 
 <!-- SECTION 6: PLATFORM CTA -->
-<section class="gaming-cta" style="border-top: 1px solid var(--border3);">
-    <div class="story-container">
-        <h2 style="font-size: 2.5rem; color: var(--text); margin-bottom: 20px;">A Better Way to Manage Operations</h2>
-        <p style="color: var(--text-mid); font-size: 1.125rem; max-width: 600px; margin: 0 auto;">Equip your operations team with a unified command center. No more juggling ten different tabs just to onboard a single employee or process payroll.</p>
-        
-        <div class="gaming-flow">
-            <div class="gaming-step"><i data-lucide="map-pin"></i> Get Set Up</div>
-            <i data-lucide="chevron-right" class="gaming-divider"></i>
-            <div class="gaming-step"><i data-lucide="users"></i> Scale Your Team</div>
-            <i data-lucide="chevron-right" class="gaming-divider"></i>
-            <div class="gaming-step"><i data-lucide="trending-up"></i> Track Performance</div>
-            <i data-lucide="chevron-right" class="gaming-divider"></i>
-            <div class="gaming-step"><i data-lucide="shield-alert"></i> Unified Support</div>
+<section class="gaming-cta" id="how-it-works" style="border-top: 1px solid var(--border3);">
+    <div class="story-container" style="max-width: 1120px;">
+        <div style="text-align:center; transform: translateZ(0); will-change: transform;">
+            <div style="font-family: var(--mono); font-size: 0.72rem; color: var(--green); letter-spacing: 0.14em; text-transform: uppercase; margin-bottom: 16px;">// HOW IT WORKS</div>
+            <h2 style="font-size: clamp(2rem, 4vw, 2.75rem); color: #fff; margin-bottom: 16px; font-weight: 700; letter-spacing: -0.02em;">A better way to manage operations</h2>
+            <p style="color: var(--text-mid); font-size: 1.125rem; max-width: 640px; margin: 0 auto;">One command center instead of ten browser tabs. Here's exactly what happens — from your first day to everyday.</p>
+        </div>
+
+        <!-- HOW IT WORKS: 4 concrete steps -->
+        <div class="trust-shield" style="margin-top: 52px;">
+            <div class="trust-badge" style="text-align:left;">
+                <div style="display:flex; align-items:center; gap:10px;"><span style="font-family:var(--mono); color:var(--green); font-size:0.8rem; font-weight:700;">01</span><i data-lucide="map-pin"></i></div>
+                <h4>Get set up — the same day</h4>
+                <p>Your workspace arrives pre-loaded with current SSS, PhilHealth, Pag-IBIG, and BIR tables, roles, and secure storage. Import your team from a spreadsheet and you're live in an afternoon — not a months-long rollout.</p>
+            </div>
+            <div class="trust-badge" style="text-align:left;">
+                <div style="display:flex; align-items:center; gap:10px;"><span style="font-family:var(--mono); color:var(--green); font-size:0.8rem; font-weight:700;">02</span><i data-lucide="users"></i></div>
+                <h4>Scale your team</h4>
+                <p>Hire through the ATS; an accepted candidate becomes an employee with a 201 file, contract, and payroll record automatically — zero re-typing. Add 5 people or 500, it's the same few clicks.</p>
+            </div>
+            <div class="trust-badge" style="text-align:left;">
+                <div style="display:flex; align-items:center; gap:10px;"><span style="font-family:var(--mono); color:var(--green); font-size:0.8rem; font-weight:700;">03</span><i data-lucide="trending-up"></i></div>
+                <h4>Track everything</h4>
+                <p>Attendance, overtime, leave, and reviews all attach to one record per employee. Payroll reads straight from that data, so a run is one click and every peso traces back to a timesheet.</p>
+            </div>
+            <div class="trust-badge" style="text-align:left;">
+                <div style="display:flex; align-items:center; gap:10px;"><span style="font-family:var(--mono); color:var(--green); font-size:0.8rem; font-weight:700;">04</span><i data-lucide="life-buoy"></i></div>
+                <h4>Support everyone</h4>
+                <p>Employees pull their own payslips, file leave, and open tickets; HR only handles the exceptions. One login, one source of truth — no more chasing spreadsheets across ten tabs.</p>
+            </div>
+        </div>
+
+        <!-- OBJECTION BUSTERS -->
+        <div style="text-align:center; margin-top:72px; transform: translateZ(0); will-change: transform;">
+            <h3 style="font-size:clamp(1.4rem,3vw,1.9rem); color:#fff; font-weight:700; letter-spacing:-0.02em;">Still wondering how we're different?</h3>
+        </div>
+        <div class="trust-shield" style="margin-top:28px;">
+            <div class="trust-badge" style="text-align:left;">
+                <i data-lucide="landmark"></i>
+                <h4>Built for PH compliance</h4>
+                <p>Statutory rates are versioned data — when BIR, SSS, or PhilHealth changes, it's an update, not a broken payroll run. Historical runs stay accurate.</p>
+            </div>
+            <div class="trust-badge" style="text-align:left;">
+                <i data-lucide="package"></i>
+                <h4>One price, everything in</h4>
+                <p>Core HR, ATS, Payroll, ELR, Service Desk, and Attendance — all included. No per-module upsells, no surprise second contract.</p>
+            </div>
+            <div class="trust-badge" style="text-align:left;">
+                <i data-lucide="shield-check"></i>
+                <h4>Isolated &amp; audit-ready</h4>
+                <p>Each company's data is walled off, encrypted bank-level, role-restricted, and every change is logged in a tamper-proof trail.</p>
+            </div>
+            <div class="trust-badge" style="text-align:left;">
+                <i data-lucide="download"></i>
+                <h4>No lock-in</h4>
+                <p>Your data is yours. Export employees, payroll, and full history anytime — we earn your stay, we don't trap it.</p>
+            </div>
+        </div>
+
+        <!-- FAQ -->
+        <div style="max-width:780px; margin: 76px auto 0; text-align:left; transform: translateZ(0); will-change: transform;">
+            <h3 style="font-size:clamp(1.4rem,3vw,1.9rem); color:#fff; font-weight:700; letter-spacing:-0.02em; text-align:center; margin-bottom:28px;">Questions you're probably asking</h3>
+            <details style="border:1px solid var(--border2); border-radius:10px; padding:16px 20px; margin-bottom:12px; background:rgba(255,255,255,0.02);">
+                <summary style="cursor:pointer; font-weight:600; color:var(--text);">How much does it cost?</summary>
+                <p style="color:var(--text-mid); margin-top:10px; line-height:1.65;">One all-inclusive plan covers the entire platform — no per-module pricing. Early partners join <strong style="color:var(--green);">free during the beta</strong> and help shape the roadmap while we onboard them hands-on.</p>
+            </details>
+            <details style="border:1px solid var(--border2); border-radius:10px; padding:16px 20px; margin-bottom:12px; background:rgba(255,255,255,0.02);">
+                <summary style="cursor:pointer; font-weight:600; color:var(--text);">Is our employee data safe?</summary>
+                <p style="color:var(--text-mid); margin-top:10px; line-height:1.65;">Yes. Each company's data is fully isolated, encrypted with the same AES-256 standard banks use, and access is role-restricted so people only see what their role allows. Every change, login, and file access is recorded in a tamper-proof audit trail, and files are never stored anywhere a browser could reach.</p>
+            </details>
+            <details style="border:1px solid var(--border2); border-radius:10px; padding:16px 20px; margin-bottom:12px; background:rgba(255,255,255,0.02);">
+                <summary style="cursor:pointer; font-weight:600; color:var(--text);">How hard is it to switch from our current setup?</summary>
+                <p style="color:var(--text-mid); margin-top:10px; line-height:1.65;">Import your people straight from a spreadsheet; the PH statutory tables are already loaded, so most teams are running the same day. And because you can export everything anytime, there's no lock-in if you ever want to leave.</p>
+            </details>
+            <details style="border:1px solid var(--border2); border-radius:10px; padding:16px 20px; margin-bottom:12px; background:rgba(255,255,255,0.02);">
+                <summary style="cursor:pointer; font-weight:600; color:var(--text);">Is it actually ready, or still experimental?</summary>
+                <p style="color:var(--text-mid); margin-top:10px; line-height:1.65;">We're in beta and onboarding early partners directly. The core is built and running — statutory payroll, attendance, hiring, employee records, and audit-ready security. Early partners get hands-on support and a direct line to shape what ships next.</p>
+            </details>
         </div>
     </div>
 </section>
