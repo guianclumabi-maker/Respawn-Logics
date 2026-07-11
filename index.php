@@ -165,7 +165,7 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
 
         /* ─── NEW HERO (HUGO STYLE) ─── */
         .hero {
-            min-height: unset;
+            min-height: 100vh;
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -245,7 +245,7 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
             50% { opacity: 0.6; transform: scale(1.15); }
         }
         .hero-h1-new {
-            font-size: clamp(5.5rem, 12vw, 12.5rem);
+            font-size: clamp(3.5rem, 8vw, 7.5rem);
             font-weight: 800;
             line-height: 0.95;
             letter-spacing: -0.04em;
@@ -2855,30 +2855,53 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
 </div>
 
 <!-- ANIMATED STAT COUNTERS -->
-<div class="stat-belt">
-    <div class="stat-inner">
-        <div class="stat-eyebrow">// BY THE NUMBERS</div>
-        <h2 class="stat-headline">Built to handle real scale.<br>Ready on day one.</h2>
-        <div class="stat-grid">
-            <div class="stat-block">
-                <div class="stat-num"><span class="counter" data-target="17">0</span><span>+</span></div>
-                <div class="stat-label">Operational modules pre-wired and ready to activate.</div>
-                <div class="stat-sub">// MODULES ACTIVE</div>
+<div class="trust-section" id="whats-inside" style="background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(0,224,122,0.05), transparent);">
+    <div class="trust-inner">
+        <div class="trust-header" style="transform: translateZ(0); will-change: transform; position: relative; z-index: 2;">
+            <div style="font-family: var(--mono); font-size: 0.72rem; color: var(--green); letter-spacing: 0.14em; text-transform: uppercase; margin-bottom: 16px;">// WHAT'S INSIDE</div>
+            <h2 style="font-size: clamp(2rem, 4vw, 2.75rem); font-family: var(--sans); font-weight: 700; line-height: 1.15; color: #fff;">One platform. Every HR tool your team needs.</h2>
+            <p style="color: var(--text-mid); font-size: 1.05rem; line-height: 1.6; margin-top: 14px;">No more juggling separate systems for payroll, hiring, and attendance — it's all built in and works together.</p>
+        </div>
+        <div class="trust-shield">
+            <div class="trust-badge">
+                <i data-lucide="calculator"></i>
+                <h4>Payroll &amp; Statutory</h4>
+                <p>SSS, PhilHealth, Pag-IBIG, BIR withholding, and 13th-month pay — computed correctly on every run.</p>
             </div>
-            <div class="stat-block">
-                <div class="stat-num"><span class="counter" data-target="99">0</span><span style="color:var(--text);">.</span><span>9<span style="color:var(--green);">%</span></span></div>
-                <div class="stat-label">System uptime across all core engines and services.</div>
-                <div class="stat-sub">// UPTIME SLA</div>
+            <div class="trust-badge">
+                <i data-lucide="clock"></i>
+                <h4>Attendance &amp; Time</h4>
+                <p>Hours, overtime, night differential, and holidays tracked and fed straight into payroll.</p>
             </div>
-            <div class="stat-block">
-                <div class="stat-num"><span style="color:var(--green);">&lt;</span><span class="counter" data-target="50">0</span><span style="color:var(--text-mid); font-size:2rem;">ms</span></div>
-                <div class="stat-label">Average payroll computation time per employee record.</div>
-                <div class="stat-sub">// COMPUTE LATENCY</div>
+            <div class="trust-badge">
+                <i data-lucide="kanban"></i>
+                <h4>Hiring (ATS)</h4>
+                <p>Post jobs, move applicants through each stage, and turn a hire into an employee in one click.</p>
             </div>
-            <div class="stat-block">
-                <div class="stat-num"><span class="counter" data-target="256">0</span><span style="color:var(--blue); font-size:1.5rem;">-bit</span></div>
-                <div class="stat-label">AES encryption on all documents, contracts, and payslips.</div>
-                <div class="stat-sub">// AES KEY SIZE</div>
+            <div class="trust-badge">
+                <i data-lucide="folder-open"></i>
+                <h4>Employee Directory &amp; 201 Files</h4>
+                <p>A complete, secure record for every employee — contracts, IDs, and history in one place.</p>
+            </div>
+            <div class="trust-badge">
+                <i data-lucide="calendar-check"></i>
+                <h4>Leave Management</h4>
+                <p>Requests, approvals, and balances handled automatically, with your leave policies built in.</p>
+            </div>
+            <div class="trust-badge">
+                <i data-lucide="trending-up"></i>
+                <h4>Performance Reviews</h4>
+                <p>Set goals, run review cycles, and keep a clear history of every evaluation.</p>
+            </div>
+            <div class="trust-badge">
+                <i data-lucide="scale"></i>
+                <h4>Employee Relations</h4>
+                <p>Log cases, track resolutions, and keep a documented, compliant paper trail.</p>
+            </div>
+            <div class="trust-badge">
+                <i data-lucide="life-buoy"></i>
+                <h4>Service Desk</h4>
+                <p>Employees get HR answers fast; complex cases route straight to your team.</p>
             </div>
         </div>
     </div>

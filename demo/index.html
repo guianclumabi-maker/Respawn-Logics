@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Respawn Logics — Operations Center (Demo)</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0b0f1a; --bg2:#0f1422; --bg3:#141929; --bg4:#1a2035;
+    --green:#00e07a; --amber:#f5a623; --blue:#4f8ef7; --purple:#9b6dff; --red:#ff4d6a;
+    --text:#c8d0e0; --text-dim:#5e6a82; --text-mid:#8b95a8;
+    --border:rgba(255,255,255,0.07); --border2:rgba(255,255,255,0.04);
+    --mono:'JetBrains Mono',monospace; --sans:'Space Grotesk',sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{
+    font-family:var(--sans); background:var(--bg); color:var(--text);
+    -webkit-font-smoothing:antialiased; overflow:hidden;
+  }
+  .panels{
+    display:grid; grid-template-columns:230px 1fr 1fr; height:100vh;
+  }
+  /* ---------- SIDEBAR ---------- */
+  .sidebar{border-right:1px solid var(--border); padding:16px 12px; overflow-y:auto; background:var(--bg2)}
+  .sidebar-header{
+    font-family:var(--mono); font-size:0.62rem; letter-spacing:0.14em; color:var(--text-dim);
+    text-transform:uppercase; padding:4px 8px 12px;
+  }
+  .item{
+    padding:11px 10px; border-radius:8px; cursor:pointer; margin-bottom:4px;
+    border:1px solid transparent; transition:background .15s,border-color .15s;
+  }
+  .item:hover{background:rgba(255,255,255,0.03)}
+  .item.active{background:rgba(0,224,122,0.06); border-color:rgba(0,224,122,0.18)}
+  .item-top{display:flex; justify-content:space-between; align-items:center; gap:8px}
+  .item-name{display:flex; align-items:center; gap:8px; font-size:0.8rem; font-weight:600; color:var(--text)}
+  .dot{width:14px;height:14px;border-radius:50%;border:1.5px solid var(--green);flex-shrink:0;position:relative}
+  .dot.done{background:var(--green)}
+  .dot.done::after{content:'✓';position:absolute;inset:0;font-size:9px;color:#00160c;display:flex;align-items:center;justify-content:center;font-weight:900}
+  .dot.pending{border-color:var(--amber)}
+  .item-time{font-family:var(--mono);font-size:0.6rem;color:var(--text-dim)}
+  .item-sub{font-size:0.68rem;color:var(--text-mid);margin-top:5px;line-height:1.35}
+  .item-diff{font-family:var(--mono);font-size:0.6rem;margin-top:6px}
+  .ins{color:var(--green)} .del{color:var(--red)}
+  /* ---------- CENTER ---------- */
+  .center{border-right:1px solid var(--border); display:flex; flex-direction:column; min-width:0}
+  .center-head{
+    padding:14px 20px; border-bottom:1px solid var(--border); font-weight:600; font-size:0.9rem;
+    display:flex; align-items:center; gap:10px;
+  }
+  .center-head .tag{font-family:var(--mono);font-size:0.58rem;color:var(--green);border:1px solid rgba(0,224,122,0.25);padding:2px 8px;border-radius:20px}
+  .center-body{padding:18px 20px; overflow-y:auto; flex:1; font-size:0.8rem}
+  .prompt{
+    background:var(--bg3); border:1px solid var(--border); border-radius:8px; padding:12px 14px;
+    color:var(--text); line-height:1.55; margin-bottom:16px; font-size:0.78rem;
+  }
+  .prompt .ws{color:var(--green);font-weight:600}
+  .log{display:flex; gap:8px; padding:3px 0; line-height:1.5; opacity:0; transform:translateY(4px); animation:rise .3s forwards}
+  @keyframes rise{to{opacity:1;transform:none}}
+  .log .act{color:var(--blue);font-family:var(--mono);font-size:0.72rem;font-weight:600}
+  .log .file{color:var(--text);font-family:var(--mono);font-size:0.72rem}
+  .log .muted{color:var(--text-dim)}
+  .log .think{color:var(--text-mid);font-style:italic}
+  .log .ok{color:var(--green)} .log .warn{color:var(--amber)}
+  .filechg{
+    display:flex; justify-content:space-between; align-items:center; background:var(--bg3);
+    border:1px solid var(--border); border-radius:7px; padding:9px 12px; margin:8px 0; font-family:var(--mono); font-size:0.72rem;
+  }
+  .done-msg{margin-top:10px;color:var(--text);display:flex;gap:8px;line-height:1.5}
+  .center-foot{
+    padding:12px 16px; border-top:1px solid var(--border); display:flex; align-items:center; gap:10px;
+    justify-content:space-between; background:var(--bg2);
+  }
+  .center-input{
+    font-family:var(--mono); font-size:0.72rem; color:var(--text-dim); flex:1;
+    background:var(--bg3); border:1px solid var(--border); border-radius:7px; padding:9px 12px;
+    display:flex; align-items:center; gap:6px;
+  }
+  .cursor{width:6px;height:13px;background:var(--green);display:inline-block;animation:blink 1s steps(1) infinite}
+  @keyframes blink{50%{opacity:0}}
+  .pill{font-family:var(--mono);font-size:0.62rem;color:var(--amber);border:1px solid rgba(245,166,35,0.25);padding:5px 10px;border-radius:20px;white-space:nowrap}
+  /* ---------- PREVIEW ---------- */
+  .preview{display:flex; flex-direction:column; min-width:0; background:var(--bg2)}
+  .preview-bar{
+    display:flex; align-items:center; gap:8px; padding:10px 14px; border-bottom:1px solid var(--border);
+  }
+  .navbtn{width:22px;height:22px;border-radius:6px;background:var(--bg4);display:flex;align-items:center;justify-content:center;color:var(--text-dim);font-size:0.8rem}
+  .address{font-family:var(--mono);font-size:0.62rem;color:var(--text-dim);background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:5px 12px;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .preview-body{padding:18px; overflow-y:auto; flex:1}
+  .card{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:16px}
+  .card-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px}
+  .card-title{font-weight:700;font-size:0.9rem;color:var(--text)}
+  .card-sub{font-size:0.62rem;color:var(--text-dim);margin-top:2px}
+  .badge{font-family:var(--mono);font-size:0.56rem;color:var(--green);border:1px solid rgba(0,224,122,0.3);padding:3px 8px;border-radius:20px;white-space:nowrap}
+  .badge.amber{color:var(--amber);border-color:rgba(245,166,35,0.3)}
+  .badge.blue{color:var(--blue);border-color:rgba(79,142,247,0.3)}
+  .meta{font-size:0.66rem;color:var(--text-dim);margin-bottom:12px}
+  .meta b{color:var(--text);font-weight:600}
+  .row{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--border2);font-size:0.74rem}
+  .row .k{color:var(--text-mid)} .row .v{color:var(--text);font-family:var(--mono)}
+  .v.green{color:var(--green)} .v.red{color:var(--red)}
+  .total{display:flex;justify-content:space-between;padding-top:12px;margin-top:6px;border-top:1px solid var(--border)}
+  .total .k{font-weight:700;font-size:0.8rem} .total .v{font-weight:700;font-size:0.95rem;color:var(--green);font-family:var(--mono)}
+  .chip{display:inline-block;font-size:0.6rem;padding:3px 8px;border-radius:5px;margin:3px 4px 0 0;font-family:var(--mono)}
+  .chip.g{background:rgba(0,224,122,0.1);color:var(--green)}
+  .chip.b{background:rgba(79,142,247,0.1);color:var(--blue)}
+  .chip.a{background:rgba(245,166,35,0.1);color:var(--amber)}
+  .chip.p{background:rgba(155,109,255,0.1);color:var(--purple)}
+  .bar{height:7px;border-radius:4px;background:var(--bg4);overflow:hidden;margin-top:6px}
+  .bar span{display:block;height:100%;background:var(--green);border-radius:4px}
+  /* scrollbars */
+  ::-webkit-scrollbar{width:8px;height:8px}
+  ::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.06);border-radius:4px}
+  @media(max-width:820px){ .panels{grid-template-columns:1fr; height:auto} .preview,.center{border-right:none;border-top:1px solid var(--border)} }
+</style>
+</head>
+<body>
+<div class="panels">
+  <!-- SIDEBAR -->
+  <div class="sidebar" id="sidebar"></div>
+  <!-- CENTER -->
+  <div class="center">
+    <div class="center-head"><span id="c-title">Payroll Run — July 2026</span><span class="tag" id="c-tag">RUNNING</span></div>
+    <div class="center-body" id="c-body"></div>
+    <div class="center-foot">
+      <div class="center-input"><span id="c-input">Run payroll, process leaves, generate reports…</span><span class="cursor"></span></div>
+      <div class="pill">⚡ Engine v2.5</div>
+    </div>
+  </div>
+  <!-- PREVIEW -->
+  <div class="preview">
+    <div class="preview-bar">
+      <div class="navbtn">‹</div><div class="navbtn">›</div>
+      <div class="address" id="p-addr">respawn-logics.local/payslips/july_2026</div>
+    </div>
+    <div class="preview-body" id="p-body"></div>
+  </div>
+</div>
+
+<script>
+const DATA = {
+  payroll:{
+    name:"Payroll Run — July", time:"now", status:"done",
+    sub:"Generated 47 payslips, BIR withholding computed", diff:'<span class="ins">+47</span> <span class="del">-0</span> · payslips',
+    title:"Payroll Run — July 2026", tag:"RUNNING", tagColor:"var(--green)",
+    input:"Run payroll, process leaves, generate reports…",
+    addr:"respawn-logics.local/payslips/july_2026",
+    prompt:'run payroll for all active employees in workspace <span class="ws">respawn-ph</span> — apply July 2026 statutory tables, generate payslips, and flag anomalies',
+    logs:[
+      {t:'read', act:'Read', file:'employees.json', muted:'· 47 active records'},
+      {t:'read', act:'Read', file:'statutory_tables/2026.json'},
+      {t:'think', text:'Computing BIR withholding tax for 47 employees…'},
+      {t:'ok', text:'SSS / PhilHealth / Pag-IBIG deductions applied'},
+      {t:'warn', text:'1 anomaly flagged — Cruz, J. (retroactive adjustment)'},
+      {t:'file', file:'payslips/july_2026_batch.pdf', ins:'+47', del:'-0'},
+      {t:'file', file:'reports/bir_1601c_july.xlsx', ins:'+1', del:'-0'},
+      {t:'done', text:'Done. 47 payslips generated. ₱2,847,500 gross disbursed. 1 anomaly queued.'}
+    ],
+    preview:`<div class="card">
+      <div class="card-head"><div><div class="card-title">Respawn Logics Inc.</div><div class="card-sub">Payslip · July 2026</div></div><div class="badge">FINALIZED</div></div>
+      <div class="meta">Employee: <b>Alex Mercer · Senior Engineer</b></div>
+      <div class="row"><span class="k">Basic Pay</span><span class="v">₱ 85,000.00</span></div>
+      <div class="row"><span class="k">Allowances</span><span class="v green">+ ₱ 5,000.00</span></div>
+      <div class="row"><span class="k">SSS</span><span class="v red">- ₱ 1,800.00</span></div>
+      <div class="row"><span class="k">PhilHealth</span><span class="v red">- ₱ 1,000.00</span></div>
+      <div class="row"><span class="k">Pag-IBIG</span><span class="v red">- ₱ 200.00</span></div>
+      <div class="row"><span class="k">BIR Withholding</span><span class="v red">- ₱ 9,450.00</span></div>
+      <div class="total"><span class="k">NET PAY</span><span class="v">₱ 77,550.00</span></div>
+    </div>`
+  },
+  ats:{
+    name:"ATS Pipeline — Batch 3", time:"now", status:"done",
+    sub:"3 candidates moved to offer stage", diff:'<span class="ins">+3</span> · offers',
+    title:"ATS Pipeline — Batch 3", tag:"SYNCED", tagColor:"var(--blue)",
+    input:"Advance candidates, schedule interviews…",
+    addr:"respawn-logics.local/ats/senior-react-engineer",
+    prompt:'advance top candidates in <span class="ws">Senior React Engineer</span> pipeline to the offer stage and notify hiring managers',
+    logs:[
+      {t:'read', act:'Read', file:'candidates.json', muted:'· 128 applicants'},
+      {t:'think', text:'Ranking by skill match + interview scores…'},
+      {t:'ok', text:'Alex Mercer, Sarah Chen, David Kim → Offer stage'},
+      {t:'ok', text:'Hiring managers notified via email'},
+      {t:'file', file:'pipeline/offers_batch3.json', ins:'+3', del:'-0'},
+      {t:'done', text:'Done. 3 candidates moved to Offer. 2 interviews auto-scheduled.'}
+    ],
+    preview:`<div class="card">
+      <div class="card-head"><div><div class="card-title">Alex Mercer</div><div class="card-sub">Google · 5 YOE</div></div><div class="badge">OFFER</div></div>
+      <div class="meta">Stage: <b>Offer extended</b> · Match 96%</div>
+      <div class="bar"><span style="width:96%"></span></div>
+      <div style="margin-top:12px"><span class="chip g">React</span><span class="chip b">Node.js</span><span class="chip p">System Design</span></div>
+      <div class="row" style="margin-top:14px"><span class="k">Sarah Chen · Stripe</span><span class="v" style="color:var(--blue)">Interviewing</span></div>
+      <div class="row"><span class="k">David Kim · Amazon</span><span class="v" style="color:var(--amber)">Offer</span></div>
+    </div>`
+  },
+  onboard:{
+    name:"Employee Onboarding", time:"12m", status:"done",
+    sub:"201 file created, RBAC role assigned", diff:'<span class="ins">+8</span> <span class="del">-1</span> · records',
+    title:"Employee Onboarding", tag:"COMPLETE", tagColor:"var(--green)",
+    input:"Onboard new hire, provision access…",
+    addr:"respawn-logics.local/directory/201/marquez-r",
+    prompt:'onboard new hire <span class="ws">Marquez, R.</span> — create 201 file, assign RBAC role, and enroll in statutory benefits',
+    logs:[
+      {t:'read', act:'Read', file:'offer_letter.pdf'},
+      {t:'ok', text:'201 file created · TIN, SSS, PhilHealth, Pag-IBIG captured'},
+      {t:'ok', text:'RBAC role assigned: Employee (tenant-scoped)'},
+      {t:'think', text:'Provisioning module access…'},
+      {t:'file', file:'directory/marquez-r/profile.json', ins:'+8', del:'-1'},
+      {t:'done', text:'Done. Employee active. Welcome email sent. Access provisioned.'}
+    ],
+    preview:`<div class="card">
+      <div class="card-head"><div><div class="card-title">Marquez, R.</div><div class="card-sub">Marketing Specialist</div></div><div class="badge">ACTIVE</div></div>
+      <div class="meta">Employee ID: <b>RL-2026-0192</b></div>
+      <div class="row"><span class="k">TIN</span><span class="v">✓ Captured</span></div>
+      <div class="row"><span class="k">SSS / PhilHealth</span><span class="v green">✓ Enrolled</span></div>
+      <div class="row"><span class="k">RBAC Role</span><span class="v">Employee</span></div>
+      <div class="row"><span class="k">Module Access</span><span class="v">4 granted</span></div>
+    </div>`
+  },
+  leave:{
+    name:"Leave Request — Cruz", time:"28m", status:"done",
+    sub:"Approved, balance deducted", diff:'<span class="ins">+1</span> · approvals',
+    title:"Leave Request — Cruz, J.", tag:"APPROVED", tagColor:"var(--green)",
+    input:"Review and process leave requests…",
+    addr:"respawn-logics.local/leave/cruz-j/2026-07",
+    prompt:'review pending leave request from <span class="ws">Cruz, J.</span> — validate balance, apply policy, and update the calendar',
+    logs:[
+      {t:'read', act:'Read', file:'leave_balance/cruz-j.json', muted:'· 8.5 days available'},
+      {t:'think', text:'Checking policy: Vacation Leave, 3 days requested…'},
+      {t:'ok', text:'Within balance · no blackout conflict'},
+      {t:'file', file:'leave/cruz-j/2026-07-approved.json', ins:'+1', del:'-0'},
+      {t:'done', text:'Done. Leave approved. Balance: 5.5 days. Team calendar updated.'}
+    ],
+    preview:`<div class="card">
+      <div class="card-head"><div><div class="card-title">Cruz, J.</div><div class="card-sub">Vacation Leave · Jul 21–23</div></div><div class="badge">APPROVED</div></div>
+      <div class="meta">Approver: <b>You</b> · applied automatically</div>
+      <div class="row"><span class="k">Requested</span><span class="v">3.0 days</span></div>
+      <div class="row"><span class="k">Balance before</span><span class="v">8.5 days</span></div>
+      <div class="row"><span class="k">Balance after</span><span class="v green">5.5 days</span></div>
+      <div class="row"><span class="k">Blackout conflict</span><span class="v">None</span></div>
+    </div>`
+  },
+  bir:{
+    name:"BIR 1601-C Export", time:"45m", status:"pending",
+    sub:"Pending final approval sign-off", diff:'',
+    title:"BIR 1601-C Export", tag:"PENDING", tagColor:"var(--amber)",
+    input:"Generate statutory export, await sign-off…",
+    addr:"respawn-logics.local/compliance/bir-1601c/july",
+    prompt:'compile <span class="ws">BIR Form 1601-C</span> for July 2026 remittance — total withholding across all 47 employees',
+    logs:[
+      {t:'read', act:'Read', file:'payroll_run/july_2026.json'},
+      {t:'ok', text:'Aggregated withholding: ₱444,150.00'},
+      {t:'think', text:'Formatting per BIR 1601-C schema…'},
+      {t:'file', file:'compliance/bir_1601c_july.xlsx', ins:'+1', del:'-0'},
+      {t:'warn', text:'Awaiting final approval sign-off before filing'}
+    ],
+    preview:`<div class="card">
+      <div class="card-head"><div><div class="card-title">BIR Form 1601-C</div><div class="card-sub">Monthly Remittance · July 2026</div></div><div class="badge amber">PENDING</div></div>
+      <div class="meta">Coverage: <b>47 employees</b></div>
+      <div class="row"><span class="k">Total Compensation</span><span class="v">₱ 3,120,000</span></div>
+      <div class="row"><span class="k">Total Withholding</span><span class="v">₱ 444,150.00</span></div>
+      <div class="row"><span class="k">Status</span><span class="v" style="color:var(--amber)">Awaiting sign-off</span></div>
+      <div class="row"><span class="k">Due</span><span class="v">Aug 10, 2026</span></div>
+    </div>`
+  }
+};
+const ORDER = ["payroll","ats","onboard","leave","bir"];
+let current = "payroll";
+let streamTimer = null, loopTimer = null;
+
+function renderSidebar(){
+  const el = document.getElementById('sidebar');
+  el.innerHTML = '<div class="sidebar-header">Ready for review '+ORDER.length+'</div>' + ORDER.map(k=>{
+    const d = DATA[k];
+    const dotClass = d.status==='pending' ? 'pending' : 'done';
+    return `<div class="item ${k===current?'active':''}" data-k="${k}">
+      <div class="item-top"><div class="item-name"><span class="dot ${dotClass}"></span>${d.name}</div><span class="item-time">${d.time}</span></div>
+      <div class="item-sub">${d.sub}</div>
+      ${d.diff?`<div class="item-diff">${d.diff}</div>`:''}
+    </div>`;
+  }).join('');
+  el.querySelectorAll('.item').forEach(it=>it.addEventListener('click',()=>select(it.dataset.k)));
+}
+
+function select(k){
+  if(streamTimer) clearTimeout(streamTimer);
+  if(loopTimer) clearTimeout(loopTimer);
+  current = k;
+  const d = DATA[k];
+  renderSidebar();
+  document.getElementById('c-title').textContent = d.title;
+  const tag = document.getElementById('c-tag');
+  tag.textContent = d.tag; tag.style.color = d.tagColor; tag.style.borderColor = d.tagColor.replace(')',', 0.3)').replace('var(--','rgba(');
+  document.getElementById('c-input').textContent = d.input;
+  document.getElementById('p-addr').textContent = d.addr;
+  document.getElementById('p-body').innerHTML = d.preview;
+  streamLogs(d);
+}
+
+function lineHTML(l){
+  if(l.t==='file') return `<div class="filechg"><span class="file">${l.file}</span><span><span class="ins">${l.ins}</span> <span class="del">${l.del}</span></span></div>`;
+  if(l.t==='done') return `<div class="done-msg"><span class="ok">✔</span><span>${l.text}</span></div>`;
+  if(l.t==='ok') return `<div class="log"><span class="ok">✔</span><span>${l.text}</span></div>`;
+  if(l.t==='warn') return `<div class="log"><span class="warn">⚠</span><span>${l.text}</span></div>`;
+  if(l.t==='think') return `<div class="log"><span class="think">${l.text}</span></div>`;
+  if(l.t==='read') return `<div class="log"><span class="act">${l.act}</span> <span class="file">${l.file}</span> ${l.muted?`<span class="muted">${l.muted}</span>`:''}</div>`;
+  return '';
+}
+
+function streamLogs(d){
+  const body = document.getElementById('c-body');
+  body.innerHTML = `<div class="prompt">${d.prompt}</div>`;
+  let i = 0;
+  (function step(){
+    if(i < d.logs.length){
+      body.insertAdjacentHTML('beforeend', lineHTML(d.logs[i]));
+      body.scrollTop = body.scrollHeight;
+      i++;
+      streamTimer = setTimeout(step, 620);
+    } else {
+      // loop the currently-selected item so it always feels alive
+      loopTimer = setTimeout(()=>{ if(current===Object.keys(DATA).find(k=>DATA[k]===d)) streamLogs(d); }, 3200);
+    }
+  })();
+}
+
+renderSidebar();
+select('payroll');
+</script>
+</body>
+</html>
