@@ -115,6 +115,24 @@ export function HomeDashboard() {
   const inputRef = useRef<HTMLInputElement>(null);
 
   const fetchStats = useCallback(async () => {
+    const isDemo = window.location.href.includes('demo=true');
+    if (isDemo) {
+      setStats({
+        clocked_in_today: true,
+        clock_time: "08:15:00 AM",
+        total_hours: 42.5,
+        pending_leaves: 2,
+        active_tasks_count: 2,
+        todo_list: [
+          { id: 1, task_name: "Approve July 2026 Payroll Run", task_description: "", is_completed: 0 },
+          { id: 2, task_name: "Finalize ATS Pipeline for Senior Engineer", task_description: "", is_completed: 0 },
+          { id: 3, task_name: "Sign off BIR 1601-C", task_description: "", is_completed: 1 }
+        ]
+      });
+      setLoading(false);
+      return;
+    }
+
     try {
       const res = await fetch(`${API}&action=get_stats`, {
         credentials: "include",

@@ -56,6 +56,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const bootstrap = async () => {
       try {
+        const isDemo = window.location.href.includes('demo=true');
+        if (isDemo) {
+            setUser({
+                id: 999,
+                name: "Alex Mercer",
+                email: "demo@respawn.logics",
+                roles: ["Tenant_Admin"],
+                permissions: ["manage_tenant", "view_reports", "manage_users"],
+                job_title: "Senior Engineer",
+                tenant_id: 1,
+            });
+            setLoading(false);
+            return;
+        }
+
         // Check if we just registered — a one-time login_token may be in the URL hash query string
         // e.g. #/onboarding?login_token=abc123 or #/dashboard?login_token=abc123
         const hashPart = window.location.hash; // e.g. "#/onboarding?login_token=abc123"
