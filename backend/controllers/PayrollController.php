@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/../utils/Storage.php';
+require_once __DIR__ . '/../utils/Crypto.php';
 
 class PayrollController
 {
@@ -585,14 +586,26 @@ class PayrollController
             return;
         }
 
-        $finfo = finfo_open(FILEINFO_MIME_TYPE);
-        $mime = finfo_file($finfo, $fullPath);
-        finfo_close($finfo);
+        // Decrypt in memory before serving; legacy plaintext PDFs pass through.
+        $blob = file_get_contents($fullPath);
+        if ($blob === false) {
+            http_response_code(500);
+            echo "Failed to read payslip from storage";
+            return;
+        }
+        try {
+            $bytes = \App\Utils\Crypto::decryptBytes($blob);
+        } catch (\Throwable $e) {
+            error_log('[Payroll] Payslip decrypt failed for id ' . $id . ': ' . $e->getMessage());
+            http_response_code(500);
+            echo "Unable to decrypt payslip (check APP_ENCRYPTION_KEY)";
+            return;
+        }
 
-        header('Content-Type: ' . $mime);
+        header('Content-Type: application/pdf');
         header('Content-Disposition: attachment; filename="Payslip_' . $id . '.pdf"');
-        header('Content-Length: ' . filesize($fullPath));
-        readfile($fullPath);
+        header('Content-Length: ' . strlen($bytes));
+        echo $bytes;
         exit;
     }
 }

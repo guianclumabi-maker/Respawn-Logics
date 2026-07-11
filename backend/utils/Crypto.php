@@ -63,6 +63,21 @@ final class Crypto
     // ── Public helpers ─────────────────────────────────────────────────────────
 
     /**
+     * True when a valid APP_ENCRYPTION_KEY is configured. Lets upload paths
+     * degrade gracefully (store plaintext + loud warning) on dev machines
+     * where the key isn't set, instead of fataling the whole request.
+     */
+    public static function hasKey(): bool
+    {
+        $b64 = getenv('APP_ENCRYPTION_KEY') ?: ($_ENV['APP_ENCRYPTION_KEY'] ?? '');
+        if ($b64 === '') {
+            return false;
+        }
+        $key = base64_decode($b64, true);
+        return $key !== false && strlen($key) === 32;
+    }
+
+    /**
      * Returns true if $value looks like a ciphertext produced by this class.
      * Use this to tolerate legacy plaintext during a rolling migration.
      */
