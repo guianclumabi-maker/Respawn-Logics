@@ -468,7 +468,6 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
 
         /* ─── MODULES SECTION ─── */
         .section {
-            min-height: 100vh;
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -673,7 +672,6 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
 
         /* ─── PHILOSOPHY SECTION ─── */
         .story-section {
-            min-height: 100vh;
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -959,7 +957,6 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
         }
         /* ─── NEW STORY SECTIONS ─── */
         .story-section {
-            min-height: 100vh;
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -2476,7 +2473,6 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
 
         /* ─── BIG TYPE CTA ─── */
         .bigtype-cta {
-            min-height: 100vh;
             display: flex;
             flex-direction: column;
             align-items: flex-start;
