@@ -1,4 +1,6 @@
 <?php
+require_once __DIR__ . '/../utils/Crypto.php';
+use App\Utils\Crypto;
 
 class BenefitsController
 {
@@ -118,30 +120,47 @@ class BenefitsController
     {
         $stmt = $this->pdo->prepare("SELECT * FROM `employee_statutory` WHERE `employee_id` = ?");
         $stmt->execute([$this->currentUser['id']]);
-        $data = $stmt->fetch();
+        $data = $stmt->fetch(PDO::FETCH_ASSOC);
         if (!$data) {
             $data = ['sss_number'=>'', 'philhealth_number'=>'', 'pagibig_number'=>'', 'tin_number'=>''];
+        } else {
+            // Decrypt-on-read: tolerates legacy plaintext (passes through unchanged)
+            foreach (['sss_number','philhealth_number','pagibig_number','tin_number'] as $col) {
+                if (isset($data[$col])) {
+                    $data[$col] = Crypto::decrypt($data[$col]);
+                }
+            }
         }
         echo json_encode(['success' => true, 'data' => $data]);
     }
 
     private function updateStatutory($input)
     {
-        $sss = $input['sss_number'] ?? '';
+        $sss  = $input['sss_number'] ?? '';
         $phic = $input['philhealth_number'] ?? '';
         $hdmf = $input['pagibig_number'] ?? '';
-        $tin = $input['tin_number'] ?? '';
+        $tin  = $input['tin_number'] ?? '';
+
+        // Encrypt-on-write — non-deterministic AES-256-GCM per value
+        $encSss  = Crypto::encrypt($sss);
+        $encPhic = Crypto::encrypt($phic);
+        $encHdmf = Crypto::encrypt($hdmf);
+        $encTin  = Crypto::encrypt($tin);
+        // Deterministic blind index for TIN equality lookups
+        $tinBidx = Crypto::blindIndex($tin);
 
         $stmt = $this->pdo->prepare("
-            INSERT INTO `employee_statutory` (`employee_id`, `sss_number`, `philhealth_number`, `pagibig_number`, `tin_number`)
-            VALUES (?, ?, ?, ?, ?)
-            ON DUPLICATE KEY UPDATE 
-                `sss_number` = VALUES(`sss_number`),
+            INSERT INTO `employee_statutory`
+                (`employee_id`, `sss_number`, `philhealth_number`, `pagibig_number`, `tin_number`, `tin_bidx`)
+            VALUES (?, ?, ?, ?, ?, ?)
+            ON DUPLICATE KEY UPDATE
+                `sss_number`        = VALUES(`sss_number`),
                 `philhealth_number` = VALUES(`philhealth_number`),
-                `pagibig_number` = VALUES(`pagibig_number`),
-                `tin_number` = VALUES(`tin_number`)
+                `pagibig_number`    = VALUES(`pagibig_number`),
+                `tin_number`        = VALUES(`tin_number`),
+                `tin_bidx`          = VALUES(`tin_bidx`)
         ");
-        $stmt->execute([$this->currentUser['id'], $sss, $phic, $hdmf, $tin]);
+        $stmt->execute([$this->currentUser['id'], $encSss, $encPhic, $encHdmf, $encTin, $tinBidx]);
         echo json_encode(['success' => true]);
     }
 
