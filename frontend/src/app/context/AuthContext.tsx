@@ -60,11 +60,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         if (isDemo) {
             setUser({
                 id: 999,
-                name: "Alex Mercer",
+                name: "Peter Parker",
                 email: "demo@respawn.logics",
                 roles: ["Super_Admin"],
                 permissions: ["manage_tenant", "view_reports", "manage_users"],
-                job_title: "Senior Engineer",
+                job_title: "Your friendly Neighborhood Spiderman",
                 tenant_id: 1,
             });
             setLoading(false);
