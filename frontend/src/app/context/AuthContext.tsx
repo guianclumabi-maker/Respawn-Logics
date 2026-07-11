@@ -62,7 +62,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 id: 999,
                 name: "Alex Mercer",
                 email: "demo@respawn.logics",
-                roles: ["Tenant_Admin"],
+                roles: ["Super_Admin"],
                 permissions: ["manage_tenant", "view_reports", "manage_users"],
                 job_title: "Senior Engineer",
                 tenant_id: 1,
