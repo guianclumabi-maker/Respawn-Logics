@@ -1454,6 +1454,7 @@ export function CandidateProfile({ onViewChange, candidateId }: Props) {
                 </div>
               )}
             </div>
+            )}
           </div>
 
           {/* Data Privacy & Compliance */}

@@ -19,8 +19,8 @@ if (is_resource($process)) {
         $branch = trim(shell_exec('git rev-parse --abbrev-ref HEAD'));
         
         $data = [
-            'title' => 'feat: ATS-style ELR pipeline board and phase management',
-            'body' => 'Reworks the ELR Pipeline Board to use a case-first ATS-style view with client-side filtering and an integrated Manage Phases modal.',
+            'title' => 'fix: allow editing email in Candidate Profile Contact Registry',
+            'body' => 'Adds an inline edit mode to the Contact Registry on the Candidate Profile so recruiters can add missing emails, which is required before hiring a candidate.',
             'head' => $branch,
             'base' => 'main'
         ];
