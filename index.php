@@ -2993,7 +2993,7 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
 
 <!-- APP PREVIEW WINDOW — placed above features -->
 <div style="padding: 60px 5% 80px; background: var(--bg); position:relative; z-index:1;">
-    <div style="max-width: 1240px; margin: 0 auto;">
+    <div style="max-width: 1400px; margin: 0 auto;">
         <!-- section label -->
         <p style="font-family:var(--mono);font-size:0.7rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--text-dim);text-align:center;margin-bottom:20px;">// LIVE PLATFORM PREVIEW</p>
         <div style="background: #0d0f1a; border: 1px solid rgba(255,255,255,0.09); border-radius: 16px; overflow: hidden; box-shadow: 0 0 0 1px rgba(255,255,255,0.04), 0 60px 120px rgba(0,0,0,0.75), 0 0 80px rgba(0,224,122,0.05);">
@@ -3007,9 +3007,11 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
                 <div style="font-family:var(--mono);font-size:0.75rem;color:var(--text-dim);margin:0 auto;">Respawn Logics — Operations Center</div>
             </div>
             <!-- iframe -->
-            <iframe src="<?= url('/frontend/dist/index.html?demo=true#/dashboard') ?>"
-                title="Respawn Logics — live demo"
-                style="width:100%;height:640px;border:0;display:block;background:#0d0f1a;"></iframe>
+            <div style="width: 100%; height: 720px; overflow: hidden; position: relative;">
+                <iframe src="<?= url('/frontend/dist/index.html?demo=true#/dashboard') ?>"
+                    title="Respawn Logics — live demo"
+                    style="width: 125%; height: 900px; border: 0; display: block; background: #0d0f1a; transform: scale(0.8); transform-origin: top left;"></iframe>
+            </div>
         </div>
 
     </div>
