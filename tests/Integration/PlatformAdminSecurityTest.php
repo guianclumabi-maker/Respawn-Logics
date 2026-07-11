@@ -59,6 +59,10 @@ class PlatformAdminSecurityTest extends TestCase
         // 6. platform_tenant_list
         $r = self::apiGet('/api/index.php?route=iam&action=platform_tenant_list');
         $this->assertEquals(403, $r['code'] ?? 403, 'Tenant SA should be denied platform_tenant_list. ' . ($r['body'] ?? ''));
+
+        // 7. config check
+        $r = self::apiGet('/api/index.php?route=health&action=config_check');
+        $this->assertEquals(403, $r['code'] ?? 403, 'Tenant SA should be denied config check. ' . ($r['body'] ?? ''));
     }
 
     public function testPlatformAdminIsAllowed()
@@ -84,5 +88,18 @@ class PlatformAdminSecurityTest extends TestCase
         // 5. platform_tenant_list
         $r = self::apiGet('/api/index.php?route=iam&action=platform_tenant_list');
         $this->assertEquals(200, $r['code'], 'Platform Admin should access platform_tenant_list');
+
+        // 6. config check
+        $r = self::apiGet('/api/index.php?route=health&action=config_check');
+        $this->assertEquals(200, $r['code'], 'Platform Admin should access config check');
+        $data = json_decode($r['body'], true);
+        $this->assertTrue($data['success']);
+        $this->assertArrayHasKey('storage_resume', $data);
+        $this->assertArrayHasKey('storage_file', $data);
+        $this->assertArrayHasKey('mail', $data);
+        $this->assertArrayHasKey('set', $data['storage_resume']);
+        $this->assertArrayHasKey('writable', $data['storage_resume']);
+        $this->assertArrayHasKey('api_key_set', $data['mail']);
+        $this->assertArrayHasKey('from_set', $data['mail']);
     }
 }
