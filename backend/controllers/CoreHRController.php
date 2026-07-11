@@ -1,5 +1,8 @@
 <?php
 require_once __DIR__ . '/../utils/Storage.php';
+require_once __DIR__ . '/../utils/Crypto.php';
+
+use App\Utils\Crypto;
 
 class CoreHRController
 {
@@ -382,7 +385,22 @@ class CoreHRController
             $secureFilename = bin2hex(random_bytes(16)) . '.' . $ext;
             $destPath = $storageDir . '/' . $secureFilename;
             
-            if (move_uploaded_file($file['tmp_name'], $destPath)) {
+            // Encrypt-at-rest: read the upload into memory, encrypt, then persist.
+            // The raw plaintext never touches the documents directory.
+            $bytes = file_get_contents($file['tmp_name']);
+            if ($bytes === false) {
+                echo json_encode(['success' => false, 'error' => 'Failed to read uploaded file']);
+                return;
+            }
+            if (Crypto::hasKey()) {
+                $bytes = Crypto::encryptBytes($bytes);
+            } else {
+                // Dev fallback: never block HR work locally, but make the gap unmissable in logs.
+                error_log('[CoreHR] WARNING: APP_ENCRYPTION_KEY not set — employee document stored UNENCRYPTED');
+            }
+
+            if (file_put_contents($destPath, $bytes) !== false) {
+                @unlink($file['tmp_name']);
                 $relativePath = 'tenant_' . $this->tenantId . '/documents/' . $secureFilename;
                 $originalName = basename($file['name']);
 
@@ -435,14 +453,31 @@ class CoreHRController
             return;
         }
 
+        // Decrypt in memory before serving. decryptBytes() passes legacy
+        // (pre-encryption) files through untouched, so old uploads keep working.
+        $blob = file_get_contents($fullPath);
+        if ($blob === false) {
+            http_response_code(500);
+            echo "Failed to read file from storage";
+            return;
+        }
+        try {
+            $bytes = Crypto::decryptBytes($blob);
+        } catch (\Throwable $e) {
+            error_log('[CoreHR] Document decrypt failed for id ' . $id . ': ' . $e->getMessage());
+            http_response_code(500);
+            echo "Unable to decrypt document (check APP_ENCRYPTION_KEY)";
+            return;
+        }
+
         $finfo = finfo_open(FILEINFO_MIME_TYPE);
-        $mime = finfo_file($finfo, $fullPath);
+        $mime = finfo_buffer($finfo, $bytes) ?: 'application/octet-stream';
         finfo_close($finfo);
 
         header('Content-Type: ' . $mime);
         header('Content-Disposition: attachment; filename="' . basename($doc['file_name']) . '"');
-        header('Content-Length: ' . filesize($fullPath));
-        readfile($fullPath);
+        header('Content-Length: ' . strlen($bytes));
+        echo $bytes;
         exit;
     }
 

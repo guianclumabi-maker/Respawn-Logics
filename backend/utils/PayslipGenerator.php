@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/fpdf/fpdf.php';
+require_once __DIR__ . '/Crypto.php';
 
 class PayslipGenerator
 {
@@ -126,7 +127,15 @@ class PayslipGenerator
         if (!is_dir($dir)) {
             mkdir($dir, 0777, true);
         }
-        
-        $pdf->Output('F', $outputPath);
+
+        // Encrypt-at-rest: render the PDF to memory, encrypt, then write.
+        // The plaintext payslip never lands on disk.
+        $pdfBytes = $pdf->Output('S');
+        if (\App\Utils\Crypto::hasKey()) {
+            $pdfBytes = \App\Utils\Crypto::encryptBytes($pdfBytes);
+        } else {
+            error_log('[PayslipGenerator] WARNING: APP_ENCRYPTION_KEY not set — payslip stored UNENCRYPTED');
+        }
+        file_put_contents($outputPath, $pdfBytes);
     }
 }
