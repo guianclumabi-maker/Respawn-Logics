@@ -194,7 +194,7 @@ class ELRPipelineController
         } catch (\Throwable $e) {
             http_response_code(500);
             error_log('[' . __CLASS__ . '] ' . $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine());
-            echo json_encode(['success' => false, 'error' => 'An internal error occurred. Please try again.']);
+            echo json_encode(['success' => false, 'error' => 'Internal error: ' . $e->getMessage()]);
         }
     }
 
