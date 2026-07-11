@@ -2101,12 +2101,37 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
             display: flex;
             flex-direction: column;
             gap: 10px;
-            transition: border-color 0.2s;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
         }
-        .trust-badge:hover { border-color: rgba(0,224,122,0.3); }
+        .trust-badge::before {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%;
+            width: 50%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.08), transparent);
+            transform: skewX(-20deg);
+            transition: all 0.6s ease-in-out;
+            z-index: -1;
+        }
+        .trust-badge:hover { 
+            border-color: rgba(0,224,122,0.5); 
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 0 12px 30px rgba(0,224,122,0.15);
+            background: linear-gradient(145deg, rgba(255,255,255,0.04) 0%, rgba(0,224,122,0.05) 100%);
+        }
+        .trust-badge:hover::before {
+            left: 200%;
+        }
         .trust-badge i {
             font-size: 1.5rem;
             color: var(--green);
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .trust-badge:hover i {
+            transform: scale(1.2) translateY(-2px);
         }
         .trust-badge h4 {
             font-size: 0.875rem;
@@ -2775,7 +2800,7 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
 <nav>
     <?= renderLogo('navbar') ?>
     <div class="nav-links">
-        <a href="#overview">Platform</a>
+        <a href="#whats-inside">Platform</a>
         <a href="deep_dive.php">Deep Dive</a>
         <a href="design.php">Design</a>
         <a href="#why">Why Us</a>
