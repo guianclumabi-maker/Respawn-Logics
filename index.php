@@ -2992,7 +2992,7 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
 
 
 <!-- APP PREVIEW WINDOW — placed above features -->
-<div style="padding: 60px 5% 80px; background: var(--bg); position:relative; z-index:1;">
+<div id="demo" style="padding: 60px 5% 80px; background: var(--bg); position:relative; z-index:1;">
     <div style="max-width: 1400px; margin: 0 auto;">
         <!-- section label -->
         <p style="font-family:var(--mono);font-size:0.7rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--text-dim);text-align:center;margin-bottom:20px;">// LIVE PLATFORM PREVIEW</p>
@@ -3338,46 +3338,69 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
 <!-- SECTION 5.5: US VS THEM COMPARISON -->
 <section class="story-section" id="compare" style="border-top: 1px solid var(--border3);">
     <div class="story-container">
-        <h2>The Legacy Way vs. The Respawn Way</h2>
-        <p class="sub" style="text-align: center; margin-bottom: 50px;">Why elite teams refuse to use legacy HR software.</p>
+        <div style="text-align:center; transform:translateZ(0);">
+          <div style="font-family:var(--mono); font-size:0.72rem; color:var(--green); letter-spacing:0.14em; text-transform:uppercase; margin-bottom:14px;">// THE RESPAWN MOMENT</div>
+          <h2 style="font-size:clamp(2rem,4.5vw,3rem); color:#fff; font-weight:700; letter-spacing:-0.03em; margin:0 0 14px;">Stop duct-taping<br>your HR tools together.</h2>
+          <p class="sub" style="max-width:640px; margin:0 auto 48px;">As companies grow, HR ends up spread across disconnected apps and spreadsheets — hiring in one, payroll in another, attendance somewhere else. Respawn Logics brings it all back into one system.</p>
+        </div>
 
-        <div class="comparison-table-wrapper" style="overflow-x: auto; background: rgba(255,255,255,0.02); border: 1px solid var(--border2); border-radius: 12px; padding: 20px;">
-            <table style="width: 100%; border-collapse: collapse; min-width: 600px; text-align: left;">
-                <thead>
-                    <tr>
-                        <th style="padding: 20px; border-bottom: 1px solid var(--border2); color: var(--text-mid); font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.05em; width: 20%;">Focus Area</th>
-                        <th style="padding: 20px; border-bottom: 1px solid var(--border2); color: #ff4a4a; font-size: 1.1rem; width: 40%;"><i class="fa-solid fa-xmark"></i> Legacy HR Tech</th>
-                        <th style="padding: 20px; border-bottom: 1px solid var(--border2); color: var(--green); font-size: 1.2rem; width: 40%;"><i class="fa-solid fa-check-double"></i> Respawn Logics</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td style="padding: 20px; border-bottom: 1px solid var(--border2); color: var(--text); font-weight: 600;">Architecture</td>
-                        <td style="padding: 20px; border-bottom: 1px solid var(--border2); color: var(--text-mid);">"Frankenstein" integrations. You buy an ATS, an HRIS, and a Payroll system from 3 different vendors and try to tape them together.</td>
-                        <td style="padding: 20px; border-bottom: 1px solid var(--border2); color: var(--text); background: rgba(0,224,122,0.03);"><strong>A Unified Ecosystem.</strong> Candidate data flows natively from ATS directly into the Employee Directory and straight into Payroll. Zero double-entry.</td>
-                    </tr>
-                    <tr>
-                        <td style="padding: 20px; border-bottom: 1px solid var(--border2); color: var(--text); font-weight: 600;">User Experience</td>
-                        <td style="padding: 20px; border-bottom: 1px solid var(--border2); color: var(--text-mid);">Clunky, slow interfaces that look like they were built in 2005. Employees dread using them.</td>
-                        <td style="padding: 20px; border-bottom: 1px solid var(--border2); color: var(--text); background: rgba(0,224,122,0.03);"><strong>Modern &amp; Effortless.</strong> A fast, clean interface your team actually enjoys using — no training manual required.</td>
-                    </tr>
-                    <tr>
-                        <td style="padding: 20px; border-bottom: 1px solid var(--border2); color: var(--text); font-weight: 600;">PH Compliance</td>
-                        <td style="padding: 20px; border-bottom: 1px solid var(--border2); color: var(--text-mid);">Generic payroll engines or hardcoded rules that break entirely whenever BIR, SSS, or PhilHealth changes rates.</td>
-                        <td style="padding: 20px; border-bottom: 1px solid var(--border2); color: var(--text); background: rgba(0,224,122,0.03);"><strong>Versioned Statutory Tables.</strong> Built specifically for the Philippines. Statutory changes are data updates, keeping historical runs 100% accurate.</td>
-                    </tr>
-                    <tr>
-                        <td style="padding: 20px; border-bottom: 1px solid var(--border2); color: var(--text); font-weight: 600;">Data Security</td>
-                        <td style="padding: 20px; border-bottom: 1px solid var(--border2); color: var(--text-mid);">Weak access controls. Everything ends up exported to insecure Excel spreadsheets to make reporting work.</td>
-                        <td style="padding: 20px; border-bottom: 1px solid var(--border2); color: var(--text); background: rgba(0,224,122,0.03);"><strong>Bank-Grade &amp; Audit-Ready.</strong> Bank-level encryption, strict role-based access, and tamper-proof activity logs on every record.</td>
-                    </tr>
-                    <tr>
-                        <td style="padding: 20px; border-bottom: none; color: var(--text); font-weight: 600;">Pricing Model</td>
-                        <td style="padding: 20px; border-bottom: none; color: var(--text-mid);">Predatory "Pay-Per-Module" pricing. Want the ATS? That's extra. Need Service Desk? Another contract.</td>
-                        <td style="padding: 20px; border-bottom: none; color: var(--text); background: rgba(0,224,122,0.03);"><strong>All-Inclusive Suite.</strong> You get the entire platform—Core HR, ATS, Payroll, ELR, Service Desk, and Attendance—out of the box.</td>
-                    </tr>
-                </tbody>
-            </table>
+        <style>
+          .ov-stage { display:grid; grid-template-columns:1fr auto 1fr; align-items:center; gap:10px; border:1px solid var(--border2); border-radius:20px; padding:44px 36px; background:radial-gradient(ellipse 55% 90% at 100% 50%, rgba(0,224,122,0.07), transparent 70%); transform:translateZ(0); }
+          .ov-label { font-family:var(--mono); font-size:0.62rem; letter-spacing:0.12em; text-transform:uppercase; margin-bottom:18px; }
+          .ov-old .ov-label { color:#ff6472; }
+          .ov-new .ov-label { color:var(--green); }
+          .ov-mess { display:flex; flex-wrap:wrap; gap:10px; }
+          .ov-chip { display:flex; align-items:center; gap:7px; font-size:0.8rem; color:var(--text-mid); background:rgba(255,255,255,0.02); border:1px dashed rgba(255,100,114,0.3); border-radius:8px; padding:8px 12px; filter:grayscale(0.55); opacity:0.72; }
+          .ov-chip:nth-child(odd){ transform:rotate(-2.5deg); } .ov-chip:nth-child(even){ transform:rotate(2deg); }
+          .ov-chip .dot { width:6px; height:6px; border-radius:50%; background:#ff6472; box-shadow:0 0 6px #ff6472; }
+          .ov-cap { margin-top:18px; font-size:0.82rem; color:var(--text-dim); }
+          .ov-cap b { color:#ff6472; } .ov-cap.good b { color:var(--green); }
+          .ov-burst { display:flex; flex-direction:column; align-items:center; gap:9px; padding:0 8px; }
+          .ov-burst .orb { width:62px; height:62px; border-radius:50%; background:radial-gradient(circle, rgba(0,224,122,0.95), rgba(0,224,122,0.25)); display:flex; align-items:center; justify-content:center; color:#001a0f; animation:ovPulse 3s ease-in-out infinite; }
+          @keyframes ovPulse { 0%,100%{ box-shadow:0 0 22px rgba(0,224,122,0.4);} 50%{ box-shadow:0 0 48px rgba(0,224,122,0.8);} }
+          .ov-burst .lbl { font-family:var(--mono); font-size:0.58rem; letter-spacing:0.14em; text-transform:uppercase; color:var(--green); }
+          .ov-core { background:linear-gradient(180deg, rgba(0,224,122,0.1), rgba(0,224,122,0.02)); border:1px solid rgba(0,224,122,0.4); border-radius:14px; padding:20px; box-shadow:0 0 42px rgba(0,224,122,0.1); }
+          .ov-core-head { display:flex; align-items:center; gap:9px; font-weight:800; color:#fff; font-size:1rem; margin-bottom:14px; }
+          .ov-core-head i { color:var(--green); }
+          .ov-mods { display:flex; flex-wrap:wrap; gap:8px; }
+          .ov-mod { font-size:0.78rem; color:var(--green); background:rgba(0,224,122,0.1); border:1px solid rgba(0,224,122,0.25); border-radius:7px; padding:6px 11px; }
+          @media (max-width:820px){ .ov-stage{ grid-template-columns:1fr; gap:26px; } .ov-burst{ flex-direction:row; } .ov-burst .orb{ transform:rotate(90deg); } }
+        </style>
+
+        <div class="ov-stage">
+          <div class="ov-old">
+            <div class="ov-label">✕ Before — the patchwork</div>
+            <div class="ov-mess">
+              <div class="ov-chip"><span class="dot"></span> Standalone ATS</div>
+              <div class="ov-chip"><span class="dot"></span> Payroll vendor</div>
+              <div class="ov-chip"><span class="dot"></span> Timekeeping app</div>
+              <div class="ov-chip"><span class="dot"></span> Spreadsheets</div>
+              <div class="ov-chip"><span class="dot"></span> Manual CSV imports</div>
+              <div class="ov-chip"><span class="dot"></span> Duplicate employee records</div>
+            </div>
+            <div class="ov-cap"><b>5+ tools · 5+ logins</b> — double-entry everywhere</div>
+          </div>
+
+          <div class="ov-burst">
+            <div class="orb"><i data-lucide="zap"></i></div>
+            <div class="lbl">Respawn</div>
+          </div>
+
+          <div class="ov-new">
+            <div class="ov-label">✓ After — one platform</div>
+            <div class="ov-core">
+              <div class="ov-core-head"><i data-lucide="layout-grid"></i> Respawn Logics</div>
+              <div class="ov-mods">
+                <div class="ov-mod">Core HR</div>
+                <div class="ov-mod">ATS</div>
+                <div class="ov-mod">Payroll</div>
+                <div class="ov-mod">Attendance</div>
+                <div class="ov-mod">Employee Relations</div>
+                <div class="ov-mod">Service Desk</div>
+              </div>
+            </div>
+            <div class="ov-cap good"><b>1 platform · 1 login</b> — everything wired together</div>
+          </div>
         </div>
     </div>
 </section>
@@ -3543,19 +3566,84 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
 </div>
 
 <!-- SECTION 6: PLATFORM CTA -->
-<section class="gaming-cta" style="border-top: 1px solid var(--border3);">
-    <div class="story-container">
-        <h2 style="font-size: 2.5rem; color: var(--text); margin-bottom: 20px;">A Better Way to Manage Operations</h2>
-        <p style="color: var(--text-mid); font-size: 1.125rem; max-width: 600px; margin: 0 auto;">Equip your operations team with a unified command center. No more juggling ten different tabs just to onboard a single employee or process payroll.</p>
-        
-        <div class="gaming-flow">
-            <div class="gaming-step"><i data-lucide="map-pin"></i> Get Set Up</div>
-            <i data-lucide="chevron-right" class="gaming-divider"></i>
-            <div class="gaming-step"><i data-lucide="users"></i> Scale Your Team</div>
-            <i data-lucide="chevron-right" class="gaming-divider"></i>
-            <div class="gaming-step"><i data-lucide="trending-up"></i> Track Performance</div>
-            <i data-lucide="chevron-right" class="gaming-divider"></i>
-            <div class="gaming-step"><i data-lucide="shield-alert"></i> Unified Support</div>
+<section class="gaming-cta" id="how-it-works" style="border-top: 1px solid var(--border3);">
+    <div class="story-container" style="max-width: 1120px;">
+        <div style="text-align:center; transform: translateZ(0); will-change: transform;">
+            <div style="font-family: var(--mono); font-size: 0.72rem; color: var(--green); letter-spacing: 0.14em; text-transform: uppercase; margin-bottom: 16px;">// HOW IT WORKS</div>
+            <h2 style="font-size: clamp(2rem, 4vw, 2.75rem); color: #fff; margin-bottom: 16px; font-weight: 700; letter-spacing: -0.02em;">A better way to manage operations</h2>
+            <p style="color: var(--text-mid); font-size: 1.125rem; max-width: 640px; margin: 0 auto;">One command center instead of ten browser tabs. Here's exactly what happens — from your first day to everyday.</p>
+        </div>
+
+        <!-- HOW IT WORKS: 4 concrete steps -->
+        <div class="trust-shield" style="margin-top: 52px;">
+            <div class="trust-badge" style="text-align:left;">
+                <div style="display:flex; align-items:center; gap:10px;"><span style="font-family:var(--mono); color:var(--green); font-size:0.8rem; font-weight:700;">01</span><i data-lucide="map-pin"></i></div>
+                <h4>Get set up — the same day</h4>
+                <p>Your workspace arrives pre-loaded with current SSS, PhilHealth, Pag-IBIG, and BIR tables, roles, and secure storage. Import your team from a spreadsheet and you're live in an afternoon — not a months-long rollout.</p>
+            </div>
+            <div class="trust-badge" style="text-align:left;">
+                <div style="display:flex; align-items:center; gap:10px;"><span style="font-family:var(--mono); color:var(--green); font-size:0.8rem; font-weight:700;">02</span><i data-lucide="users"></i></div>
+                <h4>Scale your team</h4>
+                <p>Hire through the ATS; an accepted candidate becomes an employee with a 201 file, contract, and payroll record automatically — zero re-typing. Add 5 people or 500, it's the same few clicks.</p>
+            </div>
+            <div class="trust-badge" style="text-align:left;">
+                <div style="display:flex; align-items:center; gap:10px;"><span style="font-family:var(--mono); color:var(--green); font-size:0.8rem; font-weight:700;">03</span><i data-lucide="trending-up"></i></div>
+                <h4>Track everything</h4>
+                <p>Attendance, overtime, leave, and reviews all attach to one record per employee. Payroll reads straight from that data, so a run is one click and every peso traces back to a timesheet.</p>
+            </div>
+            <div class="trust-badge" style="text-align:left;">
+                <div style="display:flex; align-items:center; gap:10px;"><span style="font-family:var(--mono); color:var(--green); font-size:0.8rem; font-weight:700;">04</span><i data-lucide="life-buoy"></i></div>
+                <h4>Support everyone</h4>
+                <p>Employees pull their own payslips, file leave, and open tickets; HR only handles the exceptions. One login, one source of truth — no more chasing spreadsheets across ten tabs.</p>
+            </div>
+        </div>
+
+        <!-- OBJECTION BUSTERS -->
+        <div style="text-align:center; margin-top:72px; transform: translateZ(0); will-change: transform;">
+            <h3 style="font-size:clamp(1.4rem,3vw,1.9rem); color:#fff; font-weight:700; letter-spacing:-0.02em;">Still wondering how we're different?</h3>
+        </div>
+        <div class="trust-shield" style="margin-top:28px;">
+            <div class="trust-badge" style="text-align:left;">
+                <i data-lucide="landmark"></i>
+                <h4>Built for PH compliance</h4>
+                <p>Statutory rates are versioned data — when BIR, SSS, or PhilHealth changes, it's an update, not a broken payroll run. Historical runs stay accurate.</p>
+            </div>
+            <div class="trust-badge" style="text-align:left;">
+                <i data-lucide="package"></i>
+                <h4>One price, everything in</h4>
+                <p>Core HR, ATS, Payroll, ELR, Service Desk, and Attendance — all included. No per-module upsells, no surprise second contract.</p>
+            </div>
+            <div class="trust-badge" style="text-align:left;">
+                <i data-lucide="shield-check"></i>
+                <h4>Isolated &amp; audit-ready</h4>
+                <p>Each company's data is walled off, encrypted bank-level, role-restricted, and every change is logged in a tamper-proof trail.</p>
+            </div>
+            <div class="trust-badge" style="text-align:left;">
+                <i data-lucide="download"></i>
+                <h4>No lock-in</h4>
+                <p>Your data is yours. Export employees, payroll, and full history anytime — we earn your stay, we don't trap it.</p>
+            </div>
+        </div>
+
+        <!-- FAQ -->
+        <div style="max-width:780px; margin: 76px auto 0; text-align:left; transform: translateZ(0); will-change: transform;">
+            <h3 style="font-size:clamp(1.4rem,3vw,1.9rem); color:#fff; font-weight:700; letter-spacing:-0.02em; text-align:center; margin-bottom:28px;">Questions you're probably asking</h3>
+            <details style="border:1px solid var(--border2); border-radius:10px; padding:16px 20px; margin-bottom:12px; background:rgba(255,255,255,0.02);">
+                <summary style="cursor:pointer; font-weight:600; color:var(--text);">How much does it cost?</summary>
+                <p style="color:var(--text-mid); margin-top:10px; line-height:1.65;">One all-inclusive plan covers the entire platform — no per-module pricing. Early partners join <strong style="color:var(--green);">free during the beta</strong> and help shape the roadmap while we onboard them hands-on.</p>
+            </details>
+            <details style="border:1px solid var(--border2); border-radius:10px; padding:16px 20px; margin-bottom:12px; background:rgba(255,255,255,0.02);">
+                <summary style="cursor:pointer; font-weight:600; color:var(--text);">Is our employee data safe?</summary>
+                <p style="color:var(--text-mid); margin-top:10px; line-height:1.65;">Yes. Each company's data is fully isolated, encrypted with the same AES-256 standard banks use, and access is role-restricted so people only see what their role allows. Every change, login, and file access is recorded in a tamper-proof audit trail, and files are never stored anywhere a browser could reach.</p>
+            </details>
+            <details style="border:1px solid var(--border2); border-radius:10px; padding:16px 20px; margin-bottom:12px; background:rgba(255,255,255,0.02);">
+                <summary style="cursor:pointer; font-weight:600; color:var(--text);">How hard is it to switch from our current setup?</summary>
+                <p style="color:var(--text-mid); margin-top:10px; line-height:1.65;">Import your people straight from a spreadsheet; the PH statutory tables are already loaded, so most teams are running the same day. And because you can export everything anytime, there's no lock-in if you ever want to leave.</p>
+            </details>
+            <details style="border:1px solid var(--border2); border-radius:10px; padding:16px 20px; margin-bottom:12px; background:rgba(255,255,255,0.02);">
+                <summary style="cursor:pointer; font-weight:600; color:var(--text);">Is it actually ready, or still experimental?</summary>
+                <p style="color:var(--text-mid); margin-top:10px; line-height:1.65;">We're in beta and onboarding early partners directly. The core is built and running — statutory payroll, attendance, hiring, employee records, and audit-ready security. Early partners get hands-on support and a direct line to shape what ships next.</p>
+            </details>
         </div>
     </div>
 </section>
