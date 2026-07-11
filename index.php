@@ -2962,7 +2962,7 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
                 <div style="font-family:var(--mono);font-size:0.75rem;color:var(--text-dim);margin:0 auto;">Respawn Logics — Operations Center</div>
             </div>
             <!-- iframe -->
-            <iframe src="<?= rtrim(dirname($_SERVER['SCRIPT_NAME']), '/') ?>/demo/index.html"
+            <iframe src="<?= url('/demo/index.html') ?>"
                 title="Respawn Logics — live demo"
                 style="width:100%;height:640px;border:0;display:block;background:#0d0f1a;"></iframe>
         </div>
