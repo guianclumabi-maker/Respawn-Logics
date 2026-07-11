@@ -3504,54 +3504,6 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
     </div>
 </section>
 
-<!-- TESTIMONIALS -->
-<div class="testimonials-section">
-    <div class="testimonials-inner">
-        <div class="stat-eyebrow">// WHAT TEAMS ARE SAYING</div>
-        <h2 style="font-size: clamp(2rem, 4vw, 2.75rem); font-weight: 700; color: var(--text); letter-spacing: -0.03em; margin-top: 12px;">Built with teams. Loved by builders.</h2>
-        <div class="testimonials-grid">
-            <div class="testimonial-card">
-                <div class="testimonial-stars">
-                    <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
-                </div>
-                <p class="testimonial-quote">"Finally a system that doesn't make me dread Monday payroll runs. The statutory tables just work — SSS, PhilHealth, BIR all auto-computed."</p>
-                <div class="testimonial-author">
-                    <div class="testimonial-avatar" style="background: rgba(0,224,122,0.15); color: var(--green);">JM</div>
-                    <div>
-                        <div class="testimonial-name">Jasmine Montoya</div>
-                        <div class="testimonial-role">HR Director · NovaTech PH</div>
-                    </div>
-                </div>
-            </div>
-            <div class="testimonial-card">
-                <div class="testimonial-stars">
-                    <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
-                </div>
-                <p class="testimonial-quote">"The ATS pipeline alone saved us 3 weeks of onboarding time. Candidates move from sourced to offer without any double-entry or copy-pasting."</p>
-                <div class="testimonial-author">
-                    <div class="testimonial-avatar" style="background: rgba(79,142,247,0.15); color: var(--blue);">RC</div>
-                    <div>
-                        <div class="testimonial-name">Rafael Cruz</div>
-                        <div class="testimonial-role">CTO · Pillar Financial</div>
-                    </div>
-                </div>
-            </div>
-            <div class="testimonial-card">
-                <div class="testimonial-stars">
-                    <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star-half-stroke"></i>
-                </div>
-                <p class="testimonial-quote">"We migrated our entire HRIS in a weekend. The file isolation architecture gave our legal team confidence that employee data is properly secured."</p>
-                <div class="testimonial-author">
-                    <div class="testimonial-avatar" style="background: rgba(245,166,35,0.15); color: var(--amber);">AL</div>
-                    <div>
-                        <div class="testimonial-name">Andrea Lim</div>
-                        <div class="testimonial-role">COO · GlobalHire Corp</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
 
 <!-- SECURITY & TRUST SECTION -->
 <div class="trust-section">
