@@ -20,13 +20,27 @@ if (sentryDsn && sentryDsn !== "https://examplePublicKey@o0.ingest.sentry.io/0")
   });
 }
 
+import { getMockResponse } from './demoMockApi';
+
 // Global fetch interceptor to handle session expiration
 const originalFetch = window.fetch;
 const API_BASE = import.meta.env.VITE_API_BASE_URL || "";
 window.fetch = async (...args) => {
+  const urlString = typeof args[0] === 'string' ? args[0] : (args[0] instanceof Request ? args[0].url : '');
+  
+  if (window.location.href.includes('demo=true')) {
+    const mockData = getMockResponse(urlString);
+    if (mockData) {
+      return new Response(JSON.stringify(mockData), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
+  }
+
   const response = await originalFetch(...args);
   if (response.status === 401) {
-    const url = typeof args[0] === 'string' ? args[0] : (args[0] instanceof Request ? args[0].url : '');
+    const url = urlString;
     // Ignore 401s for initial auth/csrf checks to prevent immediate lockout
     if (!url.includes('action=current_user') && !url.includes('action=csrf') && !url.includes('action=login') && !url.includes('action=exchange_token')) {
       if (!window.location.href.includes('demo=true')) {
