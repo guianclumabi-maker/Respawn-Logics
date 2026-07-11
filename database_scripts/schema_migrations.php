@@ -36,5 +36,6 @@ return [
     'migrate_permissions_sync.php',
     'migrate_must_change_password.php',
     'migrate_notifications.php',
-    'migrate_elr_collations.php'
+    'migrate_elr_collations.php',
+    'migrate_encryption_columns.php'
 ];
