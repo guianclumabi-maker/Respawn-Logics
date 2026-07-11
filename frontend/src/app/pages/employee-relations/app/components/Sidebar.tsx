@@ -1,4 +1,6 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../../../context/AuthContext";
 import {
   LayoutDashboard,
   Briefcase,
@@ -53,10 +55,6 @@ const employeeNavItems: NavItem[] = [
 
 const basePath = window.location.hostname === 'localhost' ? '/respawn-logics' : '';
 
-const bottomItems = [
-  { label: "Return to Workspace", icon: <ArrowLeft size={20} />, path: `${basePath}/frontend/dist/index.html#/dashboard`, highlight: true },
-];
-
 type SidebarProps = {
   activeView: string;
   onViewChange: (view: any) => void;
@@ -68,33 +66,31 @@ export function Sidebar({ activeView, onViewChange, mode = "admin", onStartTour 
   const navItems = mode === "employee" ? employeeNavItems : adminNavItems;
   const [collapsed, setCollapsed] = useState(false);
   const [expanded, setExpanded] = useState<string>("Cases");
+  
+  const { user } = useAuth();
+  const navigate = useNavigate();
+
   const [sessionUser, setSessionUser] = useState<{ full_name: string; role: string; initials: string; department?: string; profile_image?: string } | null>(null);
 
   useEffect(() => {
-    fetch(`${basePath}/api/index.php?route=candidates&action=current_user`)
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.success && data.user) {
-          const names = data.user.full_name.split(" ");
-          const initials = names.map((n: string) => n[0]).join("").substring(0, 2).toUpperCase();
-          
-          let roleFallback = data.user.role ? (data.user.role.toLowerCase() === 'super_admin' ? 'Employee' : data.user.role.charAt(0).toUpperCase() + data.user.role.slice(1)) : "Employee";
-          let roleDesc = data.user.job_title ? data.user.job_title : roleFallback;
-          if (data.user.department) {
-            roleDesc += ` • ${data.user.department}`;
-          }
-          
-          setSessionUser({
-            full_name: data.user.full_name,
-            role: roleDesc,
-            department: data.user.department,
-            initials: initials,
-            profile_image: data.user.profile_image,
-          });
-        }
-      })
-      .catch(() => {});
-  }, []);
+    if (user) {
+      const names = user.name.split(" ");
+      const initials = names.map((n: string) => n[0]).join("").substring(0, 2).toUpperCase();
+      
+      let roleFallback = user.role ? (user.role.toLowerCase() === 'super_admin' ? 'Employee' : user.role.charAt(0).toUpperCase() + user.role.slice(1)) : "Employee";
+      let roleDesc = user.job_title ? user.job_title : roleFallback;
+      
+      setSessionUser({
+        full_name: user.name,
+        role: roleDesc,
+        department: (user as any).department,
+        initials: initials,
+        profile_image: user.profile_image,
+      });
+    } else {
+      setSessionUser(null);
+    }
+  }, [user]);
 
   const toggle = (label: string) =>
     setExpanded((prev) => (prev === label ? "" : label));
@@ -248,7 +244,7 @@ export function Sidebar({ activeView, onViewChange, mode = "admin", onStartTour 
           {/* Back to Workspace — directly below the last nav item (Analytics) */}
           <button
             onClick={() => {
-              window.location.href = `${basePath}/frontend/dist/index.html#/dashboard`;
+              navigate("/dashboard");
             }}
             className="w-full flex items-center gap-3 px-4 py-3 mt-1.5 rounded-xl text-primary hover:bg-accent text-left cursor-pointer transition-all"
           >
