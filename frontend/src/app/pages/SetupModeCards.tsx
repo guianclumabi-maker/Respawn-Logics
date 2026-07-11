@@ -29,11 +29,11 @@ export function SetupModeCards() {
         </a>
 
         <div className="hidden md:flex items-center gap-[30px] text-[0.9rem] font-medium text-[#8b95a8]" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
-          <a href={API_BASE + "/index.php"} className="flex items-center gap-2 hover:text-foreground transition-colors no-underline text-sm px-3 py-1.5 rounded-md hover:bg-accent">
+          <a href={API_BASE + "/index.php"} className="inline-flex items-center justify-center h-[36px] gap-2 hover:text-foreground transition-colors no-underline text-sm px-3 rounded-md hover:bg-accent">
             <i className="fa-solid fa-arrow-left"></i> Back to Home
           </a>
           
-          <a href={API_BASE + "/login.php"} className="font-['JetBrains_Mono'] text-[0.8rem] font-bold tracking-[0.04em] text-black bg-[#00e07a] px-[20px] py-[9px] rounded-[5px] no-underline transition-all hover:bg-card hover:-translate-y-[1px] hover:shadow-[0_4px_16px_rgba(0,224,122,0.3)] ml-2">
+          <a href={API_BASE + "/login.php"} className="inline-flex items-center justify-center h-[36px] font-['JetBrains_Mono'] text-[0.8rem] font-bold tracking-[0.04em] text-black bg-[#00e07a] px-[20px] rounded-[5px] no-underline transition-all hover:bg-card hover:-translate-y-[1px] hover:shadow-[0_4px_16px_rgba(0,224,122,0.3)] ml-2">
             [ LOGIN ]
           </a>
         </div>
