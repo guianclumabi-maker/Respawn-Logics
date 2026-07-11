@@ -307,8 +307,8 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
             color: #000;
             font-family: var(--sans);
             font-weight: 600;
-            font-size: 1.35rem;
-            padding: 20px 48px;
+            font-size: 1.1rem;
+            padding: 16px 36px;
             border-radius: 999px;
             border: none;
             cursor: pointer;
@@ -329,8 +329,8 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
             color: #fff;
             font-family: var(--sans);
             font-weight: 500;
-            font-size: 1.35rem;
-            padding: 20px 48px;
+            font-size: 1.1rem;
+            padding: 16px 36px;
             border-radius: 999px;
             border: 1px solid rgba(255,255,255,0.15);
             cursor: pointer;
