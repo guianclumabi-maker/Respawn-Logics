@@ -1726,7 +1726,7 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
 
         /* ─── STAT COUNTERS ─── */
         .stat-belt {
-            padding: 100px 24px;
+            padding: 60px 24px;
             background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(0,224,122,0.05), transparent);
             border-bottom: 1px solid var(--border3);
         }
@@ -1748,7 +1748,7 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
             font-weight: 700;
             color: var(--text);
             letter-spacing: -0.03em;
-            margin-bottom: 80px;
+            margin-bottom: 40px;
             line-height: 1.15;
         }
         .stat-grid {
