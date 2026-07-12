@@ -25,6 +25,16 @@ class EmployeeRelationsController
              $action = $input['action'] ?? $action;
         }
 
+        // --- Authorization: reads require elr.view, writes require elr.investigate ---
+        // (consistent with ELRController/ELRPipelineController; is_super bypass matches CompensationController)
+        $writeActions = ['add', 'update_stage', 'update_rating', 'delete'];
+        $needed = in_array($action, $writeActions, true) ? 'elr.investigate' : 'elr.view';
+        if (!hasPermission($needed) && empty($_SESSION['is_super'])) {
+            http_response_code(403);
+            echo json_encode(['success' => false, 'error' => 'Forbidden — you do not have access to Employee Relations.']);
+            return;
+        }
+
         try {
             switch ($action) {
                 case 'dashboard':
