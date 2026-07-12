@@ -32,10 +32,11 @@ class SecurityRegressionTest extends TestCase
         $this->tenantA = FixtureHelper::createTenant($pdo, 'Tenant Alpha');
         $this->tenantB = FixtureHelper::createTenant($pdo, 'Tenant Beta');
 
-        // Tenant A users
-        $this->hrManagerId    = FixtureHelper::createUser($pdo, $this->tenantA, 'hr@alpha.test',   'HR Manager');
-        $this->plainEmployeeId = FixtureHelper::createUser($pdo, $this->tenantA, 'emp@alpha.test', 'Employee');
-        $this->investigatorId  = FixtureHelper::createUser($pdo, $this->tenantA, 'inv@alpha.test', 'Investigator');
+        // Tenant A users (use unique emails to prevent 1062 Duplicate Entry across tests)
+        $uniq = uniqid();
+        $this->hrManagerId    = FixtureHelper::createUser($pdo, $this->tenantA, "hr_{$uniq}@alpha.test",   'HR Manager');
+        $this->plainEmployeeId = FixtureHelper::createUser($pdo, $this->tenantA, "emp_{$uniq}@alpha.test", 'Employee');
+        $this->investigatorId  = FixtureHelper::createUser($pdo, $this->tenantA, "inv_{$uniq}@alpha.test", 'Investigator');
     }
 
     // ── 1. EmployeeRelationsController — Authorization gate ───────────────
