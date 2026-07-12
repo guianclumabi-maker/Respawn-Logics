@@ -42,7 +42,20 @@ class AICompanionController
             echo json_encode(['success' => false, 'error' => 'Message is empty']);
             return;
         }
-        
+
+        // --- Rate limit: max 20 AI messages per 5 minutes per session (LLM cost/abuse guard) ---
+        $now = time();
+        $window = 300; $max = 20;
+        $_SESSION['ai_hits'] = array_values(array_filter($_SESSION['ai_hits'] ?? [], function ($t) use ($now, $window) {
+            return $t > $now - $window;
+        }));
+        if (count($_SESSION['ai_hits']) >= $max) {
+            http_response_code(429);
+            echo json_encode(['success' => false, 'error' => 'You are sending messages too quickly. Please wait a minute and try again.']);
+            return;
+        }
+        $_SESSION['ai_hits'][] = $now;
+
         $messageLower = strtolower($message);
         $reply = "";
 
