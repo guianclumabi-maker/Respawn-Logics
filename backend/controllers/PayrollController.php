@@ -181,8 +181,8 @@ class PayrollController
                         require_once __DIR__ . '/../utils/PayslipGenerator.php';
                         
                         // Fetch Run details for period and pay date
-                        $runStmt = $this->pdo->prepare("SELECT payroll_period_start, payroll_period_end, pay_date FROM payroll_runs WHERE id = ?");
-                        $runStmt->execute([$runId]);
+                        $runStmt = $this->pdo->prepare("SELECT payroll_period_start, payroll_period_end, pay_date FROM payroll_runs WHERE id = ? AND tenant_id = ?");
+                        $runStmt->execute([$runId, $this->tenantId]);
                         $runDetails = $runStmt->fetch();
                         $periodStr = $runDetails['payroll_period_start'] . ' to ' . $runDetails['payroll_period_end'];
                         $payDateStr = $runDetails['pay_date'];

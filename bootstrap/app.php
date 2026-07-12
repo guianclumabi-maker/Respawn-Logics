@@ -391,3 +391,29 @@ if (!function_exists('buildUserPayload')) {
         ];
     }
 }
+
+if (!function_exists('assertOwned')) {
+    /**
+     * Asserts that a record in the specified table belongs to the current tenant.
+     * Returns the record if found, otherwise emits a 404 response and exits.
+     */
+    function assertOwned(PDO $pdo, string $table, $id, string $tenantId) {
+        if (!preg_match('/^[a-zA-Z0-9_]+$/', $table)) {
+            http_response_code(500);
+            echo json_encode(['success' => false, 'error' => 'Invalid table name']);
+            exit;
+        }
+
+        $stmt = $pdo->prepare("SELECT * FROM `$table` WHERE id = ? AND tenant_id = ?");
+        $stmt->execute([$id, $tenantId]);
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if (!$row) {
+            http_response_code(404);
+            echo json_encode(['success' => false, 'error' => 'Resource not found.']);
+            exit;
+        }
+
+        return $row;
+    }
+}

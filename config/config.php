@@ -10,11 +10,11 @@ return [
                     : rtrim($env['APP_URL'] ?? 'http://localhost/respawn-logics', '/')
     ],
     'database' => [
-        'host' => $env['DB_HOST'] ?? 'localhost',
-        'port' => $env['DB_PORT'] ?? 3306,
-        'name' => $env['DB_NAME'] ?? 'employee_system',
-        'user' => $env['DB_USER'] ?? 'root',
-        'pass' => $env['DB_PASS'] ?? ''
+        'host' => $env['DB_HOST'] ?? $env['MYSQLHOST'] ?? 'localhost',
+        'port' => $env['DB_PORT'] ?? $env['MYSQLPORT'] ?? 3306,
+        'name' => $env['DB_NAME'] ?? $env['MYSQLDATABASE'] ?? 'employee_system',
+        'user' => $env['DB_USER'] ?? $env['MYSQLUSER'] ?? 'root',
+        'pass' => $env['DB_PASS'] ?? $env['MYSQLPASSWORD'] ?? ''
     ],
     'session' => [
         'timeout' => (int)($env['SESSION_TIMEOUT'] ?? 3600),
