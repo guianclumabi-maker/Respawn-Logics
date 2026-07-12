@@ -2,25 +2,51 @@ node_modules/
 onboarding/node_modules/
 recruitment/node_modules/
 employee-relations/node_modules/
+mobile/node_modules/
 .env
-scratch/
 *.log
 .DS_Store
 
+# Build artifacts
 storage/tenant_*/
 !storage/.htaccess
 vendor/
 
-# Local DB backups (contain data / connection details — never commit)
-backup_db.bat
-respawn_backup_*.sql
+# ── Data / backup files — NEVER commit these ──────────────────────────────
+# Any SQL file anywhere (backups, dumps, migrations in scratch)
+*.sql
+# CSV imports / exports (may contain employee PII)
+*.csv
+# Backup files
+*.bak
+*.dump
+*.zip
 
-# Additional build/test/temporary exclusions
+# Named backup patterns
+railway_backup*.sql
+respawn_backup*.sql
+backups/
+backup_db.bat
+
+# ── Web-root one-off scripts (not app code) ───────────────────────────────
+open_pr.php
+diff.php
+check_perms.php
+check_tables.php
+create_sandbox.php
+test_user_perms.php
+debug_*.php
+scratch_*.php
+fix_*.php
+
+# ── Archive directory (dead code / historical artefacts) ──────────────────
+archive/
+
+# ── Test / CI scratch output ──────────────────────────────────────────────
 phpunit_*.txt
 test_output.txt
-debug_*.php
 composer.phar
 phpunit.phar
-*.zip
-*.sql
-mobile/node_modules/
+
+# ── Scratch directory (already ignored, make it explicit) ─────────────────
+scratch/
