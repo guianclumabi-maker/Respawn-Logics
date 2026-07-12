@@ -142,7 +142,7 @@ try {
     }
 
     // Seed Roles & Mappings for each Tenant
-    $tenants = $pdo->query("SELECT DISTINCT tenant_id FROM users")->fetchAll();
+    $tenants = $pdo->query("SELECT id AS tenant_id FROM tenants")->fetchAll();
     foreach ($tenants as $t) {
         $tenantId = $t['tenant_id'];
 
