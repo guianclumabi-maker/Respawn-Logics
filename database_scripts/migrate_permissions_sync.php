@@ -43,7 +43,7 @@ while ($row = $allPermsStmt->fetch()) {
 }
 
 // Sync new permissions for existing roles across all tenants
-$tenants = $pdo->query("SELECT DISTINCT tenant_id FROM users")->fetchAll();
+$tenants = $pdo->query("SELECT id AS tenant_id FROM tenants")->fetchAll();
 foreach ($tenants as $t) {
     $tenantId = $t['tenant_id'];
 

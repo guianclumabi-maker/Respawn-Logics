@@ -29,8 +29,9 @@ class SecurityRegressionTest extends TestCase
         global $pdo;
         $this->pdo = $pdo;
 
-        $this->tenantA = FixtureHelper::createTenant($pdo, 'Tenant Alpha');
-        $this->tenantB = FixtureHelper::createTenant($pdo, 'Tenant Beta');
+        // Use globally seeded tenants so they have IAM roles populated from the migrations
+        $this->tenantA = '1';
+        $this->tenantB = 'TENANT_A';
 
         // Tenant A users (use unique emails to prevent 1062 Duplicate Entry across tests)
         $uniq = uniqid();
