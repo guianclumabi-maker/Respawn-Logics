@@ -3414,6 +3414,24 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
         <div class="changelog-row">
             <div class="changelog-card">
                 <div class="changelog-header">
+                    <span class="changelog-version">v2.7.0</span>
+                    <span class="changelog-date">Jul 12, 2026</span>
+                </div>
+                <div class="changelog-title">Tenant IDOR Verification Sweep</div>
+                <p class="changelog-desc">Enforced strict data isolation across the platform. Dynamically mutated schemas for composite indexing and patched controller queries.</p>
+            </div>
+            
+            <div class="changelog-card">
+                <div class="changelog-header">
+                    <span class="changelog-version">v2.6.0</span>
+                    <span class="changelog-date">Jul 11, 2026</span>
+                </div>
+                <div class="changelog-title">Automated CI/CD Pipeline</div>
+                <p class="changelog-desc">Introduced automated branch protection workflows with PHPUnit integration tests and frontend TypeScript checking.</p>
+            </div>
+
+            <div class="changelog-card">
+                <div class="changelog-header">
                     <span class="changelog-version">v2.5.0</span>
                     <span class="changelog-date">Jul 10, 2026</span>
                 </div>
@@ -3421,27 +3439,11 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
                 <p class="changelog-desc">Enforced security bounds. File uploads fail instantly if configured storage paths fall inside the public web root directory.</p>
             </div>
             
-            <div class="changelog-card">
-                <div class="changelog-header">
-                    <span class="changelog-version">v2.4.0</span>
-                    <span class="changelog-date">Jun 30, 2026</span>
-                </div>
-                <div class="changelog-title">Versioned PH Tax Tables</div>
-                <p class="changelog-desc">Integrated dynamically versioned tax calculation schemas for BIR, SSS, and PhilHealth computations, retaining historical runs accuracy.</p>
-            </div>
-            
-            <div class="changelog-card">
-                <div class="changelog-header">
-                    <span class="changelog-version">v2.3.0</span>
-                    <span class="changelog-date">Jun 12, 2026</span>
-                </div>
-                <div class="changelog-title">ELR Support ticket pipeline</div>
-                <p class="changelog-desc">Launched unified Employee Relations queues with automated case logging, status checks, and encrypted attachments.</p>
-            </div>
+            <!-- Kept recent 3 items, the rest are in patch notes -->
         </div>
         
         <div style="margin-top:40px;">
-            <a href="#" style="color:var(--green); font-family:var(--mono); text-decoration:none; font-size:0.9rem; font-weight:600;">See all updates →</a>
+            <a href="patch-notes.php" style="color:var(--green); font-family:var(--mono); text-decoration:none; font-size:0.9rem; font-weight:600;">See all updates & patch notes →</a>
         </div>
     </div>
 </section>
