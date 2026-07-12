@@ -40,8 +40,8 @@ echo "Running schema migrations...\n";
 $pdo->exec("SET FOREIGN_KEY_CHECKS = 0;");
 $coreMigrations = require __DIR__ . '/../database_scripts/schema_migrations.php';
 $migrationScripts = array_merge(
-    ['migrate_tenants.php', 'seed_admin.php', 'setup_db.php', 'iam_seed.php'],
-    array_diff($coreMigrations, ['migrate_tenants.php'])
+    $coreMigrations,
+    ['setup_db.php', 'iam_seed.php', 'seed_admin.php', 'setup_platform_tickets.php']
 );
 
 $databaseMigrations = [
