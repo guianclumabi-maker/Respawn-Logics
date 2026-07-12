@@ -83,10 +83,15 @@ class FixtureHelper {
         $stmt = $pdo->prepare("INSERT INTO users (tenant_id, first_name, last_name, full_name, email, password_hash, role) VALUES (?, 'Test', 'User', 'Test User', ?, ?, ?)");
         $stmt->execute([$tenantId, $email, password_hash('password123', PASSWORD_DEFAULT), $role]);
         $userId = (int)$pdo->lastInsertId();
+        // Link to IAM roles table
+        $stmtRole = $pdo->prepare("SELECT id FROM roles WHERE tenant_id = ? AND name = ?");
+        $stmtRole->execute([$tenantId, $role]);
+        $roleId = $stmtRole->fetchColumn();
         
-        // Ensure default permissions sync for tests
-        require_once __DIR__ . '/../services/PermissionService.php';
-        PermissionService::userPermissions($pdo, $userId, $tenantId);
+        if ($roleId) {
+            $pdo->prepare("INSERT IGNORE INTO user_roles (user_id, role_id) VALUES (?, ?)")
+                ->execute([$userId, $roleId]);
+        }
         
         return $userId;
     }
