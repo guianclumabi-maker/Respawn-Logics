@@ -303,8 +303,8 @@ class OnboardingController {
                 $processedCount++;
             }
 
-            $this->pdo->prepare("UPDATE import_batches SET total_rows = ?, success_rows = ?, failed_rows = ? WHERE id = ?")
-                ->execute([count($rows), $processedCount, $skippedCount, $batchId]);
+            $this->pdo->prepare("UPDATE import_batches SET total_rows = ?, success_rows = ?, failed_rows = ? WHERE id = ? AND tenant_id = ?")
+                ->execute([count($rows), $processedCount, $skippedCount, $batchId, $this->tenantId]);
 
             $this->pdo->commit();
 

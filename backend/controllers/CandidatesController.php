@@ -1505,12 +1505,12 @@ class CandidatesController
             // 3. Update application stage if an application exists
             $jobId = null;
             if ($appId) {
-                $appStmt = $this->pdo->prepare("SELECT job_id FROM candidate_applications WHERE id = ?");
-                $appStmt->execute([$appId]);
+                $appStmt = $this->pdo->prepare("SELECT job_id FROM candidate_applications WHERE id = ? AND tenant_id = ?");
+                $appStmt->execute([$appId, $this->tenantId]);
                 $jobId = $appStmt->fetchColumn();
 
-                $updateApp = $this->pdo->prepare("UPDATE candidate_applications SET stage = 'Hired', hired_at = NOW() WHERE id = ?");
-                $updateApp->execute([$appId]);
+                $updateApp = $this->pdo->prepare("UPDATE candidate_applications SET stage = 'Hired', hired_at = NOW() WHERE id = ? AND tenant_id = ?");
+                $updateApp->execute([$appId, $this->tenantId]);
             }
 
             // 4. Log activity
