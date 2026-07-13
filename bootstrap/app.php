@@ -382,6 +382,8 @@ if (!function_exists('buildUserPayload')) {
             'tenant_id'            => $user['tenant_id'] ?? null,
             'role'                 => $user['role'] ?? null,
             'roles'                => $roles,
+            'employment_status'    => $user['employment_status'] ?? 'Active',
+            'employee_id'          => $user['employee_id'] ?? null,
             'permissions'          => $_SESSION['permissions'] ?? [],
             'is_super'             => !empty($_SESSION['is_super']),
             'theme'                => $user['theme_preference'] ?? null,

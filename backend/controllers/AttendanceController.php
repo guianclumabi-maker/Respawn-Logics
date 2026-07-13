@@ -420,7 +420,14 @@ class AttendanceController
         $now = date('Y-m-d H:i:s');
         $today = date('Y-m-d');
         $email = $this->currentUser['email'];
-        
+
+        // Suspended employees cannot clock in.
+        if (($this->currentUser['employment_status'] ?? 'Active') === 'Suspended') {
+            http_response_code(403);
+            echo json_encode(['success' => false, 'error' => 'Your account is suspended — you cannot clock in. Please contact HR.']);
+            return;
+        }
+
         $checkStmt = $this->pdo->prepare("SELECT id, time_out FROM attendance WHERE employee_email = ? AND tenant_id = ? AND DATE(time_in) = ? ORDER BY id DESC LIMIT 1");
         $checkStmt->execute([$email, $this->tenantId, $today]);
         $existing = $checkStmt->fetch();

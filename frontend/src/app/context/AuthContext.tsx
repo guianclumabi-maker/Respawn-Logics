@@ -19,6 +19,8 @@ interface AuthUser {
   tenant_id?: number;
   tenant_setup_mode?: string;
   theme?: string;
+  employment_status?: string;
+  employee_id?: number;
   tier_config?: {
     default_scope: string;
     org_units: boolean;

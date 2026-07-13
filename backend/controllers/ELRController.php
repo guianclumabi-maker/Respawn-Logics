@@ -69,6 +69,13 @@ class ELRController
                         echo json_encode(['success' => false, 'error' => 'Invalid method']);
                     }
                     break;
+                case 'apply_sanction':
+                    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+                        $this->applySanction($input);
+                    } else {
+                        echo json_encode(['success' => false, 'error' => 'Invalid method']);
+                    }
+                    break;
                 case 'copilot':
                     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         $this->copilot($input);
@@ -750,6 +757,64 @@ class ELRController
             error_log('[' . __CLASS__ . '] ' . $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine());
             http_response_code(500);
             echo json_encode(['success' => false, 'error' => 'An internal error occurred. Please try again.']);
+        }
+    }
+
+    private function applySanction($input) {
+        requirePermission('elr.manage');
+        $id = (int)($input['id'] ?? 0);
+        $sanctionType = $input['sanction_type'] ?? '';
+        $employeeId = (int)($input['employee_id'] ?? 0);
+        
+        if (!$id || !$employeeId || !$sanctionType) {
+            http_response_code(400);
+            echo json_encode(['success' => false, 'error' => 'Case ID, Employee ID, and sanction_type are required']);
+            return;
+        }
+
+        if ($sanctionType === 'Suspension') {
+            require_once __DIR__ . '/../services/SuspensionService.php';
+            $svc = new SuspensionService($this->pdo);
+            $note = $input['note'] ?? 'ELR sanction';
+            $endDate = $input['end_date'] ?? null;
+            
+            $actorId = is_array($this->currentUser) && isset($this->currentUser['id']) ? $this->currentUser['id'] : null;
+
+            try {
+                $res = $svc->suspend($this->tenantId, $employeeId, [
+                    'reason'      => $note,
+                    'end_date'    => $endDate,
+                    'source'      => 'ELR',
+                    'elr_case_id' => $id,
+                    'actor_id'    => $actorId,
+                ]);
+
+                // Update case status to Resolved if it isn't already Closed or Resolved
+                $stmt = $this->pdo->prepare("UPDATE `elr_cases` SET `status` = 'Resolved' WHERE id = ? AND tenant_id = ? AND `status` NOT IN ('Closed', 'Resolved')");
+                $stmt->execute([$id, $this->tenantId]);
+
+                echo json_encode($res);
+            } catch (\Exception $e) {
+                http_response_code(400);
+                echo json_encode(['success' => false, 'error' => $e->getMessage()]);
+            }
+        } elseif ($sanctionType === 'Reinstate') {
+            require_once __DIR__ . '/../services/SuspensionService.php';
+            $svc = new SuspensionService($this->pdo);
+            $actorId = is_array($this->currentUser) && isset($this->currentUser['id']) ? $this->currentUser['id'] : null;
+
+            try {
+                $res = $svc->reinstate($this->tenantId, $employeeId, [
+                    'actor_id' => $actorId,
+                ]);
+                echo json_encode($res);
+            } catch (\Exception $e) {
+                http_response_code(400);
+                echo json_encode(['success' => false, 'error' => $e->getMessage()]);
+            }
+        } else {
+            http_response_code(400);
+            echo json_encode(['success' => false, 'error' => 'Unsupported sanction type']);
         }
     }
 
