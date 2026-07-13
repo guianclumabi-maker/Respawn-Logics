@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
+import { AlertTriangle, AlertCircle, X, ShieldAlert } from "lucide-react";
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || (window.location.origin + (window.location.hostname === "localhost" ? "/respawn-logics" : ""));
 const API = `${API_BASE}/api/index.php?route=core_hr`;
@@ -14,14 +15,38 @@ interface Employee {
   created_at: string;
 }
 
+interface SuspensionRecord {
+  id: number;
+  employee_id: number;
+  reason: string;
+  start_date: string;
+  end_date: string | null;
+  status: string;
+  source: string;
+  elr_case_id: number | null;
+  actor_name: string;
+  created_at: string;
+  reinstated_at: string | null;
+}
+
 export function HRDirectory() {
   const { hasPermission } = useAuth();
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
 
+  const [overdue, setOverdue] = useState<any[]>([]);
+  const [selectedEmp, setSelectedEmp] = useState<Employee | null>(null);
+  const [history, setHistory] = useState<SuspensionRecord[]>([]);
+
+  const [suspendModalOpen, setSuspendModalOpen] = useState(false);
+  const [suspendReason, setSuspendReason] = useState("");
+  const [suspendEndDate, setSuspendEndDate] = useState("");
+  const [suspendWarning, setSuspendWarning] = useState<string | null>(null);
+
   useEffect(() => {
     fetchDirectory();
+    fetchOverdue();
   }, []);
 
   const fetchDirectory = async () => {
@@ -40,6 +65,104 @@ export function HRDirectory() {
     }
   };
 
+  const fetchOverdue = async () => {
+    try {
+      const res = await fetch(`${API}&action=overdue_suspensions`, { credentials: "include" });
+      const data = await res.json();
+      if (data.success && data.data) {
+        setOverdue(data.data);
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const fetchHistory = async (empId: number) => {
+    try {
+      const res = await fetch(`${API}&action=suspension_history`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ employee_id: empId })
+      });
+      const data = await res.json();
+      if (data.success && data.data) {
+        setHistory(data.data);
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const openMaster = (emp: Employee) => {
+    setSelectedEmp(emp);
+    fetchHistory(emp.id);
+  };
+
+  const closeMaster = () => {
+    setSelectedEmp(null);
+    setHistory([]);
+  };
+
+  const handleSuspend = async () => {
+    if (!selectedEmp) return;
+    try {
+      const res = await fetch(`${API}&action=suspend_employee`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ 
+          employee_id: selectedEmp.id,
+          reason: suspendReason,
+          end_date: suspendEndDate || null
+        })
+      });
+      const data = await res.json();
+      if (data.success) {
+        if (data.warning) {
+          setSuspendWarning(data.warning);
+        } else {
+          closeSuspendModal();
+        }
+        fetchDirectory();
+        fetchHistory(selectedEmp.id);
+        setSelectedEmp({...selectedEmp, employment_status: "Suspended"});
+      } else {
+        alert(data.error || "Failed to suspend");
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const handleReinstate = async () => {
+    if (!selectedEmp) return;
+    if (!window.confirm("Are you sure you want to reinstate this employee?")) return;
+    try {
+      const res = await fetch(`${API}&action=reinstate_employee`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ employee_id: selectedEmp.id })
+      });
+      const data = await res.json();
+      if (data.success) {
+        fetchDirectory();
+        fetchHistory(selectedEmp.id);
+        fetchOverdue();
+        setSelectedEmp({...selectedEmp, employment_status: "Active"});
+      } else {
+        alert(data.error || "Failed to reinstate");
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const closeSuspendModal = () => {
+    setSuspendModalOpen(false);
+    setSuspendReason("");
+    setSuspendEndDate("");
+    setSuspendWarning(null);
+  };
+
   const filteredEmployees = employees.filter(emp => {
     const q = search.toLowerCase();
     return (
@@ -54,6 +177,7 @@ export function HRDirectory() {
     switch (status) {
       case "Active": return "bg-[#00e07a]/10 text-[#00e07a] border-[#00e07a]/20";
       case "Terminated": return "bg-red-500/10 text-red-500 border-red-500/20";
+      case "Suspended": return "bg-red-500/10 text-red-500 border-red-500/20";
       case "LOA": return "bg-amber-500/10 text-amber-500 border-amber-500/20";
       case "Probation": return "bg-[#c084fc]/10 text-[#c084fc] border-[#c084fc]/20";
       default: return "bg-gray-500/10 text-muted-foreground border-gray-500/20";
@@ -72,7 +196,7 @@ export function HRDirectory() {
   };
 
   return (
-    <div className="flex-1 flex flex-col h-full overflow-hidden">
+    <div className="flex-1 flex flex-col h-full overflow-hidden relative">
       {/* Header */}
       <div className="flex-none px-8 py-6 border-b border-border bg-card text-card-foreground/50 backdrop-blur-md">
         <div className="flex justify-between items-start">
@@ -101,8 +225,25 @@ export function HRDirectory() {
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 overflow-auto p-8">
-        <div className="bg-card text-card-foreground/70 border border-border rounded-xl flex flex-col max-h-full">
+      <div className="flex-1 overflow-auto p-8 relative flex gap-6">
+        
+        <div className="flex-1 bg-card text-card-foreground/70 border border-border rounded-xl flex flex-col max-h-full">
+          {/* Overdue Nudge */}
+          {overdue.length > 0 && (
+            <div className="bg-red-500/10 border-b border-red-500/20 p-4 flex items-center gap-3 text-red-500">
+              <ShieldAlert size={20} />
+              <div className="flex-1 text-sm font-medium">
+                There {overdue.length === 1 ? 'is' : 'are'} {overdue.length} active suspension{overdue.length === 1 ? '' : 's'} past the set end date.
+              </div>
+              <button 
+                onClick={() => alert(overdue.map(o => `${o.full_name} (${o.days_overdue} days overdue)`).join('\n'))}
+                className="text-xs bg-red-500/20 px-3 py-1.5 rounded hover:bg-red-500/30 transition-colors"
+              >
+                View Overdue
+              </button>
+            </div>
+          )}
+
           {/* Panel Header */}
           <div className="flex-none p-5 border-b border-border flex justify-between items-center">
             <div className="relative w-72">
@@ -138,7 +279,7 @@ export function HRDirectory() {
                 </thead>
                 <tbody>
                   {filteredEmployees.map((emp) => (
-                    <tr key={emp.id} className="hover:bg-card/[0.02] transition-colors border-b border-white/[0.02]">
+                    <tr key={emp.id} className={`hover:bg-card/[0.02] transition-colors border-b border-white/[0.02] ${selectedEmp?.id === emp.id ? 'bg-white/[0.02]' : ''}`}>
                       <td className="py-4 px-5 align-middle">
                         <div className="flex items-center gap-3">
                           <div className="w-9 h-9 rounded-full bg-[#00e07a]/15 border border-[#00e07a]/30 flex items-center justify-center text-[#c084fc] font-bold text-sm">
@@ -160,7 +301,7 @@ export function HRDirectory() {
                         </span>
                       </td>
                       <td className="py-4 px-5 align-middle text-right">
-                        <button className="px-3 py-1.5 bg-transparent border border-border rounded text-xs font-medium text-foreground hover:bg-accent hover:border-border transition-all">
+                        <button onClick={() => openMaster(emp)} className="px-3 py-1.5 bg-transparent border border-border rounded text-xs font-medium text-foreground hover:bg-accent hover:border-border transition-all">
                           View Master
                         </button>
                       </td>
@@ -171,7 +312,156 @@ export function HRDirectory() {
             )}
           </div>
         </div>
+
+        {/* Master Profile Slide-over */}
+        {selectedEmp && (
+          <div className="w-96 bg-card border border-border rounded-xl flex flex-col overflow-hidden shadow-2xl relative">
+            <div className="p-5 border-b border-border flex justify-between items-start bg-card/50">
+              <div>
+                <div className="w-12 h-12 rounded-full bg-[#00e07a]/15 border border-[#00e07a]/30 flex items-center justify-center text-[#c084fc] font-bold text-lg mb-3">
+                  {getInitials(selectedEmp.full_name)}
+                </div>
+                <h2 className="text-xl font-bold text-foreground flex items-center gap-2">
+                  {selectedEmp.full_name}
+                  {selectedEmp.employment_status === 'Suspended' && (
+                    <span className="text-[10px] uppercase px-2 py-0.5 rounded bg-red-500/20 text-red-500 border border-red-500/30">
+                      Suspended
+                    </span>
+                  )}
+                </h2>
+                <p className="text-sm text-muted-foreground">{selectedEmp.job_title} &bull; {selectedEmp.department}</p>
+              </div>
+              <button onClick={closeMaster} className="text-muted-foreground hover:text-foreground">
+                <X size={20} />
+              </button>
+            </div>
+            
+            <div className="flex-1 overflow-auto p-5">
+              <div className="mb-6">
+                <h3 className="text-xs font-semibold uppercase text-muted-foreground mb-3 tracking-wider">Quick Actions</h3>
+                <div className="flex gap-2">
+                  {selectedEmp.employment_status === 'Suspended' ? (
+                    <button onClick={handleReinstate} className="flex-1 flex justify-center items-center gap-2 py-2 bg-[#00e07a]/10 hover:bg-[#00e07a]/20 text-[#00e07a] border border-[#00e07a]/30 rounded-lg text-sm font-medium transition-colors">
+                      Reinstate Employee
+                    </button>
+                  ) : (
+                    <button onClick={() => setSuspendModalOpen(true)} className="flex-1 flex justify-center items-center gap-2 py-2 bg-red-500/10 hover:bg-red-500/20 text-red-500 border border-red-500/30 rounded-lg text-sm font-medium transition-colors">
+                      Suspend Employee
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              <div>
+                <h3 className="text-xs font-semibold uppercase text-muted-foreground mb-3 tracking-wider">Suspension History</h3>
+                {history.length === 0 ? (
+                  <p className="text-sm text-muted-foreground italic">No suspension records found.</p>
+                ) : (
+                  <div className="space-y-4">
+                    {history.map(record => (
+                      <div key={record.id} className="p-4 bg-white/[0.02] border border-border rounded-lg">
+                        <div className="flex justify-between items-start mb-2">
+                          <span className={`text-xs font-medium px-2 py-0.5 rounded ${record.status === 'Active' ? 'bg-red-500/20 text-red-500' : 'bg-gray-500/20 text-gray-400'}`}>
+                            {record.status}
+                          </span>
+                          <span className="text-xs text-muted-foreground">{record.source}</span>
+                        </div>
+                        <p className="text-sm text-foreground mb-2">"{record.reason}"</p>
+                        <div className="text-xs text-muted-foreground space-y-1">
+                          <div className="flex justify-between">
+                            <span>Started:</span>
+                            <span>{new Date(record.start_date).toLocaleDateString()}</span>
+                          </div>
+                          {record.end_date && (
+                            <div className="flex justify-between">
+                              <span>Expected End:</span>
+                              <span>{new Date(record.end_date).toLocaleDateString()}</span>
+                            </div>
+                          )}
+                          {record.reinstated_at && (
+                            <div className="flex justify-between">
+                              <span>Reinstated:</span>
+                              <span>{new Date(record.reinstated_at).toLocaleDateString()}</span>
+                            </div>
+                          )}
+                          <div className="flex justify-between pt-1 mt-1 border-t border-border">
+                            <span>Actor:</span>
+                            <span>{record.actor_name}</span>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+
       </div>
+
+      {/* Suspend Modal */}
+      {suspendModalOpen && selectedEmp && (
+        <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+          <div className="bg-card w-full max-w-md rounded-xl border border-border shadow-2xl p-6">
+            <h2 className="text-lg font-bold text-foreground mb-1">Suspend {selectedEmp.full_name}</h2>
+            <p className="text-sm text-muted-foreground mb-5">This action will immediately restrict their access and exclude them from payroll runs.</p>
+
+            {suspendWarning && (
+              <div className="mb-4 p-3 bg-amber-500/10 border border-amber-500/30 rounded-lg flex gap-3 text-amber-500 text-sm">
+                <AlertCircle className="w-5 h-5 flex-shrink-0" />
+                <div>
+                  <strong className="block mb-1">Constructive Dismissal Risk</strong>
+                  {suspendWarning}
+                  <div className="mt-2 flex gap-2">
+                    <button onClick={closeSuspendModal} className="px-3 py-1 bg-amber-500/20 rounded hover:bg-amber-500/30 transition-colors">Cancel</button>
+                    <button onClick={() => { setSuspendWarning(null); handleSuspend(); }} className="px-3 py-1 bg-amber-500/20 text-white rounded hover:bg-amber-500/30 transition-colors font-medium">Acknowledge & Proceed</button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {!suspendWarning && (
+              <>
+                <div className="space-y-4 mb-6">
+                  <div>
+                    <label className="block text-xs font-medium text-muted-foreground mb-1.5">Reason for Suspension <span className="text-red-500">*</span></label>
+                    <textarea 
+                      value={suspendReason}
+                      onChange={e => setSuspendReason(e.target.value)}
+                      className="w-full bg-input border border-border rounded-lg p-3 text-sm text-foreground focus:outline-none focus:border-[#00e07a]/50 min-h-[80px]"
+                      placeholder="e.g. Pending investigation for..."
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-muted-foreground mb-1.5">Expected End Date (Optional)</label>
+                    <input 
+                      type="date" 
+                      value={suspendEndDate}
+                      onChange={e => setSuspendEndDate(e.target.value)}
+                      className="w-full bg-input border border-border rounded-lg p-2 text-sm text-foreground focus:outline-none focus:border-[#00e07a]/50"
+                      style={{ colorScheme: 'dark' }}
+                    />
+                  </div>
+                </div>
+                <div className="flex justify-end gap-3">
+                  <button onClick={closeSuspendModal} className="px-4 py-2 border border-border rounded-lg text-sm font-medium hover:bg-accent transition-colors">
+                    Cancel
+                  </button>
+                  <button 
+                    onClick={handleSuspend}
+                    disabled={!suspendReason.trim()}
+                    className="px-4 py-2 bg-red-500/20 text-red-500 border border-red-500/30 rounded-lg text-sm font-medium hover:bg-red-500/30 transition-colors disabled:opacity-50"
+                  >
+                    Suspend Employee
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }

@@ -248,6 +248,12 @@ export function HomeDashboard() {
               Welcome back,{" "}
               <span className="text-primary">{firstName}!</span>
             </h1>
+            {user?.employment_status === 'Suspended' && (
+              <div className="mt-4 mb-2 p-4 bg-red-500/10 border border-red-500/30 rounded-lg flex items-center gap-3 text-red-500">
+                <AlertCircle className="w-5 h-5 flex-shrink-0" />
+                <span className="text-sm font-medium">Your employment status is currently Suspended. Please contact Human Resources.</span>
+              </div>
+            )}
             <p className="text-muted-foreground text-sm">
               Viewing portal with active configurations.
             </p>
