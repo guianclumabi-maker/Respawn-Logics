@@ -62,6 +62,22 @@ class CoreHRController
                     if (!hasPermission('settings.manage')) { http_response_code(403); echo json_encode(['success'=>false, 'error'=>'Denied']); return; }
                 $this->saveTenantModules($input);
                     break;
+                case 'suspend_employee':
+                    if (!hasPermission('employees.manage') && !hasPermission('users.manage')) { http_response_code(403); echo json_encode(['success'=>false, 'error'=>'Denied']); return; }
+                    $this->suspendEmployee($input);
+                    break;
+                case 'reinstate_employee':
+                    if (!hasPermission('employees.manage') && !hasPermission('users.manage')) { http_response_code(403); echo json_encode(['success'=>false, 'error'=>'Denied']); return; }
+                    $this->reinstateEmployee($input);
+                    break;
+                case 'suspension_history':
+                    if (!hasPermission('employees.view')) { http_response_code(403); echo json_encode(['success'=>false, 'error'=>'Denied']); return; }
+                    $this->suspensionHistory($input);
+                    break;
+                case 'overdue_suspensions':
+                    if (!hasPermission('employees.view')) { http_response_code(403); echo json_encode(['success'=>false, 'error'=>'Denied']); return; }
+                    $this->overdueSuspensions();
+                    break;
                 default:
                     echo json_encode(['success' => false, 'error' => 'Unknown action']);
                     break;
@@ -76,6 +92,50 @@ class CoreHRController
     {
         $stmt = $this->pdo->prepare("INSERT INTO `employment_history` (`tenant_id`, `user_id`, `change_type`, `job_title`, `department`, `manager_id`, `base_salary`, `effective_date`, `notes`, `recorded_by`) VALUES (?, ?, ?, ?, ?, ?, ?, CURDATE(), ?, ?)");
         $stmt->execute([$this->tenantId, $userId, $changeType, $jobTitle, $dept, $managerId, $salary, $notes, $recordedBy]);
+    }
+
+    private function suspendEmployee($input)
+    {
+        $employeeId = (int)($input['employee_id'] ?? 0);
+        if ($employeeId <= 0) { echo json_encode(['success' => false, 'error' => 'employee_id is required']); return; }
+        require_once __DIR__ . '/../services/SuspensionService.php';
+        $svc = new SuspensionService($this->pdo);
+        $res = $svc->suspend($this->tenantId, $employeeId, [
+            'reason'   => $input['reason'] ?? '',
+            'end_date' => $input['end_date'] ?? null,
+            'source'   => 'Standalone',
+            'actor_id' => $this->currentUser['id'] ?? null,
+        ]);
+        if (empty($res['success'])) http_response_code(400);
+        echo json_encode($res);
+    }
+
+    private function reinstateEmployee($input)
+    {
+        $employeeId = (int)($input['employee_id'] ?? 0);
+        if ($employeeId <= 0) { echo json_encode(['success' => false, 'error' => 'employee_id is required']); return; }
+        require_once __DIR__ . '/../services/SuspensionService.php';
+        $svc = new SuspensionService($this->pdo);
+        $res = $svc->reinstate($this->tenantId, $employeeId, ['actor_id' => $this->currentUser['id'] ?? null]);
+        if (empty($res['success'])) http_response_code(400);
+        echo json_encode($res);
+    }
+
+    private function suspensionHistory($input)
+    {
+        $employeeId = (int)($input['employee_id'] ?? ($_GET['employee_id'] ?? 0));
+        if ($employeeId <= 0) { echo json_encode(['success' => false, 'error' => 'employee_id is required']); return; }
+        require_once __DIR__ . '/../services/SuspensionService.php';
+        $svc = new SuspensionService($this->pdo);
+        echo json_encode(['success' => true, 'data' => $svc->history($this->tenantId, $employeeId)]);
+    }
+
+    private function overdueSuspensions()
+    {
+        require_once __DIR__ . '/../services/SuspensionService.php';
+        $svc = new SuspensionService($this->pdo);
+        $overdue = $svc->overdue($this->tenantId);
+        echo json_encode(['success' => true, 'count' => count($overdue), 'data' => $overdue]);
     }
 
     private function directory()
