@@ -1471,12 +1471,12 @@ class CandidatesController
                 exit;
             }
 
-            $checkStmt = $this->pdo->prepare("SELECT id FROM users WHERE email = ? AND tenant_id = ?");
-            $checkStmt->execute([$candidate['email'], $this->tenantId]);
+            $checkStmt = $this->pdo->prepare("SELECT id FROM users WHERE email = ?");
+            $checkStmt->execute([$candidate['email']]);
             if ($checkStmt->fetch()) {
                 $this->pdo->rollBack();
                 http_response_code(400);
-                echo json_encode(['success' => false, 'error' => 'An employee with this email already exists in the system.']);
+                echo json_encode(['success' => false, 'error' => 'An account with this email already exists in the system globally. Please use a different email.']);
                 exit;
             }
 
