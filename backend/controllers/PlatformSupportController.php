@@ -24,7 +24,9 @@ class PlatformSupportController
 
     public function handleRequest($action)
     {
-        if (!isPlatformStaff()) {
+        $tenantActions = ['tenant_create', 'tenant_list', 'ticket_details', 'download_attachment', 'add_comment', 'submit_feedback', 'submit_csat'];
+        
+        if (!in_array($action, $tenantActions) && !isPlatformStaff()) {
             http_response_code(403);
             echo json_encode(['success' => false, 'error' => 'Forbidden: Platform access required']);
             return;

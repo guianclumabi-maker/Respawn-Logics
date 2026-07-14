@@ -39,9 +39,10 @@ CREATE TABLE IF NOT EXISTS `platform_ticket_tags` (
 try {
     $pdo->exec($sql);
     
-    // Add CSAT columns if they don't exist
+    // Add missing columns if they don't exist
     try { $pdo->exec("ALTER TABLE `platform_tickets` ADD COLUMN `csat_score` INT DEFAULT NULL"); } catch (PDOException $e) {}
     try { $pdo->exec("ALTER TABLE `platform_tickets` ADD COLUMN `csat_comment` TEXT DEFAULT NULL"); } catch (PDOException $e) {}
+    try { $pdo->exec("ALTER TABLE `platform_tickets` ADD COLUMN `sla_breach_at` DATETIME DEFAULT NULL"); } catch (PDOException $e) {}
     
     echo "Platform ticketing tables created successfully.\n";
 } catch (Exception $e) {
