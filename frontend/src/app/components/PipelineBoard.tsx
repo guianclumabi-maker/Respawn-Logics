@@ -357,7 +357,7 @@ export function PipelineBoard({ onViewChange, jobId }: Props) {
     if (!jobId) {
       apiFetch(`${API.replace(API_BASE, "")}&action=jobs`, { }).then(r => r.json()).then(d => {
         if (d.success && d.jobs?.length) {
-          setJobs(d.jobs);
+          setJobs(d.jobs || []);
           // Do NOT auto-select the first job, let the user choose from the list
         }
         setLoading(false);
