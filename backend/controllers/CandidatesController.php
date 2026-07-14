@@ -1436,9 +1436,9 @@ class CandidatesController
         $appId = $data['application_id'] ?? null;
         $employeeId = $data['employee_id'] ?? null;
         $hireDate = $data['hire_date'] ?? null;
-        $jobTitle = $data['job_title'] ?? null;
-        $department = $data['department'] ?? null;
-        $baseSalary = $data['base_salary'] ?? null;
+        $jobTitle = !empty($data['job_title']) ? $data['job_title'] : null;
+        $department = !empty($data['department']) ? $data['department'] : null;
+        $baseSalary = !empty($data['base_salary']) ? $data['base_salary'] : null;
 
         if (!$candidateId || !$employeeId || !$hireDate) {
             http_response_code(400);
