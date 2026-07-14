@@ -41,7 +41,7 @@ export function CandidatesList({ onViewChange }: { onViewChange: (v: ViewState) 
       .then((r) => r.json())
       .then((d) => {
         if (d.success) {
-          setCandidates(d.candidates);
+          setCandidates(d.candidates || []);
           setTotalPages(Math.ceil(d.total / d.limit) || 1);
         } else {
           setError(d.error || "Failed to fetch candidates");

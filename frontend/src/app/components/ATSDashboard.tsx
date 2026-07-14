@@ -446,7 +446,15 @@ export function ATSDashboard({ onViewChange }: Props) {
       .then((res) => res.json())
       .then((json) => {
         if (json.success) {
-          setData(json);
+          setData({
+            ...json,
+            action_summary: json.action_summary || { awaiting_review: 0, interviews_today: 0, pending_offers: 0, missing_scorecards: 0, pending_approvals: 0 },
+            sla_alerts: json.sla_alerts || [],
+            jobs_health: json.jobs_health || [],
+            activities: json.activities || [],
+            upcoming_interviews: json.upcoming_interviews || [],
+            totals: json.totals || { candidates: 0, open_jobs: 0, hired: 0 }
+          });
         } else {
           setError(json.error || "Failed to load dashboard data");
         }

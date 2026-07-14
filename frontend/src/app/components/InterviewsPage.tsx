@@ -124,14 +124,14 @@ function ScheduleModal({
     apiFetch(`${API.replace(API_BASE, "")}&action=candidates&limit=200`, { })
       .then((r) => r.json())
       .then((d) => {
-        if (d.success) setCandidates(d.candidates.map((c: any) => ({ id: c.id, name: c.name, email: c.email })));
+        if (d.success) setCandidates((d.candidates || []).map((c: any) => ({ id: c.id, name: c.name, email: c.email })));
       })
       .catch(() => {});
 
     apiFetch(`${API.replace(API_BASE, "")}&action=jobs`, { })
       .then((r) => r.json())
       .then((d) => {
-        if (d.success) setJobs(d.jobs.map((j: any) => ({ id: j.id, title: j.title })));
+        if (d.success) setJobs((d.jobs || []).map((j: any) => ({ id: j.id, title: j.title })));
       })
       .catch(() => {});
   }, []);
@@ -511,7 +511,7 @@ export function InterviewsPage({ onViewChange }: Props) {
       if (jobFilter) params.set("job_id", String(jobFilter));
       const res = await apiFetch(`${API.replace(API_BASE, "")}&${params}`, { });
       const data = await res.json();
-      if (data.success) setInterviews(data.interviews);
+      if (data.success) setInterviews(data.interviews || []);
     } catch { /* silent */ }
     setLoading(false);
   }, [statusFilter, jobFilter]);
@@ -523,7 +523,7 @@ export function InterviewsPage({ onViewChange }: Props) {
   useEffect(() => {
     apiFetch(`${API.replace(API_BASE, "")}&action=jobs`, { })
       .then((r) => r.json())
-      .then((d) => { if (d.success) setJobs(d.jobs.map((j: any) => ({ id: j.id, title: j.title }))); })
+      .then((d) => { if (d.success) setJobs((d.jobs || []).map((j: any) => ({ id: j.id, title: j.title }))); })
       .catch(() => {});
   }, []);
 
