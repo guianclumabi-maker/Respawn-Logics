@@ -5,7 +5,7 @@ require_once __DIR__ . '/../bootstrap/app.php';
 try {
     // Ensure the table exists
     $pdo->exec("CREATE TABLE IF NOT EXISTS `tenants` (
-        `id` VARCHAR(50) PRIMARY KEY,
+        `id` VARCHAR(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci PRIMARY KEY,
         `company_name` VARCHAR(255) NOT NULL,
         `contact_email` VARCHAR(150) NOT NULL,
         `subscription_tier` VARCHAR(50) DEFAULT 'Trial',
@@ -14,7 +14,7 @@ try {
         `ai_api_calls` INT DEFAULT 0,
         `permission_version` INT DEFAULT 1,
         `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;");
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;");
 
     echo "Tenants table created successfully.\n";
 
@@ -40,12 +40,12 @@ try {
     }
 
     $pdo->exec("CREATE TABLE IF NOT EXISTS `tenant_modules` (
-        `tenant_id` VARCHAR(50) NOT NULL,
+        `tenant_id` VARCHAR(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
         `module_key` VARCHAR(50) NOT NULL,
         `is_enabled` TINYINT(1) DEFAULT 1,
         PRIMARY KEY (`tenant_id`, `module_key`),
         FOREIGN KEY (`tenant_id`) REFERENCES `tenants`(`id`) ON DELETE CASCADE
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;");
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;");
     echo "Tenant Modules table created successfully.\n";
 
     // Seed mock tenants

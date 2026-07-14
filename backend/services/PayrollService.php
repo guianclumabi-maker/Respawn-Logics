@@ -19,6 +19,17 @@ class PayrollService
     private $tenantSettings = [];
     private $payComponents = [];
 
+    /**
+     * Canonical money-rounding helper. All monetary values MUST pass through
+     * this function at accumulation boundaries (gross, deductions, net).
+     * "Half-up" rounding to 2 decimal places — the standard for Philippine payroll.
+     * Centralizing here ensures the entire engine rounds identically.
+     */
+    private function money(float $v): float {
+        return round($v, 2, PHP_ROUND_HALF_UP);
+    }
+
+
     private function loadConfigs($payDate, $tenantId, $frequency) {
         $stmt = $this->pdo->prepare("SELECT * FROM sss_contribution_brackets WHERE effective_from <= ? AND (effective_to IS NULL OR effective_to >= ?) ORDER BY range_from ASC");
         $stmt->execute([$payDate, $payDate]);
@@ -64,8 +75,14 @@ class PayrollService
         if (empty($this->statutoryParams['thirteenth_month_exemption_cap'])) throw new Exception("No statutory parameters configured for $payDate");
 
         $settings = [
+            'default_pay_frequency' => 'Semi-Monthly',
             'proration_method' => 'split_even',
+            'default_pay_basis' => 'monthly',
+            'tax_annualization' => 0,
             'mwe_auto_exempt' => 1,
+            'rounding_mode' => 'half_up',
+            'approval_levels' => 1,
+            'statutory_basis' => 'monthly_base'
         ];
         try {
             $stmt = $this->pdo->prepare("SELECT * FROM tenant_payroll_settings WHERE tenant_id = ?");
@@ -73,9 +90,12 @@ class PayrollService
             $row = $stmt->fetch(PDO::FETCH_ASSOC);
             if ($row) {
                 $settings = $row;
+                $settings['is_explicit'] = true;
+            } else {
+                $settings['is_explicit'] = false;
             }
         } catch (Exception $e) {
-            // Table might not exist yet, fallback to defaults
+            $settings['is_explicit'] = false;
         }
         $this->tenantSettings = $settings;
 
@@ -140,7 +160,14 @@ class PayrollService
     }
 
     private function calculateTax($taxableIncome, $frequency) {
-        $brackets = $this->birBrackets[$frequency] ?? ($this->birBrackets['Monthly'] ?? []);
+        // CPA NOTE: taxable income CAN legitimately be zero (e.g. MWE with no extras).
+        // Negative income is clamped to 0 — statutory deductions cannot generate a tax credit.
+        $taxableIncome = max(0.0, (float)$taxableIncome);
+
+        if (!isset($this->birBrackets[$frequency])) {
+            throw new Exception("No statutory BIR withholding bracket configured for frequency '{$frequency}'. Ensure the correct brackets are seeded for this pay schedule.");
+        }
+        $brackets = $this->birBrackets[$frequency];
         foreach ($brackets as $b) {
             if ($taxableIncome >= floatval($b['lower_limit'])) {
                 $excess = $taxableIncome - floatval($b['lower_limit']);
@@ -148,6 +175,89 @@ class PayrollService
             }
         }
         return 0;
+    }
+
+    /**
+     * Resolve the tenant's pay basis. Defaults to 'monthly_fixed' so existing installs are unchanged.
+     * (Per-employee override can be added later via a users.pay_basis column.)
+     */
+    private function resolvePayBasis(): string {
+        $basis = $this->tenantSettings['default_pay_basis'] ?? '';
+        // Canonicalize the legacy 'monthly' value stored by older UI versions
+        if ($basis === 'monthly') {
+            return 'monthly_fixed';
+        }
+        // Reject empty/unrecognized basis values — MySQL ENUM silently stores '' for invalid input,
+        // and we must not silently default to monthly_fixed in that case.
+        $allowed = ['monthly_fixed', 'daily', 'hourly'];
+        if (!in_array($basis, $allowed, true)) {
+            throw new Exception("Unknown pay basis '{$basis}'. Set tenant default_pay_basis to monthly_fixed, daily, or hourly.");
+        }
+        return $basis;
+    }
+
+    /**
+     * Derive daily/hourly pay rate from the employee's pay basis — instead of silently applying the
+     * monthly 313-divisor to everyone. Fails loud on an unknown basis.
+     *   - monthly_fixed: base_salary is MONTHLY; hourly = (base*12)/working_days_per_year/hours_per_day.
+     *   - daily:         base_salary is the DAILY rate;  hourly = base / hours_per_day.
+     *   - hourly:        base_salary is the HOURLY rate; hourly = base.
+     *
+     * CPA VALIDATION NEEDED:
+     *  - working_days_per_year (default 313) and hours_per_day (default 8) are DOCUMENTED DEFAULTS; the
+     *    per-tenant divisor/hours must be confirmed against the employer's policy/CBA (365, 313, 261, 26...).
+     *  - For monthly_fixed staff, "basic pay = worked hours * hourly" is a timesheet-driven PROXY for the
+     *    monthly salary; confirm this matches how the employer intends to pay a full-month monthly employee.
+     */
+    private function calculateHourlyRates(array $emp): array {
+        $workingDays = floatval($this->statutoryParams['working_days_per_year'] ?? 313.00); // documented default
+        $hoursPerDay = floatval($this->statutoryParams['hours_per_day'] ?? 8.00);           // documented default
+        if ($workingDays <= 0 || $hoursPerDay <= 0) {
+            throw new Exception('Payroll config invalid: working_days_per_year and hours_per_day must be > 0.');
+        }
+        $base = floatval($emp['base_salary']);
+        $basis = $this->resolvePayBasis();
+        switch ($basis) {
+            case 'monthly_fixed':
+                $daily = ($base * 12) / $workingDays;
+                $hourly = $daily / $hoursPerDay;
+                break;
+            case 'daily':
+                $daily = $base;
+                $hourly = $base / $hoursPerDay;
+                break;
+            case 'hourly':
+                $daily = $base * $hoursPerDay;
+                $hourly = $base;
+                break;
+            default:
+                throw new Exception("Unknown pay basis '{$basis}'. Set tenant default_pay_basis to monthly_fixed, daily, or hourly.");
+        }
+        return ['daily' => $daily, 'hourly' => $hourly, 'basis' => $basis];
+    }
+
+    /**
+     * Compute pay per earning bucket from approved-timesheet hours — a pure function of hours + hourly
+     * rate so a CPA can audit each multiplier against the applied statutory_parameters config.
+     *
+     * CPA VALIDATION NEEDED — known simplifications (NOT bugs, but not full DOLE coverage):
+     *  - Rest day and special non-working day both use rest_day_or_special_multiplier (1.30). Real rules
+     *    differ for a rest-day-that-is-also-special (1.50) and for OT on those days (distinct rates). Not modeled.
+     *  - Night differential is a FLAT premium (default 10%) on the BASE hourly for night_diff_hours only. It
+     *    does NOT compound with OT / rest-day / holiday hours worked at night — the timesheet schema can't
+     *    express that overlap yet. TODO: capture overlap hour-types to model combined premiums.
+     *  - Overtime uses one ordinary-day multiplier; OT on rest days / holidays has higher rates, not modeled.
+     */
+    private function calculatePremiumPay(array $hours, float $hourly): array {
+        $p = $this->statutoryParams;
+        return [
+            'regular_pay'         => floatval($hours['reg'])  * $hourly,
+            'overtime_pay'        => floatval($hours['ot'])   * $hourly * ($p['ordinary_ot_multiplier'] ?? 1.25),
+            'rest_day_pay'        => floatval($hours['rest']) * $hourly * ($p['rest_day_or_special_multiplier'] ?? 1.30),
+            'special_holiday_pay' => floatval($hours['spec']) * $hourly * ($p['rest_day_or_special_multiplier'] ?? 1.30),
+            'regular_holiday_pay' => floatval($hours['hol'])  * $hourly * ($p['regular_holiday_multiplier'] ?? 2.00),
+            'night_diff_pay'      => floatval($hours['nd'])   * $hourly * ($p['night_diff_multiplier'] ?? 0.10),
+        ];
     }
 
     private function getDeMinimisExemption($item_name, $amount, $frequency) {
@@ -176,6 +286,16 @@ class PayrollService
         return ['exempt' => $exempt, 'excess' => $excess];
     }
 
+    /**
+     * Remaining ₱90,000 tax-exempt bucket for 13th-month + "other benefits" for the calendar year.
+     *
+     * ⚠️ CPA VALIDATION NEEDED (possible OVER-taxation): this query currently also subtracts
+     * 'De Minimis (Exempt): %' from the ₱90k cap. Under the NIRC, de-minimis benefits within their own
+     * ceilings are exempt SEPARATELY and should NOT consume the ₱90k 13th-month/other-benefits bucket —
+     * only the EXCESS de-minimis (already routed into "Other Benefits") should. Including exempt de-minimis
+     * here shrinks the ₱90k cap and can OVER-withhold tax. Left as-is (conservative — it never UNDER-withholds)
+     * pending CPA confirmation; if confirmed, drop the `De Minimis (Exempt)` clause from this query.
+     */
     private function getRemaining90kExemption($empId, $payDate, $tenantId) {
         $year = date('Y', strtotime($payDate));
         $stmt = $this->pdo->prepare("
@@ -184,7 +304,7 @@ class PayrollService
             JOIN payroll_runs pr ON pe.payroll_run_id = pr.id
             WHERE pe.employee_id = ?
             AND pr.tenant_id = ?
-            AND (pe.earning_type = 'Non-Taxable Other Benefits' OR pe.earning_type = '13th Month Pay (Non-Taxable)' OR pe.earning_type LIKE 'De Minimis (Exempt): %')
+            AND (pe.earning_type = 'Non-Taxable Other Benefits' OR pe.earning_type = '13th Month Pay (Non-Taxable)')
             AND YEAR(pr.pay_date) = ?
         ");
         $stmt->execute([$empId, $tenantId, $year]);
@@ -230,15 +350,63 @@ class PayrollService
             }
             $frequency = $schedule['frequency'];
 
-            // Load global configs and tenant configs based on pay date
+            // --- Frequency enum validation ---
+            // Fail loud rather than apply wrong statutory proration or BIR bracket.
+            $allowedFrequencies = ['Monthly', 'Semi-Monthly', 'Weekly', 'Daily'];
+            if (!in_array($frequency, $allowedFrequencies, true)) {
+                throw new Exception("Unsupported payroll schedule frequency '{$frequency}'. Allowed values: " . implode(', ', $allowedFrequencies) . ".");
+            }
+
+            // --- Date-range validation ---
+            // All three dates must be parseable ISO dates, period must be non-negative, and
+            // the pay date must not precede the period start.
+            $startTs = strtotime($start);
+            $endTs   = strtotime($end);
+            $payTs   = strtotime($payDate);
+            if (!$startTs || !$endTs || !$payTs) {
+                throw new Exception("Invalid date(s): start='{$start}', end='{$end}', payDate='{$payDate}'. All must be valid ISO-format dates.");
+            }
+            if ($startTs > $endTs) {
+                throw new Exception("Pay period start '{$start}' is after end '{$end}'. The period start must not be later than the end.");
+            }
+            if ($payTs < $startTs) {
+                throw new Exception("Pay date '{$payDate}' is before period start '{$start}'. Pay date must be on or after the period start.");
+            }
+
+            // --- Duplicate run guard ---
+            // A second run for the same tenant/schedule/start/end/run_type blocks unless all prior
+            // runs for that combination are in a terminal-rejected state.
+            $dupStmt = $this->pdo->prepare("
+                SELECT id FROM payroll_runs
+                WHERE tenant_id = ? AND payroll_schedule_id = ?
+                  AND payroll_period_start = ? AND payroll_period_end = ?
+                  AND run_type = ? AND status != 'Rejected'
+                LIMIT 1
+            ");
+            $dupStmt->execute([$tenantId, $scheduleId, $start, $end, $runType]);
+            if ($dupStmt->fetch()) {
+                $this->pdo->rollBack();
+                return ['success' => false, 'error' => "Duplicate run: a '{$runType}' payroll run for {$start}–{$end} already exists and is not rejected."];
+            }
+
             $this->loadConfigs($payDate, $tenantId, $frequency);
             if (!empty($this->tenantSettings['tax_annualization'])) {
                 throw new Exception('Tax annualization is enabled but not implemented in PayrollService. Disable it or implement annualized BIR withholding before running payroll.');
             }
             
-            $prorateFactor = ($frequency === 'Semi-Monthly') ? 0.5 : 1.0;
-            
-            // Determine statutory multiplier based on proration method
+            $prorateFactor = 1.0;
+            if ($frequency === 'Semi-Monthly') {
+                $prorateFactor = 0.5;
+            } elseif ($frequency === 'Weekly') {
+                // 52 weeks / 12 months — gives the fraction of monthly statutory per pay period.
+                // CPA VALIDATION NEEDED: confirm this divisor for your pay schedule.
+                $prorateFactor = 12.0 / 52.0;
+            } elseif ($frequency === 'Daily') {
+                $workingDaysPerYear = floatval($this->statutoryParams['working_days_per_year'] ?? 313.00);
+                $prorateFactor = 12.0 / $workingDaysPerYear;
+            }
+            // Monthly: prorateFactor stays 1.0.
+
             $isFirstCutoff = date('j', strtotime($end)) <= 15;
             $prorationMethod = $this->tenantSettings['proration_method'] ?? 'split_even';
             $statutoryMultiplier = 1.0;
@@ -307,48 +475,102 @@ class PayrollService
             // 5. Process Each Employee
             foreach ($employees as $emp) {
                 $empId = $emp['id'];
-                // Timesheet-driven gross pay
-                $workingDays = $this->statutoryParams['working_days_per_year'] ?? 313.00;
-                $hoursPerDay = $this->statutoryParams['hours_per_day'] ?? 8.00;
-                $daily = (floatval($emp['base_salary']) * 12) / $workingDays;
-                $hourly = $daily / $hoursPerDay;
-
+                // Timesheet-driven gross pay. Rate derivation is pay-basis-aware (see calculateHourlyRates)
+                // instead of assuming every employee is monthly-fixed on the 313 divisor.
+                $rates = $this->calculateHourlyRates($emp);
+                $hourly = $rates['hourly'];
                 $tsStmt = $this->pdo->prepare("
-                    SELECT 
-                        SUM(regular_hours) as reg, 
-                        SUM(overtime_hours) as ot, 
-                        SUM(rest_day_hours) as rest, 
-                        SUM(special_day_hours) as spec, 
-                        SUM(regular_holiday_hours) as hol, 
-                        SUM(night_diff_hours) as nd 
-                    FROM timesheets 
-                    WHERE tenant_id = ? AND employee_id = ? 
-                    AND timesheet_date >= ? AND timesheet_date <= ? 
-                    AND status = 'Approved'
-                ");
-                $tsStmt->execute([$tenantId, $empId, $start, $end]);
-                $tsData = $tsStmt->fetch(PDO::FETCH_ASSOC);
+                     SELECT 
+                         timesheet_date,
+                         regular_hours, 
+                         overtime_hours, 
+                         rest_day_hours, 
+                         special_day_hours, 
+                         regular_holiday_hours, 
+                         night_diff_hours 
+                     FROM timesheets 
+                     WHERE tenant_id = ? AND employee_id = ? 
+                     AND timesheet_date >= ? AND timesheet_date <= ? 
+                     AND status = 'Approved'
+                 ");
+                 $tsStmt->execute([$tenantId, $empId, $start, $end]);
+                 $tsRows = $tsStmt->fetchAll(PDO::FETCH_ASSOC);
 
-                $cutoffBase = 0;
-                $grossReg = 0;
-                $grossOt = 0;
-                $grossRest = 0;
-                $grossSpec = 0;
-                $grossHol = 0;
-                $grossNd = 0;
+                 $cutoffBase = 0;
+                 $grossReg = 0;
+                 $grossOt = 0;
+                 $grossRest = 0;
+                 $grossSpec = 0;
+                 $grossHol = 0;
+                 $grossNd = 0;
 
-                if ($tsData && $tsData['reg'] !== null) {
-                    $grossReg = floatval($tsData['reg']) * $hourly;
-                    $grossOt = floatval($tsData['ot']) * $hourly * ($this->statutoryParams['ordinary_ot_multiplier'] ?? 1.25);
-                    $grossRest = floatval($tsData['rest']) * $hourly * ($this->statutoryParams['rest_day_or_special_multiplier'] ?? 1.30);
-                    $grossSpec = floatval($tsData['spec']) * $hourly * ($this->statutoryParams['rest_day_or_special_multiplier'] ?? 1.30);
-                    $grossHol = floatval($tsData['hol']) * $hourly * ($this->statutoryParams['regular_holiday_multiplier'] ?? 2.00);
-                    $grossNd = floatval($tsData['nd']) * $hourly * ($this->statutoryParams['night_diff_multiplier'] ?? 0.10);
+                 if (!empty($tsRows)) {
+                     $sums = [
+                         'reg'  => 0.0,
+                         'ot'   => 0.0,
+                         'rest' => 0.0,
+                         'spec' => 0.0,
+                         'hol'  => 0.0,
+                         'nd'   => 0.0
+                     ];
 
-                    $cutoffBase = $grossReg + $grossOt + $grossRest + $grossSpec + $grossHol + $grossNd;
-                } else if ($runType === 'Regular') {
-                    throw new Exception("Employee #{$empId} has no approved timesheets for the payroll period. Approve timesheets before running payroll.");
-                }
+                     foreach ($tsRows as $row) {
+                         $regVal  = floatval($row['regular_hours']);
+                         $otVal   = floatval($row['overtime_hours']);
+                         $restVal = floatval($row['rest_day_hours']);
+                         $specVal = floatval($row['special_day_hours']);
+                         $holVal  = floatval($row['regular_holiday_hours']);
+                         $ndVal   = floatval($row['night_diff_hours']);
+
+                         // --- Negative hours guard ---
+                         // Negative hours would inflate pay or create negative deductions.
+                         // These are always a data-entry error and must fail loud.
+                         foreach (['regular_hours' => $regVal, 'overtime_hours' => $otVal,
+                                   'rest_day_hours' => $restVal, 'special_day_hours' => $specVal,
+                                   'regular_holiday_hours' => $holVal, 'night_diff_hours' => $ndVal] as $field => $val) {
+                             if ($val < 0) {
+                                 throw new Exception("Invalid timesheet: negative {$field} ({$val}) on {$row['timesheet_date']} for employee #{$empId}.");
+                             }
+                         }
+
+                         $hasPremiumDay = ($restVal > 0 || $specVal > 0 || $holVal > 0);
+                         $hasOt = ($otVal > 0);
+                         $hasNd = ($ndVal > 0);
+
+                         // 1. Multiple premium day types active on the same day (e.g. Rest Day + Special Holiday)
+                         $activePremiumDaysCount = ($restVal > 0 ? 1 : 0) + ($specVal > 0 ? 1 : 0) + ($holVal > 0 ? 1 : 0);
+                         if ($activePremiumDaysCount > 1) {
+                             throw new Exception("Ambiguous combined premium: multiple premium day types on " . $row['timesheet_date']);
+                         }
+                         // 2. OT on a premium day (Rest/Special/Regular Holiday)
+                         if ($hasOt && $hasPremiumDay) {
+                             throw new Exception("Ambiguous combined premium: Overtime hours on premium day (Rest/Special/Holiday) on " . $row['timesheet_date']);
+                         }
+                         // 3. Night Differential on a premium day or during Overtime
+                         if ($hasNd && ($hasPremiumDay || $hasOt)) {
+                             throw new Exception("Ambiguous combined premium: Night differential overlapping with premium day or overtime on " . $row['timesheet_date']);
+                         }
+
+                         $sums['reg']  += $regVal;
+                         $sums['ot']   += $otVal;
+                         $sums['rest'] += $restVal;
+                         $sums['spec'] += $specVal;
+                         $sums['hol']  += $holVal;
+                         $sums['nd']   += $ndVal;
+                     }
+
+                     $prem = $this->calculatePremiumPay($sums, $hourly);
+                     $grossReg  = $prem['regular_pay'];
+                     $grossOt   = $prem['overtime_pay'];
+                     $grossRest = $prem['rest_day_pay'];
+                     $grossSpec = $prem['special_holiday_pay'];
+                     $grossHol  = $prem['regular_holiday_pay'];
+                     $grossNd   = $prem['night_diff_pay'];
+
+                     $cutoffBase = $grossReg + $grossOt + $grossRest + $grossSpec + $grossHol + $grossNd;
+                 } else if ($runType === 'Regular') {
+                     throw new Exception("Employee #{$empId} has no approved timesheets for the payroll period. Approve timesheets before running payroll.");
+                 }
                 $remaining90k = $this->getRemaining90kExemption($empId, $payDate, $tenantId);
 
                 $empExpenses = $expensesByEmployee[$empId] ?? [];
@@ -359,9 +581,60 @@ class PayrollService
                     $totalExpenses += floatval($exp['amount']);
                 }
                 
-                $sss = $this->calculateSSS(floatval($emp['base_salary']), $statutoryMultiplier);
-                $phic = $this->calculatePhilHealth(floatval($emp['base_salary']), $statutoryMultiplier);
-                $hdmf = $this->calculatePagIbig(floatval($emp['base_salary']), $statutoryMultiplier);
+                // Statutory basis strategy checks and calculations
+                $basis = $rates['basis'];
+                $statutoryBasis = $this->tenantSettings['statutory_basis'] ?? null;
+                $isExplicit = $this->tenantSettings['is_explicit'] ?? false;
+                
+                if (!$isExplicit && $basis !== 'monthly_fixed') {
+                    throw new Exception("Missing tenant payroll settings: Tenant payroll settings must be explicitly configured in the database for daily/hourly employees.");
+                }
+
+                if (!$statutoryBasis) {
+                    if ($basis === 'monthly_fixed') {
+                        $statutoryBasis = 'monthly_base';
+                    } else {
+                        throw new Exception("Missing tenant payroll settings: statutory_basis must be explicitly configured for daily/hourly employees.");
+                    }
+                }
+
+                if ($statutoryBasis !== 'monthly_base' && $statutoryBasis !== 'actual_period_equivalent') {
+                    throw new Exception("Unknown statutory basis strategy '{$statutoryBasis}'.");
+                }
+
+                $workingDays = floatval($this->statutoryParams['working_days_per_year'] ?? 313.00);
+                $hoursPerDay = floatval($this->statutoryParams['hours_per_day'] ?? 8.00);
+
+                if ($workingDays <= 0 || $hoursPerDay <= 0) {
+                    throw new Exception("Payroll config invalid: working_days_per_year and hours_per_day must be > 0.");
+                }
+
+                $monthlyBase = 0;
+                if ($statutoryBasis === 'monthly_base') {
+                    if ($basis === 'monthly_fixed') {
+                        $monthlyBase = floatval($emp['base_salary']);
+                    } else if ($basis === 'daily') {
+                        $monthlyBase = floatval($emp['base_salary']) * $workingDays / 12;
+                    } else if ($basis === 'hourly') {
+                        $monthlyBase = floatval($emp['base_salary']) * $hoursPerDay * $workingDays / 12;
+                    }
+                } else if ($statutoryBasis === 'actual_period_equivalent') {
+                    if ($frequency === 'Semi-Monthly') {
+                        $monthlyBase = $grossReg * 2;
+                    } else if ($frequency === 'Monthly') {
+                        $monthlyBase = $grossReg;
+                    } else if ($frequency === 'Weekly') {
+                        $monthlyBase = $grossReg * 52 / 12;
+                    } else if ($frequency === 'Daily') {
+                        $monthlyBase = $grossReg * $workingDays / 12;
+                    } else {
+                        throw new Exception("Unsupported payroll frequency '{$frequency}' for actual_period_equivalent statutory basis.");
+                    }
+                }
+
+                $sss = $this->calculateSSS($monthlyBase, $statutoryMultiplier);
+                $phic = $this->calculatePhilHealth($monthlyBase, $statutoryMultiplier);
+                $hdmf = $this->calculatePagIbig($monthlyBase, $statutoryMultiplier);
                 
                 $totalHmoDeduction = 0;
                 $totalAllowances = 0;
@@ -474,7 +747,7 @@ class PayrollService
                     $markExpStmt->execute([$exp['id']]);
                 }
 
-                $gross = round($cutoffBase + $totalExpenses + $totalAllowances + $customEarnings + $thirteenthPayout, 2);
+                $gross = $this->money($cutoffBase + $totalExpenses + $totalAllowances + $customEarnings + $thirteenthPayout);
                 
                 $isMwe = (intval($emp['is_mwe']) === 1);
                 
@@ -484,15 +757,26 @@ class PayrollService
                     $taxableIncome = ($cutoffBase + $taxableOtherBenefits + $customTaxableEarnings) - ($sss['ee'] + $phic['ee'] + $hdmf['ee']);
                 }
                 
-                $tax = round($this->calculateTax($taxableIncome, $frequency), 2);
+                $taxableIncome = max(0.0, $taxableIncome); // Statutory deductions cannot create negative taxable income
+                $tax = $this->money($this->calculateTax($taxableIncome, $frequency));
                 
                 // Accrue 13th-month on BASIC pay only (regular-hours pay), excluding OT, holiday
                 // premium, night differential and allowances — per PD 851's "basic salary".
                 // The 13th-month run itself does not accrue.
                 $thirteenthAccrual = $is13thMonth ? 0.00 : round($grossReg / 12, 2);
 
-                $totalDeductions = round($tax + $sss['ee'] + $phic['ee'] + $hdmf['ee'] + $totalHmoDeduction + $customDeductions, 2);
-                $net = round($gross - $totalDeductions, 2);
+                $totalDeductions = $this->money($tax + $sss['ee'] + $phic['ee'] + $hdmf['ee'] + $totalHmoDeduction + $customDeductions);
+                $net = $this->money($gross - $totalDeductions);
+
+                // Strict payslip reconciliation check: gross - deductions must equal net pay.
+                // Because all three values are computed with the same money() helper at the same
+                // precision, this should always hold. A mismatch indicates a rounding-boundary bug.
+                $reconciledNet = $this->money($gross - $totalDeductions);
+                if (abs($reconciledNet - $net) > 0.01) {
+                    throw new Exception("Payslip reconciliation mismatch for Employee #{$empId}: Gross={$gross}, Deductions={$totalDeductions}, Net={$net}, Expected Net={$reconciledNet}");
+                }
+                
+                // Note: Employer contributions (sss_er, sss_ec, wisp_er, phic_er, hdmf_er) are stored separately and do not reduce the employee's net pay.
 
                 $reStmt->execute([$runId, $empId, $gross, $totalDeductions, $net, round($sss['er'], 2), round($sss['ec'], 2), round($sss['wisp_er'], 2), round($phic['er'], 2), round($hdmf['er'], 2), $thirteenthAccrual]);
 

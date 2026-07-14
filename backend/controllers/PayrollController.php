@@ -98,6 +98,14 @@ class PayrollController
                         return;
                     }
 
+                    // Basic date format guard before delegating to service
+                    foreach (['start_date' => $start, 'end_date' => $end, 'pay_date' => $payDate] as $field => $val) {
+                        if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $val) || !strtotime($val)) {
+                            echo json_encode(['success' => false, 'error' => "Invalid date for '{$field}': '{$val}'. Expected YYYY-MM-DD."]);
+                            return;
+                        }
+                    }
+
                     // Delegate to the heavily optimized Service Layer
                     $result = $this->payrollService->generateRun(
                         $this->tenantId, 
@@ -245,6 +253,12 @@ class PayrollController
                     break;
 
                 case 'my_payslips':
+                    // Verify the requesting user belongs to this tenant before querying
+                    if (!$this->currentUser || (int)($this->currentUser['tenant_id'] ?? 0) !== (int)$this->tenantId) {
+                        http_response_code(403);
+                        echo json_encode(['success' => false, 'error' => 'Access denied: tenant mismatch.']);
+                        return;
+                    }
                     $stmt = $this->pdo->prepare("
                         SELECT pp.*, pr.payroll_period_start, pr.payroll_period_end, pr.pay_date 
                         FROM `payroll_payslips` pp
@@ -399,6 +413,7 @@ class PayrollController
                     break;
 
                 case 'settings':
+                    if (!$this->canViewPayroll()) { http_response_code(403); echo json_encode(['success' => false, 'error' => 'Denied']); return; }
                     $settings = [
                         'default_pay_frequency' => 'Semi-Monthly',
                         'proration_method' => 'split_even',
@@ -422,32 +437,64 @@ class PayrollController
                     break;
 
                 case 'save_settings':
-                    if (!$this->canManagePayroll()) { echo json_encode(['success' => false, 'error' => 'Denied']); return; }
-                    $stmt = $this->pdo->prepare("
-                        INSERT INTO `tenant_payroll_settings` 
-                        (`tenant_id`, `default_pay_frequency`, `proration_method`, `default_pay_basis`, `tax_annualization`, `mwe_auto_exempt`, `rounding_mode`, `approval_levels`)
-                        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-                        ON DUPLICATE KEY UPDATE 
-                        `default_pay_frequency`=VALUES(`default_pay_frequency`),
-                        `proration_method`=VALUES(`proration_method`),
-                        `default_pay_basis`=VALUES(`default_pay_basis`),
-                        `tax_annualization`=VALUES(`tax_annualization`),
-                        `mwe_auto_exempt`=VALUES(`mwe_auto_exempt`),
-                        `rounding_mode`=VALUES(`rounding_mode`),
-                        `approval_levels`=VALUES(`approval_levels`)
-                    ");
-                    $stmt->execute([
-                        $this->tenantId,
-                        $input['default_pay_frequency'] ?? 'Semi-Monthly',
-                        $input['proration_method'] ?? 'split_even',
-                        $input['default_pay_basis'] ?? 'monthly',
-                        (int)($input['tax_annualization'] ?? 0),
-                        (int)($input['mwe_auto_exempt'] ?? 1),
-                        $input['rounding_mode'] ?? 'half_up',
-                        (int)($input['approval_levels'] ?? 1)
-                    ]);
-                    echo json_encode(['success' => true]);
-                    break;
+                     if (!$this->canManagePayroll()) { echo json_encode(['success' => false, 'error' => 'Denied']); return; }
+                     if (!empty($input['tax_annualization']) && (int)$input['tax_annualization'] === 1) {
+                         echo json_encode(['success' => false, 'error' => 'Tax annualization is not supported yet.']);
+                         return;
+                     }
+                     // Validate enum inputs before persisting — unknown values could produce wrong payroll
+                     $allowedFrequencies = ['Monthly', 'Semi-Monthly', 'Weekly', 'Daily'];
+                     $allowedBasis       = ['monthly', 'daily', 'hourly'];
+                     $allowedStatutory   = ['monthly_base', 'actual_period_equivalent'];
+                     $allowedProration   = ['split_even', 'full_first_cutoff', 'full_second_cutoff'];
+                     $allowedRounding    = ['half_up', 'half_even'];
+                     $freq = $input['default_pay_frequency'] ?? 'Semi-Monthly';
+                     $basis = $input['default_pay_basis'] ?? 'monthly';
+                     $statutory = $input['statutory_basis'] ?? 'monthly_base';
+                     $proration = $input['proration_method'] ?? 'split_even';
+                     $rounding = $input['rounding_mode'] ?? 'half_up';
+                     if (!in_array($freq, $allowedFrequencies, true)) {
+                         echo json_encode(['success' => false, 'error' => "Invalid default_pay_frequency: '{$freq}'." ]); return;
+                     }
+                     if (!in_array($basis, $allowedBasis, true)) {
+                         echo json_encode(['success' => false, 'error' => "Invalid default_pay_basis: '{$basis}'."]); return;
+                     }
+                     if (!in_array($statutory, $allowedStatutory, true)) {
+                         echo json_encode(['success' => false, 'error' => "Invalid statutory_basis: '{$statutory}'."]); return;
+                     }
+                     if (!in_array($proration, $allowedProration, true)) {
+                         echo json_encode(['success' => false, 'error' => "Invalid proration_method: '{$proration}'."]); return;
+                     }
+                     if (!in_array($rounding, $allowedRounding, true)) {
+                         echo json_encode(['success' => false, 'error' => "Invalid rounding_mode: '{$rounding}'."]); return;
+                     }
+                     $stmt = $this->pdo->prepare("
+                         INSERT INTO `tenant_payroll_settings` 
+                         (`tenant_id`, `default_pay_frequency`, `proration_method`, `default_pay_basis`, `tax_annualization`, `mwe_auto_exempt`, `rounding_mode`, `approval_levels`, `statutory_basis`)
+                         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                         ON DUPLICATE KEY UPDATE 
+                         `default_pay_frequency`=VALUES(`default_pay_frequency`),
+                         `proration_method`=VALUES(`proration_method`),
+                         `default_pay_basis`=VALUES(`default_pay_basis`),
+                         `tax_annualization`=VALUES(`tax_annualization`),
+                         `mwe_auto_exempt`=VALUES(`mwe_auto_exempt`),
+                         `rounding_mode`=VALUES(`rounding_mode`),
+                         `approval_levels`=VALUES(`approval_levels`),
+                         `statutory_basis`=VALUES(`statutory_basis`)
+                     ");
+                     $stmt->execute([
+                         $this->tenantId,
+                         $freq,
+                         $proration,
+                         $basis,
+                         (int)($input['tax_annualization'] ?? 0),
+                         (int)($input['mwe_auto_exempt'] ?? 1),
+                         $rounding,
+                         (int)($input['approval_levels'] ?? 1),
+                         $statutory
+                     ]);
+                     echo json_encode(['success' => true]);
+                     break;
 
                 case 'components_list':
                     try {

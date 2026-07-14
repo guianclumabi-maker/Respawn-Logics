@@ -420,3 +420,22 @@ input[type="checkbox"] {
   border-radius: 4px;
   cursor: pointer;
 }
+
+/* ── UI polish (module-wide) ─────────────────────────────────────────── */
+/* Hide the scrollbar on the horizontal tab bar while keeping it scrollable. */
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+.no-scrollbar::-webkit-scrollbar { display: none; }
+
+/* Clearer, scannable data tables (Queue / Exceptions / Payslips). */
+.data-table thead th {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--text-tertiary);
+  border-bottom: 1px solid var(--border-color);
+}
+.data-table tbody tr { border-top: 1px solid var(--border-light); transition: background-color 0.15s; }
+.data-table tbody tr:hover { background-color: var(--bg-hover); }
+
+/* Subtle card hover for a more tactile feel across all tabs. */
+.card { transition: border-color 0.2s, box-shadow 0.2s; }
+.card:hover { border-color: rgba(0, 224, 122, 0.3); }

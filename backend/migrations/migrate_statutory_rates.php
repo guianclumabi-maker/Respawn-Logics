@@ -22,70 +22,85 @@ if (!isset($pdo)) {
     }
 }
 
-function insertVersionedRecord($pdo, $table, $columns, $rows, $idempotencyKeys = ['effective_from']) {
+function insertVersionedRecord($pdo, $table, $columns, $rows, $naturalKeys = []) {
     if (empty($rows)) return;
-    $firstRow = $rows[0];
-
-    $whereClauses = [];
-    $whereVals = [];
-    foreach ($idempotencyKeys as $key) {
-        $whereClauses[] = "`$key` = ?";
-        $whereVals[] = $firstRow[$key];
-    }
-    $whereSql = implode(' AND ', $whereClauses);
-
-    $stmt = $pdo->prepare("SELECT 1 FROM `$table` WHERE $whereSql LIMIT 1");
-    $stmt->execute($whereVals);
-    if ($stmt->fetch()) {
-        echo "Version (" . implode(', ', $whereVals) . ") for $table already exists. Skipping.\n";
-        return;
-    }
-
-    $effectiveFrom = $firstRow['effective_from'];
-    $stmt = $pdo->prepare("SELECT `effective_from` FROM `$table` WHERE `effective_to` IS NULL LIMIT 1");
-    $stmt->execute();
-    $active = $stmt->fetch();
-    
-    if ($active) {
-        $activeFrom = $active['effective_from'];
-        if (strtotime($effectiveFrom) <= strtotime($activeFrom)) {
-            echo "Warning: New version $effectiveFrom is older or equal to active version $activeFrom for $table. Skipping.\n";
-            return;
-        }
-    }
 
     $pdo->beginTransaction();
     try {
-        if ($active) {
-            $closeStmt = $pdo->prepare("UPDATE `$table` SET `effective_to` = DATE_SUB(?, INTERVAL 1 DAY) WHERE `effective_to` IS NULL");
-            $closeStmt->execute([$effectiveFrom]);
-        }
-
-        $placeholders = implode(', ', array_fill(0, count($columns), '?'));
-        $insertStmt = $pdo->prepare("INSERT INTO `$table` (`" . implode('`, `', $columns) . "`) VALUES ($placeholders)");
         foreach ($rows as $row) {
+            $effectiveFrom = $row['effective_from'];
+
+            // 1. Build where clause for natural keys + effective_from (idempotency check)
+            $whereClauses = ["`effective_from` = ?"];
+            $whereVals = [$effectiveFrom];
+            foreach ($naturalKeys as $key) {
+                if (array_key_exists($key, $row)) {
+                    $whereClauses[] = "`$key` = ?";
+                    $whereVals[] = $row[$key];
+                } else {
+                    $whereClauses[] = "`$key` IS NULL";
+                }
+            }
+            $whereSql = implode(' AND ', $whereClauses);
+
+            $stmt = $pdo->prepare("SELECT 1 FROM `$table` WHERE $whereSql LIMIT 1");
+            $stmt->execute($whereVals);
+            if ($stmt->fetch()) {
+                // Already exists, skip this row
+                continue;
+            }
+
+            // 2. Find currently active record matching natural keys
+            $activeClauses = ["`effective_to` IS NULL"];
+            $activeVals = [];
+            foreach ($naturalKeys as $key) {
+                if (array_key_exists($key, $row)) {
+                    $activeClauses[] = "`$key` = ?";
+                    $activeVals[] = $row[$key];
+                } else {
+                    $activeClauses[] = "`$key` IS NULL";
+                }
+            }
+            $activeSql = implode(' AND ', $activeClauses);
+
+            $stmt = $pdo->prepare("SELECT `effective_from`, `id` FROM `$table` WHERE $activeSql LIMIT 1");
+            $stmt->execute($activeVals);
+            $active = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if ($active) {
+                $activeFrom = $active['effective_from'];
+                if (strtotime($effectiveFrom) <= strtotime($activeFrom)) {
+                    echo "Warning: New version $effectiveFrom is older or equal to active version $activeFrom for $table. Skipping.\n";
+                    continue;
+                }
+
+                // Close active record
+                $closeStmt = $pdo->prepare("UPDATE `$table` SET `effective_to` = DATE_SUB(?, INTERVAL 1 DAY) WHERE `id` = ?");
+                $closeStmt->execute([$effectiveFrom, $active['id']]);
+            }
+
+            // 3. Insert new row
+            $placeholders = implode(', ', array_fill(0, count($columns), '?'));
+            $insertStmt = $pdo->prepare("INSERT INTO `$table` (`" . implode('`, `', $columns) . "`) VALUES ($placeholders)");
             $vals = [];
             foreach ($columns as $col) {
                 $vals[] = $row[$col] ?? null;
             }
             $insertStmt->execute($vals);
-        }
-        
-        try {
-            $auditStmt = $pdo->prepare("INSERT INTO `audit_logs` (`tenant_id`, `user_email`, `action`, `details`, `created_at`) VALUES (NULL, 'system', 'statutory_rate_version_added', ?, NOW())");
-            $auditStmt->execute([json_encode(['table' => $table, 'effective_from' => $effectiveFrom])]);
-        } catch (Exception $e) {
+
             try {
-                // Try without tenant_id if it's not present or strict
-                $auditStmt = $pdo->prepare("INSERT INTO `audit_logs` (`user_email`, `action`, `details`, `created_at`) VALUES ('system', 'statutory_rate_version_added', ?, NOW())");
-                $auditStmt->execute([json_encode(['table' => $table, 'effective_from' => $effectiveFrom])]);
-            } catch (Exception $e2) {
-                // Ignore audit failure
+                $auditStmt = $pdo->prepare("INSERT INTO `audit_logs` (`tenant_id`, `user_email`, `action`, `details`, `created_at`) VALUES (NULL, 'system', 'statutory_rate_version_added', ?, NOW())");
+                $auditStmt->execute([json_encode(['table' => $table, 'effective_from' => $effectiveFrom, 'key' => array_intersect_key($row, array_flip($naturalKeys))])]);
+            } catch (Exception $e) {
+                try {
+                    $auditStmt = $pdo->prepare("INSERT INTO `audit_logs` (`user_email`, `action`, `details`, `created_at`) VALUES ('system', 'statutory_rate_version_added', ?, NOW())");
+                    $auditStmt->execute([json_encode(['table' => $table, 'effective_from' => $effectiveFrom, 'key' => array_intersect_key($row, array_flip($naturalKeys))])]);
+                } catch (Exception $e2) {
+                    // Ignore audit failure
+                }
             }
         }
-        
         $pdo->commit();
-        echo "Successfully inserted new version $effectiveFrom into $table.\n";
     } catch (Exception $e) {
         $pdo->rollBack();
         throw $e;
@@ -120,7 +135,23 @@ try {
         ['param_key' => 'sss_er_rate', 'param_value' => 0.10, 'effective_from' => '2025-01-01']
     ];
     // Since paramRows has multiple different keys sharing the same effective_from, we can insert them as one set
-    insertVersionedRecord($pdo, 'statutory_parameters', ['param_key', 'param_value', 'effective_from'], $paramRows);
+    insertVersionedRecord($pdo, 'statutory_parameters', ['param_key', 'param_value', 'effective_from'], $paramRows, ['param_key']);
+
+    // Seed working-day divisors into statutory_parameters so the payroll engine
+    // reads them from the database rather than falling back to hard-coded constants.
+    // CPA VALIDATION NEEDED: confirm working_days_per_year (313 is the PH standard) and
+    // hours_per_day (8 is the standard) match the employer's CBA / policy.
+    $divisorRows = [
+        ['param_key' => 'working_days_per_year', 'param_value' => 313, 'effective_from' => '2023-01-01'],
+        ['param_key' => 'hours_per_day',         'param_value' => 8,   'effective_from' => '2023-01-01'],
+        // Multipliers (CPA: confirm each rate against DOLE Labor Advisory / company policy)
+        ['param_key' => 'ordinary_ot_multiplier',            'param_value' => 1.25, 'effective_from' => '2023-01-01'],
+        ['param_key' => 'rest_day_or_special_multiplier',    'param_value' => 1.30, 'effective_from' => '2023-01-01'],
+        ['param_key' => 'regular_holiday_multiplier',        'param_value' => 2.00, 'effective_from' => '2023-01-01'],
+        ['param_key' => 'night_diff_multiplier',             'param_value' => 0.10, 'effective_from' => '2023-01-01'],
+    ];
+    insertVersionedRecord($pdo, 'statutory_parameters', ['param_key', 'param_value', 'effective_from'], $divisorRows, ['param_key']);
+
 
     // 2. SSS Brackets
     $pdo->exec("
@@ -139,8 +170,17 @@ try {
         );
     ");
 
-    // Delete incorrect SSS 2025-01-01 seed (MSC 4000) so it can be re-inserted cleanly starting at MSC 5000
-    $pdo->exec("DELETE FROM `sss_contribution_brackets` WHERE `effective_from` = '2025-01-01'");
+    // Guard against re-inserting an incorrect SSS seed:
+    // The original migration accidentally seeded MSC starting at 4000 (too low).
+    // We only delete those rows if the minimum MSC present for 2025-01-01 is < 5000,
+    // meaning the bad seed is still present. This makes the cleanup idempotent.
+    $badSeedStmt = $pdo->prepare(
+        "SELECT COUNT(*) FROM `sss_contribution_brackets` WHERE `effective_from` = '2025-01-01' AND `msc` < 5000"
+    );
+    $badSeedStmt->execute();
+    if ((int)$badSeedStmt->fetchColumn() > 0) {
+        $pdo->exec("DELETE FROM `sss_contribution_brackets` WHERE `effective_from` = '2025-01-01'");
+    }
 
     $sssRows = [];
     $effective_from = '2025-01-01';
@@ -164,7 +204,7 @@ try {
         $range_from += 500;
         $msc += 500;
     }
-    insertVersionedRecord($pdo, 'sss_contribution_brackets', ['range_from', 'range_to', 'msc', 'ee_amount', 'er_amount', 'ec_amount', 'wisp_ee', 'wisp_er', 'effective_from'], $sssRows);
+    insertVersionedRecord($pdo, 'sss_contribution_brackets', ['range_from', 'range_to', 'msc', 'ee_amount', 'er_amount', 'ec_amount', 'wisp_ee', 'wisp_er', 'effective_from'], $sssRows, ['range_from', 'range_to']);
 
 
     // 3. PhilHealth
@@ -180,7 +220,7 @@ try {
     ");
     insertVersionedRecord($pdo, 'philhealth_config', ['rate_total', 'floor_salary', 'ceiling_salary', 'effective_from'], [
         ['rate_total' => 0.05, 'floor_salary' => 10000, 'ceiling_salary' => 100000, 'effective_from' => '2024-01-01']
-    ]);
+    ], []);
 
     // 4. Pag-IBIG
     $pdo->exec("
@@ -197,7 +237,7 @@ try {
     ");
     insertVersionedRecord($pdo, 'pagibig_config', ['low_threshold', 'low_rate', 'high_rate', 'fund_salary_ceiling', 'er_rate', 'effective_from'], [
         ['low_threshold' => 1500, 'low_rate' => 0.01, 'high_rate' => 0.02, 'fund_salary_ceiling' => 10000, 'er_rate' => 0.02, 'effective_from' => '2024-02-01']
-    ]);
+    ], []);
 
     // 5. BIR Withholding
     $pdo->exec("
@@ -227,7 +267,7 @@ try {
         ['pay_frequency' => 'Monthly', 'lower_limit' => 166667, 'base_tax' => 33541.80, 'rate_on_excess' => 0.30, 'effective_from' => '2023-01-01'],
         ['pay_frequency' => 'Monthly', 'lower_limit' => 666667, 'base_tax' => 183541.80, 'rate_on_excess' => 0.35, 'effective_from' => '2023-01-01']
     ];
-    insertVersionedRecord($pdo, 'bir_withholding_brackets', ['pay_frequency', 'lower_limit', 'base_tax', 'rate_on_excess', 'effective_from'], $birRowsMonthly, ['pay_frequency', 'effective_from']);
+    insertVersionedRecord($pdo, 'bir_withholding_brackets', ['pay_frequency', 'lower_limit', 'base_tax', 'rate_on_excess', 'effective_from'], $birRowsMonthly, ['pay_frequency', 'lower_limit']);
 
     $birRowsSemi = [
         ['pay_frequency' => 'Semi-Monthly', 'lower_limit' => 0, 'base_tax' => 0, 'rate_on_excess' => 0, 'effective_from' => '2023-01-01'],
@@ -237,7 +277,7 @@ try {
         ['pay_frequency' => 'Semi-Monthly', 'lower_limit' => 83333, 'base_tax' => 16770.70, 'rate_on_excess' => 0.30, 'effective_from' => '2023-01-01'],
         ['pay_frequency' => 'Semi-Monthly', 'lower_limit' => 333333, 'base_tax' => 91770.70, 'rate_on_excess' => 0.35, 'effective_from' => '2023-01-01']
     ];
-    insertVersionedRecord($pdo, 'bir_withholding_brackets', ['pay_frequency', 'lower_limit', 'base_tax', 'rate_on_excess', 'effective_from'], $birRowsSemi, ['pay_frequency', 'effective_from']);
+    insertVersionedRecord($pdo, 'bir_withholding_brackets', ['pay_frequency', 'lower_limit', 'base_tax', 'rate_on_excess', 'effective_from'], $birRowsSemi, ['pay_frequency', 'lower_limit']);
 
     $birRowsWeekly = [
         ['pay_frequency' => 'Weekly', 'lower_limit' => 0, 'base_tax' => 0, 'rate_on_excess' => 0, 'effective_from' => '2023-01-01'],
@@ -247,7 +287,7 @@ try {
         ['pay_frequency' => 'Weekly', 'lower_limit' => 38462, 'base_tax' => 7740.45, 'rate_on_excess' => 0.30, 'effective_from' => '2023-01-01'],
         ['pay_frequency' => 'Weekly', 'lower_limit' => 153846, 'base_tax' => 42355.65, 'rate_on_excess' => 0.35, 'effective_from' => '2023-01-01']
     ];
-    insertVersionedRecord($pdo, 'bir_withholding_brackets', ['pay_frequency', 'lower_limit', 'base_tax', 'rate_on_excess', 'effective_from'], $birRowsWeekly, ['pay_frequency', 'effective_from']);
+    insertVersionedRecord($pdo, 'bir_withholding_brackets', ['pay_frequency', 'lower_limit', 'base_tax', 'rate_on_excess', 'effective_from'], $birRowsWeekly, ['pay_frequency', 'lower_limit']);
 
     $birRowsDaily = [
         ['pay_frequency' => 'Daily', 'lower_limit' => 0, 'base_tax' => 0, 'rate_on_excess' => 0, 'effective_from' => '2023-01-01'],
@@ -257,7 +297,7 @@ try {
         ['pay_frequency' => 'Daily', 'lower_limit' => 5479, 'base_tax' => 1102.60, 'rate_on_excess' => 0.30, 'effective_from' => '2023-01-01'],
         ['pay_frequency' => 'Daily', 'lower_limit' => 21918, 'base_tax' => 6034.30, 'rate_on_excess' => 0.35, 'effective_from' => '2023-01-01']
     ];
-    insertVersionedRecord($pdo, 'bir_withholding_brackets', ['pay_frequency', 'lower_limit', 'base_tax', 'rate_on_excess', 'effective_from'], $birRowsDaily, ['pay_frequency', 'effective_from']);
+    insertVersionedRecord($pdo, 'bir_withholding_brackets', ['pay_frequency', 'lower_limit', 'base_tax', 'rate_on_excess', 'effective_from'], $birRowsDaily, ['pay_frequency', 'lower_limit']);
 
     // 6. De Minimis
     $pdo->exec("
@@ -281,7 +321,7 @@ try {
         ['item_name' => 'Monetized Unused VL', 'ceiling_amount' => 10, 'frequency' => 'Days', 'effective_from' => '2026-01-06'],
         ['item_name' => 'Actual Medical Assistance', 'ceiling_amount' => 10000, 'frequency' => 'Yearly', 'effective_from' => '2026-01-06']
     ];
-    insertVersionedRecord($pdo, 'de_minimis_ceilings', ['item_name', 'ceiling_amount', 'frequency', 'effective_from'], $dmRows);
+    insertVersionedRecord($pdo, 'de_minimis_ceilings', ['item_name', 'ceiling_amount', 'frequency', 'effective_from'], $dmRows, ['item_name']);
 
     // Add ER columns to payroll_run_employees if they don't exist
     $columns = ['sss_er', 'sss_ec', 'wisp_er', 'phic_er', 'hdmf_er', 'thirteenth_month_accrual'];

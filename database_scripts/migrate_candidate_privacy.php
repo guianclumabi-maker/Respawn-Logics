@@ -1,6 +1,8 @@
 <?php
 if (!defined('MIGRATION_SAFE')) die('Forbidden');
-header('Content-Type: text/plain');
+if (PHP_SAPI !== 'cli' && !headers_sent()) {
+    header('Content-Type: text/plain');
+}
 
 try {
     echo "Adding candidate_profiles privacy columns...\n";

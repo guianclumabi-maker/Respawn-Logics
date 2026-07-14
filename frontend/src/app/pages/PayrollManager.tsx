@@ -1,5 +1,8 @@
 import React from 'react';
-import { PlayCircle } from 'lucide-react';
+import {
+  PlayCircle, Download, LayoutDashboard, ListChecks, AlertTriangle,
+  Wallet, Receipt, Clock, FileText, Settings as SettingsIcon,
+} from 'lucide-react';
 import { PayrollProvider, usePayroll } from './payroll/PayrollContext';
 import { DashboardTab } from './payroll/DashboardTab';
 import { TimesheetsTab } from './payroll/TimesheetsTab';
@@ -14,13 +17,28 @@ function PayrollManagerInner() {
     isLoading,
     exceptions,
     handleExport,
-    hasPermission
+    hasPermission,
   } = usePayroll();
+
+  const criticalCount = exceptions.filter((e) => e.severity === 'Critical').length;
+
+  // Tab definitions — same keys/order as before, now with icons + friendly labels.
+  const tabs = [
+    { key: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
+    { key: 'queue', label: 'Payroll Runs', icon: ListChecks },
+    { key: 'exceptions', label: 'Exceptions', icon: AlertTriangle, danger: true, badge: criticalCount },
+    { key: 'compensation', label: 'Compensation', icon: Wallet },
+    { key: 'payslips', label: 'Payslips', icon: Receipt },
+    { key: 'timesheets', label: 'Timesheets', icon: Clock },
+    { key: 'govreports', label: 'Gov Reports', icon: FileText },
+    { key: 'settings', label: 'Settings', icon: SettingsIcon },
+  ] as const;
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center h-screen bg-app">
+      <div className="flex flex-col items-center justify-center h-screen bg-app gap-3">
         <div className="pulse-indicator w-8 h-8"></div>
+        <p className="text-sm text-muted-foreground">Loading payroll…</p>
       </div>
     );
   }
@@ -28,79 +46,65 @@ function PayrollManagerInner() {
   return (
     <div className="flex-1 flex flex-col h-full overflow-hidden bg-input border-border relative z-0">
       {/* Global Background Glow Effects */}
-      <div style={{ position: "absolute", top: -100, left: -100, width: 500, height: 500, borderRadius: "50%", background: "#00e07a", filter: "blur(120px)", opacity: 0.06, pointerEvents: "none", zIndex: -1 }} />
-      <div style={{ position: "absolute", bottom: -150, right: -100, width: 600, height: 600, borderRadius: "50%", background: "#9b6dff", filter: "blur(140px)", opacity: 0.05, pointerEvents: "none", zIndex: -1 }} />
-      
+      <div style={{ position: 'absolute', top: -100, left: -100, width: 500, height: 500, borderRadius: '50%', background: '#00e07a', filter: 'blur(120px)', opacity: 0.06, pointerEvents: 'none', zIndex: -1 }} />
+      <div style={{ position: 'absolute', bottom: -150, right: -100, width: 600, height: 600, borderRadius: '50%', background: '#9b6dff', filter: 'blur(140px)', opacity: 0.05, pointerEvents: 'none', zIndex: -1 }} />
+
       {/* Main Content */}
       <div className="flex-1 flex flex-col h-full overflow-hidden">
-        {/* Module-specific top bar */}
-        <header className="flex-none px-8 py-4 border-b border-border bg-card text-card-foreground/50 backdrop-blur-md flex items-center justify-between">
-          <div className="flex items-center gap-4 w-full justify-between">
-            <div className="flex bg-input border-border rounded-lg p-1 border border-border">
-              <button 
-                className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${activeTab === 'dashboard' ? 'bg-[#00e07a]/20 text-[#00e07a]' : 'text-muted-foreground hover:text-foreground'}`} 
-                onClick={() => setActiveTab('dashboard')}
-              >
-                Dashboard
-              </button>
-              <button 
-                className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${activeTab === 'queue' ? 'bg-[#00e07a]/20 text-[#00e07a]' : 'text-muted-foreground hover:text-foreground'}`} 
-                onClick={() => setActiveTab('queue')}
-              >
-                Queue
-              </button>
-              <button 
-                className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${activeTab === 'exceptions' ? 'bg-red-500/20 text-red-500' : 'text-muted-foreground hover:text-foreground'}`} 
-                onClick={() => setActiveTab('exceptions')}
-              >
-                Exceptions ({exceptions.filter(e => e.severity === 'Critical').length})
-              </button>
-              <button 
-                className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${activeTab === 'compensation' ? 'bg-[#00e07a]/20 text-[#00e07a]' : 'text-muted-foreground hover:text-foreground'}`} 
-                onClick={() => setActiveTab('compensation')}
-              >
-                Compensation
-              </button>
-              <button 
-                className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${activeTab === 'payslips' ? 'bg-[#00e07a]/20 text-[#00e07a]' : 'text-muted-foreground hover:text-foreground'}`} 
-                onClick={() => setActiveTab('payslips')}
-              >
-                Payslips
-              </button>
-              <button 
-                className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${activeTab === 'timesheets' ? 'bg-[#00e07a]/20 text-[#00e07a]' : 'text-muted-foreground hover:text-foreground'}`} 
-                onClick={() => setActiveTab('timesheets')}
-              >
-                Timesheets
-              </button>
-              <button 
-                className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${activeTab === 'govreports' ? 'bg-[#00e07a]/20 text-[#00e07a]' : 'text-muted-foreground hover:text-foreground'}`} 
-                onClick={() => setActiveTab('govreports')}
-              >
-                Reports
-              </button>
-              <button 
-                className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${activeTab === 'settings' ? 'bg-[#00e07a]/20 text-[#00e07a]' : 'text-muted-foreground hover:text-foreground'}`} 
-                onClick={() => setActiveTab('settings')}
-              >
-                Settings
-              </button>
+        <header className="flex-none border-b border-border bg-card/60 backdrop-blur-md">
+          {/* Title row */}
+          <div className="px-8 pt-5 pb-4 flex items-start justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-[#00e07a]/15 text-[#00e07a] flex items-center justify-center flex-shrink-0">
+                <Wallet size={20} />
+              </div>
+              <div>
+                <h1 className="text-xl font-bold text-foreground leading-tight">Payroll</h1>
+                <p className="text-sm text-muted-foreground">Run payroll, review exceptions, and manage compensation.</p>
+              </div>
             </div>
-            
-            <div className="flex gap-3">
-              {hasPermission("payroll.view") && (
-                <button 
+
+            <div className="flex items-center gap-2 flex-shrink-0">
+              {hasPermission('payroll.view') && (
+                <button
                   onClick={handleExport}
-                  className="px-4 py-2 bg-card/50 hover:bg-accent border border-border text-foreground rounded-lg text-sm font-semibold transition-all flex items-center gap-2 cursor-pointer"
+                  className="px-3.5 py-2 bg-card hover:bg-accent border border-border text-foreground rounded-lg text-sm font-medium transition-colors flex items-center gap-2 cursor-pointer"
                 >
-                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                  Export CSV
+                  <Download size={16} /> Export CSV
                 </button>
               )}
-              <button className="px-4 py-2 bg-[#00e07a] text-black font-bold rounded-lg text-sm shadow-[0_0_10px_rgba(0,224,122,0.3)] flex items-center gap-2">
+              <button
+                onClick={() => setActiveTab('queue')}
+                className="px-4 py-2 bg-[#00e07a] hover:bg-[#00c96e] text-black font-semibold rounded-lg text-sm shadow-[0_0_16px_rgba(0,224,122,0.25)] transition-colors flex items-center gap-2 cursor-pointer"
+              >
                 <PlayCircle size={16} /> New Run
               </button>
             </div>
+          </div>
+
+          {/* Tab bar — icon + label, scrollable on narrow screens */}
+          <div className="px-6 flex items-center gap-1 overflow-x-auto no-scrollbar">
+            {tabs.map(({ key, label, icon: Icon, danger, badge }) => {
+              const active = activeTab === key;
+              const activeCls = danger ? 'text-red-500 border-red-500' : 'text-[#00e07a] border-[#00e07a]';
+              return (
+                <button
+                  key={key}
+                  onClick={() => setActiveTab(key)}
+                  className={`flex items-center gap-2 px-3.5 py-3 text-sm font-medium whitespace-nowrap border-b-2 transition-colors -mb-px ${
+                    active ? activeCls : 'text-muted-foreground border-transparent hover:text-foreground'
+                  }`}
+                >
+                  <Icon size={16} />
+                  {label}
+                  {typeof badge === 'number' && badge > 0 && (
+                    <span className="ml-0.5 min-w-[18px] h-[18px] px-1 rounded-full bg-red-500/20 text-red-500 text-[11px] font-bold flex items-center justify-center">
+                      {badge}
+                    </span>
+                  )}
+                </button>
+              );
+            })}
           </div>
         </header>
 
