@@ -93,9 +93,9 @@ export function Analytics() {
   }
 
   // Format data for Recharts
-  const headcountData = headcount?.labels.map((label, i) => ({ name: label, count: headcount.data[i] })) || [];
-  const talentData = talent?.labels.map((label, i) => ({ name: label, count: talent.data[i] })) || [];
-  const payrollData = payroll?.labels.map((label, i) => ({ name: label, total: payroll.data[i] })) || [];
+  const headcountData = headcount?.labels?.map((label, i) => ({ name: label, count: headcount.data[i] })) || [];
+  const talentData = talent?.labels?.map((label, i) => ({ name: label, count: talent.data[i] })) || [];
+  const payrollData = payroll?.labels?.map((label, i) => ({ name: label, total: payroll.data[i] })) || [];
 
   return (
     <div className="flex-1 overflow-y-auto p-8 font-sans text-foreground bg-background">
