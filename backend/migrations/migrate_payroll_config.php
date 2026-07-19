@@ -4,8 +4,6 @@ require_once __DIR__ . '/../../bootstrap/app.php';
 try {
     global $pdo;
 
-    $pdo->beginTransaction();
-
     echo "Creating tenant_payroll_settings table...\n";
     $pdo->exec("
         CREATE TABLE IF NOT EXISTS `tenant_payroll_settings` (
@@ -14,6 +12,7 @@ try {
             `proration_method` ENUM('split_even', 'full_first_cutoff', 'full_second_cutoff') DEFAULT 'split_even',
             `default_pay_basis` ENUM('monthly', 'daily', 'hourly') DEFAULT 'monthly',
             `statutory_basis` ENUM('monthly_base', 'actual_period_equivalent') DEFAULT 'monthly_base',
+            `monthly_pay_mode` ENUM('fixed_salary', 'hours_proxy') DEFAULT 'fixed_salary',
             `tax_annualization` TINYINT(1) DEFAULT 0,
             `mwe_auto_exempt` TINYINT(1) DEFAULT 1,
             `rounding_mode` ENUM('half_up', 'half_even') DEFAULT 'half_up',
@@ -22,7 +21,7 @@ try {
             `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
             PRIMARY KEY (`tenant_id`),
             FOREIGN KEY (`tenant_id`) REFERENCES `tenants`(`id`) ON DELETE CASCADE
-        ) ENGINE=InnoDB;
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
     ");
 
     // Idempotently add statutory_basis for installs where the table pre-exists.
@@ -33,6 +32,14 @@ try {
         echo "Adding statutory_basis column to tenant_payroll_settings...\n";
         $pdo->exec("ALTER TABLE `tenant_payroll_settings`
             ADD COLUMN `statutory_basis` ENUM('monthly_base', 'actual_period_equivalent') DEFAULT 'monthly_base' AFTER `default_pay_basis`");
+    }
+
+    $colChk2 = $pdo->query("SELECT COUNT(*) FROM information_schema.COLUMNS
+        WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'tenant_payroll_settings' AND COLUMN_NAME = 'monthly_pay_mode'");
+    if ((int)$colChk2->fetchColumn() === 0) {
+        echo "Adding monthly_pay_mode column to tenant_payroll_settings...\n";
+        $pdo->exec("ALTER TABLE `tenant_payroll_settings`
+            ADD COLUMN `monthly_pay_mode` ENUM('fixed_salary', 'hours_proxy') DEFAULT 'fixed_salary' AFTER `statutory_basis`");
     }
 
     echo "Creating pay_components table...\n";
@@ -54,7 +61,7 @@ try {
             `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
             FOREIGN KEY (`tenant_id`) REFERENCES `tenants`(`id`) ON DELETE CASCADE,
             UNIQUE KEY `unique_tenant_code` (`tenant_id`, `code`)
-        ) ENGINE=InnoDB;
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
     ");
 
     echo "Seeding default tenant_payroll_settings for existing tenants...\n";
@@ -71,12 +78,8 @@ try {
         $insertStmt->execute([$tenant['id']]);
     }
 
-    $pdo->commit();
     echo "Migration completed successfully!\n";
 
 } catch (Exception $e) {
-    if (isset($pdo) && $pdo->inTransaction()) {
-        $pdo->rollBack();
-    }
     echo "Migration failed: " . $e->getMessage() . "\n";
 }

@@ -228,6 +228,53 @@ class PayrollService
         ];
     }
 
+    // ── Monthly pay mode ──────────────────────────────────────────────────────
+    /**
+     * How monthly_fixed employees are paid per cutoff:
+     *  - 'fixed_salary' (DEFAULT — standard PH practice): basic = base_salary ×
+     *    cutoff factor MINUS absence deductions (absent scheduled workday × daily
+     *    rate). A 22-workday June pays the full monthly salary, not a pro-rated
+     *    hours total. Under the 313-day divisor convention (365 − 52 rest days),
+     *    the monthly salary already includes regular AND special holidays, so:
+     *      · unworked holidays: no deduction (and no extra pay)
+     *      · WORKED regular holiday pays the +100% EXCESS on top (200% total)
+     *      · WORKED special day pays the +30% EXCESS on top (130% total)
+     *      · OT/rest-day/night-diff are fully on top (not part of the salary)
+     *  - 'hours_proxy' (legacy): basic = approved hours × hourly. Underpays short
+     *    months; kept only for tenants that explicitly pay per approved hour.
+     * CPA VALIDATION NEEDED: the excess-only holiday premiums above assume the
+     * 313 divisor. A tenant using 261 (workdays only) must pay full 200%/130% and
+     * deduct unworked special days — revisit if working_days_per_year != 313.
+     */
+    private function resolveMonthlyPayMode(): string {
+        $mode = $this->tenantSettings['monthly_pay_mode'] ?? 'fixed_salary';
+        if ($mode === null || $mode === '') return 'fixed_salary';
+        if (!in_array($mode, ['fixed_salary', 'hours_proxy'], true)) {
+            throw new Exception("Unknown monthly_pay_mode '{$mode}'. Use fixed_salary or hours_proxy.");
+        }
+        return $mode;
+    }
+
+    /**
+     * Scheduled workdays in [start,end]: Mon–Fri, excluding tenant calendar holidays
+     * (both types — under the 313 divisor they are salary-included, so an unworked
+     * holiday is neither payable extra nor deductible as absence).
+     * NOTE: assumes a Mon–Fri workweek (same default as timesheet auto-draft).
+     */
+    private function scheduledWorkdays(string $start, string $end, string $tenantId): array {
+        $hStmt = $this->pdo->prepare("SELECT holiday_date FROM holiday_calendar WHERE tenant_id = ? AND holiday_date BETWEEN ? AND ?");
+        $hStmt->execute([$tenantId, $start, $end]);
+        $holidays = array_flip($hStmt->fetchAll(PDO::FETCH_COLUMN) ?: []);
+        $days = [];
+        for ($t = strtotime($start); $t <= strtotime($end); $t += 86400) {
+            $d = date('Y-m-d', $t);
+            if ((int)date('N', $t) >= 6) continue;
+            if (isset($holidays[$d])) continue;
+            $days[$d] = true;
+        }
+        return $days;
+    }
+
     // ── Statutory contribution basis ──────────────────────────────────────────
     /**
      * Resolve the salary base used for SSS/PhilHealth/Pag-IBIG.
@@ -458,12 +505,40 @@ class PayrollService
 
                 if ($tsData && $tsData['reg'] !== null) {
                     $premium = $this->calculatePremiumPay($tsData, $hourly);
-                    $grossReg  = $premium['regular_pay'];
                     $grossOt   = $premium['overtime_pay'];
                     $grossRest = $premium['rest_day_pay'];
                     $grossSpec = $premium['special_holiday_pay'];
                     $grossHol  = $premium['regular_holiday_pay'];
                     $grossNd   = $premium['night_diff_pay'];
+
+                    if ($rates['basis'] === 'monthly_fixed' && $this->resolveMonthlyPayMode() === 'fixed_salary') {
+                        // FIXED-SALARY MODE (default; see resolveMonthlyPayMode docblock).
+                        // Basic = fixed cutoff salary − absences. Holiday premiums become
+                        // EXCESS-only because the 313-divisor salary already contains the
+                        // first 100% of holidays.
+                        $scheduled = $this->scheduledWorkdays($start, $end, $tenantId);
+                        $pdStmt = $this->pdo->prepare("SELECT DISTINCT timesheet_date FROM timesheets
+                            WHERE tenant_id = ? AND employee_id = ? AND timesheet_date >= ? AND timesheet_date <= ? AND status = 'Approved'");
+                        $pdStmt->execute([$tenantId, $empId, $start, $end]);
+                        $presentScheduled = 0;
+                        foreach ($pdStmt->fetchAll(PDO::FETCH_COLUMN) as $pDate) {
+                            if (isset($scheduled[$pDate])) $presentScheduled++;
+                        }
+                        $absentDays = max(0, count($scheduled) - $presentScheduled);
+                        $fixedBasic = floatval($emp['base_salary']) * $prorateFactor;
+                        $absenceDeduction = $absentDays * $rates['daily'];
+                        $grossReg = max(0, $fixedBasic - $absenceDeduction);
+                        if ($absentDays > 0) {
+                            $warnings[] = "Employee #{$empId}: {$absentDays} absent scheduled workday(s) deducted at daily rate (" . number_format($absenceDeduction, 2) . ").";
+                        }
+                        // Excess-only holiday premiums (see docblock): worked regular
+                        // holiday +100%, worked special day +30%, on top of the salary.
+                        $grossHol  = floatval($tsData['hol'])  * $hourly * ((($this->statutoryParams['regular_holiday_multiplier'] ?? 2.00)) - 1.0);
+                        $grossSpec = floatval($tsData['spec']) * $hourly * ((($this->statutoryParams['rest_day_or_special_multiplier'] ?? 1.30)) - 1.0);
+                    } else {
+                        // hours_proxy (legacy) or daily/hourly bases: pay per approved hour.
+                        $grossReg = $premium['regular_pay'];
+                    }
 
                     $cutoffBase = $grossReg + $grossOt + $grossRest + $grossSpec + $grossHol + $grossNd;
                 } else if ($runType === 'Regular') {
@@ -556,7 +631,9 @@ class PayrollService
                     }
                 }
                 
-                if ($grossReg > 0) $earningStmt->execute([$runId, $empId, 'Basic Pay (Hours)', round($grossReg, 2)]);
+                $basicLabel = ($rates['basis'] === 'monthly_fixed' && $this->resolveMonthlyPayMode() === 'fixed_salary')
+                    ? 'Basic Pay (Monthly)' : 'Basic Pay (Hours)';
+                if ($grossReg > 0) $earningStmt->execute([$runId, $empId, $basicLabel, round($grossReg, 2)]);
                 if ($grossOt > 0) $earningStmt->execute([$runId, $empId, 'Overtime Pay', round($grossOt, 2)]);
                 if ($grossRest > 0) $earningStmt->execute([$runId, $empId, 'Rest Day Pay', round($grossRest, 2)]);
                 if ($grossSpec > 0) $earningStmt->execute([$runId, $empId, 'Special Holiday Pay', round($grossSpec, 2)]);
