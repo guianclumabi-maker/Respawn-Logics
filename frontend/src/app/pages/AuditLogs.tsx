@@ -198,7 +198,7 @@ export function AuditLogs() {
                           {log.profile_image ? (
                             <img src={log.profile_image} alt="User" className="w-8 h-8 rounded-full object-cover" />
                           ) : (
-                            (log.full_name || log.user_email).charAt(0).toUpperCase()
+                            (log.full_name || log.user_email || "System User").charAt(0).toUpperCase()
                           )}
                         </div>
                         <div>
