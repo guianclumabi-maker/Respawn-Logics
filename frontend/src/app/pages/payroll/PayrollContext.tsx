@@ -34,7 +34,11 @@ const API = {
       };
     });
   },
-  fetchGovReports: () => apiFetch('/api/index.php?route=payroll_engine&action=gov_reports').then(r => r.json()).then(d => d.data || [])
+  fetchGovReports: () => apiFetch('/api/index.php?route=payroll_engine&action=gov_reports').then(r => r.json()).then(d => d.data || []),
+  fetchSchedules: () => apiFetch('/api/index.php?route=payroll_engine&action=schedules').then(r => r.json()).then(d => d.data || []),
+  generateRun: (payload: any) => apiFetch('/api/index.php?route=payroll_engine&action=generate_run', { method: 'POST', body: JSON.stringify(payload) }).then(r => r.json()),
+  updateRunStatus: (runId: number, status: string) => apiFetch('/api/index.php?route=payroll_engine&action=update_run_status', { method: 'POST', body: JSON.stringify({ run_id: runId, status }) }).then(r => r.json()),
+  fetchRunDetails: (runId: number) => apiFetch(`/api/index.php?route=payroll_engine&action=run_details&id=${runId}`).then(r => r.json()).then(d => d.data || null)
 };
 
 interface PayrollContextType {
@@ -102,6 +106,18 @@ interface PayrollContextType {
   formatCurrency: (amount: number) => string;
   startTimesheetTour: () => void;
   hasPermission: (perm: string) => boolean;
+  // Run lifecycle
+  showNewRunModal: boolean;
+  setShowNewRunModal: (show: boolean) => void;
+  schedules: any[];
+  openNewRunModal: () => void;
+  handleGenerateRun: (payload: { schedule_id: number; start_date: string; end_date: string; pay_date: string }) => Promise<void>;
+  handleUpdateRunStatus: (runId: number, status: string) => Promise<void>;
+  runDetails: any;
+  setRunDetails: (d: any) => void;
+  handleViewRunDetails: (runId: number) => Promise<void>;
+  isRunActionBusy: boolean;
+  refreshQueue: () => Promise<void>;
   API: typeof API;
 }
 
@@ -514,6 +530,75 @@ export function PayrollProvider({ children }: { children: React.ReactNode }) {
     }
   }, [processedEmployees, progress, dashInfo]);
 
+  // ── Run lifecycle ────────────────────────────────────────────────
+  const [showNewRunModal, setShowNewRunModal] = useState(false);
+  const [schedules, setSchedules] = useState<any[]>([]);
+  const [runDetails, setRunDetails] = useState<any>(null);
+  const [isRunActionBusy, setIsRunActionBusy] = useState(false);
+
+  const refreshQueue = async () => {
+    const q = await API.fetchQueue();
+    setQueue(q);
+  };
+
+  const openNewRunModal = () => {
+    setShowNewRunModal(true);
+    if (schedules.length === 0) {
+      API.fetchSchedules().then(setSchedules).catch(() => setSchedules([]));
+    }
+  };
+
+  const handleGenerateRun = async (payload: { schedule_id: number; start_date: string; end_date: string; pay_date: string }) => {
+    setIsRunActionBusy(true);
+    try {
+      const res = await API.generateRun(payload);
+      if (res.success) {
+        setShowNewRunModal(false);
+        await refreshQueue();
+        API.fetchDashboardInfo().then(setDashInfo);
+        API.fetchExceptions().then(setExceptions);
+        alert(`Payroll run #${res.run_id ?? ''} generated successfully.`);
+      } else {
+        // Fail-loud: surface the engine's exact error (e.g. "no approved timesheets").
+        alert(res.error || 'Failed to generate payroll run.');
+      }
+    } catch (err) {
+      console.error('Error generating run:', err);
+      alert('Error generating payroll run.');
+    } finally {
+      setIsRunActionBusy(false);
+    }
+  };
+
+  const handleUpdateRunStatus = async (runId: number, status: string) => {
+    if (!confirm(`Set this payroll run to "${status}"?`)) return;
+    setIsRunActionBusy(true);
+    try {
+      const res = await API.updateRunStatus(runId, status);
+      if (res.success) {
+        setRunDetails(null);
+        await refreshQueue();
+      } else {
+        alert(res.error || 'Failed to update run status.');
+      }
+    } catch (err) {
+      console.error('Error updating run status:', err);
+      alert('Error updating run status.');
+    } finally {
+      setIsRunActionBusy(false);
+    }
+  };
+
+  const handleViewRunDetails = async (runId: number) => {
+    try {
+      const d = await API.fetchRunDetails(runId);
+      if (d) setRunDetails(d);
+      else alert('Could not load run details.');
+    } catch (err) {
+      console.error('Error fetching run details:', err);
+    }
+  };
+
   const handleViewPayslip = async (id: string) => {
     try {
       const details = await API.fetchPayslipDetails(id);
@@ -571,7 +656,9 @@ export function PayrollProvider({ children }: { children: React.ReactNode }) {
       progress, processedEmployees, fetchTimesheets, fetchEmployees, handleSaveTsRow, handleSetTsStatus,
       handleSetTsStatusPeriod, handleDeleteTsRow, handleGenerateDraft, fetchHolidays, handleSaveHoliday,
       handleDeleteHoliday, handleExport, handleViewPayslip, formatCurrency, startTimesheetTour, hasPermission,
-      handleSaveSettings, handleSaveComponent, handleDeleteComponent, API
+      handleSaveSettings, handleSaveComponent, handleDeleteComponent,
+      showNewRunModal, setShowNewRunModal, schedules, openNewRunModal, handleGenerateRun,
+      handleUpdateRunStatus, runDetails, setRunDetails, handleViewRunDetails, isRunActionBusy, refreshQueue, API
     }}>
       {children}
     </PayrollContext.Provider>

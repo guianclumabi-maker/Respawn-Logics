@@ -9,7 +9,7 @@ try {
     echo "Creating tenant_payroll_settings table...\n";
     $pdo->exec("
         CREATE TABLE IF NOT EXISTS `tenant_payroll_settings` (
-            `tenant_id` INT NOT NULL,
+            `tenant_id` VARCHAR(50) NOT NULL,
             `default_pay_frequency` ENUM('Monthly', 'Semi-Monthly', 'Weekly', 'Daily') DEFAULT 'Semi-Monthly',
             `proration_method` ENUM('split_even', 'full_first_cutoff', 'full_second_cutoff') DEFAULT 'split_even',
             `default_pay_basis` ENUM('monthly', 'daily', 'hourly') DEFAULT 'monthly',
@@ -21,14 +21,14 @@ try {
             `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
             PRIMARY KEY (`tenant_id`),
             FOREIGN KEY (`tenant_id`) REFERENCES `tenants`(`id`) ON DELETE CASCADE
-        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
     ");
 
     echo "Creating pay_components table...\n";
     $pdo->exec("
         CREATE TABLE IF NOT EXISTS `pay_components` (
             `id` INT AUTO_INCREMENT PRIMARY KEY,
-            `tenant_id` INT NOT NULL,
+            `tenant_id` VARCHAR(50) NOT NULL,
             `code` VARCHAR(50) NOT NULL,
             `name` VARCHAR(100) NOT NULL,
             `kind` ENUM('earning', 'deduction') NOT NULL,
@@ -43,7 +43,7 @@ try {
             `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
             FOREIGN KEY (`tenant_id`) REFERENCES `tenants`(`id`) ON DELETE CASCADE,
             UNIQUE KEY `unique_tenant_code` (`tenant_id`, `code`)
-        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
     ");
 
     echo "Seeding default tenant_payroll_settings for existing tenants...\n";

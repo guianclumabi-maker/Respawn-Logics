@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useEffect, useState, useCallback } from "react";
 import { useTheme } from "next-themes";
+import { apiFetch } from "../lib/apiClient";
 
 const API_BASE =
   import.meta.env.VITE_API_BASE_URL ||
