@@ -14,7 +14,8 @@ function PayrollManagerInner() {
     isLoading,
     exceptions,
     handleExport,
-    hasPermission
+    hasPermission,
+    openNewRunModal
   } = usePayroll();
 
   if (isLoading) {
@@ -97,7 +98,10 @@ function PayrollManagerInner() {
                   Export CSV
                 </button>
               )}
-              <button className="px-4 py-2 bg-[#00e07a] text-black font-bold rounded-lg text-sm shadow-[0_0_10px_rgba(0,224,122,0.3)] flex items-center gap-2">
+              <button
+                onClick={() => { setActiveTab('queue'); openNewRunModal(); }}
+                className="px-4 py-2 bg-[#00e07a] text-black font-bold rounded-lg text-sm shadow-[0_0_10px_rgba(0,224,122,0.3)] flex items-center gap-2 cursor-pointer"
+              >
                 <PlayCircle size={16} /> New Run
               </button>
             </div>

@@ -917,6 +917,23 @@ class CandidatesController
         if (!$id || empty($stage)) { http_response_code(400); echo json_encode(['success' => false, 'error' => 'Missing ID or stage']); exit; }
         if (!in_array($stage, self::ALLOWED_STAGES, true)) { http_response_code(400); echo json_encode(['success' => false, 'error' => 'Invalid stage']); exit; }
         $oldStage = $this->pdo->prepare("SELECT a.`stage`, a.`candidate_id`, a.`job_id`, p.`email`, p.`name` FROM `candidate_applications` a JOIN `candidate_profiles` p ON a.`candidate_id` = p.`id` WHERE a.`id` = ? AND a.`tenant_id` = ?"); $oldStage->execute([$id, $this->tenantId]); $old = $oldStage->fetch();
+
+        // ── Hired-stage consistency guard ─────────────────────────────────────
+        // "Hired" must go through hire_candidate (which creates the employee record,
+        // 201 basics, and credentials). Dragging a card to Hired on the board would
+        // otherwise mark the candidate Hired WITHOUT an employee ever existing in the
+        // directory — a silent data hole. Fail loud instead: allow the move only if
+        // an employee with the candidate's email already exists in this tenant.
+        if ($stage === 'Hired') {
+            $empChk = $this->pdo->prepare("SELECT id FROM `users` WHERE `email` = ? AND `tenant_id` = ?");
+            $empChk->execute([$old['email'] ?? '', $this->tenantId]);
+            if (!$old || empty($old['email']) || !$empChk->fetch()) {
+                http_response_code(400);
+                echo json_encode(['success' => false, 'error' => 'Use the "Hire" button on the candidate\'s profile to hire — it creates their employee record and login. Moving the card alone would not add them to the directory.']);
+                exit;
+            }
+        }
+
         $updateFields = "`stage` = ?, `stage_entered_at` = NOW()";
         $updateParams = [$stage];
 
