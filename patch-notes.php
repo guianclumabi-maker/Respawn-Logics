@@ -251,6 +251,36 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
         <h1 class="page-title">Patch Notes</h1>
         <p class="page-subtitle">Detailed engineering logs for major updates to the Respawn engine.</p>
 
+        <!-- v2.7.1 -->
+        <div class="patch-card">
+            <div class="patch-header">
+                <span class="patch-version">v2.7.1</span>
+                <span class="patch-date">Jul 19, 2026</span>
+            </div>
+            <h2 class="patch-title">Global CSRF Fortification & Integrity Guards</h2>
+            
+            <div class="detail-section">
+                <span class="detail-label">Reason</span>
+                <p class="detail-text">After deploying the new authentication matrix, several API endpoints performing state mutations (POST, PUT, DELETE) were returning 403 Forbidden errors due to missing CSRF tokens. Additionally, edge cases in the ATS and Payroll modules allowed inconsistent states (e.g., dragging candidates to "Hired" without an employee record, and failed payroll tenant configurations due to schema mismatches).</p>
+            </div>
+            
+            <div class="detail-section">
+                <span class="detail-label">Implementation</span>
+                <p class="detail-text">We performed a site-wide automated refactor to replace all raw <code>fetch()</code> mutation calls with a centralized <code>apiFetch</code> wrapper that inherently handles <code>X-CSRF-Token</code> injection and token refreshing. We also patched the <code>migrate_payroll_config.php</code> schema script to correct a foreign key type and collation mismatch that blocked new tenants from generating payroll settings. Finally, we introduced a strict transition guard in the ATS <code>CandidatesController</code> that rejects state changes to "Hired" unless a valid employee record has already been provisioned.</p>
+            </div>
+            
+            <div class="detail-section">
+                <span class="detail-label">Outcome</span>
+                <p class="detail-text">All 403 CSRF errors have been eliminated platform-wide. Database referential integrity for the payroll module is restored, and ATS transitions are fully consistent with the overarching employee lifecycle.</p>
+            </div>
+
+            <div class="tag-list">
+                <span class="tag">Security</span>
+                <span class="tag">Bugfix</span>
+                <span class="tag">Database</span>
+            </div>
+        </div>
+
         <!-- v2.7.0 -->
         <div class="patch-card">
             <div class="patch-header">
