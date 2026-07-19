@@ -42,8 +42,22 @@ function insertVersionedRecord($pdo, $table, $columns, $rows, $idempotencyKeys =
     }
 
     $effectiveFrom = $firstRow['effective_from'];
-    $stmt = $pdo->prepare("SELECT `effective_from` FROM `$table` WHERE `effective_to` IS NULL LIMIT 1");
-    $stmt->execute();
+
+    // ── Natural-key scoping ──────────────────────────────────────────────────
+    // Versioning must be scoped to the record's natural key (idempotency keys minus
+    // effective_from), NOT table-wide. Otherwise inserting e.g. new Monthly BIR
+    // brackets closes the ACTIVE Semi-Monthly/Weekly/Daily rows too — silently
+    // killing withholding config for unrelated frequencies.
+    $scopeKeys = array_values(array_diff($idempotencyKeys, ['effective_from']));
+    $scopeSql = '';
+    $scopeVals = [];
+    foreach ($scopeKeys as $key) {
+        $scopeSql .= " AND `$key` = ?";
+        $scopeVals[] = $firstRow[$key];
+    }
+
+    $stmt = $pdo->prepare("SELECT `effective_from` FROM `$table` WHERE `effective_to` IS NULL{$scopeSql} LIMIT 1");
+    $stmt->execute($scopeVals);
     $active = $stmt->fetch();
     
     if ($active) {
@@ -57,8 +71,9 @@ function insertVersionedRecord($pdo, $table, $columns, $rows, $idempotencyKeys =
     $pdo->beginTransaction();
     try {
         if ($active) {
-            $closeStmt = $pdo->prepare("UPDATE `$table` SET `effective_to` = DATE_SUB(?, INTERVAL 1 DAY) WHERE `effective_to` IS NULL");
-            $closeStmt->execute([$effectiveFrom]);
+            // Close ONLY the active rows within this natural-key scope (see above).
+            $closeStmt = $pdo->prepare("UPDATE `$table` SET `effective_to` = DATE_SUB(?, INTERVAL 1 DAY) WHERE `effective_to` IS NULL{$scopeSql}");
+            $closeStmt->execute(array_merge([$effectiveFrom], $scopeVals));
         }
 
         $placeholders = implode(', ', array_fill(0, count($columns), '?'));
