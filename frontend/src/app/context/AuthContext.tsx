@@ -82,7 +82,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           const loginToken = hashQuery.get('login_token');
           if (loginToken) {
             // Exchange the one-time token for a proper session
-            const exchangeRes = await fetch(`${API_BASE}/api.php?action=exchange_token&token=${encodeURIComponent(loginToken)}`, {
+            const exchangeRes = await apiFetch(`${API_BASE}/api.php?action=exchange_token&token=${encodeURIComponent(loginToken)}`, {
               credentials: 'include'
             });
             const exchangeData = await exchangeRes.json();
@@ -98,7 +98,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         }
 
         // Now do the normal session check
-        const res = await fetch(`${API_BASE}/api.php?action=current_user`, { credentials: 'include' });
+        const res = await apiFetch(`${API_BASE}/api.php?action=current_user`, { credentials: 'include' });
         const data = await res.json();
         if (data.success && data.user) {
           if (data.user.must_change_password) {
@@ -126,7 +126,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       let token = (window as any).__CSRF_TOKEN__;
       if (!token) {
         try {
-          const tokenRes = await fetch(`${API_BASE}/api/index.php?route=auth&action=csrf`, { credentials: "include" });
+          const tokenRes = await apiFetch(`${API_BASE}/api/index.php?route=auth&action=csrf`, { credentials: "include" });
           const tokenData = await tokenRes.json();
           if (tokenData.success && tokenData.csrf_token) {
             token = (window as any).__CSRF_TOKEN__ = tokenData.csrf_token;
@@ -137,7 +137,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
 
       try {
-        const res = await fetch(
+        const res = await apiFetch(
           `${API_BASE}/api/index.php?route=auth&action=login`,
           {
             method: "POST",
@@ -173,7 +173,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // ── Logout ──
   const logout = useCallback(async () => {
     try {
-      await fetch(`${API_BASE}/api/index.php?route=auth&action=logout`, {
+      await apiFetch(`${API_BASE}/api/index.php?route=auth&action=logout`, {
         method: "POST",
         headers: {
           "X-CSRF-Token": (window as any).__CSRF_TOKEN__ || ""
@@ -182,7 +182,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       });
       
       // Fetch a fresh CSRF token for the new guest session
-      const tokenRes = await fetch(`${API_BASE}/api/index.php?route=auth&action=csrf`, { credentials: "include" });
+      const tokenRes = await apiFetch(`${API_BASE}/api/index.php?route=auth&action=csrf`, { credentials: "include" });
       const tokenData = await tokenRes.json();
       if (tokenData.success && tokenData.csrf_token) {
         (window as any).__CSRF_TOKEN__ = tokenData.csrf_token;

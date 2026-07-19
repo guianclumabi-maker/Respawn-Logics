@@ -1,3 +1,4 @@
+import { apiFetch } from "../lib/apiClient";
 import { useState, useEffect } from "react";
 import { ArrowLeft, Users, Mail, MapPin, Star } from "lucide-react";
 import type { ViewState } from "./Sidebar";
@@ -29,7 +30,7 @@ export function PoolDetail({ onViewChange, poolId }: { onViewChange: (v: ViewSta
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch(`${API}&action=pool&id=${poolId}`, { credentials: "include" })
+    apiFetch(`${API}&action=pool&id=${poolId}`, { credentials: "include" })
       .then((r) => r.json())
       .then((d) => {
         if (d.success) setPool(d.pool);

@@ -1,3 +1,4 @@
+import { apiFetch } from "../lib/apiClient";
 import { useState, useEffect } from "react";
 import { Activity, Clock, ShieldAlert, CheckCircle, Info, Search, Filter } from "lucide-react";
 
@@ -44,7 +45,7 @@ export function AuditLogs() {
 
   const fetchActions = async () => {
     try {
-      const res = await fetch(`${API}&action=fetch_actions`, { credentials: "include" });
+      const res = await apiFetch(`${API}&action=fetch_actions`, { credentials: "include" });
       if (res.ok) {
         const json = await res.json();
         if (json.success && json.data) {
@@ -66,7 +67,7 @@ export function AuditLogs() {
       if (search) params.append('search', search);
       if (actionFilter) params.append('action_filter', actionFilter);
 
-      const res = await fetch(`${API}&action=fetch_logs&${params.toString()}`, { credentials: "include" });
+      const res = await apiFetch(`${API}&action=fetch_logs&${params.toString()}`, { credentials: "include" });
       if (res.status === 401 || res.status === 403) {
         setError("Access Denied. You do not have permission to view audit logs.");
         setLoading(false);

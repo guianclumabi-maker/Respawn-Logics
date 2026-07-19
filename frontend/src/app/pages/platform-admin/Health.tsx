@@ -1,3 +1,4 @@
+import { apiFetch } from "../../lib/apiClient";
 import { useEffect, useState } from "react";
 import { CheckCircle2, XCircle, RefreshCw, HeartPulse } from "lucide-react";
 
@@ -18,7 +19,7 @@ export function PlatformAdminHealth() {
   const run = () => {
     setLoading(true);
     setError("");
-    fetch(`${API_BASE}/api/index.php?route=health&action=check`, { credentials: "include" })
+    apiFetch(`${API_BASE}/api/index.php?route=health&action=check`, { credentials: "include" })
       .then((r) => r.json())
       .then((d) => {
         if (d.success) { setChecks(d.checks ?? []); setLastRun(new Date()); }

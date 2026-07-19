@@ -1,3 +1,4 @@
+import { apiFetch } from "../lib/apiClient";
 import { useState, useEffect } from "react";
 import { Database, Plus, Users, Calendar, ChevronRight } from "lucide-react";
 import type { ViewState } from "./Sidebar";
@@ -19,7 +20,7 @@ export function TalentPools({ onViewChange }: { onViewChange: (v: ViewState) => 
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch(`${API}&action=talent_pools`, { credentials: "include" })
+    apiFetch(`${API}&action=talent_pools`, { credentials: "include" })
       .then((r) => r.json())
       .then((d) => {
         if (d.success) setPools(d.pools);

@@ -1,3 +1,4 @@
+import { apiFetch } from "../lib/apiClient";
 import { useState, useEffect } from "react";
 import { 
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer,
@@ -23,7 +24,7 @@ export function Analytics() {
     const fetchAll = async () => {
       try {
         const fetchEndpoint = async (action: string) => {
-          const res = await fetch(`${API}&action=${action}`, { credentials: "include" });
+          const res = await apiFetch(`${API}&action=${action}`, { credentials: "include" });
           if (res.status === 403) {
             setAccessDenied(true);
             return null;

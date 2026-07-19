@@ -113,7 +113,7 @@ export function TicketDetail({ ticket, onBack, onStatusChange, onPriorityChange,
       formData.append("attachment", files[i]);
       
       try {
-        const res = await fetch("../api/index.php?route=platform_support&action=upload_attachment", {
+        const res = await apiFetch("../api/index.php?route=platform_support&action=upload_attachment", {
           method: "POST",
 
           body: formData
@@ -136,8 +136,8 @@ export function TicketDetail({ ticket, onBack, onStatusChange, onPriorityChange,
     const bodyText = reply.trim() ? (internal ? `[SYSTEM] ${reply}` : reply) : (internal ? `[SYSTEM] Attached files.` : `Attached files.`);
     
     const ticketIdStr = ticket.id.replace("TKT-", "");
-    await fetch("../api/index.php?route=platform_support&action=add_comment", {
-      method: "POST", headers: { "Content-Type": "application/json", },
+    await apiFetch("../api/index.php?route=platform_support&action=add_comment", {
+      method: "POST",
       body: JSON.stringify({ ticket_id: ticketIdStr, comment: bodyText, attachments: pendingAttachments })
     });
     

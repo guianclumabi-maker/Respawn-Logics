@@ -1,3 +1,4 @@
+import { apiFetch } from "../lib/apiClient";
 import { useState, useEffect } from "react";
 import { 
   TrendingUp, 
@@ -24,7 +25,7 @@ export function InsightsPage({ onViewChange }: InsightsPageProps) {
   useEffect(() => {
     const fetchAnalytics = async () => {
       try {
-        const res = await fetch(`${API}&action=analytics`, { credentials: "include" });
+        const res = await apiFetch(`${API}&action=analytics`, { credentials: "include" });
         const json = await res.json();
         if (json.success) {
           setData(json);

@@ -1,3 +1,4 @@
+import { apiFetch } from "../../lib/apiClient";
 import { useEffect, useState } from "react";
 import { Plus, Trash2, Users, Shield, HeadphonesIcon, RefreshCw, X } from "lucide-react";
 
@@ -25,7 +26,7 @@ const ROLE_COLORS: Record<string, string> = {
 };
 
 async function getCsrf(): Promise<string> {
-  const r = await fetch(`${API_BASE}/api/index.php?route=auth&action=csrf`, { credentials: "include" });
+  const r = await apiFetch(`${API_BASE}/api/index.php?route=auth&action=csrf`, { credentials: "include" });
   const d = await r.json();
   return d.csrf_token ?? "";
 }
@@ -41,7 +42,7 @@ export function PlatformAdminStaff() {
 
   const load = () => {
     setLoading(true);
-    fetch(`${API}&action=list`, { credentials: "include" })
+    apiFetch(`${API}&action=list`, { credentials: "include" })
       .then((r) => r.json())
       .then((d) => { if (d.success) setStaff(d.data ?? []); else setError(d.error ?? "Failed to load."); })
       .catch(() => setError("Could not reach server."))
@@ -55,7 +56,7 @@ export function PlatformAdminStaff() {
     setFormError("");
     try {
       const csrf = await getCsrf();
-      const r = await fetch(`${API}&action=create`, {
+      const r = await apiFetch(`${API}&action=create`, {
         method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json", "X-CSRF-Token": csrf },
@@ -79,7 +80,7 @@ export function PlatformAdminStaff() {
   const handleDelete = async (id: number) => {
     if (!confirm("Remove this staff member?")) return;
     const csrf = await getCsrf();
-    const r = await fetch(`${API}&action=delete`, {
+    const r = await apiFetch(`${API}&action=delete`, {
       method: "POST",
       credentials: "include",
       headers: { "Content-Type": "application/json", "X-CSRF-Token": csrf },

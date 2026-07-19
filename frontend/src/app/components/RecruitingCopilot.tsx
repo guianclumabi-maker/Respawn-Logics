@@ -1,3 +1,4 @@
+import { apiFetch } from "../lib/apiClient";
 import { useState, useEffect } from "react";
 import { Bot, Clock, ClipboardList, AlertTriangle, ChevronRight, UserCheck, CheckCircle } from "lucide-react";
 import type { ViewState } from "./Sidebar";
@@ -20,7 +21,7 @@ export function RecruitingCopilot({ onViewChange }: { onViewChange: (v: ViewStat
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch(`${API}&action=ai_actions`, { credentials: "include" })
+    apiFetch(`${API}&action=ai_actions`, { credentials: "include" })
       .then((r) => r.json())
       .then((d) => {
         if (d.success) setActions(d.recommendations || []);

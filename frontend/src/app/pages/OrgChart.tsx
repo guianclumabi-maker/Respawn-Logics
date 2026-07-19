@@ -1,3 +1,4 @@
+import { apiFetch } from "../lib/apiClient";
 import { useState, useEffect } from "react";
 import { ThemeProvider } from "next-themes";
 import { useAuth } from "../context/AuthContext";
@@ -24,7 +25,7 @@ export function OrgChart() {
 
   useEffect(() => {
     if (!canView) { setLoading(false); return; }
-    fetch(API, { credentials: "include" })
+    apiFetch(API, { credentials: "include" })
       .then(res => res.json())
       .then(d => {
         if (d.success && d.data.length > 0) {

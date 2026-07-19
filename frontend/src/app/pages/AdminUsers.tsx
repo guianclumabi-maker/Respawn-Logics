@@ -1,3 +1,4 @@
+import { apiFetch } from "../lib/apiClient";
 import { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
 import { User, Mail, Shield, Circle, Edit, Trash2 } from "lucide-react";
@@ -23,7 +24,7 @@ export function AdminUsers() {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const res = await fetch(API, { credentials: "include" });
+        const res = await apiFetch(API, { credentials: "include" });
         if (res.ok) {
           const json = await res.json();
           if (json.success && json.data) {

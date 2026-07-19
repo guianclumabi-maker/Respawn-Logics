@@ -1,3 +1,4 @@
+import { apiFetch } from "../../../lib/apiClient";
 import { useState, useEffect } from "react";
 import { TicketList } from "./components/tickets/TicketList";
 import { TicketDetail } from "./components/tickets/TicketDetail";
@@ -30,7 +31,7 @@ export default function App() {
 
   useEffect(() => {
     const action = isAgent ? 'agent_queue' : 'my_tickets';
-    fetch(`${API_BASE}&action=${action}`)
+    apiFetch(`${API_BASE}&action=${action}`)
       .then(r => r.json())
       .then(d => {
         if (d.success && d.data) {
