@@ -10,35 +10,53 @@ class PayrollReferenceOracleTest extends TestCase
     protected static $tenantId;
     protected static $schedId;
 
-    // --- REFERENCE TABLE (Fill from sweldongpinoy.com or CPA) ---
-    // Every reference value is null by default, which makes the test skip automatically.
-    // The moment you fill in values for a salary, it runs the assertions.
+    // --- REFERENCE TABLE (independent statutory values, verified 2026-07) ---
+    // Sources (2026 employee shares, monthly-paid):
+    //  SSS  (RA 11199, 2026): 15% of MSC, EE share 5%; MSC floor P5,000 / ceiling P35,000
+    //       in P500 brackets; MSC above P20,000 goes to the MPF/WISP individual account
+    //       (the engine posts regular EE + WISP EE as one "SSS Contribution" line).
+    //       -> 18,000 salary => MSC 18,000 => EE 900.00
+    //       -> 30,000 salary => MSC 30,000 => EE 1,500.00 (1,000 regular + 500 MPF)
+    //       -> 50,000/90,000 => MSC capped 35,000 => EE 1,750.00 (1,000 regular + 750 MPF)
+    //  PhilHealth (UHC/RA 11223, 2026): flat 5% of monthly basic, split equally
+    //       (EE 2.5%); floor P10,000 / ceiling P100,000.
+    //       -> 18k => 450.00 | 30k => 750.00 | 50k => 1,250.00 | 90k => 2,250.00
+    //  Pag-IBIG (HDMF, 2026): EE 2% of Fund Salary capped at P10,000 => 200.00 for all
+    //       salaries >= P10,000.
+    //
+    //  'tax' and 'net' are INTENTIONALLY left null: the engine derives gross from
+    //  APPROVED TIMESHEET HOURS x hourly rate (313-day divisor), so a 22-workday June
+    //  yields gross =/= the fixed monthly salary (e.g. 18,000 base -> ~15,181.92 gross).
+    //  Monthly-salary reference calculators (sweldongpinoy etc.) therefore cannot be
+    //  compared against tax/net until the monthly-paid "worked-hours proxy" question is
+    //  resolved by the CPA (see CPA_SIGNOFF_PACKAGE item #1). Filling tax/net with
+    //  calculator values NOW would assert numbers the engine is not designed to produce.
     private static $references = [
         18000 => [
-            'sss' => null,
-            'philhealth' => null,
-            'pagibig' => null,
+            'sss' => 900.00,
+            'philhealth' => 450.00,
+            'pagibig' => 200.00,
             'tax' => null,
             'net' => null,
         ],
         30000 => [
-            'sss' => null,
-            'philhealth' => null,
-            'pagibig' => null,
+            'sss' => 1500.00,
+            'philhealth' => 750.00,
+            'pagibig' => 200.00,
             'tax' => null,
             'net' => null,
         ],
         50000 => [
-            'sss' => null,
-            'philhealth' => null,
-            'pagibig' => null,
+            'sss' => 1750.00,
+            'philhealth' => 1250.00,
+            'pagibig' => 200.00,
             'tax' => null,
             'net' => null,
         ],
         90000 => [
-            'sss' => null,
-            'philhealth' => null,
-            'pagibig' => null,
+            'sss' => 1750.00,
+            'philhealth' => 2250.00,
+            'pagibig' => 200.00,
             'tax' => null,
             'net' => null,
         ],

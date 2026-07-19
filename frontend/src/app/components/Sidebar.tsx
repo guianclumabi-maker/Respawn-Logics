@@ -320,7 +320,7 @@ export function Sidebar({ activeView, onViewChange, badges = {} }: SidebarProps)
       </div>
 
       {/* ── Navigation ────────────────────────────────── */}
-      <div className="flex-1 px-3 overflow-y-auto py-5 space-y-5 scrollbar-thin">
+      <div className="flex-1 min-h-0 px-3 overflow-y-auto py-5 space-y-5 scrollbar-thin">
         {sections.map((section) => {
           const isSectionCollapsed = !!collapsedSections[section.title];
           return (

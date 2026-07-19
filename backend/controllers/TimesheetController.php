@@ -352,13 +352,45 @@ class TimesheetController
             }
         }
 
+        // ── Unworked REGULAR holidays -> 100% base pay (Labor Code Art. 94) ──────
+        // A regular holiday is paid at 100% of the daily wage even if NOT worked.
+        // The timesheet schema's regular_holiday_hours bucket pays the 200% WORKED
+        // premium, so unworked holidays are drafted as regular_hours (= 100% pay).
+        // Scope: active employees on a payroll schedule who have no row for the
+        // holiday yet (worked punches and approved rows always win).
+        // CPA VALIDATION NEEDED: Art. 94 eligibility (present or on paid leave on the
+        // workday immediately preceding the holiday) is NOT modeled — every eligible
+        // employee is drafted and the reviewer un-approves exceptions manually.
+        $holidayDrafted = 0;
+        $regHolidays = array_keys(array_filter($holidays, fn($t) => $t === 'Regular Holiday'));
+        if (!empty($regHolidays)) {
+            $empSql = "SELECT `id` FROM `users` WHERE `tenant_id` = ? AND `employment_status` = 'Active' AND `payroll_schedule_id` IS NOT NULL";
+            $empParams = [$this->tenantId];
+            if (!empty($input['employee_id'])) { $empSql .= " AND `id` = ?"; $empParams[] = (int)$input['employee_id']; }
+            $empStmt = $this->pdo->prepare($empSql);
+            $empStmt->execute($empParams);
+            $activeEmpIds = $empStmt->fetchAll(PDO::FETCH_COLUMN);
+
+            foreach ($regHolidays as $hDate) {
+                if ($hDate < $start || $hDate > $end) continue;
+                if ((int)date('N', strtotime($hDate)) >= 6) continue; // falls on a rest day — separate rule, not modeled
+                foreach ($activeEmpIds as $aEmpId) {
+                    $existsChk->execute([$this->tenantId, $aEmpId, $hDate]);
+                    if ($existsChk->fetchColumn() !== false) continue; // worked/leave/approved row wins
+                    $upsert->execute([$this->tenantId, $aEmpId, $hDate, $regularDailyHours, 0, 0, 0, 0, 0]);
+                    $holidayDrafted++;
+                }
+            }
+        }
+
         echo json_encode([
-            'success'              => true,
-            'drafted'              => $drafted,
-            'leave_days_drafted'   => $leaveDrafted,
-            'unpaid_leave_skipped' => $leaveUnpaidSkipped,
-            'skipped_approved'     => $skippedApproved,
-            'note'             => 'Draft timesheets created as Pending (incl. paid-leave days at regular hours). Review and approve before payroll. Break/OT/rest-day/paid-leave rules are policy defaults — confirm with your policy/CPA.',
+            'success'                 => true,
+            'drafted'                 => $drafted,
+            'leave_days_drafted'      => $leaveDrafted,
+            'unpaid_leave_skipped'    => $leaveUnpaidSkipped,
+            'holiday_days_drafted'    => $holidayDrafted,
+            'skipped_approved'        => $skippedApproved,
+            'note'             => 'Draft timesheets created as Pending (incl. paid-leave days and unworked regular holidays at 100% base). Review and approve before payroll. Break/OT/rest-day/leave/holiday rules are policy defaults — confirm with your policy/CPA.',
         ]);
     }
 
