@@ -1,6 +1,7 @@
 <?php
 if (!defined('MIGRATION_SAFE')) die('Forbidden');
-header('Content-Type: text/plain');
+// CLI-safe: header() under PHPUnit/CLI causes "headers already sent" warnings.
+if (php_sapi_name() !== 'cli' && !headers_sent()) header('Content-Type: text/plain');
 require_once __DIR__ . '/../bootstrap/app.php';
 
 echo "Starting All Migrations...\n";
