@@ -150,6 +150,112 @@ class PayrollService
         return 0;
     }
 
+    // ── Pay-basis strategy ────────────────────────────────────────────────────
+    /**
+     * Resolve the tenant's pay basis from tenant_payroll_settings.default_pay_basis.
+     * The schema enum stores 'monthly'|'daily'|'hourly'; 'monthly' and 'monthly_fixed'
+     * are BOTH normalized to 'monthly_fixed' so a seeded value can never crash a run.
+     * Unknown values throw (fail-loud) rather than silently paying on the wrong basis.
+     */
+    private function resolvePayBasis(): string {
+        $basis = $this->tenantSettings['default_pay_basis'] ?? 'monthly_fixed';
+        if ($basis === null || $basis === '') return 'monthly_fixed';
+        if ($basis === 'monthly') return 'monthly_fixed';
+        if (!in_array($basis, ['monthly_fixed', 'daily', 'hourly'], true)) {
+            throw new Exception("Unknown pay basis '{$basis}'. Set tenant default_pay_basis to monthly, daily, or hourly.");
+        }
+        return $basis;
+    }
+
+    /**
+     * Derive daily/hourly rates for an employee under the tenant's pay basis.
+     *  - monthly_fixed: base_salary is MONTHLY. daily = (base*12)/working_days_per_year,
+     *    hourly = daily/hours_per_day. (Identical math to the original implementation.)
+     *  - daily: base_salary is a DAILY rate. hourly = base/hours_per_day.
+     *  - hourly: base_salary IS the hourly rate.
+     * CPA VALIDATION NEEDED: the 313-day / 8-hour divisors are defaults from
+     * statutory_parameters; employers using 365/261/26-day factors (policy/CBA) must
+     * configure them. For monthly_fixed staff, "basic pay = worked hours × hourly" is a
+     * timesheet-driven PROXY for the monthly salary — confirm it matches how a full
+     * month is actually paid.
+     */
+    private function calculateHourlyRates(array $emp): array {
+        $basis = $this->resolvePayBasis();
+        $workingDays = floatval($this->statutoryParams['working_days_per_year'] ?? 313.00);
+        $hoursPerDay = floatval($this->statutoryParams['hours_per_day'] ?? 8.00);
+        if ($workingDays <= 0 || $hoursPerDay <= 0) {
+            throw new Exception("Invalid statutory divisors (working_days_per_year={$workingDays}, hours_per_day={$hoursPerDay}). Fix statutory_parameters before running payroll.");
+        }
+        $base = floatval($emp['base_salary']);
+        switch ($basis) {
+            case 'monthly_fixed':
+                $daily = ($base * 12) / $workingDays;
+                return ['daily' => $daily, 'hourly' => $daily / $hoursPerDay, 'basis' => $basis];
+            case 'daily':
+                return ['daily' => $base, 'hourly' => $base / $hoursPerDay, 'basis' => $basis];
+            case 'hourly':
+                return ['daily' => $base * $hoursPerDay, 'hourly' => $base, 'basis' => $basis];
+        }
+        throw new Exception("Unhandled pay basis '{$basis}'."); // unreachable; defensive
+    }
+
+    // ── Premium-pay matrix ────────────────────────────────────────────────────
+    /**
+     * Pure premium-pay computation from approved timesheet hour buckets.
+     * Faithful extraction of the original inline math — multipliers and results are
+     * byte-identical for the same inputs; extracted so each line is auditable.
+     *
+     * CPA VALIDATION NEEDED (documented simplifications of the timesheet schema):
+     *  1. rest_day_hours and special_day_hours share one multiplier (default 1.30).
+     *     A rest day that IS ALSO a special day should be 1.50 — the schema cannot
+     *     express the overlap, so it cannot be computed here.
+     *  2. overtime_hours uses the ordinary-OT multiplier (1.25) even if the OT fell on
+     *     a rest day/holiday (should compound, e.g. 1.30×1.30). Not representable.
+     *  3. night_diff_hours earns a flat +10% of base hourly and does NOT compound with
+     *     OT/holiday premiums for the same hour. Not representable.
+     * These under-pay in edge cases rather than over-pay; fixing them requires
+     * overlap columns in `timesheets` (e.g. rest_special_hours, ot_rest_hours).
+     */
+    private function calculatePremiumPay(array $hours, float $hourly): array {
+        $p = $this->statutoryParams;
+        return [
+            'regular_pay'         => floatval($hours['reg'] ?? 0)  * $hourly,
+            'overtime_pay'        => floatval($hours['ot'] ?? 0)   * $hourly * ($p['ordinary_ot_multiplier'] ?? 1.25),
+            'rest_day_pay'        => floatval($hours['rest'] ?? 0) * $hourly * ($p['rest_day_or_special_multiplier'] ?? 1.30),
+            'special_holiday_pay' => floatval($hours['spec'] ?? 0) * $hourly * ($p['rest_day_or_special_multiplier'] ?? 1.30),
+            'regular_holiday_pay' => floatval($hours['hol'] ?? 0)  * $hourly * ($p['regular_holiday_multiplier'] ?? 2.00),
+            'night_diff_pay'      => floatval($hours['nd'] ?? 0)   * $hourly * ($p['night_diff_multiplier'] ?? 0.10),
+        ];
+    }
+
+    // ── Statutory contribution basis ──────────────────────────────────────────
+    /**
+     * Resolve the salary base used for SSS/PhilHealth/Pag-IBIG.
+     *  - 'monthly_base' (default; original behavior): the employee's monthly base_salary.
+     *  - 'actual_period_equivalent': actual period earnings scaled to a monthly
+     *    equivalent (period pay ÷ statutoryMultiplier) — for daily/hourly/no-work-no-pay
+     *    staff whose real compensable pay differs from a fixed monthly figure.
+     * Unknown strategies throw. When a daily/hourly pay basis is combined with
+     * 'monthly_base', a WARNING is attached to the run (visible, not silent).
+     * CPA VALIDATION NEEDED: correct MSC basis for partial periods / daily-paid staff.
+     */
+    private function resolveStatutoryBasis(): string {
+        $s = $this->tenantSettings['statutory_basis'] ?? 'monthly_base';
+        if ($s === null || $s === '') return 'monthly_base';
+        if (!in_array($s, ['monthly_base', 'actual_period_equivalent'], true)) {
+            throw new Exception("Unknown statutory_basis '{$s}'. Use monthly_base or actual_period_equivalent.");
+        }
+        return $s;
+    }
+
+    private function statutorySalaryBase(array $emp, float $periodWorkPay, float $statutoryMultiplier): float {
+        if ($this->resolveStatutoryBasis() === 'actual_period_equivalent') {
+            if ($statutoryMultiplier <= 0) return 0.0; // cutoff carries no statutory deduction
+            return $periodWorkPay / $statutoryMultiplier; // scale period pay to monthly equivalent
+        }
+        return floatval($emp['base_salary']);
+    }
+
     private function getDeMinimisExemption($item_name, $amount, $frequency) {
         if (!isset($this->deMinimisConfig[$item_name])) {
             return ['exempt' => 0, 'excess' => $amount];
@@ -176,6 +282,19 @@ class PayrollService
         return ['exempt' => $exempt, 'excess' => $excess];
     }
 
+    /**
+     * Remaining ₱90,000 exemption bucket (NIRC Sec. 32(B)(7)(e)) for 13th-month pay
+     * and "other benefits" in the calendar year.
+     *
+     * HARDENED: de-minimis benefits WITHIN their own statutory ceilings are exempt
+     * under a SEPARATE provision (RR 11-2018) and must NOT consume this ₱90k bucket —
+     * so 'De Minimis (Exempt): %' rows are intentionally EXCLUDED below. De-minimis
+     * EXCESS over its ceiling is already routed into "other benefits"
+     * ($otherBenefitsThisRun in generateRun), which correctly consumes this bucket and
+     * becomes taxable once the bucket is exhausted.
+     * (Previous behavior also subtracted exempt de minimis here, over-consuming the
+     * cap and over-withholding tax.)
+     */
     private function getRemaining90kExemption($empId, $payDate, $tenantId) {
         $year = date('Y', strtotime($payDate));
         $stmt = $this->pdo->prepare("
@@ -184,7 +303,7 @@ class PayrollService
             JOIN payroll_runs pr ON pe.payroll_run_id = pr.id
             WHERE pe.employee_id = ?
             AND pr.tenant_id = ?
-            AND (pe.earning_type = 'Non-Taxable Other Benefits' OR pe.earning_type = '13th Month Pay (Non-Taxable)' OR pe.earning_type LIKE 'De Minimis (Exempt): %')
+            AND (pe.earning_type = 'Non-Taxable Other Benefits' OR pe.earning_type = '13th Month Pay (Non-Taxable)')
             AND YEAR(pr.pay_date) = ?
         ");
         $stmt->execute([$empId, $tenantId, $year]);
@@ -307,11 +426,11 @@ class PayrollService
             // 5. Process Each Employee
             foreach ($employees as $emp) {
                 $empId = $emp['id'];
-                // Timesheet-driven gross pay
-                $workingDays = $this->statutoryParams['working_days_per_year'] ?? 313.00;
-                $hoursPerDay = $this->statutoryParams['hours_per_day'] ?? 8.00;
-                $daily = (floatval($emp['base_salary']) * 12) / $workingDays;
-                $hourly = $daily / $hoursPerDay;
+                // Timesheet-driven gross pay, on the tenant's configured pay basis
+                // (monthly_fixed default preserves the original math exactly; daily/hourly
+                // supported; unknown basis throws — see calculateHourlyRates).
+                $rates = $this->calculateHourlyRates($emp);
+                $hourly = $rates['hourly'];
 
                 $tsStmt = $this->pdo->prepare("
                     SELECT 
@@ -338,12 +457,13 @@ class PayrollService
                 $grossNd = 0;
 
                 if ($tsData && $tsData['reg'] !== null) {
-                    $grossReg = floatval($tsData['reg']) * $hourly;
-                    $grossOt = floatval($tsData['ot']) * $hourly * ($this->statutoryParams['ordinary_ot_multiplier'] ?? 1.25);
-                    $grossRest = floatval($tsData['rest']) * $hourly * ($this->statutoryParams['rest_day_or_special_multiplier'] ?? 1.30);
-                    $grossSpec = floatval($tsData['spec']) * $hourly * ($this->statutoryParams['rest_day_or_special_multiplier'] ?? 1.30);
-                    $grossHol = floatval($tsData['hol']) * $hourly * ($this->statutoryParams['regular_holiday_multiplier'] ?? 2.00);
-                    $grossNd = floatval($tsData['nd']) * $hourly * ($this->statutoryParams['night_diff_multiplier'] ?? 0.10);
+                    $premium = $this->calculatePremiumPay($tsData, $hourly);
+                    $grossReg  = $premium['regular_pay'];
+                    $grossOt   = $premium['overtime_pay'];
+                    $grossRest = $premium['rest_day_pay'];
+                    $grossSpec = $premium['special_holiday_pay'];
+                    $grossHol  = $premium['regular_holiday_pay'];
+                    $grossNd   = $premium['night_diff_pay'];
 
                     $cutoffBase = $grossReg + $grossOt + $grossRest + $grossSpec + $grossHol + $grossNd;
                 } else if ($runType === 'Regular') {
@@ -359,9 +479,18 @@ class PayrollService
                     $totalExpenses += floatval($exp['amount']);
                 }
                 
-                $sss = $this->calculateSSS(floatval($emp['base_salary']), $statutoryMultiplier);
-                $phic = $this->calculatePhilHealth(floatval($emp['base_salary']), $statutoryMultiplier);
-                $hdmf = $this->calculatePagIbig(floatval($emp['base_salary']), $statutoryMultiplier);
+                // Statutory contributions use the configured basis strategy:
+                // monthly_base (default, original behavior) or actual_period_equivalent.
+                // Unknown strategy throws inside resolveStatutoryBasis().
+                $statBase = $this->statutorySalaryBase($emp, $cutoffBase, $statutoryMultiplier);
+                if ($rates['basis'] !== 'monthly_fixed' && $this->resolveStatutoryBasis() === 'monthly_base') {
+                    // Not silent: daily/hourly staff on monthly_base MSC is usually wrong
+                    // (no-work-no-pay ≠ fixed monthly salary). Surface it on every run.
+                    $warnings[] = "Employee #{$empId}: pay basis '{$rates['basis']}' with statutory_basis 'monthly_base' — SSS/PhilHealth/Pag-IBIG use the fixed monthly base_salary, not actual period pay. Set statutory_basis='actual_period_equivalent' if this tenant pays no-work-no-pay.";
+                }
+                $sss = $this->calculateSSS($statBase, $statutoryMultiplier);
+                $phic = $this->calculatePhilHealth($statBase, $statutoryMultiplier);
+                $hdmf = $this->calculatePagIbig($statBase, $statutoryMultiplier);
                 
                 $totalHmoDeduction = 0;
                 $totalAllowances = 0;
@@ -397,6 +526,20 @@ class PayrollService
                         $amount = floatval($comp['value']) * $prorateFactor;
                     } else if ($comp['calc_type'] === 'percent_of_base') {
                         $amount = (floatval($emp['base_salary']) * (floatval($comp['value']) / 100)) * $prorateFactor;
+                    } else if ($comp['calc_type'] === 'loan_amortization') {
+                        // A loan amortization IS a fixed per-period deduction; `value` is the
+                        // amortization amount. LIMITATION (documented, not silent): remaining-balance
+                        // tracking / auto-stop at zero is NOT implemented — payroll ops must
+                        // deactivate the component when the loan is fully paid.
+                        if ($comp['value'] === null || floatval($comp['value']) <= 0) {
+                            throw new Exception("Pay component '{$comp['name']}' (loan_amortization) has no amortization amount set. Set its value or deactivate it.");
+                        }
+                        $amount = floatval($comp['value']) * $prorateFactor;
+                        $warnings[] = "Component '{$comp['name']}': loan amortization deducted as a fixed amount; remaining-balance tracking is not implemented — deactivate the component once the loan is settled.";
+                    } else {
+                        // 'statutory', 'attendance_derived', 'formula' have no engine implementation.
+                        // Previously they were SILENTLY skipped => wrong net pay. Fail loud instead.
+                        throw new Exception("Pay component '{$comp['name']}' uses calc_type '{$comp['calc_type']}', which is not implemented in the payroll engine. Deactivate it or change it to 'fixed'/'percent_of_base'.");
                     }
 
                     if ($amount > 0) {

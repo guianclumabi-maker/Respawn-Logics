@@ -92,7 +92,9 @@ export function InsightsPage({ onViewChange }: InsightsPageProps) {
                 <p className="text-[10px] text-muted-foreground mt-0.5">Monthly breakdown of filed grievances and cases.</p>
               </div>
               <div className="flex items-center gap-3">
-                <button className="flex items-center gap-2 px-3 py-1.5 bg-card/[0.03] hover:bg-card/[0.08] border border-border rounded-md text-xs transition-colors">
+                <button
+                  onClick={() => setFilterPeriod(p => p === "Last 6 Months" ? "Last 12 Months" : p === "Last 12 Months" ? "Year to Date" : "Last 6 Months")}
+                  className="flex items-center gap-2 px-3 py-1.5 bg-card/[0.03] hover:bg-card/[0.08] border border-border rounded-md text-xs transition-colors cursor-pointer">
                   <Filter size={12} />
                   {filterPeriod}
                 </button>

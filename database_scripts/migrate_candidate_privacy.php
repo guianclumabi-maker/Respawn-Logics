@@ -1,6 +1,8 @@
 <?php
 if (!defined('MIGRATION_SAFE')) die('Forbidden');
-header('Content-Type: text/plain');
+// Only send headers when run via a web request — under CLI/PHPUnit output has
+// already started and header() triggers "headers already sent" warnings.
+if (php_sapi_name() !== 'cli' && !headers_sent()) header('Content-Type: text/plain');
 
 try {
     echo "Adding candidate_profiles privacy columns...\n";

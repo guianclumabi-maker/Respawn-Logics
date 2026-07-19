@@ -18,7 +18,9 @@ export function Permissions({ onViewChange }: { onViewChange: (v: ViewState) => 
           <h1 className="text-2xl font-bold font-outfit tracking-tight text-foreground mb-2">Users & Permissions</h1>
           <p className="text-sm text-muted-foreground">Manage access control and user roles for the ATS module</p>
         </div>
-        <button className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold bg-gradient-to-r from-[#8b5cf6] to-[#ec4899] hover:opacity-90 text-foreground shadow-lg shadow-purple-500/20">
+        {/* No invite endpoint exists (users are created via hiring / HR flows) — disabled honestly. */}
+        <button disabled title="Invites are not available yet — users are created via hiring or the HR Directory."
+          className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold bg-gradient-to-r from-[#8b5cf6] to-[#ec4899] text-foreground shadow-lg shadow-purple-500/20 opacity-50 cursor-not-allowed">
           <UserPlus size={16} />
           Invite User
         </button>

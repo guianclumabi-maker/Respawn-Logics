@@ -203,7 +203,17 @@ export function RunTab({ view }: RunTabProps) {
               <input type="date" value={runForm.pay_date} onChange={(e) => setRunForm({ ...runForm, pay_date: e.target.value })}
                 className="w-full mb-4 p-2 rounded-md bg-bg-item border border-border-color text-foreground" />
 
-              <p className="text-xs text-muted mb-4">Only <strong>Approved</strong> timesheets inside the period are paid. The run fails loudly if timesheets or statutory tables are missing — nothing is silently computed.</p>
+              <p className="text-xs text-muted mb-3">Only <strong>Approved</strong> timesheets inside the period are paid. The run fails loudly if timesheets or statutory tables are missing — nothing is silently computed.</p>
+              {/* Nudge: most "no approved timesheets" failures are just a missing draft step. */}
+              <p className="text-xs mb-4">
+                <button
+                  type="button"
+                  className="text-[#00e07a] hover:underline cursor-pointer bg-transparent border-0 p-0"
+                  onClick={() => { setShowNewRunModal(false); setActiveTab('timesheets'); }}
+                >
+                  Missing hours? Draft timesheets from attendance & leave first →
+                </button>
+              </p>
 
               <div className="flex justify-end gap-2">
                 <button type="button" className="btn btn-secondary" onClick={() => setShowNewRunModal(false)}>Cancel</button>

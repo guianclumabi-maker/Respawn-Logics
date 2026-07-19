@@ -132,6 +132,14 @@ export function ResultsView({ results, fileName, onReset }: ResultsViewProps) {
               </span>
             </h3>
             <button
+              onClick={() => {
+                const rows = [["row", "email", "field", "issue"], ...errorRows.map(r => [r.row, r.email, r.field, r.issue])];
+                const csv = rows.map(r => r.map(v => `"${String(v ?? "").replace(/"/g, '""')}"`).join(",")).join("\n");
+                const url = URL.createObjectURL(new Blob([csv], { type: "text/csv" }));
+                const a = document.createElement("a");
+                a.href = url; a.download = "import_errors.csv"; a.click();
+                URL.revokeObjectURL(url);
+              }}
               style={{
                 display: "flex", alignItems: "center", gap: "0.4rem",
                 background: "transparent",
@@ -236,6 +244,7 @@ export function ResultsView({ results, fileName, onReset }: ResultsViewProps) {
           Import Another File
         </button>
         <button
+          onClick={() => { window.location.hash = "#/hr-directory"; }}
           style={{
             flex: 1,
             background: "linear-gradient(135deg, #6366f1 0%, #ec4899 100%)",

@@ -253,9 +253,14 @@ class TimesheetController
         while ($h = $hStmt->fetch(PDO::FETCH_ASSOC)) { $holidays[$h['holiday_date']] = $h['type']; }
 
         // Attendance punches -> resolve to users.id (timesheets.employee_id).
+        // Prefer the stable a.user_id link; fall back to the email match ONLY for
+        // legacy rows without user_id (an email edit must not detach hours — see
+        // migrate_attendance_user_id.php).
         $sql = "SELECT u.`id` AS emp_id, a.`time_in`, a.`time_out`
                 FROM `attendance` a
-                JOIN `users` u ON LOWER(a.`employee_email`) = LOWER(u.`email`) AND u.`tenant_id` = a.`tenant_id`
+                JOIN `users` u ON u.`tenant_id` = a.`tenant_id`
+                    AND (a.`user_id` = u.`id`
+                         OR (a.`user_id` IS NULL AND LOWER(a.`employee_email`) = LOWER(u.`email`)))
                 WHERE a.`tenant_id` = ? AND a.`time_in` IS NOT NULL AND a.`time_out` IS NOT NULL
                 AND DATE(a.`time_in`) BETWEEN ? AND ?";
         $params = [$this->tenantId, $start, $end];
@@ -310,11 +315,50 @@ class TimesheetController
             $drafted++;
         }
 
+        // ── Approved PAID leave -> paid regular hours ─────────────────────────
+        // Without this, an employee on approved leave has no punches, so no timesheet
+        // rows, so payroll pays ₱0 for those days — a silent underpayment.
+        // POLICY DEFAULT (confirm with HR policy / CPA): a leave type whose name
+        // contains "unpaid" or "lwop" is unpaid; every other approved leave type
+        // (VL/SL/etc.) is paid at regular daily hours. Weekends/rest days inside the
+        // leave span draft no hours; days that already have a punch-derived or
+        // Approved row are never overwritten.
+        $leaveDrafted = 0; $leaveUnpaidSkipped = 0;
+        $lvSql = "SELECT u.`id` AS emp_id, lr.`leave_type`, lr.`start_date`, lr.`end_date`
+                  FROM `leave_requests` lr
+                  JOIN `users` u ON LOWER(lr.`employee_email`) = LOWER(u.`email`) AND u.`tenant_id` = lr.`tenant_id`
+                  WHERE lr.`tenant_id` = ? AND lr.`status` = 'Approved'
+                  AND lr.`start_date` <= ? AND lr.`end_date` >= ?";
+        $lvParams = [$this->tenantId, $end, $start];
+        if (!empty($input['employee_id'])) { $lvSql .= " AND u.`id` = ?"; $lvParams[] = (int)$input['employee_id']; }
+        $lvStmt = $this->pdo->prepare($lvSql);
+        $lvStmt->execute($lvParams);
+
+        $existsChk = $this->pdo->prepare("SELECT `status` FROM `timesheets` WHERE `tenant_id` = ? AND `employee_id` = ? AND `timesheet_date` = ?");
+        while ($lv = $lvStmt->fetch(PDO::FETCH_ASSOC)) {
+            if (preg_match('/unpaid|lwop/i', (string)$lv['leave_type'])) { $leaveUnpaidSkipped++; continue; }
+            $day = max(strtotime($lv['start_date']), strtotime($start));
+            $lastDay = min(strtotime($lv['end_date']), strtotime($end));
+            for (; $day <= $lastDay; $day += 86400) {
+                $date = date('Y-m-d', $day);
+                if ((int)date('N', $day) >= 6) continue;              // weekend/rest day: no hours drafted
+                $existsChk->execute([$this->tenantId, $lv['emp_id'], $date]);
+                if ($existsChk->fetchColumn() !== false) continue;    // punch-derived or Approved row wins
+                // Regular holidays inside a leave span are intentionally NOT drafted here:
+                // unworked-regular-holiday pay is a separate rule (100% base) not yet modeled.
+                if (($holidays[$date] ?? null) === 'Regular Holiday') continue;
+                $upsert->execute([$this->tenantId, $lv['emp_id'], $date, $regularDailyHours, 0, 0, 0, 0, 0]);
+                $leaveDrafted++;
+            }
+        }
+
         echo json_encode([
-            'success'          => true,
-            'drafted'          => $drafted,
-            'skipped_approved' => $skippedApproved,
-            'note'             => 'Draft timesheets created as Pending. Review and approve before payroll. Break/OT/rest-day rules are policy defaults — confirm with your policy/CPA.',
+            'success'              => true,
+            'drafted'              => $drafted,
+            'leave_days_drafted'   => $leaveDrafted,
+            'unpaid_leave_skipped' => $leaveUnpaidSkipped,
+            'skipped_approved'     => $skippedApproved,
+            'note'             => 'Draft timesheets created as Pending (incl. paid-leave days at regular hours). Review and approve before payroll. Break/OT/rest-day/paid-leave rules are policy defaults — confirm with your policy/CPA.',
         ]);
     }
 

@@ -117,17 +117,20 @@ class AttendanceController
         // Pre-load this tenant's employees: employee_id -> email, and a valid-email set.
         $byEmpId = [];
         $validEmails = [];
-        $ustmt = $this->pdo->prepare("SELECT `employee_id`, `email`, `work_email` FROM `users` WHERE `tenant_id` = ?");
+        $userIdByEmail = [];
+        $ustmt = $this->pdo->prepare("SELECT `id`, `employee_id`, `email`, `work_email` FROM `users` WHERE `tenant_id` = ?");
         $ustmt->execute([$this->tenantId]);
         while ($u = $ustmt->fetch(PDO::FETCH_ASSOC)) {
             $mail = $u['email'] ?: ($u['work_email'] ?? '');
             if ($mail === '') continue;
             if (!empty($u['employee_id'])) $byEmpId[strtolower((string)$u['employee_id'])] = $mail;
             $validEmails[strtolower($mail)] = true;
+            $userIdByEmail[strtolower($mail)] = (int)$u['id'];
         }
 
+        // user_id = stable employee link; email kept for display/legacy (see migrate_attendance_user_id.php).
         $insert = $this->pdo->prepare(
-            "INSERT INTO `attendance` (`tenant_id`, `employee_email`, `time_in`, `time_out`, `status`) VALUES (?, ?, ?, ?, 'Present')"
+            "INSERT INTO `attendance` (`tenant_id`, `employee_email`, `user_id`, `time_in`, `time_out`, `status`) VALUES (?, ?, ?, ?, ?, 'Present')"
         );
 
         $processed = 0;
@@ -166,7 +169,7 @@ class AttendanceController
                 continue;
             }
 
-            $insert->execute([$this->tenantId, $resolved, $ti, $to]);
+            $insert->execute([$this->tenantId, $resolved, $userIdByEmail[strtolower($resolved)] ?? null, $ti, $to]);
             $processed++;
         }
         fclose($handle);
@@ -439,8 +442,10 @@ class AttendanceController
 
         $shiftDetails = $this->calculateStatus($this->currentUser['id'], $now);
         
-        $stmt = $this->pdo->prepare("INSERT INTO attendance (tenant_id, employee_email, time_in, status, shift_id) VALUES (?, ?, ?, ?, ?)");
-        $stmt->execute([$this->tenantId, $email, $now, $shiftDetails['status'], $shiftDetails['shift_id']]);
+        // user_id is the stable link (email is display/legacy — an email edit must not
+        // detach punches from the employee; see migrate_attendance_user_id.php).
+        $stmt = $this->pdo->prepare("INSERT INTO attendance (tenant_id, employee_email, user_id, time_in, status, shift_id) VALUES (?, ?, ?, ?, ?, ?)");
+        $stmt->execute([$this->tenantId, $email, $this->currentUser['id'], $now, $shiftDetails['status'], $shiftDetails['shift_id']]);
         
         if (function_exists('logAction')) {
             logAction($email, 'Clock In', "Clocked in at " . date('h:i A', strtotime($now)));

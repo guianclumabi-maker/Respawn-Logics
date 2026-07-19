@@ -214,7 +214,12 @@ export function HRDirectory() {
                 Export CSV
               </button>
             )}
-            <button className="px-4 py-2 bg-[#00e07a]/10 text-[#00e07a] border border-[#00e07a]/20 rounded-lg text-sm font-medium hover:bg-[#00e07a]/20 transition-all shadow-[0_0_15px_rgba(0,224,122,0.15)] flex items-center gap-2">
+            {/* Employees are created by hiring through the ATS (hire_candidate creates the
+                user + directory record). There is no standalone add_employee endpoint. */}
+            <button
+              onClick={() => { window.location.hash = '#/ats'; }}
+              title="Employees are created by hiring through the ATS"
+              className="px-4 py-2 bg-[#00e07a]/10 text-[#00e07a] border border-[#00e07a]/20 rounded-lg text-sm font-medium hover:bg-[#00e07a]/20 transition-all shadow-[0_0_15px_rgba(0,224,122,0.15)] flex items-center gap-2 cursor-pointer">
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
               Add Employee
             </button>

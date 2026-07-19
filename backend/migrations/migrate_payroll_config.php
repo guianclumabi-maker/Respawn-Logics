@@ -13,6 +13,7 @@ try {
             `default_pay_frequency` ENUM('Monthly', 'Semi-Monthly', 'Weekly', 'Daily') DEFAULT 'Semi-Monthly',
             `proration_method` ENUM('split_even', 'full_first_cutoff', 'full_second_cutoff') DEFAULT 'split_even',
             `default_pay_basis` ENUM('monthly', 'daily', 'hourly') DEFAULT 'monthly',
+            `statutory_basis` ENUM('monthly_base', 'actual_period_equivalent') DEFAULT 'monthly_base',
             `tax_annualization` TINYINT(1) DEFAULT 0,
             `mwe_auto_exempt` TINYINT(1) DEFAULT 1,
             `rounding_mode` ENUM('half_up', 'half_even') DEFAULT 'half_up',
@@ -23,6 +24,16 @@ try {
             FOREIGN KEY (`tenant_id`) REFERENCES `tenants`(`id`) ON DELETE CASCADE
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
     ");
+
+    // Idempotently add statutory_basis for installs where the table pre-exists.
+    // (MySQL 8 has no ADD COLUMN IF NOT EXISTS, so check information_schema.)
+    $colChk = $pdo->query("SELECT COUNT(*) FROM information_schema.COLUMNS
+        WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'tenant_payroll_settings' AND COLUMN_NAME = 'statutory_basis'");
+    if ((int)$colChk->fetchColumn() === 0) {
+        echo "Adding statutory_basis column to tenant_payroll_settings...\n";
+        $pdo->exec("ALTER TABLE `tenant_payroll_settings`
+            ADD COLUMN `statutory_basis` ENUM('monthly_base', 'actual_period_equivalent') DEFAULT 'monthly_base' AFTER `default_pay_basis`");
+    }
 
     echo "Creating pay_components table...\n";
     $pdo->exec("
