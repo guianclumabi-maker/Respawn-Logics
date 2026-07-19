@@ -86,10 +86,20 @@ class CandidatesControllerTest extends TestCase
         global $pdo;
         self::loginAs('admin@tenantA.com');
         $base = '/api/index.php?route=candidates';
-
-        // Transition to Hired -> hired_at should be set.
-        self::apiPost($base, ['action' => 'update_stage', 'id' => self::$appA, 'stage' => 'Hired']);
         $stmt = $pdo->prepare("SELECT hired_at FROM candidate_applications WHERE id = ?");
+
+        // GUARD: moving to Hired via update_stage is REJECTED while no employee
+        // record exists for the candidate (drag-to-Hired must not skip hire_candidate,
+        // which is what actually creates the employee + credentials).
+        $r = self::apiPost($base, ['action' => 'update_stage', 'id' => self::$appA, 'stage' => 'Hired']);
+        $this->assertSame(400, $r['code'], 'Hired without an employee record must be rejected');
+        $stmt->execute([self::$appA]);
+        $this->assertNull($stmt->fetchColumn(), 'hired_at must stay null when the guard rejects');
+
+        // Once an employee with the candidate's email exists in the tenant,
+        // the transition is allowed and hired_at is set.
+        \FixtureHelper::createUser($pdo, self::$tenantA, 'jane@example.com', 'Employee');
+        self::apiPost($base, ['action' => 'update_stage', 'id' => self::$appA, 'stage' => 'Hired']);
         $stmt->execute([self::$appA]);
         $this->assertNotNull($stmt->fetchColumn(), 'hired_at should be set');
 
