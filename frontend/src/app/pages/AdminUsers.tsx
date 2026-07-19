@@ -180,12 +180,18 @@ export function AdminUsers() {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex gap-2">
-                      {u.roles && u.roles.map((role: any, i: number) => (
-                        <span key={i} className="bg-slate-100 text-slate-700 border border-slate-200 px-2 py-1 rounded text-xs font-medium flex items-center gap-1">
-                          <Shield className="w-3 h-3" />
-                          {typeof role === "string" ? role : role.name}
-                        </span>
-                      ))}
+                      {(() => {
+                        let r = u.roles;
+                        if (typeof r === 'string') {
+                          try { r = JSON.parse(r); } catch(e) { r = []; }
+                        }
+                        return Array.isArray(r) ? r.map((role: any, i: number) => (
+                          <span key={i} className="bg-slate-100 text-slate-700 border border-slate-200 px-2 py-1 rounded text-xs font-medium flex items-center gap-1">
+                            <Shield className="w-3 h-3" />
+                            {typeof role === "string" ? role : role.name}
+                          </span>
+                        )) : null;
+                      })()}
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
