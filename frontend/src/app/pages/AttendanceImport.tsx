@@ -1,6 +1,7 @@
 import { useState, useRef } from "react";
 import { ThemeProvider } from "next-themes";
 import { useAuth } from "../context/AuthContext";
+import { apiFetch } from "../lib/apiClient";
 import { 
   Upload, 
   Download, 
@@ -97,12 +98,8 @@ export function AttendanceImportContent() {
     const url = `${window.location.origin}${basePath}/api/index.php?route=attendance&action=import_punches`;
 
     try {
-      const res = await fetch(url, {
+      const res = await apiFetch(`/api/index.php?route=attendance&action=import_punches`, {
         method: "POST",
-        credentials: "include",
-        headers: {
-          "X-CSRF-Token": (window as any).__CSRF_TOKEN__ || ""
-        },
         body: formData
       });
 

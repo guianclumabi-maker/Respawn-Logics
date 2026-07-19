@@ -13,6 +13,7 @@ import {
   HelpCircle,
 } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
+import { apiFetch } from "../lib/apiClient";
 import { useTour } from "../lib/useTour";
 
 const API_BASE =
@@ -178,10 +179,8 @@ export function HomeDashboard() {
         : prev
     );
     try {
-      await fetch(`${API}&action=toggle_task`, {
+      await apiFetch(`/api/index.php?route=dashboard&action=toggle_task`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
         body: JSON.stringify({ task_id: taskId }),
       });
       await fetchStats();
@@ -196,10 +195,8 @@ export function HomeDashboard() {
     if (!name) return;
     setAddingTask(true);
     try {
-      await fetch(`${API}&action=add_task`, {
+      await apiFetch(`/api/index.php?route=dashboard&action=add_task`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
         body: JSON.stringify({ task_name: name }),
       });
       setNewTask("");

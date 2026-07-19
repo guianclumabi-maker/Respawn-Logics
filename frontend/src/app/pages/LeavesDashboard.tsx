@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
+import { apiFetch } from "../lib/apiClient";
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || (window.location.origin + (window.location.hostname === "localhost" ? "/respawn-logics" : ""));
 const API = `${API_BASE}/api/index.php?route=leaves`;
@@ -49,10 +50,8 @@ export function LeavesDashboard() {
   const handleApply = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const res = await fetch(`${API}&action=apply`, {
+      const res = await apiFetch(`/api/index.php?route=leaves&action=apply`, {
         method: "POST",
-        credentials: "include",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ leave_type: leaveType, start_date: startDate, end_date: endDate, reason })
       });
       const data = await res.json();
@@ -72,10 +71,8 @@ export function LeavesDashboard() {
 
   const handleApproveReject = async (requestId: number, decision: "Approved" | "Rejected") => {
     try {
-      const res = await fetch(`${API}&action=approve_reject`, {
+      const res = await apiFetch(`/api/index.php?route=leaves&action=approve_reject`, {
         method: "POST",
-        credentials: "include",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ request_id: requestId, decision, comments: "" })
       });
       const data = await res.json();

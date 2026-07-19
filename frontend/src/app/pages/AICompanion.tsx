@@ -17,6 +17,7 @@ import {
   BookOpen,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { apiFetch } from '../lib/apiClient';
 
 const API_BASE =
   (import.meta as any).env?.VITE_API_BASE_URL ||
@@ -81,12 +82,10 @@ export function AICompanion() {
     setIsLoading(true);
 
     try {
-      const response = await fetch(
-        `${API_BASE}/api/index.php?route=ai_companion&action=chat`,
+      const response = await apiFetch(
+        `/api/index.php?route=ai_companion&action=chat`,
         {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          credentials: 'include',
           body: JSON.stringify({ message: content }),
         }
       );

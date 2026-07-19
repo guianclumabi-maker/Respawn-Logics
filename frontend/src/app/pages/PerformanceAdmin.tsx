@@ -4,6 +4,7 @@ import { useAuth } from "../context/AuthContext";
 import { 
   Users, Calendar, Activity, X
 } from "lucide-react";
+import { apiFetch } from "../lib/apiClient";
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || (window.location.origin + (window.location.hostname === "localhost" ? "/respawn-logics" : ""));
 const API = `${API_BASE}/api/index.php?route=performance`;
@@ -77,8 +78,8 @@ function TeamReviews() {
   const handleSubmitEval = async (e: React.FormEvent, payload: any) => {
     e.preventDefault();
     try {
-      const res = await fetch(`${API}&action=submit_manager_eval`, {
-        method: "POST", body: JSON.stringify(payload), credentials: "include"
+      const res = await apiFetch(`/api/index.php?route=performance&action=submit_manager_eval`, {
+        method: "POST", body: JSON.stringify(payload)
       });
       const data = await res.json();
       if(data.success) {
@@ -212,8 +213,8 @@ function ReviewCycles() {
   const createCycle = async (e: React.FormEvent, payload: any) => {
     e.preventDefault();
     try {
-      const res = await fetch(`${API}&action=create_cycle`, {
-        method: "POST", body: JSON.stringify(payload), credentials: "include"
+      const res = await apiFetch(`/api/index.php?route=performance&action=create_cycle`, {
+        method: "POST", body: JSON.stringify(payload)
       });
       if((await res.json()).success) { setShowModal(false); fetchCycles(); }
     } catch(err) {}
@@ -222,8 +223,8 @@ function ReviewCycles() {
   const deploy = async (id: number) => {
     if(!confirm("Deploy review shells to all active employees and managers?")) return;
     try {
-      const res = await fetch(`${API}&action=initialize_reviews`, {
-        method: "POST", body: JSON.stringify({cycle_id: id}), credentials: "include"
+      const res = await apiFetch(`/api/index.php?route=performance&action=initialize_reviews`, {
+        method: "POST", body: JSON.stringify({cycle_id: id})
       });
       if((await res.json()).success) { alert("Successfully deployed."); fetchCycles(); }
     } catch(err) {}
