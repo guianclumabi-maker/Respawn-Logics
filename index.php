@@ -3414,6 +3414,15 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
         <div class="changelog-row">
             <div class="changelog-card">
                 <div class="changelog-header">
+                    <span class="changelog-version">v2.7.1</span>
+                    <span class="changelog-date">Jul 19, 2026</span>
+                </div>
+                <div class="changelog-title">Global CSRF Fortification</div>
+                <p class="changelog-desc">Performed site-wide rollout of apiFetch to inherently handle CSRF. Addressed payroll collation and ATS integrity edge cases.</p>
+            </div>
+
+            <div class="changelog-card">
+                <div class="changelog-header">
                     <span class="changelog-version">v2.7.0</span>
                     <span class="changelog-date">Jul 12, 2026</span>
                 </div>
@@ -3430,15 +3439,6 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
                 <p class="changelog-desc">Introduced automated branch protection workflows with PHPUnit integration tests and frontend TypeScript checking.</p>
             </div>
 
-            <div class="changelog-card">
-                <div class="changelog-header">
-                    <span class="changelog-version">v2.5.0</span>
-                    <span class="changelog-date">Jul 10, 2026</span>
-                </div>
-                <div class="changelog-title">Fail-Loud Storage Check</div>
-                <p class="changelog-desc">Enforced security bounds. File uploads fail instantly if configured storage paths fall inside the public web root directory.</p>
-            </div>
-            
             <!-- Kept recent 3 items, the rest are in patch notes -->
         </div>
         
