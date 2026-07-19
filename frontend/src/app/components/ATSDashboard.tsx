@@ -407,10 +407,7 @@ function JobHealthCard({
         >
           [ + CANDIDATE ]
         </button>
-        <span className="text-foreground">·</span>
-        <button className="flex items-center gap-1 text-[10px] font-semibold text-muted-foreground hover:text-muted-foreground transition-colors cursor-pointer bg-transparent border-0 px-0">
-          [ PAUSE ]
-        </button>
+        {/* [ PAUSE ] removed: there is no job-pause backend action; a dead control reads as broken. */}
       </div>
     </div>
   );

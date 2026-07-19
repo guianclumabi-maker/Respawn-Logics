@@ -50,7 +50,10 @@ export function TalentPools({ onViewChange }: { onViewChange: (v: ViewState) => 
           </h1>
           <p className="text-xs text-muted-foreground mt-1 uppercase tracking-wider font-mono">Curate groups of candidates for future hiring and passive sourcing campaigns.</p>
         </div>
-        <button className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-xs font-bold bg-primary hover:opacity-90 text-primary-foreground cursor-pointer border-0 shadow-lg shadow-green-500/10 transition-all">
+        {/* No pool-creation backend action exists — disabled with an honest tooltip
+            rather than a button that silently does nothing. */}
+        <button disabled title="Creating pools is not available yet — pools are curated from candidate profiles."
+          className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-xs font-bold bg-primary text-primary-foreground border-0 shadow-lg shadow-green-500/10 opacity-50 cursor-not-allowed">
           <Plus size={16} />
           [ CREATE POOL ]
         </button>

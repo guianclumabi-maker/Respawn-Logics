@@ -169,6 +169,14 @@ export function UploadView({ onUpload }: UploadViewProps) {
       {/* Actions */}
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "1rem" }}>
         <button
+          onClick={() => {
+            // Column set mirrors the fields validated by the import (see ResultsView error rows).
+            const csv = "full_name,email,department,job_title,start_date,salary,manager_email\nJuan dela Cruz,juan@example.com,Operations,Staff,2026-01-15,25000,manager@example.com\n";
+            const url = URL.createObjectURL(new Blob([csv], { type: "text/csv" }));
+            const a = document.createElement("a");
+            a.href = url; a.download = "employee_import_template.csv"; a.click();
+            URL.revokeObjectURL(url);
+          }}
           style={{
             display: "flex", alignItems: "center", gap: "0.5rem",
             background: "transparent",

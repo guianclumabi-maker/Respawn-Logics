@@ -7,10 +7,6 @@ import {
   Plus,
   Menu,
   Sparkles,
-  Search,
-  MoreVertical,
-  Paperclip,
-  Mic,
   Cpu,
   Zap,
   ShieldCheck,
@@ -161,7 +157,9 @@ export function AICompanion() {
                     .map((chat) => (
                       <button
                         key={chat.id}
-                        className="w-full flex items-center gap-3 px-3 py-2.5 text-sm text-slate-300 hover:text-foreground hover:bg-accent rounded-lg transition-colors group"
+                        disabled
+                        title="Saved-chat reload is not available yet"
+                        className="w-full flex items-center gap-3 px-3 py-2.5 text-sm text-slate-300 rounded-lg transition-colors group opacity-60 cursor-not-allowed"
                       >
                         <MessageSquare className="w-4 h-4 text-slate-500 group-hover:text-indigo-400 flex-shrink-0" />
                         <span className="truncate">{chat.title}</span>
@@ -199,14 +197,7 @@ export function AICompanion() {
               </h1>
             </div>
           </div>
-          <div className="flex items-center gap-1">
-            <button className="p-2 hover:bg-accent rounded-lg text-muted-foreground hover:text-foreground transition-colors">
-              <Search className="w-4 h-4" />
-            </button>
-            <button className="p-2 hover:bg-accent rounded-lg text-muted-foreground hover:text-foreground transition-colors">
-              <MoreVertical className="w-4 h-4" />
-            </button>
-          </div>
+          {/* Search / overflow buttons removed: no search or menu behavior exists yet. */}
         </header>
 
         {/* Messages / Empty state */}
@@ -308,10 +299,7 @@ export function AICompanion() {
             <div className="relative">
               <div className="absolute -inset-px bg-gradient-to-r from-indigo-500/20 to-purple-500/20 rounded-2xl blur-md pointer-events-none" />
               <div className="relative bg-input border border-border rounded-2xl shadow-2xl flex items-end p-2 transition-all focus-within:border-indigo-500/40 focus-within:shadow-indigo-500/10">
-                <button className="p-2.5 text-slate-500 hover:text-foreground transition-colors mb-0.5 flex-shrink-0">
-                  <Paperclip className="w-4 h-4" />
-                </button>
-
+                {/* Paperclip removed: file attachments are not supported by the chat endpoint. */}
                 <textarea
                   ref={textareaRef}
                   value={input}
@@ -327,10 +315,7 @@ export function AICompanion() {
                   }}
                 />
 
-                <button className="p-2.5 text-slate-500 hover:text-foreground transition-colors mb-0.5 flex-shrink-0">
-                  <Mic className="w-4 h-4" />
-                </button>
-
+                {/* Mic removed: voice input is not implemented. */}
                 <button
                   onClick={() => handleSend()}
                   disabled={!input.trim() || isLoading}

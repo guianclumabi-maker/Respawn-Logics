@@ -114,7 +114,9 @@ export function RecruitingCopilot({ onViewChange }: { onViewChange: (v: ViewStat
                   </h3>
                 </div>
 
-                <button className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-[10px] font-bold bg-muted border border-border hover:border-border hover:bg-accent transition-colors whitespace-nowrap text-foreground shrink-0">
+                <button
+                  onClick={(e) => { e.stopPropagation(); onViewChange({ view: act.action_view, jobId: act.job_id }); }}
+                  className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-[10px] font-bold bg-muted border border-border hover:border-border hover:bg-accent transition-colors whitespace-nowrap text-foreground shrink-0 cursor-pointer">
                   {`[ ${act.action.toUpperCase()} ]`}
                   <ChevronRight size={12} className="text-muted-foreground group-hover:text-foreground" />
                 </button>

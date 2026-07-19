@@ -204,7 +204,10 @@ export function CandidatesList({ onViewChange }: { onViewChange: (v: ViewState) 
                       </span>
                     </td>
                     <td className="px-6 py-4 text-right">
-                      <button className="px-2.5 py-1 text-[9px] font-bold text-muted-foreground hover:text-foreground rounded bg-muted border border-border hover:bg-accent transition-colors">
+                      <button
+                        onClick={() => onViewChange({ view: "Candidate Profile", candidateId: c.id })}
+                        className="px-2.5 py-1 text-[9px] font-bold text-muted-foreground hover:text-foreground rounded bg-muted border border-border hover:bg-accent transition-colors cursor-pointer"
+                      >
                         [ PROFILE ]
                       </button>
                     </td>
