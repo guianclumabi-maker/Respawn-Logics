@@ -151,11 +151,11 @@ export function MyProfile() {
               <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-[#00e07a]/5 to-[#00b8ff]/5 rounded-bl-full pointer-events-none"></div>
               
               <div className="w-20 h-20 rounded-full bg-gradient-to-tr from-[#00e07a] to-[#00b8ff] flex items-center justify-center text-black font-extrabold text-2xl uppercase shadow-[0_0_20px_rgba(0,224,122,0.2)]">
-                {profile.full_name.charAt(0)}
+                {(profile.full_name || "U").charAt(0)}
               </div>
               
               <div className="text-center md:text-left space-y-1">
-                <h2 className="text-2xl font-bold text-foreground tracking-tight">{profile.full_name}</h2>
+                <h2 className="text-2xl font-bold text-foreground tracking-tight">{profile.full_name || "Unknown User"}</h2>
                 <div className="text-sm font-semibold text-[#00e07a] font-mono">{profile.job_title || "No Job Title"}</div>
                 <div className="text-xs text-muted-foreground">{profile.department || "No Department"} · ID: {profile.employee_id}</div>
               </div>

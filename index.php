@@ -2091,54 +2091,67 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
             .trust-shield { grid-template-columns: 1fr; }
         }
         .trust-badge {
-            background: rgba(255,255,255,0.02);
-            border: 1px solid var(--border3);
-            border-radius: 12px;
-            padding: 20px;
+            background: linear-gradient(180deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.01) 100%);
+            border: 1px solid var(--border2);
+            border-top: 1px solid rgba(255,255,255,0.1);
+            border-radius: 16px;
+            padding: 40px 32px;
             display: flex;
             flex-direction: column;
-            gap: 10px;
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            gap: 16px;
+            transition: all 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
             position: relative;
             overflow: hidden;
             z-index: 1;
+            box-shadow: 0 10px 30px -10px rgba(0,0,0,0.5);
         }
         .trust-badge::before {
             content: '';
             position: absolute;
             top: 0; left: -100%;
             width: 50%; height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.08), transparent);
-            transform: skewX(-20deg);
-            transition: all 0.6s ease-in-out;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.06), transparent);
+            transform: skewX(-25deg);
+            transition: left 0.7s ease-in-out;
             z-index: -1;
         }
         .trust-badge:hover { 
-            border-color: rgba(0,224,122,0.5); 
-            transform: translateY(-5px) scale(1.02);
-            box-shadow: 0 12px 30px rgba(0,224,122,0.15);
-            background: linear-gradient(145deg, rgba(255,255,255,0.04) 0%, rgba(0,224,122,0.05) 100%);
+            border-color: rgba(0,224,122,0.4); 
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px -10px rgba(0,224,122,0.15), 0 0 20px rgba(0,224,122,0.1);
         }
         .trust-badge:hover::before {
             left: 200%;
         }
         .trust-badge i {
-            font-size: 1.5rem;
+            font-size: 2rem;
             color: var(--green);
-            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            background: rgba(0,224,122,0.1);
+            width: 56px;
+            height: 56px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            margin-bottom: 8px;
         }
         .trust-badge:hover i {
-            transform: scale(1.2) translateY(-2px);
+            transform: scale(1.15) translateY(-4px);
+            background: var(--green);
+            color: #000;
+            box-shadow: 0 10px 20px rgba(0,224,122,0.3);
         }
         .trust-badge h4 {
-            font-size: 0.875rem;
-            font-weight: 600;
-            color: var(--text);
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: #fff;
+            letter-spacing: -0.01em;
         }
         .trust-badge p {
-            font-size: 0.75rem;
-            color: var(--text-dim);
-            line-height: 1.4;
+            font-size: 0.95rem;
+            color: var(--text-mid);
+            line-height: 1.6;
         }
 
         /* ─── CURSOR-STYLE DEMO WINDOW ─── */

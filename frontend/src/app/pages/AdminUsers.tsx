@@ -166,10 +166,10 @@ export function AdminUsers() {
                 <tr key={u.id} className="hover:bg-muted/50 transition-colors">
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-full bg-primary/10 text-blue-600 flex items-center justify-center font-bold">
-                        {u.full_name.charAt(0)}
+                      <div className="w-8 h-8 rounded-full bg-primary/10 text-blue-600 flex items-center justify-center font-bold uppercase">
+                        {(u.full_name || u.email || "U").charAt(0)}
                       </div>
-                      <div className="font-medium text-foreground">{u.full_name}</div>
+                      <div className="font-medium text-foreground">{u.full_name || "Unknown User"}</div>
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">

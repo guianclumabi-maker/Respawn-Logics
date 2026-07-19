@@ -255,11 +255,11 @@ export function ELRCaseDrawer({ cardId, onClose, onUpdate }: ELRCaseDrawerProps)
               <div>
                 <h3 className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-3 border-b border-gray-100 dark:border-white/5 pb-2">Employee Information</h3>
                 <div className="flex items-center gap-4 mb-4">
-                  <div className="w-12 h-12 rounded-full bg-primary/10 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400 flex items-center justify-center font-bold text-lg">
-                    {cardDetails.card.full_name.charAt(0)}
+                  <div className="w-12 h-12 rounded-full bg-primary/10 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400 flex items-center justify-center font-bold text-lg uppercase">
+                    {(cardDetails.card.full_name || "Unknown").charAt(0)}
                   </div>
                   <div>
-                    <div className="font-bold text-foreground text-lg">{cardDetails.card.full_name}</div>
+                    <div className="font-bold text-foreground text-lg">{cardDetails.card.full_name || "Unknown Employee"}</div>
                     <div className="text-sm font-mono text-muted-foreground">{cardDetails.card.employee_id} • {cardDetails.card.department}</div>
                   </div>
                 </div>
