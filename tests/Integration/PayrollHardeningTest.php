@@ -59,7 +59,7 @@ class PayrollHardeningTest extends TestCase
         return [$tenantId, $schedId, $empId];
     }
 
-    private function run(array $case): array
+    private function runPayroll(array $case): array
     {
         [$tenantId, $schedId, $empId] = $case;
         $svc = new \PayrollService(self::$pdo);
@@ -85,7 +85,7 @@ class PayrollHardeningTest extends TestCase
     public function testDailyPayBasisPaysDailyRate(): void
     {
         // base_salary = 1,000/day; 10 approved days x 8h; hourly = 1000/8 = 125.
-        $case = $this->run($this->makeCase('HardDaily', 1000, 10, ['default_pay_basis' => 'daily']));
+        $case = $this->runPayroll($this->makeCase('HardDaily', 1000, 10, ['default_pay_basis' => 'daily']));
         $this->assertTrue($case['success'] ?? false, 'daily-basis run should succeed: ' . ($case['error'] ?? ''));
         [$tenantId] = [null]; // readability only
         $basic = $this->earn((int) $case['run_id'], $this->lastEmp(), 'Basic Pay (Hours)');
@@ -95,7 +95,7 @@ class PayrollHardeningTest extends TestCase
     public function testHourlyPayBasisPaysHourlyRate(): void
     {
         // base_salary = 150/hour; 5 days x 8h = 40h -> 6,000 basic.
-        $case = $this->run($this->makeCase('HardHourly', 150, 5, ['default_pay_basis' => 'hourly']));
+        $case = $this->runPayroll($this->makeCase('HardHourly', 150, 5, ['default_pay_basis' => 'hourly']));
         $this->assertTrue($case['success'] ?? false, 'hourly-basis run should succeed: ' . ($case['error'] ?? ''));
         $basic = $this->earn((int) $case['run_id'], $this->lastEmp(), 'Basic Pay (Hours)');
         $this->assertEqualsWithDelta(6000.00, $basic, 0.01, '40h x 150/h must pay 6,000 basic');
@@ -142,7 +142,7 @@ class PayrollHardeningTest extends TestCase
             'default_pay_basis' => 'daily',
             'statutory_basis'   => 'actual_period_equivalent',
         ]);
-        $r = $this->run($ids);
+        $r = $this->runPayroll($ids);
         $this->assertTrue($r['success'] ?? false, 'run should succeed: ' . ($r['error'] ?? ''));
         [, , $empId] = $ids;
         $this->assertEqualsWithDelta(500.00, $this->deduct((int) $r['run_id'], $empId, 'SSS%'), 0.01, 'SSS on actual 10,000 MSC');
@@ -151,7 +151,7 @@ class PayrollHardeningTest extends TestCase
 
     public function testDailyBasisOnMonthlyBaseWarnsVisibly(): void
     {
-        $r = $this->run($this->makeCase('HardStatWarn', 1000, 10, ['default_pay_basis' => 'daily']));
+        $r = $this->runPayroll($this->makeCase('HardStatWarn', 1000, 10, ['default_pay_basis' => 'daily']));
         $this->assertTrue($r['success'] ?? false);
         $joined = implode(' | ', $r['warnings'] ?? []);
         $this->assertStringContainsString('statutory_basis', $joined, 'daily basis + monthly_base MSC must warn, not stay silent');
@@ -165,7 +165,7 @@ class PayrollHardeningTest extends TestCase
         [$tenantId] = $ids;
         self::$pdo->prepare("INSERT INTO pay_components (tenant_id, code, name, kind, calc_type, value, taxable, is_active) VALUES (?, 'FRM1', 'Formula Comp', 'earning', 'formula', NULL, 1, 1)")
             ->execute([$tenantId]);
-        $r = $this->run($ids);
+        $r = $this->runPayroll($ids);
         $this->assertFalse($r['success'] ?? true, 'formula components are unimplemented and must fail the run');
         $this->assertStringContainsString('Formula Comp', $r['error'] ?? '', 'error must name the offending component');
     }
@@ -176,7 +176,7 @@ class PayrollHardeningTest extends TestCase
         [$tenantId, , $empId] = $ids;
         self::$pdo->prepare("INSERT INTO pay_components (tenant_id, code, name, kind, calc_type, value, taxable, is_active) VALUES (?, 'LN1', 'SSS Salary Loan', 'deduction', 'loan_amortization', 500, 0, 1)")
             ->execute([$tenantId]);
-        $r = $this->run($ids);
+        $r = $this->runPayroll($ids);
         $this->assertTrue($r['success'] ?? false, 'loan run should succeed: ' . ($r['error'] ?? ''));
         $this->assertEqualsWithDelta(500.00, $this->deduct((int) $r['run_id'], $empId, 'SSS Salary Loan'), 0.01);
         $this->assertStringContainsString('loan', strtolower(implode(' ', $r['warnings'] ?? [])), 'must warn that balance tracking is not implemented');
@@ -184,7 +184,7 @@ class PayrollHardeningTest extends TestCase
 
     public function testAnnualizationStillFailsLoud(): void
     {
-        $r = $this->run($this->makeCase('HardAnnual', 30000, 22, ['tax_annualization' => 1]));
+        $r = $this->runPayroll($this->makeCase('HardAnnual', 30000, 22, ['tax_annualization' => 1]));
         $this->assertFalse($r['success'] ?? true, 'annualization is unimplemented and must fail the run');
         $this->assertStringContainsString('annualization', strtolower($r['error'] ?? ''));
     }

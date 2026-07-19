@@ -22,7 +22,7 @@ try {
             `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
             PRIMARY KEY (`tenant_id`),
             FOREIGN KEY (`tenant_id`) REFERENCES `tenants`(`id`) ON DELETE CASCADE
-        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+        ) ENGINE=InnoDB;
     ");
 
     // Idempotently add statutory_basis for installs where the table pre-exists.
@@ -54,7 +54,7 @@ try {
             `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
             FOREIGN KEY (`tenant_id`) REFERENCES `tenants`(`id`) ON DELETE CASCADE,
             UNIQUE KEY `unique_tenant_code` (`tenant_id`, `code`)
-        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+        ) ENGINE=InnoDB;
     ");
 
     echo "Seeding default tenant_payroll_settings for existing tenants...\n";
