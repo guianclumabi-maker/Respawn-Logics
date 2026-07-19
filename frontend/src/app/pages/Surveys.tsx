@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { ThemeProvider } from "next-themes";
 import { useAuth } from "../context/AuthContext";
 import { Plus, X, Rocket, Edit, Check, Wand2, Trash2, Ghost, EyeOff } from "lucide-react";
+import { apiFetch } from "../lib/apiClient";
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || (window.location.origin + (window.location.hostname === "localhost" ? "/respawn-logics" : ""));
 const API = `${API_BASE}/api/index.php?route=surveys`;
@@ -35,9 +36,9 @@ export function Surveys() {
   const launchSurvey = async (id: number) => {
     if (!confirm('This will blast a push notification to ALL employees telling them to take the survey. Proceed?')) return;
     try {
-      const res = await fetch(`${API}&action=launch_survey`, {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id }), credentials: 'include'
+      const res = await apiFetch(`/api/index.php?route=surveys&action=launch_survey`, {
+        method: 'POST',
+        body: JSON.stringify({ id })
       });
       const data = await res.json();
       if(data.success) {
@@ -142,9 +143,9 @@ function BuilderModal({ onClose, refresh }: { onClose: () => void, refresh: () =
   const save = async () => {
     if(!title) return alert('Title required');
     try {
-      const res = await fetch(`${API}&action=create_survey`, {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ title, description: desc, questions }), credentials: 'include'
+      const res = await apiFetch(`/api/index.php?route=surveys&action=create_survey`, {
+        method: 'POST',
+        body: JSON.stringify({ title, description: desc, questions })
       });
       const data = await res.json();
       if(data.success) {
@@ -218,9 +219,9 @@ function TakeModal({ surveyId, onClose, refresh }: { surveyId: number, onClose: 
     }
     
     try {
-      const res = await fetch(`${API}&action=submit_survey`, {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ survey_id: surveyId, answers: ansArray }), credentials: 'include'
+      const res = await apiFetch(`/api/index.php?route=surveys&action=submit_survey`, {
+        method: 'POST',
+        body: JSON.stringify({ survey_id: surveyId, answers: ansArray })
       });
       const d = await res.json();
       if(d.success) {

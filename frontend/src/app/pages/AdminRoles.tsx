@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { apiFetch } from '../lib/apiClient';
 
 export function AdminRoles() {
     const { user } = useAuth();
@@ -41,10 +42,8 @@ export function AdminRoles() {
     const handleAssignRole = async (e: any) => {
         e.preventDefault();
         try {
-            await fetch('/api/index.php?route=iam&action=assign_role', {
+            await apiFetch('/api/index.php?route=iam&action=assign_role', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                credentials: 'include',
                 body: JSON.stringify({
                     user_id: selectedUser,
                     role_id: selectedRole,

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { Users, Plus, X } from 'lucide-react';
 import { Navigate } from 'react-router-dom';
+import { apiFetch } from '../lib/apiClient';
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || (window.location.origin + (window.location.hostname === 'localhost' ? '/respawn-logics' : ''));
 
@@ -96,7 +97,7 @@ export function BenefitsAdmin() {
     formData.append('description', planDesc);
 
     try {
-      const res = await fetch(`${API_BASE}/api/index.php?route=benefits&action=hr_create_plan`, { 
+      const res = await apiFetch(`/api/index.php?route=benefits&action=hr_create_plan`, { 
         method: 'POST', 
         body: formData 
       });

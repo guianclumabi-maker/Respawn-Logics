@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
 import { AlertTriangle, AlertCircle, X, ShieldAlert } from "lucide-react";
+import { apiFetch } from "../lib/apiClient";
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || (window.location.origin + (window.location.hostname === "localhost" ? "/respawn-logics" : ""));
 const API = `${API_BASE}/api/index.php?route=core_hr`;
@@ -79,9 +80,8 @@ export function HRDirectory() {
 
   const fetchHistory = async (empId: number) => {
     try {
-      const res = await fetch(`${API}&action=suspension_history`, {
+      const res = await apiFetch(`/api/index.php?route=core_hr&action=suspension_history`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ employee_id: empId })
       });
       const data = await res.json();
@@ -106,9 +106,8 @@ export function HRDirectory() {
   const handleSuspend = async () => {
     if (!selectedEmp) return;
     try {
-      const res = await fetch(`${API}&action=suspend_employee`, {
+      const res = await apiFetch(`/api/index.php?route=core_hr&action=suspend_employee`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ 
           employee_id: selectedEmp.id,
           reason: suspendReason,
@@ -137,9 +136,8 @@ export function HRDirectory() {
     if (!selectedEmp) return;
     if (!window.confirm("Are you sure you want to reinstate this employee?")) return;
     try {
-      const res = await fetch(`${API}&action=reinstate_employee`, {
+      const res = await apiFetch(`/api/index.php?route=core_hr&action=reinstate_employee`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ employee_id: selectedEmp.id })
       });
       const data = await res.json();

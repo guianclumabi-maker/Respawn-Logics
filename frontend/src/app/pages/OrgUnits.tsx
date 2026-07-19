@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { apiFetch } from '../lib/apiClient';
 
 export function OrgUnits() {
     const { user } = useAuth();
@@ -35,10 +36,8 @@ export function OrgUnits() {
 
     const handleCreateUnit = async (e: any) => {
         e.preventDefault();
-        await fetch('/api/index.php?route=iam&action=save_org_unit', {
+        await apiFetch('/api/index.php?route=iam&action=save_org_unit', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            credentials: 'include',
             body: JSON.stringify({ name, parent_id: parentId || null })
         });
         setName('');
@@ -48,10 +47,8 @@ export function OrgUnits() {
 
     const handleAssignUser = async (e: any) => {
         e.preventDefault();
-        await fetch('/api/index.php?route=iam&action=assign_org_unit', {
+        await apiFetch('/api/index.php?route=iam&action=assign_org_unit', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            credentials: 'include',
             body: JSON.stringify({ user_id: selectedUser, org_unit_id: selectedUnit || null })
         });
         setSelectedUser('');
