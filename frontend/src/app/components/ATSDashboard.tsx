@@ -1,3 +1,4 @@
+import { apiFetch } from "../lib/apiClient";
 import { useState, useEffect } from "react";
 import {
   Users,
@@ -442,7 +443,7 @@ export function ATSDashboard({ onViewChange }: Props) {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    fetch(`${API}&action=dashboard`, { credentials: "include" })
+    apiFetch(`${API}&action=dashboard`, { credentials: "include" })
       .then((res) => res.json())
       .then((json) => {
         if (json.success) {

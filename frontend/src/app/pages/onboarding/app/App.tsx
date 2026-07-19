@@ -1,3 +1,4 @@
+import { apiFetch } from "../../../lib/apiClient";
 import { useState, useRef, useEffect } from "react";
 import { Upload, Download, CheckCircle, AlertTriangle, FileSpreadsheet, ArrowRight, Settings, Users, Briefcase, Zap, Shield, Database, Gamepad2, User, Globe } from "lucide-react";
 
@@ -43,7 +44,7 @@ export default function App() {
     if ((window as any).__CSRF_TOKEN__) {
       setCsrfToken((window as any).__CSRF_TOKEN__);
     } else {
-      fetch(`${API_BASE}/api/index.php?route=auth&action=csrf`, { credentials: "include" })
+      apiFetch(`${API_BASE}/api/index.php?route=auth&action=csrf`, { credentials: "include" })
         .then(res => res.json())
         .then(data => {
           if (data.success) {
@@ -185,7 +186,7 @@ export default function App() {
     formData.append("setup_mode", setupMode);
     formData.append("mapping", JSON.stringify(mapping));
 
-    fetch(`${API_BASE}/api/index.php?route=onboarding&action=import`, {
+    apiFetch(`${API_BASE}/api/index.php?route=onboarding&action=import`, {
       method: "POST",
       credentials: "include",
       headers: {
@@ -237,7 +238,7 @@ export default function App() {
         return;
       }
 
-      const response = await fetch(`${API_BASE}/api/index.php?route=onboarding&action=update_roles`, {
+      const response = await apiFetch(`${API_BASE}/api/index.php?route=onboarding&action=update_roles`, {
         method: "POST",
         credentials: "include",
         headers: { 

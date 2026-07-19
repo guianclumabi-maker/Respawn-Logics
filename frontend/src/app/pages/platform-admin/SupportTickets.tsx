@@ -1,3 +1,4 @@
+import { apiFetch } from "../../lib/apiClient";
 import { useEffect, useState } from "react";
 import { Search, Clock, AlertCircle, ChevronDown, Filter, RefreshCw, ExternalLink, MoreHorizontal } from "lucide-react";
 
@@ -5,7 +6,7 @@ const API_BASE = import.meta.env.VITE_API_BASE_URL || (window.location.origin + 
 const API = `${API_BASE}/api/index.php?route=platform_support`;
 
 async function getCsrf(): Promise<string> {
-  const r = await fetch(`${API_BASE}/api/index.php?route=auth&action=csrf`, { credentials: "include" });
+  const r = await apiFetch(`${API_BASE}/api/index.php?route=auth&action=csrf`, { credentials: "include" });
   const d = await r.json();
   return d.csrf_token ?? "";
 }
@@ -56,7 +57,7 @@ export function PlatformAdminSupport() {
     const params = new URLSearchParams({ action: "vendor_list", tab });
     if (priority) params.set("priority", priority);
     if (search) params.set("search", search);
-    fetch(`${API}&${params}`, { credentials: "include" })
+    apiFetch(`${API}&${params}`, { credentials: "include" })
       .then((r) => r.json())
       .then((d) => {
         if (d.success) setTickets(d.data ?? []);
@@ -70,7 +71,7 @@ export function PlatformAdminSupport() {
 
   const handleStatusChange = async (ticketId: number, status: string) => {
     const csrf = await getCsrf();
-    await fetch(`${API}&action=update_status`, {
+    await apiFetch(`${API}&action=update_status`, {
       method: "POST",
       credentials: "include",
       headers: { "Content-Type": "application/json", "X-CSRF-Token": csrf },

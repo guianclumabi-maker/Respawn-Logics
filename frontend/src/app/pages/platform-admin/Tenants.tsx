@@ -1,3 +1,4 @@
+import { apiFetch } from "../../lib/apiClient";
 import { useEffect, useState } from "react";
 import { Search, UserCog, Building2, RefreshCw } from "lucide-react";
 
@@ -34,7 +35,7 @@ export function PlatformAdminTenants() {
 
   const load = () => {
     setLoading(true);
-    fetch(`${API_BASE}/api/index.php?route=iam&action=platform_tenant_list`, {
+    apiFetch(`${API_BASE}/api/index.php?route=iam&action=platform_tenant_list`, {
       credentials: "include",
     })
       .then((r) => r.json())

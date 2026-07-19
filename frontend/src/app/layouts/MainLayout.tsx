@@ -1,3 +1,4 @@
+import { apiFetch } from "../lib/apiClient";
 import { useState, useEffect } from "react";
 import { Outlet, useNavigate, useLocation } from "react-router-dom";
 import { Sidebar } from "../components/Sidebar";
@@ -92,7 +93,7 @@ export default function MainLayout() {
   useEffect(() => {
     const fetchBadges = async () => {
       try {
-        const res = await fetch(`${API}&action=dashboard`);
+        const res = await apiFetch(`${API}&action=dashboard`);
         if (!res.ok) return;
         const data = await res.json();
         if (data.success && data.action_summary) {
