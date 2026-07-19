@@ -32,14 +32,14 @@
       (function () {
         if (window.location.href.indexOf('demo=true') === -1) return;
         var realFetch = window.fetch ? window.fetch.bind(window) : null;
-        var U = { id:999, name:'Peter Parker', full_name:'Peter Parker', email:'demo@respawn.logics', roles:['Super_Admin'], permissions:['manage_tenant','view_reports','manage_users'] };
+        var U = { id:0, name:'Peter Parker', full_name:'Peter Parker', email:'demo@respawn.logics', roles:['Super_Admin'], permissions:['manage_tenant','view_reports','manage_users'] };
         var EMP = [
-          {id:999, name:'Peter Parker', full_name:'Peter Parker', email:'demo@respawn.logics', department:'Executive', position:'Chief Executive Officer', status:'Active', hire_date:'2020-01-01', base_salary:250000},
-          {id:1, name:'Alex Mercer', full_name:'Alex Mercer', email:'alex@respawn.ph', department:'Engineering', position:'Senior Engineer', status:'Active', hire_date:'2023-02-14', base_salary:85000},
-          {id:2, name:'Sarah Chen', full_name:'Sarah Chen', email:'sarah@respawn.ph', department:'People', position:'HR Manager', status:'Active', hire_date:'2022-08-01', base_salary:72000},
-          {id:3, name:'David Kim', full_name:'David Kim', email:'david@respawn.ph', department:'Operations', position:'Operations Lead', status:'Active', hire_date:'2021-11-20', base_salary:90000},
-          {id:4, name:'Maria Reyes', full_name:'Maria Reyes', email:'maria@respawn.ph', department:'Finance', position:'Finance Analyst', status:'Active', hire_date:'2024-01-09', base_salary:58000},
-          {id:5, name:'Jomar Cruz', full_name:'Jomar Cruz', email:'jomar@respawn.ph', department:'Sales', position:'Account Executive', status:'Active', hire_date:'2023-06-30', base_salary:64000}
+          {id:0, name:'Peter Parker', full_name:'Peter Parker', email:'demo@respawn.logics', department:'Executive', position:'Chief Executive Officer', status:'Active', hire_date:'2020-01-01', base_salary:250000, roles:['Super_Admin']},
+          {id:1, name:'Tony Stark', full_name:'Tony Stark', email:'tony@respawn.logics', department:'Engineering', position:'Head of Engineering', status:'Active', hire_date:'2021-03-15', base_salary:210000, roles:['Platform_Admin']},
+          {id:2, name:'Natasha Romanoff', full_name:'Natasha Romanoff', email:'natasha@respawn.logics', department:'Operations', position:'Operations Director', status:'Active', hire_date:'2021-05-10', base_salary:190000, roles:['Tenant_Admin']},
+          {id:3, name:'Steve Rogers', full_name:'Steve Rogers', email:'steve@respawn.logics', department:'People', position:'HR Director', status:'Active', hire_date:'2020-07-04', base_salary:150000, roles:['Tenant_Admin']},
+          {id:4, name:'Bruce Banner', full_name:'Bruce Banner', email:'bruce@respawn.logics', department:'Research', position:'Lead Scientist', status:'Active', hire_date:'2022-11-20', base_salary:185000, roles:['Employee']},
+          {id:5, name:'Thor Odinson', full_name:'Thor Odinson', email:'thor@respawn.logics', department:'Sales', position:'Global Account Executive', status:'Active', hire_date:'2023-01-10', base_salary:160000, roles:['Employee']}
         ];
         var SURV = [
           {id:1, title:'Q3 Pulse Check', name:'Q3 Pulse Check', status:'Active', responses:38, response_rate:81, enps:42, created_at:'2026-07-01'},
@@ -47,25 +47,25 @@
           {id:3, title:'Remote Work Sentiment', name:'Remote Work Sentiment', status:'Draft', responses:0, response_rate:0, enps:0, created_at:'2026-07-08'}
         ];
         var ATT = [
-          {id:1, employee_name:'Alex Mercer', date:'2026-07-11', time_in:'08:58', time_out:'18:04', status:'Present', hours:8.1},
-          {id:2, employee_name:'Sarah Chen', date:'2026-07-11', time_in:'09:05', time_out:'18:00', status:'Present', hours:7.9},
-          {id:3, employee_name:'David Kim', date:'2026-07-11', time_in:'—', time_out:'—', status:'On Leave', hours:0},
-          {id:4, employee_name:'Maria Reyes', date:'2026-07-11', time_in:'09:12', time_out:'18:20', status:'Late', hours:8.0}
+          {id:1, employee_name:'Tony Stark', date:'2026-07-11', time_in:'10:30', time_out:'23:45', status:'Present', hours:12.5},
+          {id:2, employee_name:'Steve Rogers', date:'2026-07-11', time_in:'06:00', time_out:'18:00', status:'Present', hours:11.0},
+          {id:3, employee_name:'Bruce Banner', date:'2026-07-11', time_in:'—', time_out:'—', status:'On Leave', hours:0},
+          {id:4, employee_name:'Thor Odinson', date:'2026-07-11', time_in:'11:15', time_out:'17:30', status:'Late', hours:5.5}
         ];
         var LEA = [
-          {id:1, employee_name:'David Kim', type:'Vacation Leave', start_date:'2026-07-21', end_date:'2026-07-23', days:3, status:'Approved'},
-          {id:2, employee_name:'Maria Reyes', type:'Sick Leave', start_date:'2026-07-14', end_date:'2026-07-14', days:1, status:'Pending'},
-          {id:3, employee_name:'Jomar Cruz', type:'Emergency Leave', start_date:'2026-07-18', end_date:'2026-07-19', days:2, status:'Pending'}
+          {id:1, employee_name:'Bruce Banner', type:'Vacation Leave', start_date:'2026-07-21', end_date:'2026-07-23', days:3, status:'Approved'},
+          {id:2, employee_name:'Thor Odinson', type:'Sick Leave', start_date:'2026-07-14', end_date:'2026-07-14', days:1, status:'Pending'},
+          {id:3, employee_name:'Natasha Romanoff', type:'Emergency Leave', start_date:'2026-07-18', end_date:'2026-07-19', days:2, status:'Pending'}
         ];
         var PAY = [
-          {id:1, employee_name:'Alex Mercer', basic:85000, deductions:12450, net:72550, status:'Paid'},
-          {id:2, employee_name:'Sarah Chen', basic:72000, deductions:10890, net:61110, status:'Paid'},
-          {id:3, employee_name:'David Kim', basic:90000, deductions:14200, net:75800, status:'Pending'},
-          {id:4, employee_name:'Maria Reyes', basic:58000, deductions:8700, net:49300, status:'Draft'}
+          {id:1, employee_name:'Tony Stark', basic:210000, deductions:45000, net:165000, status:'Paid'},
+          {id:2, employee_name:'Steve Rogers', basic:150000, deductions:30000, net:120000, status:'Paid'},
+          {id:3, employee_name:'Bruce Banner', basic:185000, deductions:37000, net:148000, status:'Pending'},
+          {id:4, employee_name:'Thor Odinson', basic:160000, deductions:32000, net:128000, status:'Draft'}
         ];
         var CAS = [
-          {id:1, title:'Attendance dispute — July', employee_name:'Jomar Cruz', category:'Attendance', status:'Open', priority:'Medium', created_at:'2026-07-09'},
-          {id:2, title:'Payslip discrepancy', employee_name:'Maria Reyes', category:'Payroll', status:'In Review', priority:'High', created_at:'2026-07-07'}
+          {id:1, title:'Attendance dispute — July', employee_name:'Thor Odinson', category:'Attendance', status:'Open', priority:'Medium', created_at:'2026-07-09'},
+          {id:2, title:'Equipment Damage', employee_name:'Bruce Banner', category:'HR Policy', status:'In Review', priority:'High', created_at:'2026-07-07'}
         ];
         var TIC = [
           {id:1, subject:'Cannot access payslip', requester:'Alex Mercer', category:'IT', status:'Open', priority:'Low', created_at:'2026-07-10'},
@@ -109,6 +109,7 @@
           }
           if (/survey|engagement|enps/.test(u)) return env(SURV,'surveys');
           if (/employee|directory|staff|people|org/.test(u)) return env(EMP,'employees');
+          if (/user|iam/.test(u)) return env(EMP,'users');
           if (/attendance|timekeep|clock|shift/.test(u)) return env(ATT,'attendance');
           if (/leave/.test(u)) return env(LEA,'leaves');
           if (/payroll|payslip/.test(u)) return env(PAY,'payroll');
@@ -132,7 +133,7 @@
         };
       })();
     </script>
-    <script type="module" crossorigin src="./assets/index-BKD4Htpd.js"></script>
+    <script type="module" crossorigin src="./assets/index-BmHlxYDj.js"></script>
     <link rel="stylesheet" crossorigin href="./assets/index-D1BCJMaS.css">
   </head>
   <body>

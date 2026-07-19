@@ -10,37 +10,59 @@ class PayrollReferenceOracleTest extends TestCase
     protected static $tenantId;
     protected static $schedId;
 
-    // --- REFERENCE TABLE (Fill from sweldongpinoy.com or CPA) ---
-    // Every reference value is null by default, which makes the test skip automatically.
-    // The moment you fill in values for a salary, it runs the assertions.
+    // --- REFERENCE TABLE (independent statutory values, verified 2026-07) ---
+    // Sources (2026 employee shares, monthly-paid):
+    //  SSS  (RA 11199, 2026): 15% of MSC, EE share 5%; MSC floor P5,000 / ceiling P35,000
+    //       in P500 brackets; MSC above P20,000 goes to the MPF/WISP individual account
+    //       (the engine posts regular EE + WISP EE as one "SSS Contribution" line).
+    //       -> 18,000 salary => MSC 18,000 => EE 900.00
+    //       -> 30,000 salary => MSC 30,000 => EE 1,500.00 (1,000 regular + 500 MPF)
+    //       -> 50,000/90,000 => MSC capped 35,000 => EE 1,750.00 (1,000 regular + 750 MPF)
+    //  PhilHealth (UHC/RA 11223, 2026): flat 5% of monthly basic, split equally
+    //       (EE 2.5%); floor P10,000 / ceiling P100,000.
+    //       -> 18k => 450.00 | 30k => 750.00 | 50k => 1,250.00 | 90k => 2,250.00
+    //  Pag-IBIG (HDMF, 2026): EE 2% of Fund Salary capped at P10,000 => 200.00 for all
+    //       salaries >= P10,000.
+    //
+    //  TAX (TRAIN monthly withholding table, RA 10963, 2023+ schedule) and NET assume
+    //  the DEFAULT monthly_pay_mode='fixed_salary': full attendance on every scheduled
+    //  workday of June 2026 pays exactly the monthly base salary as basic.
+    //    taxable = salary − (SSS_EE + PhilHealth_EE + PagIBIG_EE)
+    //    tax     = bracket base + rate × (taxable − bracket lower limit)
+    //    net     = salary − (SSS + PhilHealth + PagIBIG + tax)
+    //  Hand-computed against the official bracket boundaries (20,833 / 33,333 / 66,667):
+    //    18k: taxable 16,450.00 → tax 0.00      → net 16,450.00
+    //    30k: taxable 27,550.00 → tax 1,007.55  → net 26,542.45
+    //    50k: taxable 46,800.00 → tax 4,568.40  → net 42,231.60
+    //    90k: taxable 85,800.00 → tax 13,325.05 → net 72,474.95
     private static $references = [
         18000 => [
-            'sss' => null,
-            'philhealth' => null,
-            'pagibig' => null,
-            'tax' => null,
-            'net' => null,
+            'sss' => 900.00,
+            'philhealth' => 450.00,
+            'pagibig' => 200.00,
+            'tax' => 0.00,
+            'net' => 16450.00,
         ],
         30000 => [
-            'sss' => null,
-            'philhealth' => null,
-            'pagibig' => null,
-            'tax' => null,
-            'net' => null,
+            'sss' => 1500.00,
+            'philhealth' => 750.00,
+            'pagibig' => 200.00,
+            'tax' => 1007.55,
+            'net' => 26542.45,
         ],
         50000 => [
-            'sss' => null,
-            'philhealth' => null,
-            'pagibig' => null,
-            'tax' => null,
-            'net' => null,
+            'sss' => 1750.00,
+            'philhealth' => 1250.00,
+            'pagibig' => 200.00,
+            'tax' => 4568.40,
+            'net' => 42231.60,
         ],
         90000 => [
-            'sss' => null,
-            'philhealth' => null,
-            'pagibig' => null,
-            'tax' => null,
-            'net' => null,
+            'sss' => 1750.00,
+            'philhealth' => 2250.00,
+            'pagibig' => 200.00,
+            'tax' => 13325.05,
+            'net' => 72474.95,
         ],
     ];
 
@@ -99,15 +121,19 @@ class PayrollReferenceOracleTest extends TestCase
         self::$pdo->prepare("UPDATE users SET base_salary = ?, is_mwe = 0, payroll_schedule_id = ?, employee_id = ? WHERE id = ?")
             ->execute([$salary, self::$schedId, 'EMP-' . $salary, $empId]);
 
-        // Approved timesheets: 22 working days x 8 regular hours
+        // Approved timesheets on EVERY scheduled workday (Mon–Fri) of June 2026 —
+        // full attendance, so fixed_salary mode pays exactly the monthly base with
+        // zero absence deductions. (June 2026 has 22 weekdays.)
         $ins = self::$pdo->prepare(
             "INSERT INTO timesheets
                 (tenant_id, employee_id, timesheet_date, regular_hours, overtime_hours, rest_day_hours,
                  special_day_hours, regular_holiday_hours, night_diff_hours, status)
              VALUES (?, ?, ?, 8, 0, 0, 0, 0, 0, 'Approved')"
         );
-        for ($d = 1; $d <= 22; $d++) {
-            $ins->execute([self::$tenantId, $empId, sprintf('2026-06-%02d', $d)]);
+        for ($d = 1; $d <= 30; $d++) {
+            $date = sprintf('2026-06-%02d', $d);
+            if ((int) date('N', strtotime($date)) >= 6) continue; // skip weekends
+            $ins->execute([self::$tenantId, $empId, $date]);
         }
 
         $svc = new \PayrollService(self::$pdo);
