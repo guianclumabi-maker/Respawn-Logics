@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { View, Text, Image } from 'react-native';
-import { Screen, Card, Sub, Row, EmptyState } from '../components/UI';
+import { Screen, Card, Sub, Row, EmptyState, Chip } from '../components/UI';
 import { colors } from '../theme';
 import * as api from '../api';
 
@@ -30,36 +30,39 @@ export default function AnnouncementsScreen() {
   return (
     <Screen refreshing={refreshing} onRefresh={onRefresh}>
       {posts.length === 0 ? (
-        <EmptyState text="No announcements yet." />
+        <EmptyState text="No company announcements posted yet." icon="📣" />
       ) : (
         posts.map((p) => (
-          <Card key={p.id}>
-            <Row style={{ marginBottom: 8 }}>
+          <Card key={p.id} accentColor={colors.accent}>
+            <Row style={{ marginBottom: 10 }}>
               <View
                 style={{
-                  width: 38,
-                  height: 38,
-                  borderRadius: 19,
+                  width: 42,
+                  height: 42,
+                  borderRadius: 12,
                   backgroundColor: colors.accentSoft,
+                  borderWidth: 1,
+                  borderColor: colors.accentGlow,
                   alignItems: 'center',
                   justifyContent: 'center',
-                  marginRight: 10,
+                  marginRight: 12,
                 }}
               >
-                <Text style={{ color: colors.text, fontWeight: '800' }}>
+                <Text style={{ color: colors.accent, fontWeight: '900', fontSize: 16 }}>
                   {(p.full_name || '?').charAt(0).toUpperCase()}
                 </Text>
               </View>
               <View style={{ flex: 1 }}>
-                <Text style={{ color: colors.text, fontWeight: '700' }}>{p.full_name}</Text>
-                <Sub>
+                <Text style={{ color: colors.text, fontWeight: '800', fontSize: 15 }}>{p.full_name}</Text>
+                <Sub style={{ fontSize: 12, marginTop: 1 }}>
                   {p.job_title ? `${p.job_title} · ` : ''}
                   {p.created_at}
                 </Sub>
               </View>
+              <Chip label="NEWS" color={colors.accent} />
             </Row>
             {p.caption ? (
-              <Text style={{ color: colors.text, lineHeight: 20 }}>{p.caption}</Text>
+              <Text style={{ color: colors.text, fontSize: 14, lineHeight: 21 }}>{p.caption}</Text>
             ) : null}
             {p.image_url ? (
               <Image
@@ -67,8 +70,8 @@ export default function AnnouncementsScreen() {
                 style={{
                   width: '100%',
                   height: 200,
-                  borderRadius: 10,
-                  marginTop: 10,
+                  borderRadius: 12,
+                  marginTop: 12,
                   backgroundColor: colors.cardAlt,
                 }}
                 resizeMode="cover"

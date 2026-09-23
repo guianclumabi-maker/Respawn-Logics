@@ -31,26 +31,45 @@ export default function SetupScreen() {
   };
 
   return (
-    <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+    <KeyboardAvoidingView style={{ flex: 1, backgroundColor: colors.bg }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
       <Screen>
-        <View style={{ alignItems: 'center', marginTop: 60, marginBottom: 30 }}>
-          <Text style={{ color: colors.text, fontSize: 30, fontWeight: '800' }}>Respawn Logics</Text>
-          <Sub style={{ marginTop: 6 }}>Employee self-service · Basic access</Sub>
+        <View style={{ alignItems: 'center', marginTop: 50, marginBottom: 32 }}>
+          <View
+            style={{
+              width: 56,
+              height: 56,
+              borderRadius: 16,
+              backgroundColor: 'rgba(16, 185, 129, 0.15)',
+              borderWidth: 1,
+              borderColor: 'rgba(16, 185, 129, 0.3)',
+              alignItems: 'center',
+              justifyContent: 'center',
+              marginBottom: 14,
+            }}
+          >
+            <Text style={{ fontSize: 26 }}>⚡</Text>
+          </View>
+          <Text style={{ color: colors.accent, fontSize: 13, fontWeight: '800', letterSpacing: 1.5, marginBottom: 4 }}>
+            RESPAWN LOGICS
+          </Text>
+          <Text style={{ color: colors.text, fontSize: 26, fontWeight: '800' }}>Server Connection</Text>
+          <Sub style={{ marginTop: 4, fontSize: 13 }}>Employee Mobile Portal Setup</Sub>
         </View>
-        <Card>
-          <Title>Connect to your server</Title>
-          <Sub style={{ marginBottom: 14 }}>
-            Enter the address of your Respawn Logics installation. On a local XAMPP setup this is
-            your PC's LAN IP, e.g. http://192.168.1.100/respawn-logics
+
+        <Card accentColor={colors.accent}>
+          <Title style={{ fontSize: 18 }}>Connect to HRIS Host</Title>
+          <Sub style={{ marginBottom: 14, lineHeight: 18 }}>
+            Enter your Respawn Logics server URL. On a local XAMPP setup, use your host PC's local LAN IP address.
           </Sub>
           <Field
-            label="Server URL"
+            label="Server API URL"
             value={url}
             onChangeText={setUrl}
             keyboardType="url"
             autoCorrect={false}
+            placeholder="http://192.168.1.100/respawn-logics"
           />
-          <Button label="Connect" onPress={connect} loading={busy} />
+          <Button label="Test & Connect Host" onPress={connect} loading={busy} icon="📡" style={{ marginTop: 4 }} />
         </Card>
       </Screen>
     </KeyboardAvoidingView>
