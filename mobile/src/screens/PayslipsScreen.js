@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { View, Text, Alert, TouchableOpacity } from 'react-native';
 import * as FileSystem from 'expo-file-system/legacy';
 import * as Sharing from 'expo-sharing';
-import { Screen, Card, Title, Sub, Row, EmptyState } from '../components/UI';
+import { Screen, Card, Title, Sub, Row, EmptyState, BrandHeader, Chip } from '../components/UI';
 import { colors } from '../theme';
 import * as api from '../api';
 
@@ -62,37 +62,47 @@ export default function PayslipsScreen() {
 
   return (
     <Screen refreshing={refreshing} onRefresh={onRefresh}>
-      <Title style={{ marginBottom: 10 }}>My payslips</Title>
+      <BrandHeader title="Payroll & Earnings" subtitle="Access your pay statements and download PDFs" />
+
+      <Title style={{ marginBottom: 10, fontSize: 16 }}>Payroll History</Title>
       {slips.length === 0 ? (
-        <EmptyState text="No payslips available yet." />
+        <EmptyState text="No payslips available yet." icon="💳" />
       ) : (
         slips.map((s) => (
-          <TouchableOpacity key={s.id} onPress={() => download(s)} disabled={downloading === s.id}>
-            <Card style={{ paddingVertical: 14 }}>
-              <Row style={{ justifyContent: 'space-between' }}>
-                <View style={{ flex: 1 }}>
-                  <Text style={{ color: colors.text, fontWeight: '700' }}>
+          <TouchableOpacity
+            key={s.id}
+            onPress={() => download(s)}
+            disabled={downloading === s.id}
+            activeOpacity={0.8}
+          >
+            <Card style={{ paddingVertical: 16 }} accentColor={colors.info}>
+              <Row style={{ justifyContent: 'space-between', alignItems: 'center' }}>
+                <View style={{ flex: 1, paddingRight: 10 }}>
+                  <Text style={{ color: colors.text, fontWeight: '800', fontSize: 15 }}>
                     {s.payroll_period_start} → {s.payroll_period_end}
                   </Text>
-                  <Sub style={{ marginTop: 2 }}>Pay date: {s.pay_date}</Sub>
+                  <Sub style={{ marginTop: 4 }}>Pay date: {s.pay_date || '—'}</Sub>
                 </View>
                 <View style={{ alignItems: 'flex-end' }}>
                   {s.net_pay !== undefined && (
-                    <Text style={{ color: colors.success, fontWeight: '800' }}>
+                    <Text style={{ color: colors.accent, fontWeight: '800', fontSize: 18 }}>
                       {money(s.net_pay)}
                     </Text>
                   )}
-                  <Sub style={{ marginTop: 2 }}>
-                    {downloading === s.id ? 'Downloading…' : 'Tap for PDF'}
-                  </Sub>
+                  <View style={{ marginTop: 6 }}>
+                    <Chip
+                      label={downloading === s.id ? 'DOWNLOADING…' : '📄 DOWNLOAD PDF'}
+                      color={colors.accent}
+                    />
+                  </View>
                 </View>
               </Row>
             </Card>
           </TouchableOpacity>
         ))
       )}
-      <Sub style={{ textAlign: 'center', marginTop: 6 }}>
-        Tap a payslip to download and share its PDF.
+      <Sub style={{ textAlign: 'center', marginTop: 8, fontSize: 12 }}>
+        Tap any pay statement to download or export its PDF document.
       </Sub>
     </Screen>
   );

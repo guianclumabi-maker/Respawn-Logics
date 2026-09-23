@@ -32,13 +32,13 @@ If Expo warns about package versions on first start, run:
 npx expo install --fix
 ```
 
-## 2. Test on your iPhone (no Mac needed)
+## 2. Test on your iPhone or Android Phone (no Mac or Android Studio needed)
 
-1. Install **Expo Go** from the App Store on your iPhone.
-2. Make sure your iPhone and PC are on the **same Wi-Fi network**.
+1. Install **Expo Go** from the **Google Play Store** (Android) or **App Store** (iPhone).
+2. Make sure your phone and PC are on the **same Wi-Fi network**.
 3. Start XAMPP (Apache + MySQL) as usual.
 4. In the `mobile` folder run `npm start` (or double-click `start.bat`).
-5. Scan the QR code shown in the terminal with the iPhone camera — it opens in Expo Go.
+5. Open **Expo Go** on Android (or scan the QR code with camera on iOS / inside Expo Go on Android).
 6. In the app's first screen, enter your server address using your PC's **LAN IP**,
    not localhost — e.g. `http://192.168.1.100/respawn-logics`.
    Find your IP by running `ipconfig` in a command prompt (IPv4 Address).
@@ -56,6 +56,16 @@ npx expo install --fix
 - **Expo Go says the project isn't compatible** — this project targets SDK 54,
   which is what the App Store's Expo Go supports (as of mid-2026). If Expo Go has
   since moved on, run `npx expo install expo@latest` then `npx expo install --fix`.
+
+### Building a real installable Android app (.apk / .aab)
+
+To generate an installable Android `.apk` or Google Play `.aab` file:
+
+```bash
+npm install -g eas-cli
+eas login          # free Expo account
+eas build --platform android --profile preview    # generates standalone APK
+```
 
 ## 3. Building a real installable iOS app (later)
 

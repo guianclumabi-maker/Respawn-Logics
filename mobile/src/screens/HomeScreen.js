@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { View, Text, Alert, TouchableOpacity } from 'react-native';
-import { Screen, Card, Title, Sub, Button, Row, Chip } from '../components/UI';
+import { Screen, Card, MetricCard, Title, Sub, Button, Row, Chip, BrandHeader } from '../components/UI';
 import { colors } from '../theme';
 import { useAuth } from '../AuthContext';
 import * as api from '../api';
@@ -63,96 +63,128 @@ export default function HomeScreen() {
 
   return (
     <Screen refreshing={refreshing} onRefresh={onRefresh}>
-      <Text style={{ color: colors.text, fontSize: 24, fontWeight: '800', marginBottom: 2 }}>
-        Hi{firstName ? `, ${firstName}` : ''} 👋
-      </Text>
-      <Sub style={{ marginBottom: 16 }}>{user?.job_title || 'Employee self-service'}</Sub>
+      <BrandHeader
+        title={`Hi${firstName ? `, ${firstName}` : ''} 👋`}
+        subtitle={user?.job_title || 'Employee Self-Service'}
+        rightElement={
+          <View style={{ alignItems: 'flex-end' }}>
+            <Chip label={user?.department || 'Employee'} color={colors.accent} />
+          </View>
+        }
+      />
 
-      <Card>
-        <Row style={{ justifyContent: 'space-between' }}>
-          <View>
-            <Title>Time clock</Title>
-            <Sub>
+      {/* Primary Action Card: Time Clock */}
+      <Card accentColor={colors.accent}>
+        <Row style={{ justifyContent: 'space-between', alignItems: 'flex-start' }}>
+          <View style={{ flex: 1, paddingRight: 10 }}>
+            <Title style={{ fontSize: 19 }}>Shift Time Clock</Title>
+            <Sub style={{ marginTop: 2 }}>
               {attState === 'in'
                 ? `Clocked in at ${stats?.clock_time ?? '—'}`
                 : attState === 'completed'
                 ? 'Shift completed for today'
-                : 'Not clocked in yet'}
+                : 'Ready to start your work shift'}
             </Sub>
           </View>
           <Chip
-            label={attState === 'in' ? 'ON THE CLOCK' : attState === 'completed' ? 'DONE' : 'OFF'}
-            color={attState === 'in' ? colors.success : attState === 'completed' ? colors.info : colors.sub}
+            label={attState === 'in' ? 'ON THE CLOCK' : attState === 'completed' ? 'DONE' : 'OFF DUTY'}
+            status={attState === 'in' ? 'present' : attState === 'completed' ? 'resolved' : 'pending'}
           />
         </Row>
+
         {attState !== 'completed' && (
           <Button
-            style={{ marginTop: 14 }}
-            label={attState === 'in' ? 'Clock out' : 'Clock in'}
+            style={{ marginTop: 16 }}
+            label={attState === 'in' ? 'Clock Out Now' : 'Clock In Now'}
             variant={attState === 'in' ? 'danger' : 'primary'}
+            icon={attState === 'in' ? '🛑' : '⏱️'}
             onPress={doClock}
             loading={clockBusy}
           />
         )}
       </Card>
 
-      <Row style={{ gap: 12 }}>
-        <Card style={{ flex: 1 }}>
-          <Sub>Hours (7 days)</Sub>
-          <Text style={styleStat}>{stats ? Number(stats.total_hours).toFixed(1) : '—'}</Text>
-        </Card>
-        <Card style={{ flex: 1 }}>
-          <Sub>Pending leaves</Sub>
-          <Text style={styleStat}>{stats ? stats.pending_leaves : '—'}</Text>
-        </Card>
-        <Card style={{ flex: 1 }}>
-          <Sub>Open tasks</Sub>
-          <Text style={styleStat}>{stats ? stats.active_tasks_count : '—'}</Text>
-        </Card>
-      </Row>
+      {/* Metrics Row */}
+      <View style={{ flexDirection: 'row', gap: 10, marginBottom: 14 }}>
+        <MetricCard
+          label="Weekly Hours"
+          value={stats ? `${Number(stats.total_hours).toFixed(1)}h` : '—'}
+          icon="⏱️"
+          accentColor={colors.accent}
+        />
+        <MetricCard
+          label="Pending Leaves"
+          value={stats ? stats.pending_leaves : '—'}
+          icon="🌴"
+          accentColor={colors.purple}
+        />
+        <MetricCard
+          label="Open Tasks"
+          value={stats ? stats.active_tasks_count : '—'}
+          icon="✅"
+          accentColor={colors.info}
+        />
+      </View>
 
+      {/* Task List */}
       <Card>
-        <Title>My tasks</Title>
+        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+          <Title style={{ marginBottom: 0 }}>My Action Items</Title>
+          <Chip label={`${stats?.todo_list?.length || 0} Tasks`} color={colors.sub} />
+        </View>
+
         {!stats || !stats.todo_list || stats.todo_list.length === 0 ? (
-          <Sub>No tasks yet.</Sub>
+          <Sub style={{ textAlign: 'center', paddingVertical: 16 }}>No pending action items for today.</Sub>
         ) : (
-          stats.todo_list.map((t) => (
-            <TouchableOpacity
-              key={t.id}
-              onPress={() => toggle(t.id)}
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                paddingVertical: 10,
-                borderBottomWidth: 1,
-                borderBottomColor: colors.border,
-              }}
-            >
-              <Text style={{ fontSize: 16, marginRight: 10 }}>
-                {Number(t.is_completed) ? '✅' : '⬜'}
-              </Text>
-              <View style={{ flex: 1 }}>
-                <Text
+          stats.todo_list.map((t, idx) => {
+            const isDone = Number(t.is_completed);
+            return (
+              <TouchableOpacity
+                key={t.id}
+                onPress={() => toggle(t.id)}
+                activeOpacity={0.7}
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  paddingVertical: 12,
+                  borderBottomWidth: idx === stats.todo_list.length - 1 ? 0 : 1,
+                  borderBottomColor: colors.border,
+                }}
+              >
+                <View
                   style={{
-                    color: Number(t.is_completed) ? colors.sub : colors.text,
-                    textDecorationLine: Number(t.is_completed) ? 'line-through' : 'none',
+                    width: 22,
+                    height: 22,
+                    borderRadius: 6,
+                    borderWidth: isDone ? 0 : 1.5,
+                    borderColor: colors.subMuted,
+                    backgroundColor: isDone ? colors.accent : 'transparent',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    marginRight: 12,
                   }}
                 >
-                  {t.task_name}
-                </Text>
-                {t.task_description ? <Sub>{t.task_description}</Sub> : null}
-              </View>
-            </TouchableOpacity>
-          ))
+                  {isDone ? <Text style={{ color: '#020617', fontSize: 13, fontWeight: '900' }}>✓</Text> : null}
+                </View>
+
+                <View style={{ flex: 1 }}>
+                  <Text
+                    style={{
+                      color: isDone ? colors.subMuted : colors.text,
+                      fontSize: 15,
+                      fontWeight: '600',
+                      textDecorationLine: isDone ? 'line-through' : 'none',
+                    }}
+                  >
+                    {t.task_name}
+                  </Text>
+                  {t.task_description ? <Sub style={{ marginTop: 2, fontSize: 12 }}>{t.task_description}</Sub> : null}
+                </View>
+              </TouchableOpacity>
+            );
+          })
         )}
       </Card>
     </Screen>
   );
 }
-
-const styleStat = {
-  color: colors.text,
-  fontSize: 22,
-  fontWeight: '800',
-  marginTop: 4,
-};

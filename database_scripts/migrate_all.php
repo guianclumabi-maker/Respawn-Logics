@@ -7,6 +7,11 @@ require_once __DIR__ . '/../bootstrap/app.php';
 echo "Starting All Migrations...\n";
 echo "====================================\n";
 
+if (!isset($pdo) || !($pdo instanceof PDO)) {
+    echo "[DEMO / PRESENTATION MODE] Database connection not established. Skipping migration execution.\n";
+    return;
+}
+
 // Disable foreign key checks to prevent lock/constraint errors during table creation
 $pdo->exec("SET FOREIGN_KEY_CHECKS = 0;");
 

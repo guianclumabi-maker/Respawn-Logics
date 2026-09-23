@@ -25,6 +25,32 @@ class AuthController
                     return;
                 }
 
+                // ── Brute-force throttle ──────────────────────────────────────
+                // 5 failed attempts per email OR per IP within 15 minutes -> 429.
+                // Response is generic (never confirms the account exists). Counter
+                // clears on successful login. Self-healing table.
+                $ip = $_SERVER['REMOTE_ADDR'] ?? '';
+                try {
+                    $this->pdo->exec("CREATE TABLE IF NOT EXISTS `login_attempts` (
+                        `id` BIGINT PRIMARY KEY AUTO_INCREMENT,
+                        `email` VARCHAR(150) NOT NULL,
+                        `ip` VARCHAR(45) NOT NULL,
+                        `attempted_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                        INDEX `idx_la_email` (`email`, `attempted_at`),
+                        INDEX `idx_la_ip` (`ip`, `attempted_at`)
+                    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
+                    $thr = $this->pdo->prepare("SELECT COUNT(*) FROM `login_attempts`
+                        WHERE (`email` = ? OR `ip` = ?) AND `attempted_at` > DATE_SUB(NOW(), INTERVAL 15 MINUTE)");
+                    $thr->execute([$email, $ip]);
+                    if ((int)$thr->fetchColumn() >= 5) {
+                        http_response_code(429);
+                        echo json_encode(['success' => false, 'error' => 'Too many login attempts. Please wait 15 minutes and try again.']);
+                        return;
+                    }
+                } catch (\Throwable $thrEx) {
+                    error_log('[Auth] throttle check failed: ' . $thrEx->getMessage()); // fail open, never lock out on infra errors
+                }
+
                 try {
                     $stmt = $this->pdo->prepare("SELECT * FROM `users` WHERE `email` = ?");
                     $stmt->execute([$email]);
@@ -117,9 +143,18 @@ class AuthController
 
                         $fullUser = array_merge(buildUserPayload($user, $roles), ['tier_config' => $tierConfig]);
 
+                        // Successful login clears this identity's throttle counter.
+                        try {
+                            $this->pdo->prepare("DELETE FROM `login_attempts` WHERE `email` = ? OR `ip` = ?")->execute([$email, $ip]);
+                        } catch (\Throwable $e) { /* non-fatal */ }
+
                         logAudit('Login', 'User signed in successfully.', $user['email'], $user['tenant_id']);
                         echo json_encode(['success' => true, 'user' => $fullUser]);
                     } else {
+                        // Record the failure for the brute-force throttle.
+                        try {
+                            $this->pdo->prepare("INSERT INTO `login_attempts` (`email`, `ip`) VALUES (?, ?)")->execute([$email, $ip]);
+                        } catch (\Throwable $e) { /* non-fatal */ }
                         http_response_code(401);
                         echo json_encode(['success' => false, 'error' => 'Invalid email or password.']);
                     }

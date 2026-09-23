@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { View, Text, Alert, TouchableOpacity } from 'react-native';
-import { Screen, Card, Title, Sub, Button, Row, Chip, Field, EmptyState } from '../components/UI';
+import { Screen, Card, Title, Sub, Button, Row, Chip, Field, EmptyState, BrandHeader } from '../components/UI';
 import { colors, statusColor } from '../theme';
 import * as api from '../api';
 
@@ -76,19 +76,32 @@ export default function LeavesScreen() {
 
   return (
     <Screen refreshing={refreshing} onRefresh={onRefresh}>
-      <Title style={{ marginBottom: 10 }}>Leave balances</Title>
+      <BrandHeader title="Leave Management" subtitle="Track PTO allowances and submit time-off requests" />
+
+      <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
+        <Title style={{ fontSize: 16, marginBottom: 0 }}>Leave Balances</Title>
+        <Button
+          label={showForm ? 'Cancel' : '+ Request Leave'}
+          variant={showForm ? 'secondary' : 'primary'}
+          onPress={() => setShowForm(!showForm)}
+          style={{ paddingVertical: 8, paddingHorizontal: 12 }}
+        />
+      </View>
+
       {balances.length === 0 ? (
-        <EmptyState text="No leave balances set up for your account." />
+        <EmptyState text="No leave balances configured." icon="🌴" />
       ) : (
-        <Row style={{ flexWrap: 'wrap', gap: 10, marginBottom: 8 }}>
+        <Row style={{ flexWrap: 'wrap', gap: 10, marginBottom: 14 }}>
           {balances.map((b) => {
             const left = Number(b.total_allowance) - Number(b.used_balance);
             return (
-              <Card key={b.leave_type} style={{ flexGrow: 1, minWidth: '45%', marginBottom: 4 }}>
-                <Sub>{b.leave_type}</Sub>
-                <Text style={{ color: colors.text, fontSize: 22, fontWeight: '800', marginTop: 4 }}>
+              <Card key={b.leave_type} style={{ flexGrow: 1, minWidth: '45%', marginBottom: 4 }} accentColor={colors.purple}>
+                <Sub style={{ color: colors.sub, fontSize: 12, fontWeight: '700', textTransform: 'uppercase' }}>
+                  {b.leave_type}
+                </Sub>
+                <Text style={{ color: colors.text, fontSize: 24, fontWeight: '800', marginTop: 4 }}>
                   {left}
-                  <Text style={{ color: colors.sub, fontSize: 13, fontWeight: '400' }}>
+                  <Text style={{ color: colors.subMuted, fontSize: 13, fontWeight: '500' }}>
                     {' '}
                     / {Number(b.total_allowance)} days
                   </Text>
@@ -99,59 +112,56 @@ export default function LeavesScreen() {
         </Row>
       )}
 
-      <Button
-        label={showForm ? 'Cancel' : 'Request leave'}
-        variant={showForm ? 'secondary' : 'primary'}
-        onPress={() => setShowForm(!showForm)}
-        style={{ marginBottom: 12 }}
-      />
-
       {showForm && (
-        <Card>
-          <Title>New leave request</Title>
-          <Sub style={{ marginBottom: 10 }}>Leave type</Sub>
-          <Row style={{ flexWrap: 'wrap', gap: 8, marginBottom: 12 }}>
-            {balances.map((b) => (
-              <TouchableOpacity key={b.leave_type} onPress={() => setLeaveType(b.leave_type)}>
-                <Chip
-                  label={b.leave_type}
-                  color={leaveType === b.leave_type ? colors.accent : colors.sub}
-                />
-              </TouchableOpacity>
-            ))}
+        <Card accentColor={colors.accent}>
+          <Title style={{ fontSize: 17 }}>New Time-Off Request</Title>
+          <Sub style={{ marginBottom: 10 }}>Select Leave Category</Sub>
+          <Row style={{ flexWrap: 'wrap', gap: 8, marginBottom: 14 }}>
+            {balances.map((b) => {
+              const isSelected = leaveType === b.leave_type;
+              return (
+                <TouchableOpacity key={b.leave_type} onPress={() => setLeaveType(b.leave_type)}>
+                  <Chip
+                    label={b.leave_type}
+                    color={isSelected ? colors.accent : colors.sub}
+                    style={isSelected ? { backgroundColor: colors.accentSoft, borderColor: colors.accent } : null}
+                  />
+                </TouchableOpacity>
+              );
+            })}
           </Row>
           <Field
-            label="Start date (YYYY-MM-DD)"
+            label="Start Date (YYYY-MM-DD)"
             value={startDate}
             onChangeText={setStartDate}
             placeholder="2026-07-15"
           />
           <Field
-            label="End date (YYYY-MM-DD)"
+            label="End Date (YYYY-MM-DD)"
             value={endDate}
             onChangeText={setEndDate}
             placeholder="2026-07-16"
           />
-          <Field label="Reason (optional)" value={reason} onChangeText={setReason} multiline />
-          <Button label="Submit request" onPress={submit} loading={busy} />
+          <Field label="Reason (Optional)" value={reason} onChangeText={setReason} multiline />
+          <Button label="Submit Time-Off Request" onPress={submit} loading={busy} icon="🚀" />
         </Card>
       )}
 
-      <Title style={{ marginTop: 8, marginBottom: 10 }}>My requests</Title>
+      <Title style={{ marginTop: 8, marginBottom: 10, fontSize: 16 }}>Request History</Title>
       {requests.length === 0 ? (
-        <EmptyState text="No leave requests yet." />
+        <EmptyState text="No time-off requests submitted yet." icon="📜" />
       ) : (
         requests.map((r) => (
-          <Card key={r.id} style={{ paddingVertical: 12 }}>
+          <Card key={r.id} style={{ paddingVertical: 14 }}>
             <Row style={{ justifyContent: 'space-between' }}>
               <View style={{ flex: 1, paddingRight: 10 }}>
-                <Text style={{ color: colors.text, fontWeight: '700' }}>{r.leave_type}</Text>
-                <Sub style={{ marginTop: 2 }}>
-                  {r.start_date} → {r.end_date}
+                <Text style={{ color: colors.text, fontWeight: '700', fontSize: 15 }}>{r.leave_type}</Text>
+                <Sub style={{ marginTop: 4, color: colors.subSecondary }}>
+                  📅 {r.start_date} → {r.end_date}
                 </Sub>
-                {r.reason ? <Sub style={{ marginTop: 2 }}>{r.reason}</Sub> : null}
+                {r.reason ? <Sub style={{ marginTop: 2, fontStyle: 'italic' }}>"{r.reason}"</Sub> : null}
               </View>
-              <Chip label={r.status} color={statusColor(r.status)} />
+              <Chip label={r.status} status={r.status} />
             </Row>
           </Card>
         ))

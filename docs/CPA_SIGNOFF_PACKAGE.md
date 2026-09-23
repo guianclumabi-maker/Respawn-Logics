@@ -8,9 +8,10 @@
 
 ## PART 1 — Open questions requiring CPA decision (ranked)
 
-### Q1 (HIGHEST): Monthly-paid employees are paid by a worked-hours proxy, not their fixed salary
-The engine computes basic pay as `approved timesheet hours × hourly rate`, where `hourly = (monthly_base × 12) / 313 / 8`. In a month with fewer working days than the annual average (313/12 ≈ 26.08), a monthly-paid employee earns LESS than their contracted salary — e.g. ₱18,000/month over a 22-workday June yields **₱15,181.92** gross. Standard PH practice pays the fixed monthly salary minus absence deductions.
-**Decision needed:** keep hours-proxy (and document it in employment contracts), or switch monthly-fixed to "fixed salary − absences." This also determines whether the Reference Oracle tax/net values can be activated (they are deliberately blank until this is resolved — see `PayrollReferenceOracleTest`).
+### Q1 (RESOLVED IN CODE — CPA to CONFIRM): Monthly-paid basic pay
+**Implemented (default `monthly_pay_mode='fixed_salary'`):** monthly staff receive their fixed cutoff salary MINUS absence deductions (absent scheduled workday × daily rate, Mon–Fri workweek, calendar holidays neither paid extra nor deducted). Under the 313-day divisor the salary already includes holidays, so worked-holiday premiums pay only the EXCESS on top (regular holiday +100%, special day +30%); OT, rest-day work, and night diff are fully on top. The legacy hours-proxy survives as opt-in `monthly_pay_mode='hours_proxy'`.
+**This resolution enabled the full Reference Oracle:** tax and net for ₱18k/30k/50k/90k are now exact-value asserted against the TRAIN monthly table (see `PayrollReferenceOracleTest` — 20 assertions).
+**CPA confirms:** (a) excess-only holiday premiums are correct for the 313 divisor and must switch to full 200%/130% + special-day absence deduction under a 261 divisor; (b) Mon–Fri workweek assumption; (c) absence valuation at straight daily rate.
 
 ### Q2: Statutory contribution basis for non-monthly staff
 `tenant_payroll_settings.statutory_basis` = `monthly_base` (default; MSC = fixed monthly salary) or `actual_period_equivalent` (MSC = actual period pay scaled to monthly). Daily/hourly pay basis combined with `monthly_base` emits a run warning. **Decision needed per client:** which basis matches their remittance practice for no-work-no-pay staff.

@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { View, Text, Alert } from 'react-native';
-import { Screen, Card, Title, Sub, Button, Row, Chip, EmptyState } from '../components/UI';
+import { Screen, Card, Title, Sub, Button, Row, Chip, EmptyState, BrandHeader } from '../components/UI';
 import { colors, statusColor } from '../theme';
 import * as api from '../api';
 
@@ -67,45 +67,57 @@ export default function AttendanceScreen() {
 
   return (
     <Screen refreshing={refreshing} onRefresh={onRefresh}>
-      <Card>
-        <Title>Today</Title>
-        <Sub>
-          {state === 'in'
-            ? 'You are currently clocked in.'
-            : state === 'completed'
-            ? 'Shift completed — see you tomorrow!'
-            : 'You have not clocked in today.'}
-        </Sub>
+      <BrandHeader title="Time & Attendance" subtitle="Track shift punches and recent timesheets" />
+
+      <Card accentColor={colors.accent}>
+        <Row style={{ justifyContent: 'space-between', alignItems: 'center' }}>
+          <View>
+            <Title style={{ fontSize: 18 }}>Shift Status</Title>
+            <Sub style={{ marginTop: 2 }}>
+              {state === 'in'
+                ? 'Active shift in progress.'
+                : state === 'completed'
+                ? 'Shift completed for today.'
+                : 'Not currently clocked in.'}
+            </Sub>
+          </View>
+          <Chip
+            label={state === 'in' ? 'CLOCKED IN' : state === 'completed' ? 'FINISHED' : 'OFF'}
+            status={state === 'in' ? 'present' : state === 'completed' ? 'resolved' : 'pending'}
+          />
+        </Row>
+
         {state !== 'completed' && (
           <Button
             style={{ marginTop: 14 }}
-            label={state === 'in' ? 'Clock out' : 'Clock in'}
+            label={state === 'in' ? 'Clock Out' : 'Clock In'}
             variant={state === 'in' ? 'danger' : 'primary'}
+            icon={state === 'in' ? '🛑' : '⏱️'}
             onPress={() => doClock(state === 'in')}
             loading={busy}
           />
         )}
       </Card>
 
-      <Title style={{ marginTop: 8, marginBottom: 10 }}>Recent timesheet</Title>
+      <Title style={{ marginTop: 12, marginBottom: 10, fontSize: 16 }}>Recent Timesheet Log</Title>
       {logs.length === 0 ? (
-        <EmptyState text="No attendance records yet." />
+        <EmptyState text="No attendance records found." icon="⏱️" />
       ) : (
         logs.map((log) => {
           const hrs = hoursBetween(log.time_in, log.time_out);
           return (
-            <Card key={log.id} style={{ paddingVertical: 12 }}>
+            <Card key={log.id} style={{ paddingVertical: 14 }}>
               <Row style={{ justifyContent: 'space-between' }}>
                 <View style={{ flex: 1 }}>
-                  <Text style={{ color: colors.text, fontWeight: '700' }}>
+                  <Text style={{ color: colors.text, fontWeight: '700', fontSize: 15 }}>
                     {fmtDate(log.time_in)}
                   </Text>
-                  <Sub style={{ marginTop: 2 }}>
+                  <Sub style={{ marginTop: 4 }}>
                     {fmtTime(log.time_in)} → {fmtTime(log.time_out)}
-                    {hrs ? `  ·  ${hrs}h` : ''}
+                    {hrs ? `  •  ${hrs} hours` : ''}
                   </Sub>
                 </View>
-                <Chip label={log.status || '—'} color={statusColor(log.status)} />
+                <Chip label={log.status || 'PUNCH'} status={log.status} />
               </Row>
             </Card>
           );

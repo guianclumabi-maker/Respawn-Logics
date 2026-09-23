@@ -70,45 +70,46 @@ export default function HRCasesScreen() {
   return (
     <Screen refreshing={refreshing} onRefresh={onRefresh}>
       <Button
-        label={showForm ? 'Cancel' : 'File a new case'}
+        label={showForm ? 'Cancel' : '+ File New HR Case'}
         variant={showForm ? 'secondary' : 'primary'}
         onPress={() => setShowForm(!showForm)}
-        style={{ marginBottom: 12 }}
+        style={{ marginBottom: 14 }}
       />
+
       {showForm && (
-        <Card>
-          <Title>New HR case</Title>
+        <Card accentColor={colors.purple}>
+          <Title style={{ fontSize: 17 }}>New HR Case Filing</Title>
           <Field
-            label="Case details"
+            label="Case Title & Details"
             value={name}
             onChangeText={setName}
-            placeholder="Describe the issue…"
+            placeholder="Provide details regarding the case…"
             multiline
           />
-          <Button label="Submit case" onPress={submit} loading={busy} />
+          <Button label="Submit HR Case" onPress={submit} loading={busy} icon="📝" />
         </Card>
       )}
 
       {cases.length === 0 ? (
-        <EmptyState text="No HR cases on file." />
+        <EmptyState text="No HR cases currently on file." icon="🗂️" />
       ) : (
         cases.map((c) => (
-          <TouchableOpacity key={c.id} onLongPress={() => advance(c)}>
-            <Card style={{ paddingVertical: 12 }}>
-              <Row style={{ justifyContent: 'space-between' }}>
+          <TouchableOpacity key={c.id} onLongPress={() => advance(c)} activeOpacity={0.8}>
+            <Card style={{ paddingVertical: 14 }} accentColor={colors.purple}>
+              <Row style={{ justifyContent: 'space-between', alignItems: 'center' }}>
                 <View style={{ flex: 1, paddingRight: 10 }}>
-                  <Text style={{ color: colors.text, fontWeight: '700' }}>{c.name}</Text>
-                  <Sub style={{ marginTop: 2 }}>Filed {c.applied}</Sub>
+                  <Text style={{ color: colors.text, fontWeight: '800', fontSize: 15 }}>{c.name}</Text>
+                  <Sub style={{ marginTop: 4 }}>Filed: {c.applied}</Sub>
                 </View>
-                <Chip label={c.stage} color={statusColor(c.stage)} />
+                <Chip label={c.stage} status={c.stage} />
               </Row>
             </Card>
           </TouchableOpacity>
         ))
       )}
       {cases.length > 0 && (
-        <Sub style={{ textAlign: 'center', marginTop: 6 }}>
-          Long-press a case to advance it to the next stage.
+        <Sub style={{ textAlign: 'center', marginTop: 8, fontSize: 12 }}>
+          Tip: Long-press a case card to advance its resolution stage.
         </Sub>
       )}
     </Screen>

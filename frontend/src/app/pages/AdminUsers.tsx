@@ -2,6 +2,7 @@ import { apiFetch } from "../lib/apiClient";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { User, Mail, Shield, Circle, Edit, UserX, UserCheck, X } from "lucide-react";
+import { toast } from "sonner";
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || (window.location.origin + (window.location.hostname === "localhost" ? "/respawn-logics" : ""));
 const API = `${API_BASE}/api/index.php?route=iam&action=users`;
@@ -85,11 +86,11 @@ export function AdminUsers() {
         setEditingUser(null);
         fetchUsers();
       } else {
-        alert(json?.error || "Failed to assign role.");
+        toast.error(json?.error || "Failed to assign role.");
       }
     } catch (e) {
       console.error(e);
-      alert("Error assigning role.");
+      toast.error("Error assigning role.");
     } finally {
       setBusy(false);
     }
@@ -111,14 +112,15 @@ export function AdminUsers() {
       });
       const json = await res.json();
       if (json?.success) {
-        if (json.warning) alert(json.warning);
+        if (json.warning) toast.warning(json.warning);
+        toast.success(`Employee ${suspending ? "suspended" : "reinstated"} successfully.`);
         fetchUsers();
       } else {
-        alert(json?.error || `Failed to ${suspending ? "suspend" : "reinstate"}.`);
+        toast.error(json?.error || `Failed to ${suspending ? "suspend" : "reinstate"}.`);
       }
     } catch (e) {
       console.error(e);
-      alert("Error updating employment status.");
+      toast.error("Error updating employment status.");
     }
   };
 

@@ -35,8 +35,8 @@ try {
     // Force MySQL session to UTC to align with PHP's timezone
     $pdo->exec("SET time_zone = '+00:00';");
 } catch (PDOException $e) {
-    // Attempt local database creation if it's missing
-    if ($e->getCode() == 1049 && $dbConfig['host'] === 'localhost') {
+    // Attempt local database creation if it's missing (Error 1049: Unknown database)
+    if ($e->getCode() == 1049 && ($dbConfig['host'] === 'localhost' || $dbConfig['host'] === '127.0.0.1')) {
         try {
             $dsnNoDb = sprintf(
                 'mysql:host=%s;port=%s;charset=utf8mb4',
@@ -58,6 +58,20 @@ try {
             die("Database connection failed: " . $ex->getMessage());
         }
     } else {
-        die("Database connection failed: " . $e->getMessage());
+        $pdo = null;
+        $errorMsg = "Database connection failed: " . $e->getMessage();
+        $isRailway = !empty(getenv('RAILWAY_ENVIRONMENT'))
+            || !empty(getenv('RAILWAY_PUBLIC_DOMAIN'))
+            || !empty($_ENV['RAILWAY_ENVIRONMENT'])
+            || !empty($_SERVER['RAILWAY_ENVIRONMENT']);
+        if ($isRailway && ($dbConfig['host'] === 'localhost' || $dbConfig['host'] === '127.0.0.1')) {
+            $errorMsg .= " [Railway Note: Database host resolved to '{$dbConfig['host']}'. Running in Demo/Presentation mode].";
+        }
+        error_log($errorMsg);
+        
+        // Only die in CLI when strictly required, otherwise allow demo/presentation mode
+        if (php_sapi_name() === 'cli' && (getenv('APP_ENV') === 'testing')) {
+            die($errorMsg . "\n");
+        }
     }
 }

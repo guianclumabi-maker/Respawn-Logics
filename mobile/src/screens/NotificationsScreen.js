@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
-import { Screen, Card, Sub, Button, EmptyState } from '../components/UI';
+import { Screen, Card, Sub, Button, EmptyState, Chip } from '../components/UI';
 import { colors } from '../theme';
 import * as api from '../api';
 
@@ -40,18 +40,25 @@ export default function NotificationsScreen() {
   return (
     <Screen refreshing={refreshing} onRefresh={onRefresh}>
       {items.length > 0 && (
-        <Button label="Mark all as read" variant="secondary" onPress={readAll} style={{ marginBottom: 12 }} />
+        <Button label="Mark All as Read" variant="secondary" onPress={readAll} style={{ marginBottom: 14 }} icon="✓" />
       )}
       {items.length === 0 ? (
-        <EmptyState text="You're all caught up 🎉" />
+        <EmptyState text="You're all caught up 🎉" icon="🔔" />
       ) : (
         items.map((n) => (
-          <TouchableOpacity key={n.id} onPress={() => readOne(n.id)}>
-            <Card style={{ paddingVertical: 12 }}>
-              <Text style={{ color: colors.text, fontWeight: '700' }}>{n.title}</Text>
-              <Sub style={{ marginTop: 3 }}>{n.message}</Sub>
-              <Sub style={{ marginTop: 6, fontSize: 11 }}>
-                {n.created_at} · tap to mark read
+          <TouchableOpacity key={n.id} onPress={() => readOne(n.id)} activeOpacity={0.8}>
+            <Card style={{ paddingVertical: 14 }} accentColor={colors.warning}>
+              <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
+                <Text style={{ color: colors.text, fontWeight: '800', fontSize: 15, flex: 1, paddingRight: 10 }}>
+                  {n.title}
+                </Text>
+                <Chip label="NEW" color={colors.warning} />
+              </View>
+              <Sub style={{ color: colors.textSecondary, marginTop: 2, fontSize: 13, lineHeight: 18 }}>
+                {n.message}
+              </Sub>
+              <Sub style={{ marginTop: 8, fontSize: 11, color: colors.subMuted }}>
+                ⏰ {n.created_at} • Tap card to dismiss
               </Sub>
             </Card>
           </TouchableOpacity>

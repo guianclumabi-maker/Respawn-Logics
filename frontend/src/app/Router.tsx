@@ -62,6 +62,7 @@ import { AuditLogs } from "./pages/AuditLogs";
 import { AICompanion } from "./pages/AICompanion";
 import { Analytics } from "./pages/Analytics";
 import { OrgUnits } from "./pages/OrgUnits";
+import { NotFound } from "../pages/NotFound";
 
 // Platform Admin Command Center (Platform_Admin only)
 import { PlatformAdminGuard } from "./pages/platform-admin/PlatformAdminGuard";
@@ -151,7 +152,7 @@ export const router = createHashRouter([
           { path: "audit", element: <AuditLogs /> },
         ]
       },
-      { path: "*", element: <Navigate to="/dashboard" replace /> }
+      { path: "*", element: <NotFound /> }
     ]
   },
   { path: "/onboarding", element: <AuthGuard><OnboardingManager /></AuthGuard> },
@@ -177,4 +178,5 @@ export const router = createHashRouter([
       { path: "impersonate", element: <PlatformAdminImpersonate /> },
     ],
   },
+  { path: "*", element: <NotFound /> }
 ]);

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, Alert, KeyboardAvoidingView, Platform, TouchableOpacity } from 'react-native';
-import { Screen, Card, Title, Sub, Field, Button } from '../components/UI';
+import { Screen, Card, Title, Sub, Field, Button, Chip } from '../components/UI';
 import { colors } from '../theme';
 import { useAuth } from '../AuthContext';
 
@@ -26,34 +26,58 @@ export default function LoginScreen() {
   };
 
   return (
-    <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+    <KeyboardAvoidingView style={{ flex: 1, backgroundColor: colors.bg }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
       <Screen>
-        <View style={{ alignItems: 'center', marginTop: 60, marginBottom: 30 }}>
-          <Text style={{ color: colors.text, fontSize: 30, fontWeight: '800' }}>Welcome back</Text>
-          <Sub style={{ marginTop: 6 }}>{serverUrl}</Sub>
+        {/* Brand Header Badge */}
+        <View style={{ alignItems: 'center', marginTop: 50, marginBottom: 32 }}>
+          <View
+            style={{
+              width: 56,
+              height: 56,
+              borderRadius: 16,
+              backgroundColor: 'rgba(16, 185, 129, 0.15)',
+              borderWidth: 1,
+              borderColor: 'rgba(16, 185, 129, 0.3)',
+              alignItems: 'center',
+              justifyContent: 'center',
+              marginBottom: 14,
+            }}
+          >
+            <Text style={{ fontSize: 26 }}>⚡</Text>
+          </View>
+          <Text style={{ color: colors.accent, fontSize: 13, fontWeight: '800', letterSpacing: 1.5, marginBottom: 4 }}>
+            RESPAWN LOGICS
+          </Text>
+          <Text style={{ color: colors.text, fontSize: 28, fontWeight: '800' }}>Welcome Back</Text>
+          <Sub style={{ marginTop: 6, fontSize: 13 }}>Connected to {serverUrl}</Sub>
         </View>
-        <Card>
-          <Title>Sign in</Title>
+
+        <Card accentColor={colors.accent}>
+          <Title style={{ fontSize: 18, marginBottom: 16 }}>Sign In to Account</Title>
           <Field
-            label="Email"
+            label="Work Email Address"
             value={email}
             onChangeText={setEmail}
             keyboardType="email-address"
             autoComplete="email"
+            placeholder="name@company.com"
           />
           <Field
             label="Password"
             value={password}
             onChangeText={setPassword}
             secureTextEntry
+            placeholder="••••••••"
           />
-          <Button label="Sign in" onPress={submit} loading={busy} />
-          <TouchableOpacity onPress={changeServer} style={{ marginTop: 16, alignItems: 'center' }}>
-            <Text style={{ color: colors.accent, fontSize: 13 }}>Use a different server</Text>
+          <Button label="Sign In" onPress={submit} loading={busy} icon="🔐" style={{ marginTop: 6 }} />
+          
+          <TouchableOpacity onPress={changeServer} style={{ marginTop: 18, alignItems: 'center' }}>
+            <Text style={{ color: colors.accent, fontSize: 13, fontWeight: '600' }}>Switch Server Host</Text>
           </TouchableOpacity>
         </Card>
-        <Sub style={{ textAlign: 'center', marginTop: 8 }}>
-          Accounts with 2FA or a pending password change must use the web app.
+
+        <Sub style={{ textAlign: 'center', marginTop: 12, paddingHorizontal: 20, fontSize: 12, color: colors.subMuted }}>
+          Note: Accounts requiring 2FA or initial password reset must access via the desktop web application.
         </Sub>
       </Screen>
     </KeyboardAvoidingView>
