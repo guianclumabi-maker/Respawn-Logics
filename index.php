@@ -2820,7 +2820,7 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
         <?php if ($loggedIn): ?>
             <a href="<?= url('/frontend/dist/index.html?v=<?= time() ?>#/dashboard') ?>" class="nav-cta">[ RESUME ]</a>
         <?php else: ?>
-            <a href="<?= url('/login.php') ?>" class="nav-cta">[ LOGIN ]</a>
+            <a href="<?= url('/frontend/dist/index.html?demo=true#/dashboard') ?>" class="nav-cta" style="background: linear-gradient(135deg, #00e07a, #00b8ff); color: #000; font-weight: 800;">[ ⚡ INSTANT ACCESS ]</a>
         <?php endif; ?>
     </div>
 </nav>
@@ -2850,14 +2850,14 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
                         Resume Session <i data-lucide="arrow-right"></i>
                     </a>
                 <?php else: ?>
-                    <a href="<?= url('/frontend/dist/index.html?v=' . time() . '#/setup') ?>" class="btn-neon-pill">
-                        Get Started Free <i data-lucide="arrow-right"></i>
+                    <a href="<?= url('/frontend/dist/index.html?demo=true#/dashboard') ?>" class="btn-neon-pill">
+                        ⚡ Instant Access (No Password) <i data-lucide="arrow-right"></i>
                     </a>
                     <a href="presentation.html" class="btn-outline-pill" style="border-color: rgba(0, 224, 122, 0.4); color: var(--green);">
                         📊 Presentation Deck
                     </a>
-                    <a href="#demo" class="btn-outline-pill">
-                        View Demo
+                    <a href="<?= url('/frontend/dist/index.html?demo=manager#/dashboard') ?>" class="btn-outline-pill">
+                        👔 Manager Demo
                     </a>
                 <?php endif; ?>
             </div>
