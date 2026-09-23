@@ -12,8 +12,17 @@ $envFile = __DIR__ . '/../.env';
 $localEnv = file_exists($envFile) ? parse_ini_file($envFile) : [];
 $env = array_merge($localEnv, getenv(), $_ENV);
 
+// Keys required for application & database connection across various environments (Docker, Railway, PHP-FPM)
+$syncKeys = [
+    'DB_HOST', 'DB_PORT', 'DB_NAME', 'DB_USER', 'DB_PASS', 'DB_PASSWORD', 'DB_DATABASE',
+    'MYSQLHOST', 'MYSQLPORT', 'MYSQLUSER', 'MYSQLPASSWORD', 'MYSQLDATABASE',
+    'DATABASE_URL', 'MYSQL_URL', 'MYSQL_PRIVATE_URL',
+    'APP_NAME', 'APP_URL', 'APP_ENV', 'APP_DEBUG',
+    'RAILWAY_PUBLIC_DOMAIN', 'RAILWAY_ENVIRONMENT', 'RAILWAY_STATIC_URL'
+];
+
 // PHP-FPM sometimes puts env vars in $_SERVER
-foreach (['DB_HOST', 'DB_PORT', 'DB_NAME', 'DB_USER', 'DB_PASS', 'APP_URL', 'APP_ENV', 'APP_DEBUG'] as $key) {
+foreach ($syncKeys as $key) {
     if (isset($_SERVER[$key]) && !isset($env[$key])) {
         $env[$key] = $_SERVER[$key];
     }
@@ -24,9 +33,9 @@ foreach (['DB_HOST', 'DB_PORT', 'DB_NAME', 'DB_USER', 'DB_PASS', 'APP_URL', 'APP
 // via proc_open() — but getenv('KEY') WITH an argument IS reliable cross-platform. Letting it win
 // keeps the parent (PHPUnit) and child (php -S test server) pointed at the SAME database, and is
 // strictly more correct in production too (real env vars always win over a committed .env).
-foreach (['DB_HOST', 'DB_PORT', 'DB_NAME', 'DB_USER', 'DB_PASS', 'APP_URL', 'APP_ENV', 'APP_DEBUG'] as $key) {
+foreach ($syncKeys as $key) {
     $val = getenv($key);
-    if ($val !== false) {
+    if ($val !== false && $val !== '') {
         $env[$key] = $val;
     }
 }
@@ -89,21 +98,23 @@ require_once __DIR__ . '/../config/db.php';
 // 5b. Start Session with MySQL Handler (must come AFTER db.php so $pdo is available)
 // This ensures sessions are shared across all Railway container replicas.
 if (session_status() === PHP_SESSION_NONE) {
-    require_once __DIR__ . '/../services/MySQLSessionHandler.php';
-    try {
-        // Ensure the sessions table exists (idempotent)
-        $pdo->exec("CREATE TABLE IF NOT EXISTS `php_sessions` (
-            `id`         VARCHAR(128) NOT NULL PRIMARY KEY,
-            `data`       MEDIUMTEXT   NOT NULL,
-            `expires_at` DATETIME     NOT NULL,
-            INDEX `idx_expires` (`expires_at`)
-        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;");
+    if (isset($pdo) && $pdo instanceof PDO) {
+        require_once __DIR__ . '/../services/MySQLSessionHandler.php';
+        try {
+            // Ensure the sessions table exists (idempotent)
+            $pdo->exec("CREATE TABLE IF NOT EXISTS `php_sessions` (
+                `id`         VARCHAR(128) NOT NULL PRIMARY KEY,
+                `data`       MEDIUMTEXT   NOT NULL,
+                `expires_at` DATETIME     NOT NULL,
+                INDEX `idx_expires` (`expires_at`)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;");
 
-        $sessionHandler = new MySQLSessionHandler($pdo, (int)($config['session']['timeout'] ?? 3600));
-        session_set_save_handler($sessionHandler, true);
-    } catch (PDOException $e) {
-        // If DB session handler fails, fall back to file-based sessions gracefully
-        error_log('MySQLSessionHandler setup failed, falling back to files: ' . $e->getMessage());
+            $sessionHandler = new MySQLSessionHandler($pdo, (int)($config['session']['timeout'] ?? 3600));
+            session_set_save_handler($sessionHandler, true);
+        } catch (PDOException $e) {
+            // If DB session handler fails, fall back to file-based sessions gracefully
+            error_log('MySQLSessionHandler setup failed, falling back to files: ' . $e->getMessage());
+        }
     }
     session_start();
 }

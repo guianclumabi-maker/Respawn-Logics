@@ -12,6 +12,8 @@ $error = '';
 $success = false;
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'register') {
+    csrf_verify();
+
     $companyName = trim($_POST['company_name'] ?? '');
     $fullName = trim($_POST['full_name'] ?? '');
     $email = trim($_POST['email'] ?? '');
@@ -177,6 +179,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
 
                 <form action="register.php" method="POST" class="onboarding-form">
                     <input type="hidden" name="action" value="register">
+                    <?= csrf_field() ?>
                     
                     <div class="form-group">
                         <label for="company_name">Company Name</label>
