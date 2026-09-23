@@ -59,17 +59,59 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const bootstrap = async () => {
       try {
-        const isDemo = window.location.href.includes('demo=true');
+        const href = window.location.href;
+        const isDemo = href.includes('demo=true') || href.includes('demo=employee') || href.includes('demo=manager') || href.includes('demo=admin');
         if (isDemo) {
-            setUser({
-                id: 999,
-                name: "Peter Parker",
-                email: "demo@respawn.logics",
-                roles: ["Super_Admin"],
-                permissions: ["manage_tenant", "view_reports", "manage_users"],
-                job_title: "Your friendly Neighborhood Spiderman",
-                tenant_id: 1,
-            });
+            if (href.includes('demo=employee') || href.includes('role=employee')) {
+                // Regular Employee persona (Employee Self-Service)
+                setUser({
+                    id: 2,
+                    name: "David Kim",
+                    email: "david@respawn.logics",
+                    roles: ["Employee"],
+                    role: "Employee",
+                    permissions: ["leave.request", "attendance.view"],
+                    job_title: "Frontend Engineer",
+                    tenant_id: 1,
+                    employment_status: "Active"
+                });
+            } else if (href.includes('demo=manager') || href.includes('role=manager')) {
+                // Manager / Supervisor persona (Manager Self-Service & Approvals)
+                setUser({
+                    id: 1,
+                    name: "Sarah Chen",
+                    email: "sarah@respawn.logics",
+                    roles: ["Manager"],
+                    role: "Manager",
+                    permissions: [
+                        "leave.request", "leave.view", "attendance.view", 
+                        "users.view", "shifts.manage", "performance.manage", 
+                        "ats.view", "analytics.view"
+                    ],
+                    job_title: "Engineering Manager",
+                    tenant_id: 1,
+                    employment_status: "Active"
+                });
+            } else {
+                // Default Super Admin persona (Full Administrative Console)
+                setUser({
+                    id: 999,
+                    name: "Peter Parker",
+                    email: "demo@respawn.logics",
+                    roles: ["Super_Admin"],
+                    role: "Super_Admin",
+                    is_super: true,
+                    permissions: [
+                        "manage_tenant", "view_reports", "manage_users", 
+                        "users.view", "users.manage", "settings.manage", 
+                        "payroll.manage", "ats.view", "ats.edit", "elr.view", 
+                        "performance.manage", "attendance.view", "leave.view", "audit.view"
+                    ],
+                    job_title: "Chief People Officer & Super Admin",
+                    tenant_id: 1,
+                    employment_status: "Active"
+                });
+            }
             setLoading(false);
             return;
         }

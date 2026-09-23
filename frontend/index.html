@@ -109,6 +109,7 @@
           }
           if (/survey|engagement|enps/.test(u)) return env(SURV,'surveys');
           if (/employee|directory|staff|people|org/.test(u)) return env(EMP,'employees');
+          if (/my_profile/.test(u)) return { success:true, data: EMP[0] };
           if (/user|iam/.test(u)) return env(EMP,'users');
           if (/attendance|timekeep|clock|shift/.test(u)) return env(ATT,'attendance');
           if (/leave/.test(u)) return env(LEA,'leaves');

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { apiFetch } from '../lib/apiClient';
+import { toast } from 'sonner';
 
 export function AdminRoles() {
     const { user } = useAuth();
@@ -56,8 +57,9 @@ export function AdminRoles() {
             setSelectedRole('');
             setSelectedScope('tenant');
             setSelectedOrgUnit('');
+            toast.success('Role assigned successfully');
         } catch (e) {
-            alert('Failed to assign role');
+            toast.error('Failed to assign role');
         }
     };
 

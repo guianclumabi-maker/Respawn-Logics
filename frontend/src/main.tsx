@@ -21,6 +21,8 @@ if (sentryDsn && sentryDsn !== "https://examplePublicKey@o0.ingest.sentry.io/0")
 }
 
 import { getMockResponse } from './demoMockApi';
+import { ServerError } from './pages/ServerError';
+import { Toaster } from './app/components/ui/sonner';
 
 // Global fetch interceptor to handle session expiration
 const originalFetch = window.fetch;
@@ -149,9 +151,10 @@ async function boot() {
   createRoot(document.getElementById("root")!).render(
     <ThemeProvider attribute="data-theme" defaultTheme="system" storageKey="theme">
       {/* @ts-ignore: React 18 type mismatch from Sentry */}
-      <Sentry.ErrorBoundary fallback={<div className="p-8 text-red-500">Something went wrong. Please reload the page.</div>}>
+      <Sentry.ErrorBoundary fallback={({ error }) => <ServerError error={error} />}>
         <AuthProvider>
           <RouterProvider router={router} />
+          <Toaster position="bottom-right" />
         </AuthProvider>
       </Sentry.ErrorBoundary>
     </ThemeProvider>

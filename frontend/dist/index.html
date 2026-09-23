@@ -109,6 +109,7 @@
           }
           if (/survey|engagement|enps/.test(u)) return env(SURV,'surveys');
           if (/employee|directory|staff|people|org/.test(u)) return env(EMP,'employees');
+          if (/my_profile/.test(u)) return { success:true, data: EMP[0] };
           if (/user|iam/.test(u)) return env(EMP,'users');
           if (/attendance|timekeep|clock|shift/.test(u)) return env(ATT,'attendance');
           if (/leave/.test(u)) return env(LEA,'leaves');
@@ -133,8 +134,8 @@
         };
       })();
     </script>
-    <script type="module" crossorigin src="./assets/index-BmHlxYDj.js"></script>
-    <link rel="stylesheet" crossorigin href="./assets/index-D1BCJMaS.css">
+    <script type="module" crossorigin src="./assets/index-HbnMooBc.js"></script>
+    <link rel="stylesheet" crossorigin href="./assets/index-U2CNbg6j.css">
   </head>
   <body>
     <div id="root"></div>

@@ -2813,6 +2813,7 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
         <a href="#whats-inside">Platform</a>
         <a href="deep_dive.php">Deep Dive</a>
         <a href="design.php">Design</a>
+        <a href="presentation.html" style="color: var(--green); font-weight: 700;">★ Presentation</a>
         <a href="#why">Why Us</a>
         <a href="#story">The Story</a>
         <a href="#beta">Beta</a>
@@ -2851,6 +2852,9 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
                 <?php else: ?>
                     <a href="<?= url('/frontend/dist/index.html?v=' . time() . '#/setup') ?>" class="btn-neon-pill">
                         Get Started Free <i data-lucide="arrow-right"></i>
+                    </a>
+                    <a href="presentation.html" class="btn-outline-pill" style="border-color: rgba(0, 224, 122, 0.4); color: var(--green);">
+                        📊 Presentation Deck
                     </a>
                     <a href="#demo" class="btn-outline-pill">
                         View Demo
