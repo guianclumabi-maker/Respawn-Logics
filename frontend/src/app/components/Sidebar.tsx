@@ -153,8 +153,8 @@ const getSections = (hasPermission: (p: string) => boolean, hasRole: (r: string 
         view: "Platform Support", 
         icon: <Satellite size={19} />, 
         color: "#00e07a", 
-        externalLink: window.location.href.includes('demo=true') ? undefined : "/pages/admin_platform_support.php",
-        onClick: window.location.href.includes('demo=true') ? () => { window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'info', message: 'Platform Support is disabled in Live Preview.' } })); } : undefined
+        externalLink: /demo=/.test(window.location.href) ? undefined : "/pages/admin_platform_support.php",
+        onClick: /demo=/.test(window.location.href) ? () => { window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'info', message: 'Platform Support is disabled in Live Preview.' } })); } : undefined
       }] : []),
     ]
   },
@@ -192,7 +192,7 @@ const getSections = (hasPermission: (p: string) => boolean, hasRole: (r: string 
         view: "Feedback",
         icon: <MessageCircle size={19} />,
         onClick: () => {
-          if (window.location.href.includes('demo=true')) {
+          if (/demo=/.test(window.location.href)) {
             window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'info', message: 'Feedback forms are disabled in Live Preview.' } }));
           } else {
             window.location.href = "mailto:support@respawn-logics.com?subject=Respawn%20Logics%20Feedback";

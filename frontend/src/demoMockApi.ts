@@ -85,5 +85,68 @@ export function getMockResponse(url: string): any | null {
     };
   }
 
+  // Dashboard Stats & Tasks (HomeDashboard)
+  if (url.includes("action=get_stats") || url.includes("route=dashboard")) {
+    const isEmployee = url.includes("employee") || window.location.href.includes("employee");
+    const isManager = url.includes("manager") || window.location.href.includes("manager");
+
+    if (isEmployee) {
+      return {
+        success: true,
+        data: {
+          clocked_in_today: true,
+          clock_time: "09:02:00 AM",
+          total_hours: 38.5,
+          pending_leaves: 1,
+          active_tasks_count: 2,
+          todo_list: [
+            { id: 1, task_name: "Submit medical certificate for sick leave", task_description: "HR health compliance", is_completed: 0 },
+            { id: 2, task_name: "Review latest July 2026 payslip breakdown", task_description: "ESS verification", is_completed: 0 },
+            { id: 3, task_name: "Biometric clock-in verification", task_description: "Attendance logging", is_completed: 1 }
+          ]
+        }
+      };
+    }
+
+    if (isManager) {
+      return {
+        success: true,
+        data: {
+          clocked_in_today: true,
+          clock_time: "08:30:00 AM",
+          total_hours: 44.0,
+          pending_leaves: 3,
+          active_tasks_count: 3,
+          todo_list: [
+            { id: 1, task_name: "Approve David Kim's Vacation Leave (3 days)", task_description: "Engineering team roster", is_completed: 0 },
+            { id: 2, task_name: "Sign off Alex Mercer's overtime submission", task_description: "Project sprint delivery", is_completed: 0 },
+            { id: 3, task_name: "Verify team weekly attendance radar", task_description: "8 direct reports", is_completed: 1 }
+          ]
+        }
+      };
+    }
+
+    // Default: Super Admin
+    return {
+      success: true,
+      data: {
+        clocked_in_today: true,
+        clock_time: "08:15:00 AM",
+        total_hours: 42.5,
+        pending_leaves: 2,
+        active_tasks_count: 2,
+        todo_list: [
+          { id: 1, task_name: "Approve July 2026 Payroll Run", task_description: "Statutory remittance & bank export", is_completed: 0 },
+          { id: 2, task_name: "Finalize ATS Pipeline for Senior Engineer", task_description: "4 candidates in review", is_completed: 0 },
+          { id: 3, task_name: "Sign off BIR Form 1601-C Remittance", task_description: "Compliance verified", is_completed: 1 }
+        ]
+      }
+    };
+  }
+
+  if (url.includes("action=toggle_task") || url.includes("action=add_task")) {
+    return { success: true };
+  }
+
   return null;
 }
