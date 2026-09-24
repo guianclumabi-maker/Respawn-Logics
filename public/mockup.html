@@ -1,0 +1,983 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Respawn Logics — Interactive System Mockups & Persona Suite</title>
+  <script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <style>
+    :root {
+      --bg-dark: #07090e;
+      --card-dark: #0d121f;
+      --border-dark: rgba(255, 255, 255, 0.08);
+      --green-neon: #00e07a;
+      --blue-cyber: #4f8ef7;
+      --purple-admin: #9b6dff;
+      --amber-warn: #f5a623;
+      --red-alert: #ff4d6a;
+    }
+    body {
+      background-color: var(--bg-dark);
+      color: #d1d9e6;
+      font-family: 'Space Grotesk', -apple-system, sans-serif;
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+    }
+    .font-mono {
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .tab-btn.active {
+      background: rgba(255, 255, 255, 0.08);
+      color: #fff;
+      border-color: rgba(255, 255, 255, 0.25);
+    }
+    .modal-backdrop-anim {
+      backdrop-filter: blur(8px);
+      background: rgba(4, 6, 12, 0.85);
+    }
+    .badge-glow {
+      box-shadow: 0 0 12px currentColor;
+    }
+    .glass-panel {
+      background: rgba(13, 18, 31, 0.88);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(12px);
+    }
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 3px;
+    }
+    .cyber-btn {
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .cyber-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+    }
+  </style>
+</head>
+<body class="custom-scrollbar">
+
+  <!-- Top Navigation & Persona Bar -->
+  <header class="sticky top-0 z-40 bg-[#07090e]/90 border-b border-white/10 backdrop-blur-md px-4 lg:px-8 py-3.5">
+    <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-4">
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 rounded-lg bg-gradient-to-br from-[#00e07a] to-[#4f8ef7] flex items-center justify-center text-black font-extrabold text-lg shadow-lg shadow-[#00e07a]/20">
+          🎮
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="font-extrabold text-white tracking-wider text-base">RESPAWN LOGICS</span>
+            <span class="text-[10px] font-mono font-bold px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">LIVE MOCKUP SUITE</span>
+          </div>
+          <p class="text-xs text-slate-400 font-mono hidden sm:block">Interactive Role Views &amp; Zero-Password Railway Sandbox</p>
+        </div>
+      </div>
+
+      <!-- Navigation Tabs -->
+      <nav class="flex items-center gap-1.5 p-1 rounded-xl bg-slate-900/80 border border-white/10 text-xs font-mono">
+        <button onclick="switchTab('webpage')" id="tab-webpage" class="tab-btn active px-3 py-1.5 rounded-lg text-slate-300 font-semibold transition border border-transparent flex items-center gap-1.5">
+          <span>🌐</span> <span class="hidden md:inline">Homepage &amp;</span> Modal
+        </button>
+        <button onclick="switchTab('employee')" id="tab-employee" class="tab-btn px-3 py-1.5 rounded-lg text-slate-300 font-semibold transition border border-transparent flex items-center gap-1.5">
+          <span>👤</span> <span class="hidden md:inline">Employee (David)</span>
+        </button>
+        <button onclick="switchTab('manager')" id="tab-manager" class="tab-btn px-3 py-1.5 rounded-lg text-slate-300 font-semibold transition border border-transparent flex items-center gap-1.5">
+          <span>👔</span> <span class="hidden md:inline">Manager (Sarah)</span>
+        </button>
+        <button onclick="switchTab('admin')" id="tab-admin" class="tab-btn px-3 py-1.5 rounded-lg text-slate-300 font-semibold transition border border-transparent flex items-center gap-1.5">
+          <span>🛡️</span> <span class="hidden md:inline">Admin (Peter)</span>
+        </button>
+      </nav>
+
+      <!-- Railway Status Pill -->
+      <div class="hidden xl:flex items-center gap-2 text-xs font-mono text-emerald-400 bg-emerald-950/40 border border-emerald-500/30 px-3 py-1.5 rounded-lg">
+        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+        <span>Railway Ready · Zero Passwords</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN CONTAINER -->
+  <main class="max-w-7xl mx-auto p-4 lg:p-8">
+
+    <!-- ========================================== -->
+    <!-- TAB 1: WEBPAGE PREVIEW & LOGIN MODAL -->
+    <!-- ========================================== -->
+    <section id="view-webpage" class="space-y-6">
+      <!-- Callout Banner -->
+      <div class="glass-panel rounded-2xl p-5 border-l-4 border-l-[#00e07a] flex flex-wrap items-center justify-between gap-4">
+        <div>
+          <h2 class="text-lg font-bold text-white flex items-center gap-2">
+            <span>🌐 Live Webpage Preview &amp; Interactive Login Modal</span>
+            <span class="text-xs px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 font-mono">index.php</span>
+          </h2>
+          <p class="text-sm text-slate-300 mt-1">
+            Click the <strong class="text-emerald-400 font-mono">[ LOG IN ]</strong> button in the navbar or the hero CTA below to trigger the persona selection modal popup.
+          </p>
+        </div>
+        <div class="flex items-center gap-2">
+          <button onclick="openSimulationModal()" class="cyber-btn px-4 py-2 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-black font-bold font-mono text-xs shadow-lg shadow-emerald-500/25 flex items-center gap-2">
+            <i class="fa-solid fa-arrow-up-right-from-square"></i> Open Login Modal Now
+          </button>
+        </div>
+      </div>
+
+      <!-- Webpage Simulation Frame -->
+      <div class="rounded-2xl border border-white/10 bg-[#0a0d17] overflow-hidden shadow-2xl relative">
+        <!-- Mock Browser Topbar -->
+        <div class="bg-[#05070d] px-4 py-2.5 border-b border-white/10 flex items-center justify-between text-xs font-mono">
+          <div class="flex items-center gap-2">
+            <div class="w-3 h-3 rounded-full bg-rose-500/80"></div>
+            <div class="w-3 h-3 rounded-full bg-amber-500/80"></div>
+            <div class="w-3 h-3 rounded-full bg-emerald-500/80"></div>
+            <span class="ml-3 text-slate-500 hidden sm:inline">Respawn Logics Web Portal</span>
+          </div>
+          <div class="flex items-center gap-2 bg-[#0c101c] px-3 py-1 rounded-md text-slate-400 border border-white/5 w-1/2 max-w-sm">
+            <span class="text-emerald-400">🔒</span>
+            <span class="truncate">https://respawn-logics-production-fe89.up.railway.app/</span>
+          </div>
+          <div class="text-slate-500 text-[11px]">Production Deploy</div>
+        </div>
+
+        <!-- Simulated Website Header -->
+        <div class="px-6 py-4 border-b border-white/5 flex items-center justify-between bg-[#080b14]">
+          <div class="flex items-center gap-2.5 font-bold text-white tracking-wider text-sm font-mono">
+            <span class="text-emerald-400">❖</span> RESPAWN_LOGICS
+          </div>
+          <div class="hidden md:flex items-center gap-6 text-xs font-mono text-slate-400">
+            <a href="#features" class="hover:text-white transition">FEATURES</a>
+            <a href="#architecture" class="hover:text-white transition">ARCHITECTURE</a>
+            <a href="#payroll" class="hover:text-white transition">COMPLIANCE</a>
+            <a href="#stats" class="hover:text-white transition">ANALYTICS</a>
+          </div>
+          <div class="flex items-center gap-3">
+            <button onclick="openSimulationModal()" class="cyber-btn px-4 py-1.5 rounded-lg bg-emerald-500 text-black font-extrabold font-mono text-xs hover:bg-emerald-400 shadow-md shadow-emerald-500/20">
+              [ LOG IN ]
+            </button>
+          </div>
+        </div>
+
+        <!-- Simulated Website Hero -->
+        <div class="p-8 lg:p-14 text-center relative overflow-hidden bg-radial from-slate-900/60 to-[#0a0d17]">
+          <div class="absolute inset-0 bg-[radial-gradient(#00e07a_1px,transparent_1px)] [background-size:24px_24px] opacity-10 pointer-events-none"></div>
+          
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/25 text-emerald-400 text-xs font-mono mb-4">
+            <span class="animate-pulse">●</span> NEXT-GEN PHILIPPINE ENTERPRISE HR &amp; PAYROLL SUITE
+          </div>
+
+          <h1 class="text-3xl lg:text-5xl font-black text-white max-w-3xl mx-auto leading-tight">
+            Human Capital Intelligence with <span class="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-cyan-400">Zero Password Friction</span>
+          </h1>
+
+          <p class="text-slate-400 text-sm lg:text-base max-w-2xl mx-auto mt-4 leading-relaxed">
+            Experience role-based employee self-service, real-time manager approvals, BIR 1601-C tax compliance, and automated payroll pipelines in an instant interactive sandbox.
+          </p>
+
+          <div class="flex flex-wrap items-center justify-center gap-3 mt-8">
+            <button onclick="openSimulationModal()" class="cyber-btn px-6 py-3 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-black font-bold font-mono text-sm shadow-xl shadow-emerald-500/20 flex items-center gap-2">
+              <i class="fa-solid fa-bolt"></i> Launch Persona Sandbox Modal
+            </button>
+            <button onclick="switchTab('employee')" class="px-5 py-3 rounded-xl bg-slate-800/80 hover:bg-slate-700 border border-white/10 text-white font-mono text-xs transition">
+              Preview Employee View →
+            </button>
+          </div>
+
+          <!-- Feature Cards Grid -->
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-12 text-left">
+            <div class="p-4 rounded-xl bg-slate-900/60 border border-white/5 hover:border-emerald-500/30 transition">
+              <div class="text-2xl mb-2">👤</div>
+              <h4 class="text-white font-bold text-sm">Employee Self-Service</h4>
+              <p class="text-xs text-slate-400 mt-1">Clock in with geolocation, request leaves, track balances, and download monthly pay stubs.</p>
+            </div>
+            <div class="p-4 rounded-xl bg-slate-900/60 border border-white/5 hover:border-blue-500/30 transition">
+              <div class="text-2xl mb-2">👔</div>
+              <h4 class="text-white font-bold text-sm">Manager Operations</h4>
+              <p class="text-xs text-slate-400 mt-1">1-click team leave approvals, live attendance radar, and department shift scheduling.</p>
+            </div>
+            <div class="p-4 rounded-xl bg-slate-900/60 border border-white/5 hover:border-purple-500/30 transition">
+              <div class="text-2xl mb-2">🛡️</div>
+              <h4 class="text-white font-bold text-sm">Super Admin Compliance</h4>
+              <p class="text-xs text-slate-400 mt-1">BIR 1601-C withholding, SSS/PhilHealth deductions, candidate hiring pipeline & audit trail.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- TAB 2: REGULAR EMPLOYEE VIEW (DAVID KIM) -->
+    <!-- ========================================== -->
+    <section id="view-employee" class="hidden space-y-6">
+      <!-- Persona Header -->
+      <div class="glass-panel rounded-2xl p-5 border border-emerald-500/30 flex flex-wrap items-center justify-between gap-4">
+        <div class="flex items-center gap-4">
+          <div class="w-14 h-14 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-3xl text-emerald-400">
+            👤
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <h2 class="text-xl font-bold text-white">David Kim</h2>
+              <span class="text-xs font-mono font-bold px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">EMPLOYEE VIEW</span>
+            </div>
+            <p class="text-xs text-slate-400 font-mono mt-0.5">Frontend Software Engineer · Employee ID: #EMP-2024-042</p>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-3">
+          <a href="https://respawn-logics-production-fe89.up.railway.app/frontend/dist/index.html?demo=employee#/dashboard" target="_blank" class="cyber-btn px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-black font-mono font-bold text-xs shadow-lg shadow-emerald-500/20 flex items-center gap-2">
+            <span>Launch Live App</span> <i class="fa-solid fa-arrow-up-right-from-square"></i>
+          </a>
+        </div>
+      </div>
+
+      <!-- Employee Interactive Widgets Grid -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        
+        <!-- Widget 1: Interactive Time Tracker / Clock In -->
+        <div class="glass-panel rounded-2xl p-5 border border-white/10 flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between mb-4">
+              <h3 class="font-bold text-white text-sm flex items-center gap-2 font-mono">
+                <i class="fa-regular fa-clock text-emerald-400"></i> LIVE TIME CARD
+              </h3>
+              <span id="emp-clock-status" class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+                CLOCKED IN
+              </span>
+            </div>
+
+            <div class="text-center py-4 bg-slate-900/60 rounded-xl border border-white/5 mb-4">
+              <div id="live-time-display" class="text-3xl font-extrabold text-white font-mono tracking-widest">
+                09:41:22 AM
+              </div>
+              <div class="text-xs text-slate-400 font-mono mt-1">Shift: 09:00 AM - 06:00 PM (Flexible)</div>
+              <div class="text-xs text-emerald-400 font-mono mt-2 flex items-center justify-center gap-1.5">
+                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                <span id="elapsed-time">Elapsed: 0h 41m 22s</span>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <button id="clock-toggle-btn" onclick="toggleClockInOut()" class="w-full py-2.5 rounded-xl font-bold font-mono text-xs transition flex items-center justify-center gap-2 bg-rose-500/20 hover:bg-rose-500/30 text-rose-400 border border-rose-500/30">
+              <i class="fa-solid fa-power-off"></i> <span>CLOCK OUT FOR THE DAY</span>
+            </button>
+            <p id="clock-log-hint" class="text-[11px] font-mono text-slate-500 text-center mt-2">Punched in at 08:58 AM via Manila Office IP</p>
+          </div>
+        </div>
+
+        <!-- Widget 2: Interactive Leave Filing & Remaining Credits -->
+        <div class="glass-panel rounded-2xl p-5 border border-white/10">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="font-bold text-white text-sm flex items-center gap-2 font-mono">
+              <i class="fa-solid fa-plane-departure text-emerald-400"></i> LEAVE BALANCES
+            </h3>
+            <span class="text-[10px] font-mono text-slate-400">FY 2026 Credits</span>
+          </div>
+
+          <div class="grid grid-cols-2 gap-3 mb-4">
+            <div class="p-3 rounded-xl bg-slate-900/60 border border-white/5 text-center">
+              <div id="vacation-balance" class="text-2xl font-bold text-white font-mono">12.0</div>
+              <div class="text-[11px] text-slate-400 font-mono mt-0.5">Vacation Days</div>
+            </div>
+            <div class="p-3 rounded-xl bg-slate-900/60 border border-white/5 text-center">
+              <div id="sick-balance" class="text-2xl font-bold text-white font-mono">8.0</div>
+              <div class="text-[11px] text-slate-400 font-mono mt-0.5">Sick Leave Days</div>
+            </div>
+          </div>
+
+          <!-- Leave Application Form -->
+          <form onsubmit="handleLeaveSubmit(event)" class="space-y-2.5 text-xs font-mono">
+            <div>
+              <label class="block text-slate-400 mb-1">Leave Type</label>
+              <select id="leave-type-select" class="w-full bg-slate-900 border border-white/10 rounded-lg p-2 text-slate-200 focus:outline-none focus:border-emerald-500">
+                <option value="Vacation">Vacation Leave (1 Day)</option>
+                <option value="Sick">Sick Leave (1 Day)</option>
+                <option value="Emergency">Emergency Leave (1 Day)</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-slate-400 mb-1">Reason / Note</label>
+              <input id="leave-reason-input" type="text" placeholder="e.g. Annual physical exam" required class="w-full bg-slate-900 border border-white/10 rounded-lg p-2 text-slate-200 focus:outline-none focus:border-emerald-500">
+            </div>
+            <button type="submit" class="w-full py-2 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-black font-bold font-mono transition">
+              Submit Leave Request
+            </button>
+            <div id="leave-submit-toast" class="hidden text-emerald-400 text-center text-[11px] py-1 bg-emerald-500/10 rounded border border-emerald-500/20">
+              ✓ Request forwarded to Manager (Sarah Chen)!
+            </div>
+          </form>
+        </div>
+
+        <!-- Widget 3: Itemized Monthly Payslip Preview -->
+        <div class="glass-panel rounded-2xl p-5 border border-white/10 flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between mb-4">
+              <h3 class="font-bold text-white text-sm flex items-center gap-2 font-mono">
+                <i class="fa-solid fa-receipt text-emerald-400"></i> LATEST PAYSLIP
+              </h3>
+              <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-blue-500/10 text-blue-400 border border-blue-500/20">
+                MAR 1-15, 2026
+              </span>
+            </div>
+
+            <div class="space-y-2 text-xs font-mono">
+              <div class="flex justify-between py-1 border-b border-white/5">
+                <span class="text-slate-400">Basic Semi-Monthly:</span>
+                <span class="text-white font-semibold">₱32,500.00</span>
+              </div>
+              <div class="flex justify-between py-1 border-b border-white/5">
+                <span class="text-slate-400">De Minimis Allowance:</span>
+                <span class="text-white font-semibold">₱2,500.00</span>
+              </div>
+              <div class="flex justify-between py-1 border-b border-white/5 text-rose-400">
+                <span>Withholding Tax:</span>
+                <span>-₱3,842.10</span>
+              </div>
+              <div class="flex justify-between py-1 border-b border-white/5 text-rose-400">
+                <span>SSS / PhilHealth / HDMF:</span>
+                <span>-₱1,625.00</span>
+              </div>
+              <div class="flex justify-between py-1.5 pt-2 text-sm">
+                <span class="font-bold text-white">Net Take-Home Pay:</span>
+                <span class="font-bold text-emerald-400">₱29,532.90</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="mt-4">
+            <button onclick="simulateDownloadPayslip()" id="btn-payslip-dl" class="w-full py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-mono text-xs border border-white/10 flex items-center justify-center gap-2 transition">
+              <i class="fa-solid fa-file-pdf text-rose-400"></i> <span>Download Itemized PDF</span>
+            </button>
+            <div id="payslip-toast" class="hidden text-xs text-center text-slate-300 font-mono mt-1.5">
+              📥 Payslip_DavidKim_Mar2026.pdf generated!
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Live Recent Tasks & Activities -->
+      <div class="glass-panel rounded-2xl p-5 border border-white/10">
+        <h3 class="font-bold text-white text-sm mb-3 font-mono flex items-center gap-2">
+          <i class="fa-solid fa-list-check text-emerald-400"></i> DAVID'S CURRENT SPRINT DELIVERABLES
+        </h3>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs font-mono">
+          <div class="p-3 rounded-xl bg-slate-900/40 border border-white/5 flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <span class="text-emerald-400">✓</span>
+              <span class="text-slate-300">Migrate React router to hash routes</span>
+            </div>
+            <span class="text-[10px] text-slate-500">Done</span>
+          </div>
+          <div class="p-3 rounded-xl bg-slate-900/40 border border-white/5 flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <span class="text-amber-400 animate-spin">●</span>
+              <span class="text-slate-300">Fix demo get_stats fallback</span>
+            </div>
+            <span class="text-[10px] text-amber-400">In Review</span>
+          </div>
+          <div class="p-3 rounded-xl bg-slate-900/40 border border-white/5 flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <span class="text-slate-500">○</span>
+              <span class="text-slate-400">Verify BIR 1601-C export format</span>
+            </div>
+            <span class="text-[10px] text-slate-500">Backlog</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- TAB 3: MANAGER / LEAD VIEW (SARAH CHEN) -->
+    <!-- ========================================== -->
+    <section id="view-manager" class="hidden space-y-6">
+      <!-- Persona Header -->
+      <div class="glass-panel rounded-2xl p-5 border border-blue-500/30 flex flex-wrap items-center justify-between gap-4">
+        <div class="flex items-center gap-4">
+          <div class="w-14 h-14 rounded-2xl bg-blue-500/10 border border-blue-500/30 flex items-center justify-center text-3xl text-blue-400">
+            👔
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <h2 class="text-xl font-bold text-white">Sarah Chen</h2>
+              <span class="text-xs font-mono font-bold px-2 py-0.5 rounded bg-blue-500/20 text-blue-400 border border-blue-500/30">MANAGER VIEW</span>
+            </div>
+            <p class="text-xs text-slate-400 font-mono mt-0.5">Engineering Director · Team Respawn (14 Direct Reports)</p>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-3">
+          <a href="https://respawn-logics-production-fe89.up.railway.app/frontend/dist/index.html?demo=manager#/dashboard" target="_blank" class="cyber-btn px-4 py-2 rounded-xl bg-blue-500 hover:bg-blue-400 text-black font-mono font-bold text-xs shadow-lg shadow-blue-500/20 flex items-center gap-2">
+            <span>Launch Live App</span> <i class="fa-solid fa-arrow-up-right-from-square"></i>
+          </a>
+        </div>
+      </div>
+
+      <!-- Manager Queue & Team Attendance -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+        <!-- Left 2 Cols: Interactive Approval Queue -->
+        <div class="lg:col-span-2 glass-panel rounded-2xl p-5 border border-white/10 space-y-4">
+          <div class="flex items-center justify-between">
+            <h3 class="font-bold text-white text-sm flex items-center gap-2 font-mono">
+              <i class="fa-solid fa-inbox text-blue-400"></i> PENDING TEAM REQUESTS
+              <span id="pending-badge-count" class="px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-400 text-xs">3 Pending</span>
+            </h3>
+            <button onclick="batchApproveAll()" class="cyber-btn text-xs font-mono text-emerald-400 hover:text-emerald-300 underline underline-offset-4">
+              ✓ Batch Approve All
+            </button>
+          </div>
+
+          <div id="approval-queue-container" class="space-y-3 font-mono text-xs">
+            <!-- Request 1 -->
+            <div id="req-card-1" class="p-4 rounded-xl bg-slate-900/60 border border-white/5 hover:border-blue-500/20 transition flex flex-wrap items-center justify-between gap-3">
+              <div class="space-y-1">
+                <div class="flex items-center gap-2">
+                  <span class="font-bold text-white text-sm">David Kim</span>
+                  <span class="text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-400">Vacation Leave</span>
+                </div>
+                <p class="text-slate-400 text-[11px]">Dates: Mar 27 - Mar 28 (2 days) · Reason: Family vacation trip</p>
+                <p class="text-[10px] text-slate-500">Remaining Balance: 12 days · Coverage: John Watson</p>
+              </div>
+              <div class="flex items-center gap-2">
+                <button onclick="decideLeave(1, 'Approved')" class="px-3 py-1.5 rounded-lg bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-400 border border-emerald-500/30 font-bold transition">
+                  ✓ Approve
+                </button>
+                <button onclick="decideLeave(1, 'Rejected')" class="px-3 py-1.5 rounded-lg bg-rose-500/20 hover:bg-rose-500/30 text-rose-400 border border-rose-500/30 font-bold transition">
+                  ✕ Reject
+                </button>
+              </div>
+            </div>
+
+            <!-- Request 2 -->
+            <div id="req-card-2" class="p-4 rounded-xl bg-slate-900/60 border border-white/5 hover:border-blue-500/20 transition flex flex-wrap items-center justify-between gap-3">
+              <div class="space-y-1">
+                <div class="flex items-center gap-2">
+                  <span class="font-bold text-white text-sm">Alex Morgan</span>
+                  <span class="text-[10px] px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-400">Overtime Request</span>
+                </div>
+                <p class="text-slate-400 text-[11px]">Date: Today (4.0 hrs OT) · Project: Q1 Security Auditing &amp; SOC2</p>
+                <p class="text-[10px] text-slate-500">Billable to Client · Multiplier: 1.25x Regular Hourly</p>
+              </div>
+              <div class="flex items-center gap-2">
+                <button onclick="decideLeave(2, 'Approved')" class="px-3 py-1.5 rounded-lg bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-400 border border-emerald-500/30 font-bold transition">
+                  ✓ Approve
+                </button>
+                <button onclick="decideLeave(2, 'Rejected')" class="px-3 py-1.5 rounded-lg bg-rose-500/20 hover:bg-rose-500/30 text-rose-400 border border-rose-500/30 font-bold transition">
+                  ✕ Reject
+                </button>
+              </div>
+            </div>
+
+            <!-- Request 3 -->
+            <div id="req-card-3" class="p-4 rounded-xl bg-slate-900/60 border border-white/5 hover:border-blue-500/20 transition flex flex-wrap items-center justify-between gap-3">
+              <div class="space-y-1">
+                <div class="flex items-center gap-2">
+                  <span class="font-bold text-white text-sm">Gwen Stacy</span>
+                  <span class="text-[10px] px-1.5 py-0.5 rounded bg-cyan-500/10 text-cyan-400">WFH Switch</span>
+                </div>
+                <p class="text-slate-400 text-[11px]">Shift date: Tomorrow · Reason: Fiber internet maintenance technician arrival</p>
+                <p class="text-[10px] text-slate-500">Core hours maintained · Available on Slack &amp; Google Meet</p>
+              </div>
+              <div class="flex items-center gap-2">
+                <button onclick="decideLeave(3, 'Approved')" class="px-3 py-1.5 rounded-lg bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-400 border border-emerald-500/30 font-bold transition">
+                  ✓ Approve
+                </button>
+                <button onclick="decideLeave(3, 'Rejected')" class="px-3 py-1.5 rounded-lg bg-rose-500/20 hover:bg-rose-500/30 text-rose-400 border border-rose-500/30 font-bold transition">
+                  ✕ Reject
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Col: Live Team Attendance Radar -->
+        <div class="glass-panel rounded-2xl p-5 border border-white/10 space-y-4">
+          <div class="flex items-center justify-between">
+            <h3 class="font-bold text-white text-sm flex items-center gap-2 font-mono">
+              <i class="fa-solid fa-users text-blue-400"></i> TEAM RADAR
+            </h3>
+            <span class="text-[11px] font-mono text-emerald-400">12 / 14 Online</span>
+          </div>
+
+          <div class="space-y-2.5 font-mono text-xs">
+            <div class="p-2.5 rounded-lg bg-slate-900/50 border border-white/5 flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+                <span class="text-white">David Kim</span>
+              </div>
+              <span class="text-[10px] text-slate-400">In Office (Manila)</span>
+            </div>
+            <div class="p-2.5 rounded-lg bg-slate-900/50 border border-white/5 flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+                <span class="text-white">Alex Morgan</span>
+              </div>
+              <span class="text-[10px] text-slate-400">In Office (Manila)</span>
+            </div>
+            <div class="p-2.5 rounded-lg bg-slate-900/50 border border-white/5 flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-blue-400"></span>
+                <span class="text-white">Gwen Stacy</span>
+              </div>
+              <span class="text-[10px] text-blue-400">Remote / WFH</span>
+            </div>
+            <div class="p-2.5 rounded-lg bg-slate-900/50 border border-white/5 flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-amber-400"></span>
+                <span class="text-white">Miles Morales</span>
+              </div>
+              <span class="text-[10px] text-amber-400">On Sick Leave</span>
+            </div>
+          </div>
+
+          <!-- Quick Action -->
+          <div class="pt-2 border-t border-white/5">
+            <div class="text-[11px] text-slate-400 font-mono mb-2">Team Attendance Stats:</div>
+            <div class="w-full bg-slate-800 rounded-full h-2 overflow-hidden flex">
+              <div class="bg-emerald-400 h-full" style="width: 85%"></div>
+              <div class="bg-blue-400 h-full" style="width: 10%"></div>
+              <div class="bg-amber-400 h-full" style="width: 5%"></div>
+            </div>
+            <div class="flex justify-between text-[10px] font-mono text-slate-500 mt-1">
+              <span>85% Present</span>
+              <span>10% WFH</span>
+              <span>5% Leave</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- TAB 4: SUPER ADMIN VIEW (PETER PARKER) -->
+    <!-- ========================================== -->
+    <section id="view-admin" class="hidden space-y-6">
+      <!-- Persona Header -->
+      <div class="glass-panel rounded-2xl p-5 border border-purple-500/30 flex flex-wrap items-center justify-between gap-4">
+        <div class="flex items-center gap-4">
+          <div class="w-14 h-14 rounded-2xl bg-purple-500/10 border border-purple-500/30 flex items-center justify-center text-3xl text-purple-400">
+            🛡️
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <h2 class="text-xl font-bold text-white">Peter Parker</h2>
+              <span class="text-xs font-mono font-bold px-2 py-0.5 rounded bg-purple-500/20 text-purple-400 border border-purple-500/30">SUPER ADMIN VIEW</span>
+            </div>
+            <p class="text-xs text-slate-400 font-mono mt-0.5">Chief People Officer · Tenant: Respawn Technologies Global Inc.</p>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-3">
+          <a href="https://respawn-logics-production-fe89.up.railway.app/frontend/dist/index.html?demo=true#/dashboard" target="_blank" class="cyber-btn px-4 py-2 rounded-xl bg-purple-500 hover:bg-purple-400 text-black font-mono font-bold text-xs shadow-lg shadow-purple-500/20 flex items-center gap-2">
+            <span>Launch Live App</span> <i class="fa-solid fa-arrow-up-right-from-square"></i>
+          </a>
+        </div>
+      </div>
+
+      <!-- Admin Interactive Calculator & ATS Pipeline -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+        <!-- Widget 1: Interactive Philippine BIR Form 1601-C Tax Calculator -->
+        <div class="glass-panel rounded-2xl p-5 border border-white/10 space-y-4">
+          <div class="flex items-center justify-between">
+            <h3 class="font-bold text-white text-sm flex items-center gap-2 font-mono">
+              <i class="fa-solid fa-calculator text-purple-400"></i> BIR FORM 1601-C WITHHOLDING SIMULATOR
+            </h3>
+            <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-purple-500/10 text-purple-400 border border-purple-500/20">
+              TRAIN LAW / 2026
+            </span>
+          </div>
+
+          <div class="space-y-3 font-mono text-xs">
+            <div>
+              <div class="flex justify-between text-slate-300 mb-1">
+                <span>Total Monthly Compensation:</span>
+                <span id="slider-gross-display" class="font-bold text-purple-400">₱2,450,000.00</span>
+              </div>
+              <input type="range" id="gross-slider" min="500000" max="10000000" step="50000" value="2450000" oninput="calculateBIR()" class="w-full accent-purple-500 cursor-pointer">
+            </div>
+
+            <div class="grid grid-cols-2 gap-3 pt-2">
+              <div class="p-3 rounded-xl bg-slate-900/60 border border-white/5">
+                <span class="text-slate-400 text-[11px] block">Statutory Deductions (SSS/PhilHealth/HDMF):</span>
+                <span id="statutory-display" class="font-bold text-white text-sm block mt-1">₱183,750.00</span>
+              </div>
+              <div class="p-3 rounded-xl bg-slate-900/60 border border-white/5">
+                <span class="text-slate-400 text-[11px] block">Total Remittable Tax Withheld:</span>
+                <span id="tax-due-display" class="font-bold text-purple-400 text-sm block mt-1">₱367,500.00</span>
+              </div>
+            </div>
+
+            <div class="p-3 rounded-xl bg-purple-950/20 border border-purple-500/20 text-[11px] text-slate-300 flex items-center justify-between">
+              <div>
+                <span class="font-bold text-white">Filing Deadline:</span> 10th of every month
+                <div class="text-[10px] text-slate-400">Export format: eFPS BIR 1601-C Monthly Return</div>
+              </div>
+              <button onclick="alert('eFPS File 1601C_032026.dat exported for BIR e-Services Portal upload!')" class="px-3 py-1.5 rounded-lg bg-purple-500 hover:bg-purple-400 text-black font-bold text-[10px] transition">
+                Export DAT File
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Widget 2: Interactive ATS Candidate Hiring Board -->
+        <div class="glass-panel rounded-2xl p-5 border border-white/10 space-y-4">
+          <div class="flex items-center justify-between">
+            <h3 class="font-bold text-white text-sm flex items-center gap-2 font-mono">
+              <i class="fa-solid fa-user-plus text-purple-400"></i> ATS CANDIDATE PIPELINE
+            </h3>
+            <span class="text-[10px] font-mono text-slate-400">4 Active Candidates</span>
+          </div>
+
+          <div class="space-y-2.5 font-mono text-xs">
+            <!-- Candidate 1 -->
+            <div class="p-3 rounded-xl bg-slate-900/60 border border-white/5 flex items-center justify-between">
+              <div>
+                <span class="font-bold text-white block">Natasha Romanoff</span>
+                <span class="text-[11px] text-slate-400">Senior DevOps Engineer · Match: 98%</span>
+              </div>
+              <span id="stage-badge-1" class="text-[10px] px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+                Offer Extended
+              </span>
+            </div>
+
+            <!-- Candidate 2 -->
+            <div class="p-3 rounded-xl bg-slate-900/60 border border-white/5 flex items-center justify-between">
+              <div>
+                <span class="font-bold text-white block">Tony Stark</span>
+                <span class="text-[11px] text-slate-400">Principal Systems Architect · Match: 99%</span>
+              </div>
+              <div class="flex items-center gap-1.5">
+                <span id="stage-badge-2" class="text-[10px] px-2 py-0.5 rounded bg-blue-500/20 text-blue-400 border border-blue-500/30">
+                  Final Interview
+                </span>
+                <button onclick="advanceCandidate(2)" class="px-2 py-0.5 rounded bg-purple-500/20 hover:bg-purple-500/40 text-purple-300 text-[10px]">
+                  Advance →
+                </button>
+              </div>
+            </div>
+
+            <!-- Candidate 3 -->
+            <div class="p-3 rounded-xl bg-slate-900/60 border border-white/5 flex items-center justify-between">
+              <div>
+                <span class="font-bold text-white block">Bruce Banner</span>
+                <span class="text-[11px] text-slate-400">Data Science &amp; ML Lead · Match: 95%</span>
+              </div>
+              <div class="flex items-center gap-1.5">
+                <span id="stage-badge-3" class="text-[10px] px-2 py-0.5 rounded bg-amber-500/20 text-amber-400 border border-amber-500/30">
+                  Tech Screening
+                </span>
+                <button onclick="advanceCandidate(3)" class="px-2 py-0.5 rounded bg-purple-500/20 hover:bg-purple-500/40 text-purple-300 text-[10px]">
+                  Advance →
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="text-[11px] font-mono text-slate-500 text-center">
+            Click "Advance →" to simulate automated candidate progression and offer generation.
+          </div>
+        </div>
+
+      </div>
+
+      <!-- System Audit Trail -->
+      <div class="glass-panel rounded-2xl p-5 border border-white/10 font-mono text-xs">
+        <h3 class="font-bold text-white text-sm mb-3 flex items-center gap-2">
+          <i class="fa-solid fa-shield-halved text-purple-400"></i> REAL-TIME SECURITY AUDIT LOG
+        </h3>
+        <div class="space-y-2 text-slate-400">
+          <div class="flex items-center justify-between py-1 border-b border-white/5">
+            <span class="text-emerald-400">[AUTH_SUCCESS]</span>
+            <span>Sandbox session initialized for Peter Parker (Super Admin)</span>
+            <span class="text-slate-500">Just now</span>
+          </div>
+          <div class="flex items-center justify-between py-1 border-b border-white/5">
+            <span class="text-blue-400">[ROUTING]</span>
+            <span>Frontend demo router loaded persona profile without DB requirement</span>
+            <span class="text-slate-500">1 min ago</span>
+          </div>
+          <div class="flex items-center justify-between py-1 border-b border-white/5">
+            <span class="text-purple-400">[PAYROLL]</span>
+            <span>Semi-monthly payroll batch cycle verified for 48 active employees</span>
+            <span class="text-slate-500">5 mins ago</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ========================================== -->
+  <!-- MODAL POPUP SIMULATOR (FAITHFUL TO INDEX.PHP) -->
+  <!-- ========================================== -->
+  <div id="sim-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 modal-backdrop-anim hidden" onclick="if(event.target===this) closeSimulationModal()">
+    <div class="bg-[#0f1423] border border-white/15 rounded-2xl max-w-xl w-full p-6 shadow-2xl relative animate-in fade-in zoom-in duration-200">
+      
+      <!-- Close button -->
+      <button onclick="closeSimulationModal()" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white flex items-center justify-center text-lg transition font-mono">
+        &times;
+      </button>
+
+      <!-- Modal Header -->
+      <div class="flex items-center gap-3.5 mb-5">
+        <div class="w-11 h-11 rounded-xl bg-gradient-to-br from-[#00e07a] to-[#4f8ef7] flex items-center justify-center text-black font-extrabold text-xl shadow-lg shadow-emerald-500/20">
+          🎮
+        </div>
+        <div>
+          <h3 class="text-lg font-bold text-white tracking-tight">Choose Your Login Persona</h3>
+          <p class="text-xs text-slate-400 font-mono">⚡ Instant Sandbox Access · Zero Passwords Required</p>
+        </div>
+      </div>
+
+      <!-- Persona Cards List -->
+      <div class="space-y-3 font-mono">
+        
+        <!-- 👤 Regular Employee View -->
+        <a href="https://respawn-logics-production-fe89.up.railway.app/frontend/dist/index.html?demo=employee#/dashboard" target="_blank" class="block p-4 rounded-xl bg-[#141b2e] hover:bg-[#182138] border border-emerald-500/25 hover:border-emerald-500/60 transition group relative overflow-hidden">
+          <span class="absolute top-3 right-3 text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
+            EMPLOYEE
+          </span>
+          <div class="flex items-start gap-3.5">
+            <div class="w-10 h-10 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center text-lg flex-shrink-0">
+              👤
+            </div>
+            <div>
+              <div class="font-bold text-white text-sm group-hover:text-emerald-400 transition">
+                David Kim <span class="text-xs font-normal text-slate-400">· Frontend Engineer</span>
+              </div>
+              <div class="text-[11px] text-slate-400 mt-0.5">Employee Self-Service (ESS)</div>
+              <p class="text-xs text-slate-300 font-sans mt-1 leading-snug">
+                Clock in/out with live timestamp, file sick &amp; vacation leaves, track remaining credits, and download itemized monthly payslips.
+              </p>
+              <div class="text-xs font-bold text-emerald-400 mt-2 flex items-center gap-1">
+                <span>Launch Regular Employee View</span> <span class="group-hover:translate-x-1 transition-transform">→</span>
+              </div>
+            </div>
+          </div>
+        </a>
+
+        <!-- 👔 Manager / Lead View -->
+        <a href="https://respawn-logics-production-fe89.up.railway.app/frontend/dist/index.html?demo=manager#/dashboard" target="_blank" class="block p-4 rounded-xl bg-[#141b2e] hover:bg-[#182138] border border-blue-500/25 hover:border-blue-500/60 transition group relative overflow-hidden">
+          <span class="absolute top-3 right-3 text-[10px] font-bold px-2 py-0.5 rounded bg-blue-500/10 text-blue-400 border border-blue-500/30">
+            MANAGER
+          </span>
+          <div class="flex items-start gap-3.5">
+            <div class="w-10 h-10 rounded-xl bg-blue-500/10 text-blue-400 flex items-center justify-center text-lg flex-shrink-0">
+              👔
+            </div>
+            <div>
+              <div class="font-bold text-white text-sm group-hover:text-blue-400 transition">
+                Sarah Chen <span class="text-xs font-normal text-slate-400">· Engineering Manager</span>
+              </div>
+              <div class="text-[11px] text-slate-400 mt-0.5">Manager Self-Service (MSS) &amp; Approvals</div>
+              <p class="text-xs text-slate-300 font-sans mt-1 leading-snug">
+                Approve or reject team leave requests, review overtime submissions, inspect department live attendance radar, and manage team shift schedules.
+              </p>
+              <div class="text-xs font-bold text-blue-400 mt-2 flex items-center gap-1">
+                <span>Launch Manager / Lead View</span> <span class="group-hover:translate-x-1 transition-transform">→</span>
+              </div>
+            </div>
+          </div>
+        </a>
+
+        <!-- 🛡️ Platform Super Admin View -->
+        <a href="https://respawn-logics-production-fe89.up.railway.app/frontend/dist/index.html?demo=true#/dashboard" target="_blank" class="block p-4 rounded-xl bg-[#141b2e] hover:bg-[#182138] border border-purple-500/25 hover:border-purple-500/60 transition group relative overflow-hidden">
+          <span class="absolute top-3 right-3 text-[10px] font-bold px-2 py-0.5 rounded bg-purple-500/10 text-purple-400 border border-purple-500/30">
+            SUPER ADMIN
+          </span>
+          <div class="flex items-start gap-3.5">
+            <div class="w-10 h-10 rounded-xl bg-purple-500/10 text-purple-400 flex items-center justify-center text-lg flex-shrink-0">
+              🛡️
+            </div>
+            <div>
+              <div class="font-bold text-white text-sm group-hover:text-purple-400 transition">
+                Peter Parker <span class="text-xs font-normal text-slate-400">· Chief People Officer</span>
+              </div>
+              <div class="text-[11px] text-slate-400 mt-0.5">Platform Executive Command Center</div>
+              <p class="text-xs text-slate-300 font-sans mt-1 leading-snug">
+                Global payroll execution, BIR Form 1601-C tax compliance export, ATS candidate pipeline, tenant RBAC permissions, and system audit trail.
+              </p>
+              <div class="text-xs font-bold text-purple-400 mt-2 flex items-center gap-1">
+                <span>Launch Super Admin View</span> <span class="group-hover:translate-x-1 transition-transform">→</span>
+              </div>
+            </div>
+          </div>
+        </a>
+
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="mt-5 pt-4 border-t border-white/10 flex items-center justify-between text-xs font-mono">
+        <a href="presentation.html" target="_blank" class="text-emerald-400 hover:text-emerald-300 font-bold underline underline-offset-4 flex items-center gap-1.5">
+          <span>★</span> Open Presentation Slide Deck
+        </a>
+        <span class="text-slate-500">Press ESC or click outside to dismiss</span>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- INTERACTIVE SCRIPTS -->
+  <script>
+    // Tab Switching
+    function switchTab(tabId) {
+      const views = ['webpage', 'employee', 'manager', 'admin'];
+      views.forEach(v => {
+        const sec = document.getElementById('view-' + v);
+        const btn = document.getElementById('tab-' + v);
+        if (v === tabId) {
+          sec.classList.remove('hidden');
+          btn.classList.add('active');
+        } else {
+          sec.classList.add('hidden');
+          btn.classList.remove('active');
+        }
+      });
+    }
+
+    // Modal Simulation Controls
+    function openSimulationModal() {
+      const modal = document.getElementById('sim-modal');
+      modal.classList.remove('hidden');
+    }
+    function closeSimulationModal() {
+      const modal = document.getElementById('sim-modal');
+      modal.classList.add('hidden');
+    }
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeSimulationModal();
+    });
+
+    // Employee Time Clock Widget Logic
+    let isClockedIn = true;
+    let clockSeconds = 41 * 60 + 22; // starting elapsed
+    setInterval(() => {
+      const now = new Date();
+      document.getElementById('live-time-display').innerText = now.toLocaleTimeString();
+      if (isClockedIn) {
+        clockSeconds++;
+        const hrs = Math.floor(clockSeconds / 3600);
+        const mins = Math.floor((clockSeconds % 3600) / 60);
+        const secs = clockSeconds % 60;
+        document.getElementById('elapsed-time').innerText = `Elapsed: ${hrs}h ${mins}m ${secs}s`;
+      }
+    }, 1000);
+
+    function toggleClockInOut() {
+      isClockedIn = !isClockedIn;
+      const statusPill = document.getElementById('emp-clock-status');
+      const toggleBtn = document.getElementById('clock-toggle-btn');
+      const hint = document.getElementById('clock-log-hint');
+
+      if (isClockedIn) {
+        statusPill.innerText = 'CLOCKED IN';
+        statusPill.className = 'text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30';
+        toggleBtn.innerHTML = '<i class="fa-solid fa-power-off"></i> <span>CLOCK OUT FOR THE DAY</span>';
+        toggleBtn.className = 'w-full py-2.5 rounded-xl font-bold font-mono text-xs transition flex items-center justify-center gap-2 bg-rose-500/20 hover:bg-rose-500/30 text-rose-400 border border-rose-500/30';
+        hint.innerText = 'Punched back in at ' + new Date().toLocaleTimeString();
+      } else {
+        statusPill.innerText = 'CLOCKED OUT';
+        statusPill.className = 'text-[10px] font-mono px-2 py-0.5 rounded-full bg-slate-500/20 text-slate-400 border border-slate-500/30';
+        toggleBtn.innerHTML = '<i class="fa-solid fa-play"></i> <span>CLOCK IN NOW</span>';
+        toggleBtn.className = 'w-full py-2.5 rounded-xl font-bold font-mono text-xs transition flex items-center justify-center gap-2 bg-emerald-500 hover:bg-emerald-400 text-black shadow-lg shadow-emerald-500/20';
+        hint.innerText = 'Punched out at ' + new Date().toLocaleTimeString();
+      }
+    }
+
+    // Leave Filing Logic
+    let vacBal = 12.0;
+    let sickBal = 8.0;
+    function handleLeaveSubmit(e) {
+      e.preventDefault();
+      const type = document.getElementById('leave-type-select').value;
+      if (type === 'Vacation' && vacBal >= 1) {
+        vacBal -= 1;
+        document.getElementById('vacation-balance').innerText = vacBal.toFixed(1);
+      } else if (type === 'Sick' && sickBal >= 1) {
+        sickBal -= 1;
+        document.getElementById('sick-balance').innerText = sickBal.toFixed(1);
+      }
+      const toast = document.getElementById('leave-submit-toast');
+      toast.classList.remove('hidden');
+      setTimeout(() => toast.classList.add('hidden'), 3500);
+      document.getElementById('leave-reason-input').value = '';
+    }
+
+    // Payslip Download Simulation
+    function simulateDownloadPayslip() {
+      const toast = document.getElementById('payslip-toast');
+      toast.classList.remove('hidden');
+      setTimeout(() => toast.classList.add('hidden'), 3500);
+    }
+
+    // Manager Leave Queue Logic
+    let pendingCount = 3;
+    function decideLeave(cardId, action) {
+      const card = document.getElementById('req-card-' + cardId);
+      if (!card) return;
+      pendingCount = Math.max(0, pendingCount - 1);
+      document.getElementById('pending-badge-count').innerText = pendingCount + ' Pending';
+
+      if (action === 'Approved') {
+        card.innerHTML = `
+          <div class="flex items-center justify-between w-full py-1 text-emerald-400">
+            <span class="flex items-center gap-2 font-bold">✓ Request #${cardId} has been Approved</span>
+            <span class="text-[10px] text-slate-400">Logged to Payroll System</span>
+          </div>
+        `;
+        card.classList.add('border-emerald-500/40', 'bg-emerald-950/20');
+      } else {
+        card.innerHTML = `
+          <div class="flex items-center justify-between w-full py-1 text-rose-400">
+            <span class="flex items-center gap-2 font-bold">✕ Request #${cardId} has been Rejected</span>
+            <span class="text-[10px] text-slate-400">Notification sent to employee</span>
+          </div>
+        `;
+        card.classList.add('border-rose-500/40', 'bg-rose-950/20');
+      }
+    }
+
+    function batchApproveAll() {
+      [1, 2, 3].forEach(id => decideLeave(id, 'Approved'));
+    }
+
+    // Super Admin BIR 1601-C Calculation Logic
+    function calculateBIR() {
+      const gross = parseFloat(document.getElementById('gross-slider').value);
+      document.getElementById('slider-gross-display').innerText = '₱' + gross.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      
+      const statutory = gross * 0.075;
+      const taxable = gross - statutory;
+      const taxWithheld = taxable * 0.16; // approximate aggregate graduated rate
+
+      document.getElementById('statutory-display').innerText = '₱' + statutory.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      document.getElementById('tax-due-display').innerText = '₱' + taxWithheld.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+
+    // ATS Candidate Progression Logic
+    function advanceCandidate(id) {
+      const badge = document.getElementById('stage-badge-' + id);
+      if (id === 2) {
+        badge.innerText = 'Offer Extended';
+        badge.className = 'text-[10px] px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30';
+      } else if (id === 3) {
+        badge.innerText = 'Final Interview';
+        badge.className = 'text-[10px] px-2 py-0.5 rounded bg-blue-500/20 text-blue-400 border border-blue-500/30';
+      }
+    }
+  </script>
+</body>
+</html>
