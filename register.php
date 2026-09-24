@@ -168,6 +168,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                     <?= renderLogo('centered') ?>
                     <h1 class="text-center">Register Your Company</h1>
                     <p class="text-center">Create a dedicated workspace for your organization in seconds.</p>
+                    <div style="background: rgba(0, 224, 122, 0.1); border: 1px solid rgba(0, 224, 122, 0.3); border-radius: 8px; padding: 12px; margin: 16px 0; text-align: center;">
+                        <div style="color: #00e07a; font-weight: 700; font-size: 0.85rem; font-family: monospace;">⚡ PRESENTATION / DEMO MODE</div>
+                        <div style="font-size: 0.8rem; color: #c8d0e0; margin: 4px 0 8px;">No need to create an account or set a password to evaluate.</div>
+                        <a href="frontend/dist/index.html?demo=true#/dashboard" style="display: inline-block; background: #00e07a; color: #000; font-weight: 700; font-size: 0.8rem; padding: 6px 16px; border-radius: 6px; text-decoration: none;">
+                            Launch Instant Demo (Zero Password) →
+                        </a>
+                    </div>
                 </div>
 
                 <?php if (!empty($error)): ?>

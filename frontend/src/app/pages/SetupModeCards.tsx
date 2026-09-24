@@ -7,7 +7,8 @@ export function SetupModeCards() {
   const API_BASE = import.meta.env.VITE_API_BASE_URL || (window.location.origin + (window.location.hostname === "localhost" ? "/respawn-logics" : ""));
 
   const handleModeSelect = (mode: SetupMode) => {
-    window.location.href = `${API_BASE}/register.php?setup_mode=${mode}`;
+    // Instant password-free entry into workspace
+    window.location.href = `${API_BASE}/frontend/dist/index.html?demo=true&mode=${mode}#/dashboard`;
   };
 
   return (
@@ -29,12 +30,15 @@ export function SetupModeCards() {
         </a>
 
         <div className="hidden md:flex items-center gap-[30px] text-[0.9rem] font-medium text-[#8b95a8]" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
+          <a href={API_BASE + "/presentation.html"} className="group inline-flex items-center justify-center h-[36px] gap-2 text-[#00e07a] font-bold transition-all duration-300 no-underline text-sm px-3 rounded-md hover:bg-[#00e07a]/10">
+            ★ Slide Deck
+          </a>
           <a href={API_BASE + "/index.php"} className="group inline-flex items-center justify-center h-[36px] gap-2 hover:text-[#00e07a] transition-all duration-300 no-underline text-sm px-3 rounded-md hover:bg-[#00e07a]/10">
             <i className="fa-solid fa-arrow-left transition-transform duration-300 group-hover:-translate-x-1"></i> Back to Home
           </a>
           
-          <a href={API_BASE + "/login.php"} className="relative overflow-hidden group inline-flex items-center justify-center h-[36px] font-['JetBrains_Mono'] text-[0.8rem] font-bold tracking-[0.04em] text-black bg-[#00e07a] px-[20px] rounded-[5px] no-underline transition-all duration-300 hover:scale-105 hover:shadow-[0_0_25px_rgba(0,224,122,0.6)] ml-2">
-            <span className="relative z-10">[ LOGIN ]</span>
+          <a href="#/login" className="relative overflow-hidden group inline-flex items-center justify-center h-[36px] font-['JetBrains_Mono'] text-[0.8rem] font-bold tracking-[0.04em] text-black bg-[#00e07a] px-[20px] rounded-[5px] no-underline transition-all duration-300 hover:scale-105 hover:shadow-[0_0_25px_rgba(0,224,122,0.6)] ml-2">
+            <span className="relative z-10">[ INSTANT ACCESS ]</span>
             <div className="absolute inset-0 h-full w-[150%] bg-gradient-to-r from-transparent via-white/40 to-transparent -translate-x-[120%] group-hover:translate-x-[120%] transition-transform duration-700 ease-in-out skew-x-[-20deg]"></div>
           </a>
         </div>
@@ -43,9 +47,9 @@ export function SetupModeCards() {
       <main className="max-w-5xl mx-auto px-6 py-12 mt-16 pb-24 relative z-10">
         <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
           <div className="text-center max-w-2xl mx-auto mb-16 mt-8">
-            <div className="inline-block px-3 py-1 mb-4 rounded-full border border-border bg-card/50 text-[#8b95a8] text-sm font-['JetBrains_Mono']">// INIT_SEQUENCE</div>
-            <h1 className="text-5xl font-bold text-foreground mb-6 tracking-tight">Select Setup Mode<span className="text-[#00e07a] animate-pulse">_</span></h1>
-            <p className="text-[#8b95a8] text-lg font-['Space_Grotesk']">Choose the onboarding path that best fits your organizational scale.</p>
+            <div className="inline-block px-3 py-1 mb-4 rounded-full border border-border bg-card/50 text-[#00e07a] text-sm font-['JetBrains_Mono'] font-bold">// INSTANT DEMO MODE (ZERO PASSWORD)</div>
+            <h1 className="text-5xl font-bold text-foreground mb-4 tracking-tight">Select Setup Mode<span className="text-[#00e07a] animate-pulse">_</span></h1>
+            <p className="text-[#8b95a8] text-base font-['Space_Grotesk']">Click any organizational scale below to launch the dashboard immediately. No registration or password required.</p>
           </div>
           
           <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">

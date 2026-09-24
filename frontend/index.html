@@ -27,12 +27,57 @@
       })();
     </script>
     <script>
-      /* DEMO MODE — pure front-end sandbox. When ?demo=true, intercept every API call so nothing
-         reaches the backend (no auth, no DB, no security). In-memory SAMPLE data; refresh resets. */
+      /* DEMO MODE — pure front-end sandbox. Allows instant presentation without database credentials. */
       (function () {
-        if (window.location.href.indexOf('demo=true') === -1) return;
+        var href = window.location.href;
+        var isDemoParam = /demo=(true|employee|manager|admin)/.test(href) || /role=(employee|manager|admin)/.test(href);
+        var storedDemo = localStorage.getItem('respawn_demo_mode') === 'true' || localStorage.getItem('respawn_demo_persona');
+        var isDemo = isDemoParam || !!storedDemo || location.hostname.includes('railway.app') || location.search.indexOf('demo') !== -1;
+        if (!isDemo) return;
+
         var realFetch = window.fetch ? window.fetch.bind(window) : null;
-        var U = { id:0, name:'Peter Parker', full_name:'Peter Parker', email:'demo@respawn.logics', roles:['Super_Admin'], permissions:['manage_tenant','view_reports','manage_users'] };
+        var persona = 'admin';
+        if (href.indexOf('demo=employee') > -1 || href.indexOf('role=employee') > -1 || localStorage.getItem('respawn_demo_persona') === 'employee') {
+          persona = 'employee';
+        } else if (href.indexOf('demo=manager') > -1 || href.indexOf('role=manager') > -1 || localStorage.getItem('respawn_demo_persona') === 'manager') {
+          persona = 'manager';
+        }
+
+        var U = (persona === 'employee') ? {
+          id: 2,
+          name: 'David Kim',
+          full_name: 'David Kim',
+          email: 'david@respawn.logics',
+          roles: ['Employee'],
+          role: 'Employee',
+          job_title: 'Frontend Engineer',
+          permissions: ['leave.request', 'attendance.view'],
+          tenant_id: 1,
+          employment_status: 'Active'
+        } : (persona === 'manager') ? {
+          id: 1,
+          name: 'Sarah Chen',
+          full_name: 'Sarah Chen',
+          email: 'sarah@respawn.logics',
+          roles: ['Manager'],
+          role: 'Manager',
+          job_title: 'Engineering Manager',
+          permissions: ['leave.request', 'leave.view', 'attendance.view', 'users.view', 'shifts.manage', 'performance.manage', 'ats.view', 'analytics.view'],
+          tenant_id: 1,
+          employment_status: 'Active'
+        } : {
+          id: 999,
+          name: 'Peter Parker',
+          full_name: 'Peter Parker',
+          email: 'demo@respawn.logics',
+          roles: ['Super_Admin'],
+          role: 'Super_Admin',
+          is_super: true,
+          job_title: 'Chief People Officer & Super Admin',
+          permissions: ['manage_tenant', 'view_reports', 'manage_users', 'users.view', 'users.manage', 'settings.manage', 'payroll.manage', 'ats.view', 'ats.edit', 'elr.view', 'performance.manage', 'attendance.view', 'leave.view', 'audit.view'],
+          tenant_id: 1,
+          employment_status: 'Active'
+        };
         var EMP = [
           {id:0, name:'Peter Parker', full_name:'Peter Parker', email:'demo@respawn.logics', department:'Executive', position:'Chief Executive Officer', status:'Active', hire_date:'2020-01-01', base_salary:250000, roles:['Super_Admin']},
           {id:1, name:'Tony Stark', full_name:'Tony Stark', email:'tony@respawn.logics', department:'Engineering', position:'Head of Engineering', status:'Active', hire_date:'2021-03-15', base_salary:210000, roles:['Platform_Admin']},
@@ -95,8 +140,7 @@
         };
         function env(rows, key){ var o = { success:true, csrf_token:'demo', data:rows, items:rows, results:rows, records:rows, list:rows, rows:rows, total:rows.length, count:rows.length }; if (key) o[key]=rows; return o; }
         function route(url){
-          var u = url.toLowerCase();
-          if (u.indexOf('current_user')>-1) return { success:true, user:U, csrf_token:'demo' };
+          if (u.indexOf('current_user')>-1 || u.indexOf('action=login')>-1 || u.indexOf('route=auth')>-1) return { success:true, user:U, csrf_token:'demo' };
           if (u.indexOf('csrf')>-1) return { success:true, csrf_token:'demo' };
           // ATS — must come before generic employee/dashboard checks
           if (/candidate|route=candidates/.test(u)) {

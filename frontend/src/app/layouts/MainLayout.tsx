@@ -4,6 +4,7 @@ import { Outlet, useNavigate, useLocation } from "react-router-dom";
 import { Sidebar } from "../components/Sidebar";
 import type { ViewState, SidebarBadges } from "../components/Sidebar";
 import { viewStateToPath } from "../lib/atsNav";
+import { useAuth } from "../context/AuthContext";
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || (window.location.origin + (window.location.hostname === "localhost" ? "/respawn-logics" : ""));
 const API = `${API_BASE}/api/index.php?route=candidates`;
@@ -11,6 +12,7 @@ const API = `${API_BASE}/api/index.php?route=candidates`;
 export default function MainLayout() {
   const navigate = useNavigate();
   const location = useLocation();
+  const { user, switchPersona } = useAuth();
 
   // Map react-router location to the old ViewState for the Sidebar compatibility
   const getActiveViewFromPath = (): ViewState => {
@@ -179,6 +181,66 @@ export default function MainLayout() {
         />
       )}
       <main className="flex-1 flex flex-col min-w-0 overflow-hidden relative z-10 bg-background">
+        {/* Top Presentation / Persona HUD Banner */}
+        <div className="bg-[#0b0f19] border-b border-white/[0.08] px-4 py-2 flex flex-wrap items-center justify-between gap-2 text-xs flex-shrink-0 z-20">
+          <div className="flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-[#00e07a] animate-pulse"></span>
+            <span className="font-mono text-[11px] text-slate-300">
+              Active Persona: <strong className="text-white">{user?.name || 'Peter Parker'}</strong>
+              <span className="text-slate-400 ml-1">({user?.job_title || 'Chief People Officer'})</span>
+            </span>
+            <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-[#00e07a]/10 text-[#00e07a] border border-[#00e07a]/30">
+              {user?.role || (user?.roles && user?.roles[0]) || 'Admin'}
+            </span>
+          </div>
+          <div className="flex items-center gap-1.5 flex-wrap">
+            <span className="text-[11px] text-slate-400 font-mono hidden md:inline">Switch Role (No Password):</span>
+            <button
+              type="button"
+              onClick={() => switchPersona('employee')}
+              title="Switch to Regular Employee View"
+              className={`px-2.5 py-1 rounded text-[11px] font-mono font-medium transition cursor-pointer ${
+                user?.name === 'David Kim' || user?.role === 'Employee'
+                  ? 'bg-[#00e07a] text-black font-bold shadow-[0_0_12px_rgba(0,224,122,0.4)]'
+                  : 'bg-white/5 text-slate-300 hover:bg-white/10 hover:text-white border border-white/5'
+              }`}
+            >
+              👤 Employee (David Kim)
+            </button>
+            <button
+              type="button"
+              onClick={() => switchPersona('manager')}
+              title="Switch to Manager View"
+              className={`px-2.5 py-1 rounded text-[11px] font-mono font-medium transition cursor-pointer ${
+                user?.name === 'Sarah Chen' || user?.role === 'Manager'
+                  ? 'bg-[#4f8ef7] text-white font-bold shadow-[0_0_12px_rgba(79,142,247,0.4)]'
+                  : 'bg-white/5 text-slate-300 hover:bg-white/10 hover:text-white border border-white/5'
+              }`}
+            >
+              👔 Manager (Sarah Chen)
+            </button>
+            <button
+              type="button"
+              onClick={() => switchPersona('admin')}
+              title="Switch to Super Admin View"
+              className={`px-2.5 py-1 rounded text-[11px] font-mono font-medium transition cursor-pointer ${
+                user?.name === 'Peter Parker' || user?.role === 'Super_Admin'
+                  ? 'bg-[#9b6dff] text-white font-bold shadow-[0_0_12px_rgba(155,109,255,0.4)]'
+                  : 'bg-white/5 text-slate-300 hover:bg-white/10 hover:text-white border border-white/5'
+              }`}
+            >
+              🛡️ Admin (Peter Parker)
+            </button>
+            <a
+              href={`${API_BASE}/presentation.html`}
+              target="_blank"
+              rel="noreferrer"
+              className="ml-1 px-2.5 py-1 rounded text-[11px] font-mono font-bold bg-amber-500/15 text-amber-400 border border-amber-500/30 hover:bg-amber-500 hover:text-black transition flex items-center gap-1"
+            >
+              ★ Slide Deck
+            </a>
+          </div>
+        </div>
         <Outlet context={{ setBadges }} />
       </main>
     </div>
