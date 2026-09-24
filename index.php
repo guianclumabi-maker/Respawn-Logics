@@ -2817,11 +2817,7 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
         <a href="#why">Why Us</a>
         <a href="#story">The Story</a>
         <a href="#beta">Beta</a>
-        <?php if ($loggedIn): ?>
-            <a href="<?= url('/frontend/dist/index.html?v=<?= time() ?>#/dashboard') ?>" class="nav-cta">[ RESUME ]</a>
-        <?php else: ?>
-            <a href="<?= url('/frontend/dist/index.html?demo=true#/dashboard') ?>" class="nav-cta" style="background: linear-gradient(135deg, #00e07a, #00b8ff); color: #000; font-weight: 800;">[ ⚡ INSTANT ACCESS ]</a>
-        <?php endif; ?>
+        <button type="button" onclick="openLoginModal()" class="nav-cta" style="background: linear-gradient(135deg, var(--green), #00b8ff); color: #000; font-weight: 800; border: none; cursor: pointer;">[ LOG IN ]</button>
     </div>
 </nav>
 
@@ -2845,21 +2841,15 @@ $loggedIn = isLoggedIn() && (!isset($_SESSION['must_change_password']) || $_SESS
             </p>
 
             <div class="hero-actions-new">
-                <?php if ($loggedIn): ?>
-                    <a href="<?= url('/frontend/dist/index.html?v=' . time() . '#/dashboard') ?>" class="btn-neon-pill">
-                        Resume Session <i data-lucide="arrow-right"></i>
-                    </a>
-                <?php else: ?>
-                    <a href="<?= url('/frontend/dist/index.html?demo=true#/dashboard') ?>" class="btn-neon-pill">
-                        ⚡ Instant Access (No Password) <i data-lucide="arrow-right"></i>
-                    </a>
-                    <a href="presentation.html" class="btn-outline-pill" style="border-color: rgba(0, 224, 122, 0.4); color: var(--green);">
-                        📊 Presentation Deck
-                    </a>
-                    <a href="<?= url('/frontend/dist/index.html?demo=manager#/dashboard') ?>" class="btn-outline-pill">
-                        👔 Manager Demo
-                    </a>
-                <?php endif; ?>
+                <button type="button" onclick="openLoginModal()" class="btn-neon-pill" style="cursor: pointer;">
+                    ⚡ Instant Demo Access <i data-lucide="arrow-right"></i>
+                </button>
+                <button type="button" onclick="openLoginModal()" class="btn-outline-pill" style="cursor: pointer;">
+                    👥 Select Persona (No Password)
+                </button>
+                <a href="presentation.html" class="btn-outline-pill" style="border-color: rgba(0, 224, 122, 0.4); color: var(--green);">
+                    📊 Presentation Deck
+                </a>
             </div>
         </div>
     </div>
@@ -4281,6 +4271,298 @@ window.addEventListener('scroll', () => {
             dot.style.boxShadow = '0 0 12px var(--green)';
         }
     }
+});
+</script>
+
+<!-- ─── LOGIN PERSONA MODAL POPUP ─── -->
+<style>
+.login-modal-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 999999;
+    background: rgba(5, 8, 16, 0.88);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px 16px;
+    animation: modalOverlayFade 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+@keyframes modalOverlayFade {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+.login-modal-container {
+    background: #0d121f;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 20px;
+    max-width: 640px;
+    width: 100%;
+    padding: 32px;
+    position: relative;
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.85), 0 0 50px rgba(0, 224, 122, 0.12);
+    max-height: 92vh;
+    overflow-y: auto;
+    animation: modalContentPop 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+@keyframes modalContentPop {
+    from { opacity: 0; transform: scale(0.95) translateY(10px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+}
+.login-modal-close-btn {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: 1px solid rgba(255,255,255,0.1);
+    background: rgba(255,255,255,0.04);
+    color: var(--text-dim);
+    font-size: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    line-height: 1;
+}
+.login-modal-close-btn:hover {
+    background: rgba(255,255,255,0.12);
+    color: #fff;
+    transform: rotate(90deg);
+}
+.login-modal-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 24px;
+}
+.login-modal-logo {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, var(--green), #00b8ff);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #000;
+    font-size: 22px;
+    box-shadow: 0 8px 24px rgba(0,224,122,0.3);
+    flex-shrink: 0;
+}
+.login-role-card {
+    display: block;
+    background: rgba(255, 255, 255, 0.025);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 14px;
+    padding: 18px 20px;
+    margin-bottom: 12px;
+    text-decoration: none;
+    color: inherit;
+    transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+    position: relative;
+    overflow: hidden;
+}
+.login-role-card:hover {
+    transform: translateY(-2px);
+    background: rgba(255, 255, 255, 0.045);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+.login-role-card.c-emp:hover { border-color: rgba(0, 224, 122, 0.5); box-shadow: 0 8px 30px rgba(0, 224, 122, 0.15); }
+.login-role-card.c-mgr:hover { border-color: rgba(79, 142, 247, 0.5); box-shadow: 0 8px 30px rgba(79, 142, 247, 0.15); }
+.login-role-card.c-adm:hover { border-color: rgba(155, 109, 255, 0.5); box-shadow: 0 8px 30px rgba(155, 109, 255, 0.15); }
+
+.role-badge-tag {
+    position: absolute;
+    top: 14px;
+    right: 16px;
+    font-family: var(--mono);
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    padding: 3px 8px;
+    border-radius: 4px;
+}
+.role-inner-layout {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+}
+.role-icon-box {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+.role-body {
+    flex: 1;
+    min-width: 0;
+}
+.role-name-title {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 2px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.role-sub-pill {
+    font-size: 0.75rem;
+    color: var(--text-dim);
+    font-family: var(--mono);
+    margin-bottom: 6px;
+}
+.role-summary-p {
+    font-size: 0.8rem;
+    color: var(--text-mid);
+    line-height: 1.45;
+    margin-bottom: 8px;
+}
+.role-launch-action {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    transition: transform 0.2s;
+}
+.login-role-card:hover .role-launch-action {
+    transform: translateX(4px);
+}
+.modal-footer-nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 20px;
+    padding-top: 16px;
+    border-top: 1px solid rgba(255,255,255,0.07);
+    font-family: var(--mono);
+    font-size: 0.75rem;
+}
+</style>
+
+<div id="loginModal" class="login-modal-overlay" style="display: none;" onclick="if(event.target===this) closeLoginModal()">
+    <div class="login-modal-container">
+        <button type="button" onclick="closeLoginModal()" class="login-modal-close-btn" aria-label="Close modal">&times;</button>
+        
+        <div class="login-modal-header">
+            <div class="login-modal-logo">
+                <i class="fa-solid fa-gamepad"></i>
+            </div>
+            <div>
+                <h3 style="color: #fff; font-size: 1.3rem; font-weight: 800; margin-bottom: 3px; font-family: var(--sans);">
+                    Choose Your Login Persona
+                </h3>
+                <p style="color: var(--text-dim); font-size: 0.8rem; font-family: var(--mono);">
+                    ⚡ Instant Sandbox Access · No Passwords Required
+                </p>
+            </div>
+        </div>
+
+        <div class="login-modal-cards-list">
+            <!-- 👤 Regular Employee View -->
+            <a href="https://respawn-logics-production-fe89.up.railway.app/frontend/dist/index.html?demo=employee#/dashboard" class="login-role-card c-emp" target="_blank">
+                <span class="role-badge-tag" style="background: rgba(0,224,122,0.1); color: var(--green); border: 1px solid rgba(0,224,122,0.25);">EMPLOYEE</span>
+                <div class="role-inner-layout">
+                    <div class="role-icon-box" style="background: rgba(0,224,122,0.12); color: var(--green);">
+                        👤
+                    </div>
+                    <div class="role-body">
+                        <div class="role-name-title">
+                            David Kim <span style="font-size:0.75rem; font-weight:400; color:var(--text-dim);">· Frontend Engineer</span>
+                        </div>
+                        <div class="role-sub-pill">Employee Self-Service (ESS)</div>
+                        <div class="role-summary-p">
+                            Clock in/out with live timestamp, file sick & vacation leaves, track remaining credits, and download itemized monthly payslips.
+                        </div>
+                        <div class="role-launch-action" style="color: var(--green);">
+                            Launch Regular Employee View →
+                        </div>
+                    </div>
+                </div>
+            </a>
+
+            <!-- 👔 Manager / Lead View -->
+            <a href="https://respawn-logics-production-fe89.up.railway.app/frontend/dist/index.html?demo=manager#/dashboard" class="login-role-card c-mgr" target="_blank">
+                <span class="role-badge-tag" style="background: rgba(79,142,247,0.1); color: var(--blue); border: 1px solid rgba(79,142,247,0.25);">MANAGER</span>
+                <div class="role-inner-layout">
+                    <div class="role-icon-box" style="background: rgba(79,142,247,0.12); color: var(--blue);">
+                        👔
+                    </div>
+                    <div class="role-body">
+                        <div class="role-name-title">
+                            Sarah Chen <span style="font-size:0.75rem; font-weight:400; color:var(--text-dim);">· Engineering Manager</span>
+                        </div>
+                        <div class="role-sub-pill">Manager Self-Service (MSS) &amp; Approvals</div>
+                        <div class="role-summary-p">
+                            Approve or reject team leave requests, review overtime submissions, inspect department live attendance radar, and manage team shift schedules.
+                        </div>
+                        <div class="role-launch-action" style="color: var(--blue);">
+                            Launch Manager / Lead View →
+                        </div>
+                    </div>
+                </div>
+            </a>
+
+            <!-- 🛡️ Platform Super Admin View -->
+            <a href="https://respawn-logics-production-fe89.up.railway.app/frontend/dist/index.html?demo=true#/dashboard" class="login-role-card c-adm" target="_blank">
+                <span class="role-badge-tag" style="background: rgba(155,109,255,0.1); color: var(--purple); border: 1px solid rgba(155,109,255,0.25);">SUPER ADMIN</span>
+                <div class="role-inner-layout">
+                    <div class="role-icon-box" style="background: rgba(155,109,255,0.12); color: var(--purple);">
+                        🛡️
+                    </div>
+                    <div class="role-body">
+                        <div class="role-name-title">
+                            Peter Parker <span style="font-size:0.75rem; font-weight:400; color:var(--text-dim);">· Chief People Officer</span>
+                        </div>
+                        <div class="role-sub-pill">Platform Executive Command Center</div>
+                        <div class="role-summary-p">
+                            Global payroll execution, BIR Form 1601-C tax compliance export, ATS candidate pipeline, tenant RBAC permissions, and system audit trail.
+                        </div>
+                        <div class="role-launch-action" style="color: var(--purple);">
+                            Launch Super Admin View →
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <div class="modal-footer-nav">
+            <a href="presentation.html" target="_blank" style="color: var(--green); text-decoration: underline; text-underline-offset: 3px; font-weight: 700;">
+                ★ Open Interactive Slide Deck
+            </a>
+            <span style="color: var(--text-dim);">ESC or click outside to close</span>
+        </div>
+    </div>
+</div>
+
+<script>
+function openLoginModal() {
+    var modal = document.getElementById('loginModal');
+    if (modal) {
+        modal.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+    }
+}
+function closeLoginModal() {
+    var modal = document.getElementById('loginModal');
+    if (modal) {
+        modal.style.display = 'none';
+        document.body.style.overflow = '';
+    }
+}
+window.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') closeLoginModal();
 });
 </script>
 </body>

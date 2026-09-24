@@ -29,8 +29,12 @@ const originalFetch = window.fetch;
 const API_BASE = import.meta.env.VITE_API_BASE_URL || "";
 window.fetch = async (...args) => {
   const urlString = typeof args[0] === 'string' ? args[0] : (args[0] instanceof Request ? args[0].url : '');
+  const isDemo = /demo=(true|employee|manager|admin)/.test(window.location.href) ||
+                 /role=(employee|manager|admin)/.test(window.location.href) ||
+                 !!localStorage.getItem('respawn_demo_persona') ||
+                 window.location.hostname.includes('railway.app');
   
-  if (window.location.href.includes('demo=true')) {
+  if (isDemo) {
     const mockData = getMockResponse(urlString);
     if (mockData) {
       return new Response(JSON.stringify(mockData), {
@@ -40,17 +44,31 @@ window.fetch = async (...args) => {
     }
   }
 
-  const response = await originalFetch(...args);
-  if (response.status === 401) {
-    const url = urlString;
-    // Ignore 401s for initial auth/csrf checks to prevent immediate lockout
-    if (!url.includes('action=current_user') && !url.includes('action=csrf') && !url.includes('action=login') && !url.includes('action=exchange_token')) {
-      if (!window.location.href.includes('demo=true')) {
-        window.location.hash = '#/login';
+  try {
+    const response = await originalFetch(...args);
+    if (response.status === 401) {
+      const url = urlString;
+      // Ignore 401s for initial auth/csrf checks to prevent immediate lockout
+      if (!url.includes('action=current_user') && !url.includes('action=csrf') && !url.includes('action=login') && !url.includes('action=exchange_token')) {
+        if (!isDemo) {
+          window.location.hash = '#/login';
+        }
       }
     }
+    return response;
+  } catch (err) {
+    // If network fails (e.g. Railway without MySQL), mock fallback if possible
+    if (isDemo) {
+      const fallbackMock = getMockResponse(urlString);
+      if (fallbackMock) {
+        return new Response(JSON.stringify(fallbackMock), {
+          status: 200,
+          headers: { 'Content-Type': 'application/json' }
+        });
+      }
+    }
+    throw err;
   }
-  return response;
 };
 
 // ── PHP legacy link interceptor ───────────────────────────────────────
